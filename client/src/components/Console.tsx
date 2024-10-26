@@ -1,0 +1,101 @@
+import { Card, Title, Text, Grid, Col, DateRangePicker, Metric, Subtitle, Bold, Italic, Select, SelectItem, TabGroup, TabList, Tab, DateRangePickerItem, DateRangePickerValue } from "@tremor/react";
+import { useState, useMemo } from "react";
+
+export default function Fatturato() {
+
+    const today = new Date(Date.now());
+    const [groupKey, setGroupKey] = useState("1");
+    const [selectedView, setSelectedView] = useState(0);
+    return (
+        <main>
+            <Title>Dashboard</Title>
+            <Text>Explore Kiruna</Text>
+            <TabGroup className="mt-6" onIndexChange={(index) => { setSelectedView(index) }}>
+                <TabList>
+                    <Tab>
+                        Map
+                    </Tab>
+                    <Tab>
+                        Insights
+                    </Tab>
+                    <Tab>
+                        Notes
+                    </Tab>
+                </TabList>
+            </TabGroup>
+            <Grid numItemsLg={6} className="gap-6 mt-6">
+                <Col numColSpanLg={5}>
+                    <Card className="h-full">
+                        {renderCurrentSelection(selectedView)}
+                    </Card>
+                </Col>
+
+                <Col numColSpanLg={1}>
+                    <div className="space-y-6">
+                        <Card>
+                            <Text>Seleziona</Text>
+                            <Select
+                                className="mt-2" value={groupKey} onValueChange={setGroupKey}
+                            >
+                                <SelectItem value="1">
+                                    1
+                                </SelectItem>
+                                <SelectItem value="2">
+                                    2
+                                </SelectItem>
+                                <SelectItem value="3">
+                                    3
+                                </SelectItem>
+                                <SelectItem value="4">
+                                    4
+                                </SelectItem>
+                                <SelectItem value="5">
+                                    5
+                                </SelectItem>
+                            </Select>
+                        </Card>
+                        <Card>
+                            Prova
+                        </Card>
+                        <Card>
+                            <Metric>CHF 1,995</Metric>
+                            <Title>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Title>
+                            <Subtitle>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Subtitle>
+                            <Text>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Text>
+                            <Text>Drei Weieren is an <Bold>oasis of peace</Bold> in the middle of <Italic>St.Gallen.</Italic></Text>
+                        </Card>
+                    </div>
+                </Col>
+              
+            </Grid>
+            <Card className="mt-6">
+               <>
+               Bottom diagram
+               </>
+            </Card>
+        </main >
+    );
+    function renderCurrentSelection(selectedView: number = 0) {
+        switch (selectedView) {
+            case 0:
+                return (
+                    <>
+                        <Card> Pag 1</Card>
+                    </>
+                );
+            case 1:
+                return (
+                    <>
+                        <Card>Pag 2</Card>
+                    </>
+                );
+            case 2:
+                return (
+                    <>
+                        <Card>Pag 3</Card>
+                    </>
+                );
+        }
+
+    }
+}
