@@ -1,5 +1,5 @@
-# polito-se2-18
-Software Engineering 2 - Kiruna Explorer
+# polito-se2-24-Kiruna-eXplorer-18
+Software Engineering 2 - main project - Kiruna eXplorer - group 18
 
 [Prod](kiruna.veebor.dev) - [![Build Status](https://travis-ci.com/veebor/polito-se2-18.svg?branch=master)](https://travis-ci.com/veebor/polito-se2-18)
 [Beta](kx-beta.veebor.dev) - [![Build Status](https://travis-ci.com/veebor/polito-se2-18.svg?branch=dev)](https://travis-ci.com/veebor/polito-se2-18)
