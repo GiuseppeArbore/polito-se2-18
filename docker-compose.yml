@@ -11,11 +11,14 @@ services:
       context: ./server
     ports:
       - "3001:3001"
-    volumes:
-      - ./server/src/db:/app/src/db
     networks:
       - kiruna-x
-
+  db:
+    image: "mongo:latest"
+    ports:
+      - "27017:27017"
+    networks:
+      - kiruna-x
 networks:
   kiruna-x:
     driver: bridge

@@ -33,7 +33,7 @@ export default function Fatturato() {
                 <Col numColSpanLg={1}>
                     <div className="space-y-6">
                         <Card>
-                            <Text>Seleziona</Text>
+                            <Text>Select</Text>
                             <Select
                                 className="mt-2" value={groupKey} onValueChange={setGroupKey}
                             >
