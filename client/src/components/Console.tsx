@@ -55,10 +55,10 @@ export default function Fatturato() {
                             </Select>
                         </Card>
                         <Card>
-                            Prova
+                            Test
                         </Card>
                         <Card>
-                            <Metric>CHF 1,995</Metric>
+                            <Metric>EUR 1,995</Metric>
                             <Title>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Title>
                             <Subtitle>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Subtitle>
                             <Text>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Text>
