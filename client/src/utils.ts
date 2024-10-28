@@ -6,3 +6,31 @@ export function parseLocalizedNumber(n: string, locale?: string): number {
         .replaceAll(decimalSeparator, '.')
     );
 }
+
+export function validatePageRangeString(pr: string): PageRange[] | undefined {
+    const tmpRanges = pr.replaceAll(" ", "").split(",")
+    let ranges: PageRange[] = [];
+    for (const r of tmpRanges) {
+        const tmpRange = r.split("-");
+        if (tmpRange.length > 2 || !tmpRange.every(r => r.length > 0))
+            return undefined;
+
+        const first = Number(tmpRange.at(0));
+        if (Number.isNaN(first) || !Number.isInteger(first))
+            return undefined;
+
+        if (tmpRange.length === 1) {
+            ranges.push(first);
+            continue;
+        }
+
+        const second = Number(tmpRange.at(1));
+        if (Number.isNaN(second) || !Number.isInteger(second))
+            return undefined;
+
+        ranges.push([first, second]);
+    }
+    return ranges;
+}
+
+export type PageRange = [number, number] | number;
