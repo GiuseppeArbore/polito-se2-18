@@ -1,9 +1,11 @@
 import { Button, DatePicker, Dialog, DialogPanel, Divider, SearchSelect, SearchSelectItem, TextInput, Textarea  } from '@tremor/react';
 import { useState } from 'react';
 import locales from './../../locales.json'
+import { parseLocalizedNumber } from '../../utils';
 
 export function FormDialog() {
     const [isOpen, setIsOpen] = useState(false);
+    const [scale, setScale] = useState(10000);
     return (
         <>
             <Button className="mx-auto block" onClick={() => setIsOpen(true)}>Open Dialog</Button>
@@ -63,12 +65,30 @@ export function FormDialog() {
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <TextInput
-                                        type="text"
                                         id="scale"
+                                        defaultValue="10000"
+                                        value={scale.toLocaleString()}
+                                        onValueChange={(v) => {
+                                            if (v === "") {
+                                                setScale(0);
+                                                return;
+                                            }
+                                            const num = parseLocalizedNumber(v);
+                                            if (!Number.isNaN(num) && Number.isInteger(num) && num >= 0 && num <= 10_000_000_000_000) {
+                                                setScale(num);
+                                            }
+                                        }}
                                         name="scale"
                                         autoComplete="scale"
-                                        placeholder="Scale"
+                                        placeholder="10.000"
                                         className="mt-2"
+                                        icon={() =>
+                                            <p
+                                                className="border-r h-full text-tremor-default text-end text-right tremor-TextInput-icon shrink-0 h-5 w-5 mx-2.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle"
+                                            >
+                                                1:
+                                            </p>
+                                        }
                                         required
                                     />
                                 </div>
