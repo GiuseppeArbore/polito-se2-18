@@ -8,7 +8,7 @@ export function FormDialog() {
     const [isOpen, setIsOpen] = useState(false);
     const [scale, setScale] = useState(10000);
     const [pages, setPages] = useState("");
-    const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(undefined);
+    const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
     return (
         <>
             <Button className="mx-auto block" onClick={() => setIsOpen(true)}>Open Dialog</Button>
