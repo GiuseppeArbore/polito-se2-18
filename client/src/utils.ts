@@ -8,6 +8,9 @@ export function parseLocalizedNumber(n: string, locale?: string): number {
 }
 
 export function validatePageRangeString(pr: string): PageRange[] | undefined {
+    if (pr.length === 0)
+        return [];
+
     const tmpRanges = pr.replaceAll(" ", "").split(",")
     let ranges: PageRange[] = [];
     for (const r of tmpRanges) {
