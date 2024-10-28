@@ -1,6 +1,7 @@
 import { Button, DatePicker, Dialog, DialogPanel, Divider, SearchSelect, SearchSelectItem, TextInput, Textarea  } from '@tremor/react';
 import { useState } from 'react';
 import locales from './../../locales.json'
+import docTypes from './../../docTypes.json'
 import { parseLocalizedNumber } from '../../utils';
 
 export function FormDialog() {
@@ -113,14 +114,25 @@ export function FormDialog() {
                                     >
                                         Type
                                     </label>
-                                    <TextInput
-                                        type="text"
-                                        id="type"
-                                        name="type"
-                                        autoComplete="off"
-                                        placeholder="Type"
+                                    <SearchSelect
+                                        id="conn_type"
+                                        name="conn_type"
                                         className="mt-2"
-                                    />
+                                        required
+                                    >
+                                        {
+                                            docTypes.flatMap((dt, i, arr) => {
+                                                const prev = arr.at(i - 1);
+                                                const separator = (prev && prev.category !== dt.category) ?
+                                                    <p
+                                                        className="text-tremor-label text-sm font-semibold italic ps-5 text-tremor-content-weak dark:text-dark-tremor-content-weak"
+                                                    >
+                                                        {dt.category}
+                                                    </p> : null;
+                                                return [separator, <SearchSelectItem value={dt.id}>{dt.name}</SearchSelectItem>];
+                                            })
+                                        }
+                                    </SearchSelect>
                                 </div>
                                 <div className="col-span-full">
                                     <label
