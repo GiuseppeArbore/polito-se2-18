@@ -2,11 +2,13 @@ import { Button, DatePicker, Dialog, DialogPanel, Divider, SearchSelect, SearchS
 import { useState } from 'react';
 import locales from './../../locales.json'
 import docTypes from './../../docTypes.json'
-import { parseLocalizedNumber } from '../../utils';
+import { parseLocalizedNumber, PageRange, validatePageRangeString } from '../../utils';
 
 export function FormDialog() {
     const [isOpen, setIsOpen] = useState(false);
     const [scale, setScale] = useState(10000);
+    const [pages, setPages] = useState("");
+    const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(undefined);
     return (
         <>
             <Button className="mx-auto block" onClick={() => setIsOpen(true)}>Open Dialog</Button>
@@ -179,6 +181,16 @@ export function FormDialog() {
                                     <TextInput
                                         id="pages"
                                         name="pages"
+                                        onValueChange={(v: string) => {
+                                            setPages(v);
+                                        }}
+                                        onBlur={() => {
+                                            const range = validatePageRangeString(pages);
+                                            setPageRanges(range);
+                                            console.log("asdfsadf")
+                                        }}
+                                        error={!pageRanges ? true : false}
+                                        errorMessage='Invalid page range. Examples of valid ranges: "10" or "1-5" or "1-5,6"'
                                         autoComplete="pages"
                                         placeholder="Pages"
                                         className="mt-2"
