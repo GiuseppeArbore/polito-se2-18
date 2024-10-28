@@ -1,8 +1,9 @@
-import { Button, DatePicker, Dialog, DialogPanel, Divider, SearchSelect, SearchSelectItem, TextInput, Textarea  } from '@tremor/react';
+import { Button, DatePicker, Dialog, DialogPanel, Divider, MultiSelect, MultiSelectItem, SearchSelect, SearchSelectItem, TextInput, Textarea } from '@tremor/react';
 import { useState } from 'react';
 import locales from './../../locales.json'
 import docTypes from './../../docTypes.json'
 import { parseLocalizedNumber, PageRange, validatePageRangeString } from '../../utils';
+
 
 export function FormDialog() {
     const [isOpen, setIsOpen] = useState(false);
@@ -13,7 +14,7 @@ export function FormDialog() {
 
     return (
         <>
-            
+
             <Button className="mx-auto block mb-2" onClick={() => setIsOpen(true)}>Add new document</Button >
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true} >
                 <DialogPanel className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2" style={{ maxWidth: "80vw" }}>
@@ -44,7 +45,7 @@ export function FormDialog() {
                                         required
                                     />
                                 </div>
-                                <div className="col-span-full sm:col-span-3">
+                                <div className="col-span-full" >
                                     <label
                                         htmlFor="stakeholders"
                                         className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
@@ -52,17 +53,15 @@ export function FormDialog() {
                                         Stakeholders
                                         <span className="text-red-500">*</span>
                                     </label>
-                                    <TextInput
-                                        type="text"
-                                        id="stakeholders"
-                                        name="stakeholders"
-                                        autoComplete="stakeholders"
-                                        placeholder="Stakeholders"
-                                        className="mt-2"
-                                        required
-                                    />
+                                    <MultiSelect>
+                                        <MultiSelectItem value="1">Urban Developer</MultiSelectItem>
+                                        <MultiSelectItem value="2">Urban Planner</MultiSelectItem>
+                                        <MultiSelectItem value="3">Resident</MultiSelectItem>
+                                        <MultiSelectItem value="4">Visitor</MultiSelectItem>
+                                    </MultiSelect>
+
                                 </div>
-                                <div className="col-span-full sm:col-span-3">
+                                <div className="col-span-full">
                                     <label
                                         htmlFor="issuance-date"
                                         className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
