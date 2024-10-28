@@ -11,20 +11,22 @@ export default function Fatturato() {
         <main>
             <Title>Dashboard</Title>
             <Text>Explore Kiruna</Text>
-            <TabGroup className="mt-6" onIndexChange={(index) => { setSelectedView(index) }}>
-                <TabList>
-                    <Tab>
-                        Map
-                    </Tab>
-                    <Tab>
-                        Insights
-                    </Tab>
-                    <Tab>
-                        Notes
-                    </Tab>
-
-                </TabList>
-            </TabGroup>
+            <div className="flex items-stretch mt-6">
+                <TabGroup className="flex-1" onIndexChange={(index) => { setSelectedView(index) }}>
+                    <TabList>
+                        <Tab>
+                            Map
+                        </Tab>
+                        <Tab>
+                            Insights
+                        </Tab>
+                        <Tab>
+                            Notes
+                        </Tab>
+                        
+                    </TabList>
+                </TabGroup>
+            </div>
             <Grid numItemsLg={6} className="gap-6 mt-6">
                 <Col numColSpanLg={5}>
                     <Card className="h-full">
@@ -34,6 +36,8 @@ export default function Fatturato() {
 
                 <Col numColSpanLg={1}>
                     <div className="space-y-6">
+                    <FormDialog />
+
                         <Card>
                             <Text>Select</Text>
                             <Select
@@ -55,13 +59,6 @@ export default function Fatturato() {
                                     5
                                 </SelectItem>
                             </Select>
-                        </Card>
-                        <Card>
-                            Test
-                        </Card>
-                        <Card>
-
-                            <FormDialog />
                         </Card>
                         <Card>
                             <Metric>EUR 1,995</Metric>

@@ -9,17 +9,20 @@ export function FormDialog() {
     const [scale, setScale] = useState(10000);
     const [pages, setPages] = useState("");
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
+
+
     return (
         <>
-            <Button className="mx-auto block" onClick={() => setIsOpen(true)}>Open Dialog</Button>
+            
+            <Button className="mx-auto block mb-2" onClick={() => setIsOpen(true)}>Add new document</Button >
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true} >
                 <DialogPanel className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2" style={{ maxWidth: "80vw" }}>
                     <div className="sm:mx-auto sm:max-w-2xl">
                         <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                            Add new document description
+                            Add new document
                         </h3>
                         <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-                            Add the description of the document
+                            Add all the information about the document
                         </p>
                         <form action="#" method="post" className="mt-8">
                             <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
@@ -41,7 +44,7 @@ export function FormDialog() {
                                         required
                                     />
                                 </div>
-                                <div className="col-span-full">
+                                <div className="col-span-full sm:col-span-3">
                                     <label
                                         htmlFor="stakeholders"
                                         className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
@@ -59,7 +62,51 @@ export function FormDialog() {
                                         required
                                     />
                                 </div>
-                                <div className="col-span-full">
+                                <div className="col-span-full sm:col-span-3">
+                                    <label
+                                        htmlFor="issuance-date"
+                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                                    >
+                                        Issuance date
+                                    </label>
+                                    <DatePicker
+                                        id="issuance-date"
+                                        className="mt-2"
+                                        enableYearNavigation={true}
+                                        weekStartsOn={1}
+                                    />
+                                </div>
+
+
+                                <div className="col-span-full sm:col-span-3">
+                                    <label
+                                        htmlFor="type"
+                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                                    >
+                                        Type
+                                    </label>
+                                    <SearchSelect
+                                        id="conn_type"
+                                        name="conn_type"
+                                        className="mt-2"
+                                        required
+                                    >
+                                        {
+                                            docTypes.flatMap((dt, i, arr) => {
+                                                const prev = arr.at(i - 1);
+                                                const separator = (prev && prev.category !== dt.category) ?
+                                                    <p
+                                                        className="text-tremor-label text-sm font-semibold italic ps-5 text-tremor-content-weak dark:text-dark-tremor-content-weak"
+                                                    >
+                                                        {dt.category}
+                                                    </p> : null;
+                                                return [separator, <SearchSelectItem value={dt.id}>{dt.name}</SearchSelectItem>];
+                                            })
+                                        }
+                                    </SearchSelect>
+                                </div>
+
+                                <div className="col-span-full sm:col-span-3">
                                     <label
                                         htmlFor="scale"
                                         className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
@@ -95,63 +142,7 @@ export function FormDialog() {
                                         required
                                     />
                                 </div>
-                                <div className="col-span-full">
-                                    <label
-                                        htmlFor="issuance-date"
-                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
-                                    >
-                                        Issuance date
-                                    </label>
-                                    <DatePicker
-                                        id="issuance-date"
-                                        className="mt-2"
-                                        enableYearNavigation={true}
-                                        weekStartsOn={1}
-                                    />
-                                </div>
-                                <div className="col-span-full">
-                                    <label
-                                        htmlFor="type"
-                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
-                                    >
-                                        Type
-                                    </label>
-                                    <SearchSelect
-                                        id="conn_type"
-                                        name="conn_type"
-                                        className="mt-2"
-                                        required
-                                    >
-                                        {
-                                            docTypes.flatMap((dt, i, arr) => {
-                                                const prev = arr.at(i - 1);
-                                                const separator = (prev && prev.category !== dt.category) ?
-                                                    <p
-                                                        className="text-tremor-label text-sm font-semibold italic ps-5 text-tremor-content-weak dark:text-dark-tremor-content-weak"
-                                                    >
-                                                        {dt.category}
-                                                    </p> : null;
-                                                return [separator, <SearchSelectItem value={dt.id}>{dt.name}</SearchSelectItem>];
-                                            })
-                                        }
-                                    </SearchSelect>
-                                </div>
-                                <div className="col-span-full">
-                                    <label
-                                        htmlFor="connections"
-                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
-                                    >
-                                        Connections
-                                    </label>
-                                    <TextInput
-                                        type="text"
-                                        id="connections"
-                                        name="connections"
-                                        autoComplete="off"
-                                        placeholder="Connections"
-                                        className="mt-2"
-                                    />
-                                </div>
+
                                 <div className="col-span-full sm:col-span-3">
                                     <label
                                         htmlFor="language"
@@ -196,21 +187,7 @@ export function FormDialog() {
                                         className="mt-2"
                                     />
                                 </div>
-                                <div className="col-span-full">
-                                    <label
-                                        htmlFor="coordinates"
-                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
-                                    >
-                                        Coordinates
-                                    </label>
-                                    <TextInput
-                                        id="coordinates"
-                                        name="coordinates"
-                                        autoComplete="coordinates"
-                                        placeholder="Coordinates"
-                                        className="mt-2"
-                                    />
-                                </div>
+
                             </div>
                             <Divider />
                             <div className="col-span-full">
@@ -225,6 +202,7 @@ export function FormDialog() {
                                     name="description"
                                     placeholder="Description"
                                     className="mt-2"
+                                    style={{ minHeight: '200px' }}
                                 />
                             </div>
                             <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
