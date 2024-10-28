@@ -21,7 +21,6 @@ class DAO {
             await mongoose.connect('mongodb://localhost:27017/kiruna-ex', {
                 autoCreate: true,
             });
-            console.log('Connected to the database');
         } catch (error) {
             console.error('Error connecting to the database', error);
         }
@@ -43,6 +42,7 @@ class DAO {
                 _id: result[0]._id,
                 stakeholders: result[0].stakeholders,
                 scale: result[0].scale,
+                scale_info: result[0].scale_info,
                 issuance_date: result[0].issuance_date,
                 type: result[0].type,
                 connections: result[0].connections,
@@ -62,6 +62,7 @@ class DAO {
                 _id: result[0]._id,
                 stakeholders: result[0].stakeholders,
                 scale: result[0].scale,
+                scale_info: result[0].scale_info,
                 issuance_date: result[0].issuance_date,
                 type: result[0].type,
                 connections: result[0].connections,

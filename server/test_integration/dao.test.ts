@@ -4,13 +4,14 @@ import { AreaType, KxDocumentType, Language, Scale, Stakeholders } from "../src/
 import { KxDocument } from "../src/models/model";
 import { ObjectId } from "mongodb";
 
-const list:ObjectId[]  = [];
+const list: ObjectId[] = [];
 
 beforeAll(async () => {
-   const res =  await db.createKxDocument({
+    const res = await db.createKxDocument({
         title: "title 1",
-        stakeholders: [Stakeholders.RESIDENTS],
-        scale: Scale.TEXT,
+        stakeholders: [Stakeholders.RESIDENT],
+        scale_info: Scale.TEXT,
+        scale: 10,
         issuance_date: 0,
         type: KxDocumentType.INFORMATIVE,
         connections: 0,
@@ -27,8 +28,9 @@ describe("Test DAO", () => {
     test("Test Create Document", async () => {
         const res = await db.createKxDocument({
             title: "title 2",
-            stakeholders: [Stakeholders.RESIDENTS],
-            scale: Scale.TEXT,
+            stakeholders: [Stakeholders.RESIDENT],
+            scale: 10,
+            scale_info: Scale.TEXT,
             issuance_date: 0,
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
@@ -42,13 +44,14 @@ describe("Test DAO", () => {
         expect(res).toHaveProperty("_id");
     });
 
-    test("Test Get Document By Title", async  () => {
+    test("Test Get Document By Title", async () => {
         const res = await db.getKxDocumentByTitle("title 1");
         expect(res).toEqual({
             title: "title 1",
             _id: list[0],
-            stakeholders: [Stakeholders.RESIDENTS],
-            scale: Scale.TEXT,
+            stakeholders: [Stakeholders.RESIDENT],
+            scale: 10,
+            scale_info: Scale.TEXT,
             issuance_date: 0,
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
@@ -57,7 +60,7 @@ describe("Test DAO", () => {
             description: "Test"
         })
     });
-    test("Test Get All Documents", async  () => {
+    test("Test Get All Documents", async () => {
         const res = await db.getAlldocuments();
         expect(res).toHaveLength(2);
     });
@@ -67,8 +70,9 @@ describe("Test DAO", () => {
         expect(res).toEqual({
             title: "title 1",
             _id: list[0],
-            stakeholders: [Stakeholders.RESIDENTS],
-            scale: Scale.TEXT,
+            stakeholders: [Stakeholders.RESIDENT],
+            scale: 10,
+            scale_info: Scale.TEXT,
             issuance_date: 0,
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
@@ -78,8 +82,6 @@ describe("Test DAO", () => {
         })
     });
     test("Test Delete Document", async () => {
-        console.log(list[0].toString());
-        console.log(list[1].toString());
         const res = await db.deleteKxDocument(list[0].toString());
         const res2 = await db.deleteKxDocument(list[1].toString());
         expect(res).toBeTruthy();

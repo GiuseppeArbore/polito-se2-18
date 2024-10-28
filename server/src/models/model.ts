@@ -3,7 +3,8 @@ import { ObjectId } from "mongodb";
 export class KxDocument {
     title: string;
     stakeholders: Stakeholders[];
-    scale: Scale;
+    scale_info: Scale;
+    scale: number;
     issuance_date: number;
     type: KxDocumentType;
     connections: number;
@@ -16,7 +17,8 @@ export class KxDocument {
     constructor(
         title: string,
         stakeholders: Stakeholders[],
-        scale: Scale,
+        scale: number,
+        scale_info: Scale,
         issuance_date: number,
         type: KxDocumentType,
         connections: number,
@@ -30,6 +32,7 @@ export class KxDocument {
         this._id = _id;
         this.stakeholders = stakeholders;
         this.scale = scale;
+        this.scale_info = scale_info;
         this.issuance_date = issuance_date;
         this.type = type;
         this.connections = connections;

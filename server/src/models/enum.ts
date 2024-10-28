@@ -1,6 +1,9 @@
 export enum Stakeholders {
-    KIRUNA_KOMMUN = "Kiruna kommun",
-    RESIDENTS = "Residents"
+    URBAN_DEVELOPER = "Urban Developer",
+    URBAN_PLANNER = "Urban Planner",
+    RESIDENT = "Resident",
+    VISITOR = "Visitor"
+
 }
 
 export enum Scale {
@@ -16,7 +19,8 @@ export enum KxDocumentType {
 
 export enum Language {
     SWEDISH = "Swedish",
-    ENGLISH = "English"
+    ENGLISH = "English",
+    OTHER = "Other"
 }
 
 export enum AreaType {

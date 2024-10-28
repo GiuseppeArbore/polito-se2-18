@@ -11,9 +11,13 @@ const DocumentSchema = new mongoose.Schema({
         enum: Object.values(Stakeholders),
         required: true
     },
-    scale: {
+    scale_info: {
         type: String,
         enum: Object.values(Scale),
+        required: true
+    },
+    scale: {
+        type: Number,
         required: true
     },
     issuance_date: {
