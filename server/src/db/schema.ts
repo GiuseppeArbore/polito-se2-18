@@ -21,7 +21,7 @@ const DocumentSchema = new mongoose.Schema({
         required: true
     },
     issuance_date: {
-        type: Number,
+        type: Date,
         required: true
     },
     type: {

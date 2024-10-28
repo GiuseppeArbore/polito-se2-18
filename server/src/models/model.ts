@@ -1,11 +1,12 @@
 import { AreaType, KxDocumentType, Language, Scale, Stakeholders } from "./enum";
 import { ObjectId } from "mongodb";
+
 export class KxDocument {
     title: string;
     stakeholders: Stakeholders[];
     scale_info: Scale;
     scale: number;
-    issuance_date: number;
+    issuance_date: Date;
     type: KxDocumentType;
     connections: number;
     language: Language;
@@ -19,7 +20,7 @@ export class KxDocument {
         stakeholders: Stakeholders[],
         scale: number,
         scale_info: Scale,
-        issuance_date: number,
+        issuance_date: Date,
         type: KxDocumentType,
         connections: number,
         language: Language,

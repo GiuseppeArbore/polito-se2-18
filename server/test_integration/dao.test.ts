@@ -5,6 +5,7 @@ import { KxDocument } from "../src/models/model";
 import { ObjectId } from "mongodb";
 
 const list: ObjectId[] = [];
+const date = new Date();
 
 beforeAll(async () => {
     const res = await db.createKxDocument({
@@ -12,7 +13,7 @@ beforeAll(async () => {
         stakeholders: [Stakeholders.RESIDENT],
         scale_info: Scale.TEXT,
         scale: 10,
-        issuance_date: 0,
+        issuance_date: date,
         type: KxDocumentType.INFORMATIVE,
         connections: 0,
         language: Language.SWEDISH,
@@ -31,7 +32,7 @@ describe("Test DAO", () => {
             stakeholders: [Stakeholders.RESIDENT],
             scale: 10,
             scale_info: Scale.TEXT,
-            issuance_date: 0,
+            issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
             language: Language.SWEDISH,
@@ -52,7 +53,7 @@ describe("Test DAO", () => {
             stakeholders: [Stakeholders.RESIDENT],
             scale: 10,
             scale_info: Scale.TEXT,
-            issuance_date: 0,
+            issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
             language: Language.SWEDISH,
@@ -73,7 +74,7 @@ describe("Test DAO", () => {
             stakeholders: [Stakeholders.RESIDENT],
             scale: 10,
             scale_info: Scale.TEXT,
-            issuance_date: 0,
+            issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
             language: Language.SWEDISH,
