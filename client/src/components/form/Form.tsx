@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogPanel, Divider, SearchSelect, SearchSelectItem, TextInput, Textarea  } from '@tremor/react';
+import { Button, DatePicker, Dialog, DialogPanel, Divider, SearchSelect, SearchSelectItem, TextInput, Textarea  } from '@tremor/react';
 import { useState } from 'react';
 import locales from './../../locales.json'
 
@@ -79,13 +79,11 @@ export function FormDialog() {
                                     >
                                         Issuance date
                                     </label>
-                                    <TextInput
-                                        type="text"
+                                    <DatePicker
                                         id="issuance-date"
-                                        name="issuance-date"
-                                        autoComplete="off"
-                                        placeholder="Issuance date"
                                         className="mt-2"
+                                        enableYearNavigation={true}
+                                        weekStartsOn={1}
                                     />
                                 </div>
                                 <div className="col-span-full">
