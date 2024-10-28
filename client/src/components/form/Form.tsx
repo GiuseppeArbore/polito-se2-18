@@ -1,5 +1,6 @@
-import { Button, Dialog, DialogPanel, Divider, TextInput, Textarea  } from '@tremor/react';
+import { Button, Dialog, DialogPanel, Divider, SearchSelect, SearchSelectItem, TextInput, Textarea  } from '@tremor/react';
 import { useState } from 'react';
+import locales from './../../locales.json'
 
 export function FormDialog() {
     const [isOpen, setIsOpen] = useState(false);
@@ -126,13 +127,17 @@ export function FormDialog() {
                                     >
                                         Language
                                     </label>
-                                    <TextInput
+                                    <SearchSelect
                                         id="language"
                                         name="language"
-                                        autoComplete="language"
-                                        placeholder="Language"
                                         className="mt-2"
-                                    />
+                                    >
+                                        {
+                                            locales.map((l) => {
+                                                return <SearchSelectItem value={l.code}>{l.name}</SearchSelectItem>
+                                            })
+                                        }
+                                    </SearchSelect>
                                 </div>
                                 <div className="col-span-full sm:col-span-3">
                                     <label
