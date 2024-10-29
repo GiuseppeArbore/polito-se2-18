@@ -1,12 +1,14 @@
-import { Button, DatePicker, Dialog, DialogPanel, Divider, MultiSelect, MultiSelectItem, SearchSelect, SearchSelectItem, TextInput, Textarea } from '@tremor/react';
+import { Button, Card, DatePicker, Dialog, DialogPanel, Divider, MultiSelect, MultiSelectItem, SearchSelect, SearchSelectItem, TextInput, Textarea } from '@tremor/react';
 import { useState } from 'react';
 import locales from './../../locales.json'
 import docTypes from './../../docTypes.json'
+import { PreviewMap, SatMap } from '../map/Map';
 import { parseLocalizedNumber, PageRange, validatePageRangeString } from '../../utils';
 
 
 export function FormDialog() {
     const [isOpen, setIsOpen] = useState(false);
+    const [isMapOpen, setIsMapOpen] = useState(false);
     const [scale, setScale] = useState(10000);
     const [pages, setPages] = useState("");
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -188,7 +190,14 @@ export function FormDialog() {
                                 </div>
 
                             </div>
-                            <Divider />
+                            <Card className="my-4 p-0 overflow-hidden cursor-pointer" onClick={() => setIsMapOpen(true)}>
+                                <PreviewMap style={{ minHeight: "300px", width: "100%" }}></PreviewMap>
+                            </Card>
+                            <Dialog open={isMapOpen} onClose={(val) => setIsMapOpen(val)} static={true} >
+                                <DialogPanel className="p-0 overflow-hidden" style={{ maxWidth: "100%" }}>
+                                    <SatMap style={{ minHeight: "95vh", width: "100%" }}></SatMap>
+                                </DialogPanel>
+                            </Dialog>
                             <div className="col-span-full">
                                 <label
                                     htmlFor="description"
