@@ -8,7 +8,7 @@ class DAO {
     private constructor() {
         this.connectToDB();
     }
-    
+
     static getInstance(): DAO {
         if (!DAO.instance) {
             DAO.instance = new DAO();
@@ -37,40 +37,14 @@ class DAO {
     async getKxDocumentById(id: string): Promise<KxDocument | null> {
         const result = await Document.find().where("_id").equals(id).exec();
         if (result) {
-            const doc:KxDocument = {
-                title: result[0].title,
-                _id: result[0]._id,
-                stakeholders: result[0].stakeholders,
-                scale: result[0].scale,
-                scale_info: result[0].scale_info,
-                issuance_date: result[0].issuance_date,
-                type: result[0].type,
-                connections: result[0].connections,
-                language: result[0].language,
-                area_type: result[0].area_type,
-                description: result[0].description,
-            };
-            return doc;
+            return this.fromResultToKxDocument(result[0]);
         }
         return null;
     }
     async getKxDocumentByTitle(title: string): Promise<KxDocument | null> {
         const result = await Document.find().where("title").equals(title).exec();
         if (result) {
-            const doc:KxDocument = {
-                title: result[0].title,
-                _id: result[0]._id,
-                stakeholders: result[0].stakeholders,
-                scale: result[0].scale,
-                scale_info: result[0].scale_info,
-                issuance_date: result[0].issuance_date,
-                type: result[0].type,
-                connections: result[0].connections,
-                language: result[0].language,
-                area_type: result[0].area_type,
-                description: result[0].description,
-            };
-            return doc;
+            return this.fromResultToKxDocument(result[0]);
         }
         return null;
     }
@@ -78,18 +52,8 @@ class DAO {
         const result = await Document.find().exec();
         if (result) {
             const list = result.map((doc: any) => {
-                return {
-                    title: doc.title,
-                    _id: doc._id,
-                    stakeholders: doc.stakeholders,
-                    scale: doc.scale,
-                    issuance_date: doc.issuance_date,
-                    type: doc.type,
-                    connections: doc.connections,
-                    language: doc.language,
-                    area_type: doc.area_type,
-                    description: doc.description,
-            } as KxDocument;}); 
+                return this.fromResultToKxDocument(doc);
+            });
             return list;
         }
         return [];
@@ -98,18 +62,7 @@ class DAO {
         const newDocument = new Document(document);
         const result = await newDocument.save();
         if (result) {
-            return {
-                title: result.title,
-                _id: result._id,
-                stakeholders: result.stakeholders,
-                scale: result.scale,
-                issuance_date: result.issuance_date,
-                type: result.type,
-                connections: result.connections,
-                language: result.language,
-                area_type: result.area_type,
-                description: result.description,
-        } as KxDocument;
+            return this.fromResultToKxDocument(result);
         }
         return null;
     }
@@ -119,11 +72,43 @@ class DAO {
         }).exec();
         if (result) {
             return true;
-           
+
         }
         return false;
     }
+    private fromResultToKxDocument(result: any): KxDocument {
+        if (result.pages) {
+            return {
+                title: result.title,
+                _id: result._id,
+                stakeholders: result.stakeholders,
+                scale: result.scale,
+                scale_info: result.scale_info,
+                issuance_date: result.issuance_date,
+                type: result.type,
+                connections: result.connections,
+                pages: result.pages,
+                area_type: result.area_type,
+                description: result.description,
+                language: result.language,
+            } as KxDocument;
+        }
+        return {
+            title: result.title,
+            _id: result._id,
+            stakeholders: result.stakeholders,
+            scale: result.scale,
+            scale_info: result.scale_info,
+            issuance_date: result.issuance_date,
+            type: result.type,
+            connections: result.connections,
+            area_type: result.area_type,
+            description: result.description,
+            language: result.language,
+        } as KxDocument;
+    }
 }
+
 
 
 export const db = DAO.getInstance();

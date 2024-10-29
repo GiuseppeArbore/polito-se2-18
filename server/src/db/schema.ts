@@ -1,4 +1,4 @@
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "../models/enum";
+import { AreaType, KxDocumentType, Scale, Stakeholders, PageRange } from "../models/enum";
 const mongoose = require("mongoose");
 
 const DocumentSchema = new mongoose.Schema({
@@ -38,7 +38,7 @@ const DocumentSchema = new mongoose.Schema({
         required: true
     },
     pages: {
-        type: Number,
+        type: [{}],
         default: null
     },
     area_type: {

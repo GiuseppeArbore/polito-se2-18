@@ -88,7 +88,28 @@ describe("Test DAO", () => {
         expect(res).toBeTruthy();
         expect(res2).toBeTruthy();
     });
-
+    test("Test complex pages query", async () => {
+        const res = await db.createKxDocument({
+            title: "test",
+            stakeholders: [],
+            scale_info: Scale.TEXT,
+            scale: 0,
+            issuance_date: date,
+            type: KxDocumentType.INFORMATIVE,
+            connections: 0,
+            language: "Italian",
+            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            description: "Test",
+            pages: [2, [4, 8]]
+        });
+        if (res && res._id) {
+            expect(res).toHaveProperty("_id");
+            const get = await db.getKxDocumentById(res._id.toString());
+            expect(get?.pages).toEqual([2, [4, 8]]);
+            const res2 = await db.deleteKxDocument(res._id.toString());
+            expect(res2).toBeTruthy();
+        }
+    });
 });
 
 afterAll(async () => {
