@@ -1,11 +1,14 @@
 import { Card, Title, Text, Grid, Col, DateRangePicker, Metric, Subtitle, Bold, Italic, Select, SelectItem, TabGroup, TabList, Tab, DateRangePickerItem, DateRangePickerValue } from "@tremor/react";
 import { useState, useMemo } from "react";
+import { MultiSelect, MultiSelectItem } from '@tremor/react';
 
 export default function Fatturato() {
 
     const today = new Date(Date.now());
     const [groupKey, setGroupKey] = useState("1");
     const [selectedView, setSelectedView] = useState(0);
+    const [selectedDocuments, setselectedDocuments] = useState<string[]>(['doc1']);
+
     return (
         <main>
             <Title>Dashboard</Title>
@@ -20,6 +23,9 @@ export default function Fatturato() {
                     </Tab>
                     <Tab>
                         Notes
+                    </Tab>
+                    <Tab>
+                        Create a Document
                     </Tab>
                 </TabList>
             </TabGroup>
@@ -66,7 +72,6 @@ export default function Fatturato() {
                         </Card>
                     </div>
                 </Col>
-              
             </Grid>
             <Card className="mt-6">
                <>
@@ -95,6 +100,19 @@ export default function Fatturato() {
                         <Card>Pag 3</Card>
                     </>
                 );
+            case 3:
+                return (
+                    <>
+                        <MultiSelect value={selectedDocuments} placeholder="Select Documents..." onValueChange={setselectedDocuments} >
+                            <MultiSelectItem value="doc1">Doc 1</MultiSelectItem>
+                            <MultiSelectItem value="doc2">Doc 2</MultiSelectItem>
+                            <MultiSelectItem value="doc3">Doc 3</MultiSelectItem>
+                            <MultiSelectItem value="doc4">Doc 4</MultiSelectItem>
+                        </MultiSelect>
+                    </>
+                );
+
+
         }
 
     }
