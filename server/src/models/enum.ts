@@ -23,14 +23,10 @@ export enum KxDocumentType {
     CONSULTATION = "Consultation document",
 }
 
-export enum Language {
-    SWEDISH = "Swedish",
-    ENGLISH = "English",
-    OTHER = "Other"
-}
-
 export enum AreaType {
     ENTIRE_MUNICIPALITY = "The entire municipality of Kiruna",
     POINT = "A point in Kiruna",
     AREA = "An area in Kiruna"
 }
+
+export type PageRange = [number, number] | number;

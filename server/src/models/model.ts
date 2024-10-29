@@ -1,4 +1,4 @@
-import { AreaType, KxDocumentType, Language, Scale, Stakeholders } from "./enum";
+import { AreaType, KxDocumentType, PageRange, Scale, Stakeholders } from "./enum";
 import { ObjectId } from "mongodb";
 
 export class KxDocument {
@@ -9,11 +9,11 @@ export class KxDocument {
     issuance_date: Date;
     type: KxDocumentType;
     connections: number;
-    language: Language;
+    language: string;
     area_type: AreaType;
     description: string;
     _id?: ObjectId;
-    pages?: number;
+    pages?: PageRange[];
 
     constructor(
         title: string,
@@ -23,11 +23,11 @@ export class KxDocument {
         issuance_date: Date,
         type: KxDocumentType,
         connections: number,
-        language: Language,
+        language: string,
         description: string,
         area_type: AreaType,
         _id?: ObjectId,
-        pages?: number
+        pages?: PageRange[]
     ) {
         this.title = title;
         this._id = _id;

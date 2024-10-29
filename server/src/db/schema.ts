@@ -1,4 +1,4 @@
-import { AreaType, KxDocumentType, Language, Scale, Stakeholders } from "../models/enum";
+import { AreaType, KxDocumentType, Scale, Stakeholders } from "../models/enum";
 const mongoose = require("mongoose");
 
 const DocumentSchema = new mongoose.Schema({
@@ -35,7 +35,6 @@ const DocumentSchema = new mongoose.Schema({
     },
     language: {
         type: String,
-        enum: Object.values(Language),
         required: true
     },
     pages: {

@@ -1,6 +1,6 @@
 import { describe, test } from "@jest/globals"
 import { db } from "../src/db/dao";
-import { AreaType, KxDocumentType, Language, Scale, Stakeholders } from "../src/models/enum";
+import { AreaType, KxDocumentType, Scale, Stakeholders } from "../src/models/enum";
 import { KxDocument } from "../src/models/model";
 import { ObjectId } from "mongodb";
 
@@ -16,7 +16,7 @@ beforeAll(async () => {
         issuance_date: date,
         type: KxDocumentType.INFORMATIVE,
         connections: 0,
-        language: Language.SWEDISH,
+        language: "Swedish",
         area_type: AreaType.ENTIRE_MUNICIPALITY,
         description: "Test"
     } as KxDocument);
@@ -35,7 +35,7 @@ describe("Test DAO", () => {
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
-            language: Language.SWEDISH,
+            language: "Swedish",
             area_type: AreaType.ENTIRE_MUNICIPALITY,
             description: "Test",
         })
@@ -56,7 +56,7 @@ describe("Test DAO", () => {
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
-            language: Language.SWEDISH,
+            language: "Swedish",
             area_type: AreaType.ENTIRE_MUNICIPALITY,
             description: "Test"
         })
@@ -77,7 +77,7 @@ describe("Test DAO", () => {
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
-            language: Language.SWEDISH,
+            language: "Swedish",
             area_type: AreaType.ENTIRE_MUNICIPALITY,
             description: "Test"
         })
