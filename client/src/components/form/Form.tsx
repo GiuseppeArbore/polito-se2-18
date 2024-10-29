@@ -177,7 +177,6 @@ export function FormDialog() {
                                         onBlur={() => {
                                             const range = validatePageRangeString(pages);
                                             setPageRanges(range);
-                                            console.log("asdfsadf")
                                         }}
                                         error={!pageRanges ? true : false}
                                         errorMessage='Invalid page range. Examples of valid ranges: "10" or "1-5" or "1-5,6"'
