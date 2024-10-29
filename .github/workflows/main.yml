@@ -24,9 +24,14 @@ jobs:
     strategy:
       matrix:
         node-version: [21.x]
+        mongodb-version: ['6.0', '7.0']
         # See supported Node.js release schedule at https://nodejs.org/en/about/releases/
 
     steps:
+    - name: Start MongoDB
+      uses: supercharge/mongodb-github-action@1.11.0
+      with:
+        mongodb-version: ${{ matrix.mongodb-version }}
     - uses: actions/checkout@v4
     - name: Server CI Use Node.js ${{ matrix.node-version }}
       uses: actions/setup-node@v4
