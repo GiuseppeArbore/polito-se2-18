@@ -1,7 +1,8 @@
 import { Card, Title, Text, Grid, Col, DateRangePicker, Metric, Subtitle, Bold, Italic, Select, SelectItem, TabGroup, TabList, Tab, DateRangePickerItem, DateRangePickerValue } from "@tremor/react";
 import { useState, useMemo } from "react";
-import { MultiSelect, MultiSelectItem } from '@tremor/react';
 import { FormDialog } from "./form/Form";
+import { MultiSelect, MultiSelectItem } from '@tremor/react';
+
 
 export default function Fatturato() {
 
@@ -64,7 +65,7 @@ export default function Fatturato() {
                             </Select>
                         </Card>
                         <Card>
-                            <Metric>CHF 1,995</Metric>
+                            <Metric>EUR 1,995</Metric>
                             <Title>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Title>
                             <Subtitle>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Subtitle>
                             <Text>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Text>
