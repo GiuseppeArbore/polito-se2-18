@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import locales from './../../locales.json'
 import docTypes from './../../docTypes.json'
 import { parseLocalizedNumber, PageRange, validatePageRangeString } from '../../utils';
-import { PlusIcon } from '@heroicons/react/solid';
+import "../../index.css"
+
 export class Link {
     connectionType : string = ""; 
     documents: string[] = []
@@ -14,36 +15,15 @@ export function FormDialog() {
     const [scale, setScale] = useState(10000);
     const [pages, setPages] = useState("");
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
-    // TODO: Need to become dynamic
-    const [connectionTypes, setConnectionTypes] = useState<string[]>(["Direct", "Collateral", "Projection", "Update"]);
-    const [selectedDocuments, setSelectedDocuments] = useState<string[]>(['']);
+
     // For initializing
-    const [documents, setDocuments] = useState<string[]>(['Doc 1', "Doc 2", "Doc 3"]);
-    const [selectedType, setSelectedType] = useState("");
-    const [links, setLinks] = useState<Link[]>([]);
+    const [documents, setDocuments] = useState<string[]>(["Doc 1", "Doc 2", "Doc 3"]);
 
+    const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
+    const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
+    const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
+    const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
 
-    useEffect(() => {
-        console.log(links);
-    }, [links]);
-
-    const addLink = () => {
-
-        const linkedDocuments: string[] = []; 
-       
-        selectedDocuments.map((document) => {
-            linkedDocuments.push(document);
-        });
-
-        const link = new Link();
-        link.connectionType = selectedType; 
-        link.documents = linkedDocuments; 
-
-        links.push(link);
-       
-        setSelectedType("");
-       
-    };
 
     return (
         <>
@@ -131,7 +111,7 @@ export function FormDialog() {
                                                     >
                                                         {dt.category}
                                                     </p> : null;
-                                                return [separator, <SearchSelectItem value={dt.id}>{dt.name}</SearchSelectItem>];
+                                                return [separator, <SearchSelectItem value={dt.id} key={dt.id}>{dt.name}</SearchSelectItem>];
                                             })
                                         }
                                     </SearchSelect>
@@ -147,7 +127,7 @@ export function FormDialog() {
                                     </label>
                                     <TextInput
                                         id="scale"
-                                        defaultValue="10000"
+                                        
                                         value={scale.toLocaleString()}
                                         onValueChange={(v) => {
                                             if (v === "") {
@@ -242,20 +222,8 @@ export function FormDialog() {
                                         htmlFor="connectionType"
                                         className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
                                     >
-                                        Connection Type
+                                        Connection Type: <strong>Direct</strong>
                                     </label>
-                                    <SearchSelect
-                                        id="connectionType"
-                                        name="connectionType"
-                                        className="mt-2"
-                                        onValueChange={setSelectedType}
-                                    >
-                                        {
-                                            connectionTypes.map((ct) => (
-                                                <SearchSelectItem key={ct} value={ct}>{ct}</SearchSelectItem>
-                                            ))
-                                        }
-                                    </SearchSelect>
                                 </div>
 
                                 <div className="col-span-full sm:col-span-2">
@@ -263,25 +231,121 @@ export function FormDialog() {
                                         htmlFor="document"
                                         className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
                                     >
-                                        Document
+                                        Document(s)
                                     </label>
                                     <MultiSelect
-                                        value={selectedDocuments}
-                                        onValueChange={setSelectedDocuments}
+                                        value={documentsForDirect}
+                                        onValueChange={setDocumentsForDirect}
                                         className="mt-2"
                                     >
                                     {documents.map((doc) => (
-                                        <MultiSelectItem key={doc} value={doc} className={selectedDocuments.includes(doc) ? "opacity-50 cursor-not-allowed" : ""}>
+                                        <MultiSelectItem key={doc} value={doc} 
+                                        className={documentsForProjection.includes(doc) || documentsForDirect.includes(doc) || documentsForCollateral.includes(doc) || documentsForUpdate.includes(doc) ? "opacity-50 cursor-not-allowed " : ""}>
                                             {doc}
                                         </MultiSelectItem>
                                         ))
                                         }
                                      </MultiSelect>
                                 </div>
-                                <div className="sm:col-span-2 flex items-end">
-                                    <Button onClick={() => addLink()}>
-                                        <PlusIcon className="h-5 w-5 text-white btn-circle" aria-hidden="true" />
-                                    </Button>
+
+                            </div>          
+                           
+                            <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
+                                <div className="col-span-full sm:col-span-2">
+                                    <label
+                                        htmlFor="connectionType"
+                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                                    >
+                                        Connection Type: <strong>Collateral</strong>
+                                    </label>
+                                </div>
+
+                                <div className="col-span-full sm:col-span-2">
+                                    <label
+                                        htmlFor="document"
+                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                                    >
+                                        Document(s)
+                                    </label>
+                                    <MultiSelect
+                                        value={documentsForCollateral}
+                                        onValueChange={setDocumentsForCollateral}
+                                        className="mt-2"
+                                    >
+                                    {documents.map((doc) => (
+                                        <MultiSelectItem key={doc} value={doc} 
+                                        className={documentsForProjection.includes(doc) || documentsForDirect.includes(doc) || documentsForCollateral.includes(doc) || documentsForUpdate.includes(doc) ? "opacity-50 cursor-not-allowed no-click" : ""}>
+                                            {doc}
+                                        </MultiSelectItem>
+                                        ))
+                                        }
+                                     </MultiSelect>
+                                </div>
+                            </div>          
+                            
+                            <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
+                                <div className="col-span-full sm:col-span-2">
+                                    <label
+                                        htmlFor="connectionType"
+                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                                    >
+                                        Connection Type:‌<strong>Projection</strong>
+                                    </label>
+                                </div>
+
+                                <div className="col-span-full sm:col-span-2">
+                                    <label
+                                        htmlFor="document"
+                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                                    >
+                                        Document(s)
+                                    </label>
+                                    <MultiSelect
+                                        value={documentsForProjection}
+                                        onValueChange={setDocumentsForProjection}
+                                        className="mt-2"
+                                    >
+                                    {documents.map((doc) => (
+                                        <MultiSelectItem key={doc} value={doc} 
+                                        className={documentsForProjection.includes(doc) || documentsForDirect.includes(doc) || documentsForCollateral.includes(doc) || documentsForUpdate.includes(doc) ? "opacity-50 cursor-not-allowed no-click" : ""}>
+                                            {doc}
+                                        </MultiSelectItem>
+                                        ))
+                                        }
+                                     </MultiSelect>
+                                </div>
+                            </div>          
+                           
+                            <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
+                                <div className="col-span-full sm:col-span-2">
+                                    <label
+                                        htmlFor="connectionType"
+                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                                    >
+                                        Connection Type : <strong>Update</strong>
+                                    </label>
+                                </div>
+
+                                <div className="col-span-full sm:col-span-2">
+                                    <label
+                                        htmlFor="document"
+                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                                    >
+                                        Document(s)
+                                    </label>
+                                    <MultiSelect
+                                        value={documentsForUpdate}
+                                        onValueChange={setDocumentsForUpdate}
+                                        className="mt-2"
+                                    >
+                                    {documents.map((doc) => (
+                                        <MultiSelectItem key={doc} value={doc} 
+                                        className={documentsForProjection.includes(doc) || documentsForDirect.includes(doc) || documentsForCollateral.includes(doc) || documentsForUpdate.includes(doc) ? "opacity-50 cursor-not-allowed no-click" : ""}>
+                                            {doc}
+                                        </MultiSelectItem>
+                                        ))
+                                        }
+                                     </MultiSelect>
                                 </div>
                             </div>          
                             <Divider />

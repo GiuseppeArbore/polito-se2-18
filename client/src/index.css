@@ -5,3 +5,7 @@
 body {
     padding: 2%;
 }
+
+.no-click {
+    pointer-events: none;
+ }
