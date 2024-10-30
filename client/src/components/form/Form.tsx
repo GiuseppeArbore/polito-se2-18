@@ -43,7 +43,6 @@ export function FormDialog() {
        
         setSelectedType("");
        
-        console.log("links: ", links);
     };
 
     return (
