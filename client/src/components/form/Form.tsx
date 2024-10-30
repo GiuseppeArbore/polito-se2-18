@@ -54,10 +54,10 @@ export function FormDialog() {
                                         <span className="text-red-500">*</span>
                                     </label>
                                     <MultiSelect>
-                                        <MultiSelectItem value="1">Urban Developer</MultiSelectItem>
-                                        <MultiSelectItem value="2">Urban Planner</MultiSelectItem>
-                                        <MultiSelectItem value="3">Resident</MultiSelectItem>
-                                        <MultiSelectItem value="4">Visitor</MultiSelectItem>
+                                        <MultiSelectItem key="sh-1" value="1">Urban Developer</MultiSelectItem>
+                                        <MultiSelectItem key="sh-2" value="2">Urban Planner</MultiSelectItem>
+                                        <MultiSelectItem key="sh-3" value="3">Resident</MultiSelectItem>
+                                        <MultiSelectItem key="sh-4" value="4">Visitor</MultiSelectItem>
                                     </MultiSelect>
 
                                 </div>
@@ -85,21 +85,23 @@ export function FormDialog() {
                                         Type
                                     </label>
                                     <SearchSelect
-                                        id="conn_type"
-                                        name="conn_type"
+                                        id="doc_type"
+                                        name="doc_type"
                                         className="mt-2"
                                         required
                                     >
                                         {
                                             docTypes.flatMap((dt, i, arr) => {
-                                                const prev = arr.at(i - 1);
-                                                const separator = (prev && prev.category !== dt.category) ?
-                                                    <p
-                                                        className="text-tremor-label text-sm font-semibold italic ps-5 text-tremor-content-weak dark:text-dark-tremor-content-weak"
-                                                    >
-                                                        {dt.category}
-                                                    </p> : null;
-                                                return [separator, <SearchSelectItem value={dt.id}>{dt.name}</SearchSelectItem>];
+                                                // Tremor does not seem to allow to do this
+                                                //const prev = arr.at(i - 1);
+                                                //const separator = (prev && prev.category !== dt.category) ?
+                                                //    <p
+                                                //        className="text-tremor-label text-sm font-semibold italic ps-5 text-tremor-content-weak dark:text-dark-tremor-content-weak"
+                                                //        key={`separator-${i}`}
+                                                //    >
+                                                //        {dt.category}
+                                                //    </p> : null;
+                                                return <SearchSelectItem key={`type-${dt.id}`} value={dt.id}>{dt.name}</SearchSelectItem>;
                                             })
                                         }
                                     </SearchSelect>
@@ -115,7 +117,6 @@ export function FormDialog() {
                                     </label>
                                     <TextInput
                                         id="scale"
-                                        defaultValue="10000"
                                         value={scale.toLocaleString()}
                                         onValueChange={(v) => {
                                             if (v === "") {
@@ -156,7 +157,7 @@ export function FormDialog() {
                                     >
                                         {
                                             locales.map((l) => {
-                                                return <SearchSelectItem value={l.code}>{l.name}</SearchSelectItem>
+                                                return <SearchSelectItem key={`lang-${l.code}`} value={l.code}>{l.name}</SearchSelectItem>
                                             })
                                         }
                                     </SearchSelect>
