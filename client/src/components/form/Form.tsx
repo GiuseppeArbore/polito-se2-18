@@ -195,7 +195,7 @@ export function FormDialog() {
                             </Card>
                             <Dialog open={isMapOpen} onClose={(val) => setIsMapOpen(val)} static={true} >
                                 <DialogPanel className="p-0 overflow-hidden" style={{ maxWidth: "100%" }}>
-                                    <SatMap style={{ minHeight: "95vh", width: "100%" }}></SatMap>
+                                    <SatMap onCancel={() => setIsMapOpen(false)} onDone={() => setIsMapOpen(false)} style={{ minHeight: "95vh", width: "100%" }}></SatMap>
                                 </DialogPanel>
                             </Dialog>
                             <div className="col-span-full">
