@@ -1,16 +1,50 @@
 import { Button, DatePicker, Dialog, DialogPanel, Divider, MultiSelect, MultiSelectItem, SearchSelect, SearchSelectItem, TextInput, Textarea } from '@tremor/react';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import locales from './../../locales.json'
 import docTypes from './../../docTypes.json'
 import { parseLocalizedNumber, PageRange, validatePageRangeString } from '../../utils';
-
+import { PlusIcon } from '@heroicons/react/solid';
+export class Link {
+    connectionType : string = ""; 
+    documents: string[] = []
+}
 
 export function FormDialog() {
     const [isOpen, setIsOpen] = useState(false);
     const [scale, setScale] = useState(10000);
     const [pages, setPages] = useState("");
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
+    // TODO: Need to become dynamic
+    const [connectionTypes, setConnectionTypes] = useState<string[]>(["Direct", "Collateral", "Projection", "Update"]);
+    const [selectedDocuments, setSelectedDocuments] = useState<string[]>(['']);
+    // For initializing
+    const [documents, setDocuments] = useState<string[]>(['Doc 1', "Doc 2", "Doc 3"]);
+    const [selectedType, setSelectedType] = useState("");
+    const [links, setLinks] = useState<Link[]>([]);
 
+
+    useEffect(() => {
+        console.log(links);
+    }, [links]);
+
+    const addLink = () => {
+
+        const linkedDocuments: string[] = []; 
+       
+        selectedDocuments.map((document) => {
+            linkedDocuments.push(document);
+        });
+
+        const link = new Link();
+        link.connectionType = selectedType; 
+        link.documents = linkedDocuments; 
+
+        links.push(link);
+       
+        setSelectedType("");
+       
+        console.log("links: ", links);
+    };
 
     return (
         <>
@@ -76,7 +110,6 @@ export function FormDialog() {
                                     />
                                 </div>
 
-
                                 <div className="col-span-full sm:col-span-3">
                                     <label
                                         htmlFor="type"
@@ -94,7 +127,7 @@ export function FormDialog() {
                                             docTypes.flatMap((dt, i, arr) => {
                                                 const prev = arr.at(i - 1);
                                                 const separator = (prev && prev.category !== dt.category) ?
-                                                    <p
+                                                    <p key={i}
                                                         className="text-tremor-label text-sm font-semibold italic ps-5 text-tremor-content-weak dark:text-dark-tremor-content-weak"
                                                     >
                                                         {dt.category}
@@ -156,7 +189,7 @@ export function FormDialog() {
                                     >
                                         {
                                             locales.map((l) => {
-                                                return <SearchSelectItem value={l.code}>{l.name}</SearchSelectItem>
+                                                return <SearchSelectItem value={l.code} key={l.code}>{l.name}</SearchSelectItem>
                                             })
                                         }
                                     </SearchSelect>
@@ -203,6 +236,56 @@ export function FormDialog() {
                                     style={{ minHeight: '200px' }}
                                 />
                             </div>
+                            <Divider /> 
+                            <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
+                                <div className="col-span-full sm:col-span-2">
+                                    <label
+                                        htmlFor="connectionType"
+                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                                    >
+                                        Connection Type
+                                    </label>
+                                    <SearchSelect
+                                        id="connectionType"
+                                        name="connectionType"
+                                        className="mt-2"
+                                        onValueChange={setSelectedType}
+                                    >
+                                        {
+                                            connectionTypes.map((ct) => (
+                                                <SearchSelectItem key={ct} value={ct}>{ct}</SearchSelectItem>
+                                            ))
+                                        }
+                                    </SearchSelect>
+                                </div>
+
+                                <div className="col-span-full sm:col-span-2">
+                                    <label
+                                        htmlFor="document"
+                                        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                                    >
+                                        Document
+                                    </label>
+                                    <MultiSelect
+                                        value={selectedDocuments}
+                                        onValueChange={setSelectedDocuments}
+                                        className="mt-2"
+                                    >
+                                    {documents.map((doc) => (
+                                        <MultiSelectItem key={doc} value={doc} className={selectedDocuments.includes(doc) ? "opacity-50 cursor-not-allowed" : ""}>
+                                            {doc}
+                                        </MultiSelectItem>
+                                        ))
+                                        }
+                                     </MultiSelect>
+                                </div>
+                                <div className="sm:col-span-2 flex items-end">
+                                    <Button onClick={() => addLink()}>
+                                        <PlusIcon className="h-5 w-5 text-white btn-circle" aria-hidden="true" />
+                                    </Button>
+                                </div>
+                            </div>          
+                            <Divider />
                             <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
                                 <Button className="w-full sm:w-auto mt-4 sm:mt-0" variant="light" onClick={() => setIsOpen(false)}>
                                     Cancel
