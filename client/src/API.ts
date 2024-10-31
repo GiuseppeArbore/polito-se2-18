@@ -1,6 +1,6 @@
 import { KxDocument } from './model';
 
-const API_URL = 'http://localhost:3000/api';
+const API_URL = 'http://localhost:3001/api';
 
  const createKxDocument = async (document: KxDocument): Promise<KxDocument | null> => {
     try {

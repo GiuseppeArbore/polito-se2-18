@@ -1,6 +1,7 @@
 const cors = require('cors');
 import express from 'express';
 import initRoutes from './src/routes';
+import { registerErrorHandler } from './src/errorHandlers';
 
 const app: express.Application = express();
 
@@ -15,6 +16,7 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 initRoutes(app);
+registerErrorHandler(app);
 
 if (!module.parent) {
   app.listen(port, () => {

@@ -5,6 +5,7 @@ import { AreaType, KxDocumentType, Scale, Stakeholders } from "../src/models/enu
 import {db} from "../src/db/dao";
 
 
+
 const date = new Date();
 let documentIds: string[] = [];
 
@@ -19,7 +20,7 @@ describe("Integration Tests for Document API", () => {
         await db.disconnectFromDB();
     });
 
-    test("Should create a new document", async () => {
+    test("Test 1 - Should create a new document", async () => {
         const response = await request(app)
             .post('/api/documents')
             .send({
@@ -41,7 +42,7 @@ describe("Integration Tests for Document API", () => {
         documentIds.push(response.body._id);
     });
 
-    test("Should fail to create a document with missing required fields", async () => {
+    test("Test 2 - Should fail to create a document with missing required fields", async () => {
         const response = await request(app)
             .post('/api/documents')
             .send({
@@ -58,6 +59,27 @@ describe("Integration Tests for Document API", () => {
         expect(response.status).toBe(400);
         expect(response.body.errors).toBeDefined();
         expect(response.body.errors[0].msg).toBe('Title is required');
+    });
+
+
+    test("Test 3 - Should not create a new document if i send an already existing _id", async () => {
+        const response = await request(app)
+            .post('/api/documents')
+            .send({
+                _id: documentIds[0],
+                title: "Integration Test Document",
+                stakeholders: [Stakeholders.RESIDENT],
+                scale_info: Scale.TEXT,
+                scale: 10,
+                issuance_date: date,
+                type: KxDocumentType.INFORMATIVE,
+                connections: 0,
+                language: "Swedish",
+                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                description: "This is a test document for integration testing."
+            });
+        expect(response.status).toBe(400);
+        expect(response.body).toEqual({ error: 'Internal Server Error', status: 400 });
     });
 
 });

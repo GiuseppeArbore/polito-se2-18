@@ -4,7 +4,7 @@ import { createKxDocument } from '../src/controller';
 import {app} from "../index";
 import { AreaType, KxDocumentType, Scale, Stakeholders } from '../src/models/enum';
 
-// Mock del controller
+
 jest.mock('../src/controller', () => ({
     createKxDocument: jest.fn(),
 }));
@@ -15,7 +15,7 @@ describe('Document Routes', () => {
         jest.clearAllMocks();
     });
 
-    test('POST /api/documents - should create a new document', async () => {
+    test('Test 1 - POST /api/documents - should create a new document', async () => {
         const mockDocument = {
             _id: '12345',
             title: 'Integration Test Document',
@@ -56,7 +56,7 @@ describe('Document Routes', () => {
 
    
 
-    test('POST /api/documents - should fail with missing required fields', async () => {
+    test('Test 2 - POST /api/documents - should fail with missing required fields', async () => {
         const response = await request(app)
             .post('/api/documents')
             .send({
