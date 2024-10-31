@@ -30,6 +30,10 @@ describe('Document Routes', () => {
             description: 'This is a test document for integration testing.',
         };
 
+        jest.mock('../src/errorHandlers', () => ({
+            validateRequest: jest.fn().mockImplementation((req, res, next) => next())
+        }));
+
         (createKxDocument as jest.Mock).mockImplementation((req: Request, res: Response) => {
             res.status(201).json(mockDocument);
         });
@@ -56,22 +60,87 @@ describe('Document Routes', () => {
 
    
 
-    test('Test 2 - POST /api/documents - should fail with missing required fields', async () => {
+    test('Test 2 - POST /api/documents - should return error 400 (missing title)', async () => {
+
+        jest.mock('express-validator', () => ({
+            body: jest.fn().mockImplementation((fieldName: string) => {
+                if (fieldName === 'title') {
+                    return {
+                        run: jest.fn().mockResolvedValue({
+                            errors: [{ msg: 'Title is required', param: 'title', location: 'body' }]
+                        })
+                    };
+                }
+            })
+        }));
+
+
         const response = await request(app)
             .post('/api/documents')
             .send({
-                stakeholders: ['RESIDENT'],
-                scale_info: 'TEXT',
+                stakeholders: [Stakeholders.RESIDENT],
+                scale_info: Scale.TEXT,
                 scale: 10,
                 issuance_date: new Date().toISOString(),
-                type: 'INFORMATIVE',
+                type: KxDocumentType.INFORMATIVE,
                 connections: 0,
                 language: 'Swedish',
-                area_type: 'ENTIRE_MUNICIPALITY',
+                area_type: AreaType.ENTIRE_MUNICIPALITY,
                 description: 'This is a test document for integration testing.',
             });
 
         expect(response.status).toBe(400);
-        expect(response.body).toHaveProperty('errors');
+        expect(response.body.errors[0].msg).toBe('Title is required');
     });
+
+    test('Test 3 - POST /api/documents - should return error 400 (missing title,stakeholders)', async () => {
+
+        jest.mock('express-validator', () => ({
+            body: jest.fn().mockImplementation((fieldName: string) => {
+                if (fieldName === 'title') {
+                    return {
+                        run: jest.fn().mockResolvedValue({
+                            errors: [{ msg: 'Title is required', param: 'title', location: 'body' }]
+                        })
+                    };
+                }
+                if (fieldName === 'stakeholders') {
+                    return {
+                        run: jest.fn().mockResolvedValue({
+                            errors: [{ msg: 'Stakeholders are requiredftygui', param: 'stakeholders', location: 'body' }]
+                        })
+                    };
+                }
+            })
+        }));
+
+        jest.mock('../src/errorHandlers', () => ({
+    validateRequest: jest.fn().mockImplementation((req, res, next) => {
+        req.validationErrors = [
+            { msg: 'Title is required', param: 'title', location: 'body' },
+            { msg: 'Stakeholders are requiredasdtfy', param: 'stakeholders', location: 'body' }
+        ];
+        return next();
+    })
+}));
+
+
+        const response = await request(app)
+            .post('/api/documents')
+            .send({
+                scale_info: Scale.TEXT,
+                scale: 10,
+                issuance_date: new Date().toISOString(),
+                type: KxDocumentType.INFORMATIVE,
+                connections: 0,
+                language: 'Swedish',
+                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                description: 'This is a test document for integration testing.',
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body.errors[0].msg).toBe('Title is required');
+        expect(response.body.errors[1].msg).toBe('Stakeholders are required');
+    });
+    
 });
