@@ -1,7 +1,7 @@
 import mapboxgl from "mapbox-gl"
 import React, { useEffect, useRef } from "react";
 import { Button, Card, Tab, TabGroup, TabList } from "@tremor/react";
-import { RiDeleteBinFill } from "@remixicon/react";
+import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -53,24 +53,21 @@ interface MapControlsProps {
 const MapControls: React.FC<MapControlsProps> = (props) => {
     return (
         <Card
-            className="ring-transparent absolute top-0 right-0 xsm:w-full sm:w-80 backdrop-blur-xl bg-black/50"
+            className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50"
         >
-            <h3 className="text-center text-tremor-title font-semibold text-slate-50">
-                Area selector
-            </h3>
-            <TabGroup className="mt-4 flex justify-center">
+            <TabGroup className="mt-1 flex justify-center">
                 <TabList variant="solid">
                     <Tab value="1">Point</Tab>
                     <Tab value="2">Area</Tab>
                     <Tab value="3">Whole Municipality</Tab>
                 </TabList>
             </TabGroup>
-            <div className="mt-4 px-2 flex justify-between">
-                <Button variant="secondary" icon={RiDeleteBinFill} color="red"/>
-                <Button variant="secondary" onClick={props.onCancel}>Cancel</Button>
-                <Button variant="primary" onClick={() => {
+            <div className="mt-4 px-2 flex justify-between space-x-2">
+                <Button size="xs" variant="secondary" icon={RiDeleteBinFill} color="red" className="flex-1">Line</Button>
+                <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
+                <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
                     props.onDone!(1);
-                }}>Done</Button>
+                }} className="flex-1">Save</Button>
             </div>
         </Card>
     )
@@ -102,7 +99,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
 
     return (
         <>
-            <div className={props.className} ref={mapContainerRef} id="map" style={props.style}/>
+            <div className={props.className} ref={mapContainerRef} id="map" style={props.style} />
             <MapControls onCancel={props.onCancel} onDone={props.onDone}></MapControls>
         </>
     )
