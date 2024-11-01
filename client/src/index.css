@@ -9,3 +9,7 @@ body {
 .no-click {
     pointer-events: none;
  }
+
+.text-sm {
+    font-size: smaller;
+}
