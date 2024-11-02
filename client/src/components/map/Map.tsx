@@ -1,16 +1,11 @@
 import mapboxgl from "mapbox-gl"
-import React, { useEffect, useRef } from "react";
-import { Button, Card, Tab, TabGroup, TabList } from "@tremor/react";
-import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import FreehandMode from 'mapbox-gl-draw-freehand-mode'
+import React, { useContext, useEffect, useRef } from "react";
+import { Button, Card  } from "@tremor/react";
+import { RiCheckFill, RiCloseLine  } from "@remixicon/react";
+import { DrawBarPolygon } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import CutPolygonMode, {
-    drawStyles as cutPolygonDrawStyles,
-  } from "mapbox-gl-draw-cut-polygon-mode";
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
-import { CutBar } from "mapbox-gl-draw-cut-polygon-mode";
-import { KxTheme } from "mapbox-gl-draw-cut-polygon-mode";
+
 export interface SatMapProps {
     zoom?: number,
     style?: React.CSSProperties,
@@ -19,7 +14,9 @@ export interface SatMapProps {
 
 const defaultZoom = 12;
 
+
 export const PreviewMap: React.FC<SatMapProps> = (props) => {
+
     const mapContainerRef = useRef<any>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
 
@@ -61,21 +58,14 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
         <Card
             className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50"
         >
-            <TabGroup className="mt-1 flex justify-center">
-                <TabList variant="solid">
-                    <Tab value="1">Point</Tab>
-                    <Tab value="2">Area</Tab>
-                    <Tab value="3">Whole Municipality</Tab>
-                </TabList>
-            </TabGroup>
-            <div className="mt-4 px-2 flex justify-between space-x-2">
+            <div className="px-2 flex justify-between space-x-2">
                 <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
                 <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
                     props.onDone!(1);
                 }} className="flex-1">Save</Button>
             </div>
         </Card>
-    )
+    );
 };
 
 export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
@@ -84,7 +74,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
 
     useEffect(() => {
         if (mapRef.current) return;
-
+        console.log("pizza");
         mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: "mapbox://styles/mapbox/satellite-streets-v12",
@@ -92,45 +82,12 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
             zoom: props.zoom || defaultZoom,
             pitch: 40,
         });
+        mapRef.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+        mapRef.current.addControl(DrawBarPolygon, "top-left")
+        mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
         
-        var Draw = new MapboxDraw({
-            displayControlsDefault: true,
-            modes: {
-                ...CutPolygonMode(MapboxDraw.modes),
-                draw_polygon: FreehandMode
-            },
-            styles: [...cutPolygonDrawStyles(KxTheme)],
-            userProperties: true,
-            controls: {
-                polygon: true,
-                trash: true,
-                line_string: false,
-                point: false,
-                combine_features: false,
-                uncombine_features: false,
-            }
 
-
-        });
-        const splitPolygon = () => {
-            try {
-              Draw?.changeMode("cut_polygon");
-            } catch (err) {
-              console.error(err);
-            }
-        };
-        var drawBar = new CutBar({
-            draw: Draw,
-            buttons: [
-              {
-                on: "click",
-                action: splitPolygon,
-                classes: ["split-icon"],
-              },
-            ],
-          });
-
-        mapRef.current.addControl(drawBar, 'top-left');
     }, []);
 
     useEffect(() => {
