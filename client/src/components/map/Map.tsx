@@ -1,7 +1,8 @@
 import mapboxgl, { LngLatLike } from "mapbox-gl"
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState, useContext } from "react";
 import { Button, Card, Tab, TabGroup, TabList } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
+import { InsertContext } from "./insertContext";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -52,16 +53,16 @@ interface MapControlsProps {
 }
 
 const MapControls: React.FC<MapControlsProps> = (props) => {
-    const [selectedInsert, setSelectedInsert] = useState(0);
+    const { selectedInsert, setSelectedInsert } = useContext(InsertContext);
     return (
         <Card
             className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50"
         >
             <TabGroup className="mt-1 flex justify-center" onIndexChange={(index) => { setSelectedInsert(index) }}>
                 <TabList variant="solid">
-                    <Tab value="1">Point</Tab>
-                    <Tab value="2">Area</Tab>
-                    <Tab value="3">Whole Municipality</Tab>
+                    <Tab value="0">Point</Tab>
+                    <Tab value="1">Area</Tab>
+                    <Tab value="2">Whole Municipality</Tab>
                 </TabList>
             </TabGroup>
             <div className="mt-4 px-2 flex justify-between space-x-2">
