@@ -13,6 +13,7 @@ import {
   Textarea,
   Badge,
   Callout,
+  Switch,
 } from "@tremor/react";
 import { useState } from "react";
 import locales from "./../../locales.json";
@@ -43,6 +44,8 @@ export function FormDialog() {
   const [scale, setScale] = useState(10000);
   const [pages, setPages] = useState("");
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
+  const [showMap, setShowMap] = useState<boolean>(false);
+
 
   // For initializing
   const [documents, setDocuments] = useState<string[]>([
@@ -249,30 +252,49 @@ export function FormDialog() {
                   />
                 </div>
               </div>
-              <Card
-                className="my-4 p-0 overflow-hidden cursor-pointer"
-                onClick={() => setIsMapOpen(true)}
-              >
-                <PreviewMap
-                  style={{ minHeight: "300px", width: "100%" }}
-                ></PreviewMap>
-              </Card>
-              <Dialog
-                open={isMapOpen}
-                onClose={(val) => setIsMapOpen(val)}
-                static={true}
-              >
-                <DialogPanel
-                  className="p-0 overflow-hidden"
-                  style={{ maxWidth: "100%" }}
-                >
-                  <SatMap
-                    onCancel={() => setIsMapOpen(false)}
-                    onDone={() => setIsMapOpen(false)}
-                    style={{ minHeight: "95vh", width: "100%" }}
-                  ></SatMap>
-                </DialogPanel>
-              </Dialog>
+
+              <Divider />
+              <div className="flex items-center space-x-3">
+                <label htmlFor="switch" className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                  Select the whole Municipality {' '}
+                  <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Kiruna</span>
+                </label>
+                <Switch
+                  id="switch"
+                  name="switch"
+                  checked={showMap}
+                  onChange={setShowMap}
+                />
+              </div>
+
+              {!showMap && (
+                <>
+                  <Card
+                    className="my-4 p-0 overflow-hidden cursor-pointer"
+                    onClick={() => setIsMapOpen(true)}
+                  >
+                    <PreviewMap
+                      style={{ minHeight: "300px", width: "100%" }}
+                    ></PreviewMap>
+                  </Card>
+                  <Dialog
+                    open={isMapOpen}
+                    onClose={() => setIsMapOpen(false)}
+                    static={true}
+                  >
+                    <DialogPanel
+                      className="p-0 overflow-hidden"
+                      style={{ maxWidth: "100%" }}
+                    >
+                      <SatMap
+                        onCancel={() => setIsMapOpen(false)}
+                        onDone={() => setIsMapOpen(false)}
+                        style={{ minHeight: "95vh", width: "100%" }}
+                      ></SatMap>
+                    </DialogPanel>
+                  </Dialog>
+                </>
+              )}
               <Divider />
               <div className="col-span-full">
                 <label
@@ -320,9 +342,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -352,9 +374,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -381,9 +403,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -410,9 +432,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
