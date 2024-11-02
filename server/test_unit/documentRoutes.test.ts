@@ -28,6 +28,7 @@ describe('Document Routes', () => {
             language: 'Swedish',
             area_type: AreaType.ENTIRE_MUNICIPALITY,
             description: 'This is a test document for unit testing.',
+            pages: []
         };
 
         (createKxDocument as jest.Mock).mockImplementation((req: Request, res: Response) => {
@@ -47,6 +48,7 @@ describe('Document Routes', () => {
                 language: 'Swedish',
                 area_type: AreaType.ENTIRE_MUNICIPALITY,
                 description: 'This is a test document for unit testing.',
+                pages: []
             });
 
         expect(response.status).toBe(201);

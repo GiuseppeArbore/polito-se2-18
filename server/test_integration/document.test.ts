@@ -33,7 +33,8 @@ describe("Integration Tests for Document API", () => {
                 connections: 0,
                 language: "Swedish",
                 area_type: AreaType.ENTIRE_MUNICIPALITY,
-                description: "This is a test document for integration testing."
+                description: "This is a test document for integration testing.",
+                pages: []
             });
         expect(response.status).toBe(201);
         expect(response.body).toHaveProperty('_id');
@@ -76,7 +77,8 @@ describe("Integration Tests for Document API", () => {
                 connections: 0,
                 language: "Swedish",
                 area_type: AreaType.ENTIRE_MUNICIPALITY,
-                description: "This is a test document for integration testing."
+                description: "This is a test document for integration testing.",
+                pages: []
             });
         expect(response.status).toBe(400);
         expect(response.body).toEqual({ error: 'Internal Server Error', status: 400 });
@@ -104,7 +106,8 @@ describe("Integration Tests for Document API", () => {
                 connections: 0,
                 language: "Swedish",
                 area_type: AreaType.ENTIRE_MUNICIPALITY,
-                description: "This is a test document for integration testing."
+                description: "This is a test document for integration testing.",
+                pages: []
             });
 
         expect(response.status).toBe(500);

@@ -8,7 +8,7 @@ import { AreaType, KxDocumentType, Scale, Stakeholders } from './models/enum';
 
 export function initRoutes(app: Application) {
 
-     const validateKxDocument = () => [
+     const kxDocumentValidationChain = [
         body('title').notEmpty().withMessage('Title is required'),
         body('stakeholders').notEmpty().withMessage('Stakeholders are required')
             .isArray().withMessage('Stakeholders must be an array')
@@ -22,13 +22,20 @@ export function initRoutes(app: Application) {
             .isISO8601().toDate().withMessage('Issuance date must be a valid date'),
         body('type').notEmpty().withMessage('Type is required')
             .isIn(Object.values(KxDocumentType)).withMessage('Invalid document type'),
-        body('connections').notEmpty().withMessage('Connections are required')
-            .isNumeric().withMessage('Connections must be a number'),
         body('language').notEmpty().withMessage('Language is required')
             .isString().withMessage('Language must be a string'),
         body('area_type').notEmpty().withMessage('Area type is required')
             .isIn(Object.values(AreaType)).withMessage('Invalid area type value'),
         body('description').notEmpty().withMessage('Description is required'),
+        body('pages').isArray().custom((v) => {
+            if (!Array.isArray(v))
+                return false;
+
+            return v.every((e) => {
+                return ((Array.isArray(e) && e.length === 2 && e.every(t => typeof t === "number" && t >= 0 && Number.isInteger(t))) ||
+                    (typeof e === "number" && e >= 0 && Number.isInteger(e)));
+            })
+        }).withMessage('Invalid pages'),
     ];
     
     app.get("/doc", async (req, res) => {
@@ -37,7 +44,7 @@ export function initRoutes(app: Application) {
 
     app.post(
         '/api/documents',
-        validateKxDocument(),
+        kxDocumentValidationChain,
         validateRequest,
         createKxDocument
     );
