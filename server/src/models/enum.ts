@@ -13,14 +13,14 @@ export enum Scale {
 }
 
 export enum KxDocumentType {
-    INFORMATIVE = "Informative document",
+    INFORMATIVE = "Informative Document",
     PRESCRIPTIVE = "Prescriptive Document",
-    DESIGN = "Design document",
-    TECHNICAL = "Technical document",
-    STRATEGY = "Strategy document",
-    AGREEMENT = "Agreement document",
-    CONFLICT = "Conflict resolution document",
-    CONSULTATION = "Consultation document",
+    DESIGN = "Design Document",
+    TECHNICAL = "Technical Document",
+    STRATEGY = "Strategy",
+    AGREEMENT = "Agreement",
+    CONFLICT = "Conflict Resolution",
+    CONSULTATION = "Consultation",
 }
 
 export enum AreaType {

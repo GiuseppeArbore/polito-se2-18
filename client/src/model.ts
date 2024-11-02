@@ -6,12 +6,12 @@ export class KxDocument {
     stakeholders: Stakeholders[];
     scale_info: Scale;
     scale: number;
-    issuance_date: Date;
-    type: KxDocumentType;
-    connections: number;
-    language: string;
-    area_type: AreaType;
-    description: string;
+    issuance_date?: Date;
+    type?: KxDocumentType;
+    connections?: number;
+    language?: string;
+    area_type?: AreaType;
+    description?: string;
     _id?: ObjectId;
     pages?: PageRange[];
 
@@ -20,12 +20,12 @@ export class KxDocument {
         stakeholders: Stakeholders[],
         scale: number,
         scale_info: Scale,
-        issuance_date: Date,
-        type: KxDocumentType,
-        connections: number,
-        language: string,
-        description: string,
-        area_type: AreaType,
+        issuance_date?: Date,
+        type?: KxDocumentType,
+        connections?: number,
+        language?: string,
+        description?: string,
+        area_type?: AreaType,
         _id?: ObjectId,
         pages?: PageRange[]
     ) {
