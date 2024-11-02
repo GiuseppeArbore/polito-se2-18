@@ -22,12 +22,12 @@ export function initRoutes(app: Application) {
             .isISO8601().toDate().withMessage('Issuance date must be a valid date'),
         body('type').notEmpty().withMessage('Type is required')
             .isIn(Object.values(KxDocumentType)).withMessage('Invalid document type'),
-        body('language').notEmpty().withMessage('Language is required')
+        body('language').optional().notEmpty().withMessage('Language is required')
             .isString().withMessage('Language must be a string'),
         body('area_type').notEmpty().withMessage('Area type is required')
             .isIn(Object.values(AreaType)).withMessage('Invalid area type value'),
         body('description').notEmpty().withMessage('Description is required'),
-        body('pages').isArray().custom((v) => {
+        body('pages').optional().isArray().custom((v) => {
             if (!Array.isArray(v))
                 return false;
 

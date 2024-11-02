@@ -43,15 +43,19 @@ export class Link {
 export function FormDialog() {
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
+  const [titleError, setTitleError] = useState(false);
   const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
+  const [shError, setShError] = useState(false);
   const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(
-    undefined
+    new Date()
   );
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
+  const [typeError, setTypeError] = useState(false);
   const [scale, setScale] = useState(10000);
-  const [language, setLanguage] = useState("");
+  const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState("");
-  const [description, setDescription] = useState("");
+  const [description, setDescription] = useState<string | undefined>(undefined);
+  const [descriptionError, setDescriptionError] = useState(false);
   // const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [error, setError] = useState("");
   const [isMapOpen, setIsMapOpen] = useState(false);
@@ -64,6 +68,16 @@ export function FormDialog() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    const tmpTitleError = title.length === 0;
+    const tmpShError = stakeholders.length === 0;
+    if (tmpTitleError || tmpShError) {
+      setTitleError(tmpTitleError);
+      setShError(tmpShError);
+      setTypeError(!type);
+      setDescriptionError(!!description);
+      return;
+    }
+
     const newDocument: KxDocument = {
       title,
       stakeholders,
@@ -136,6 +150,11 @@ export function FormDialog() {
                     autoComplete="title"
                     placeholder="Title"
                     className="mt-2"
+                    onBlur={() => {
+                      setTitleError(title.length === 0);
+                    }}
+                    error={titleError}
+                    errorMessage="The title is mandatory"
                     required
                   />
                 </div>
@@ -151,7 +170,12 @@ export function FormDialog() {
                     id="stakeholders"
                     name="stakeholders"
                     className="mt-2"
+                    onBlur={() => {
+                      setShError(stakeholders.length === 0);
+                    }}
                     onValueChange={s => setStakeholders(s.map(sh => Stakeholders[sh as keyof typeof Stakeholders]))}
+                    error={shError}
+                    errorMessage="You must select at least one stakeholder."
                     required
                   >
                     {
@@ -171,6 +195,7 @@ export function FormDialog() {
                     className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
                   >
                     Issuance date
+                    <span className="text-red-500">*</span>
                   </label>
                   <DatePicker
                     id="issuance-date"
@@ -179,6 +204,7 @@ export function FormDialog() {
                     onValueChange={d => setIssuanceDate(d)}
                     enableYearNavigation={true}
                     weekStartsOn={1}
+                    enableClear={false}
                   />
                 </div>
 
@@ -188,12 +214,18 @@ export function FormDialog() {
                     className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
                   >
                     Type
+                    <span className="text-red-500">*</span>
                   </label>
                   <SearchSelect
                     id="doc_type"
                     name="doc_type"
                     className="mt-2"
                     onValueChange={t => setType(KxDocumentType[t as keyof typeof KxDocumentType])}
+                    onBlur={() => {
+                      setTypeError(!type);
+                    }}
+                    error={typeError}
+                    errorMessage="The type is mandatory"
                     required
                   >
                     {
@@ -326,6 +358,7 @@ export function FormDialog() {
                   className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
                 >
                   Description
+                  <span className="text-red-500">*</span>
                 </label>
                 <Textarea
                   id="description"
@@ -333,6 +366,11 @@ export function FormDialog() {
                   placeholder="Description"
                   className="mt-2"
                   value={description}
+                  onBlur={() => {
+                    setDescriptionError(!!description);
+                  }}
+                  error={descriptionError}
+                  errorMessage="The description is mandatory"
                   onValueChange={d => setDescription(d)}
                   style={{ minHeight: "200px" }}
                 />
