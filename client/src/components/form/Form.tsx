@@ -4,15 +4,54 @@ import locales from './../../locales.json'
 import docTypes from './../../docTypes.json'
 import { PreviewMap, SatMap } from '../map/Map';
 import { parseLocalizedNumber, PageRange, validatePageRangeString } from '../../utils';
+import API from '../../API';
+import {  KxDocumentType, Scale, Stakeholders, AreaType } from '../../enum';
+import { KxDocument } from '../../model';
 
 
 export function FormDialog() {
     const [isOpen, setIsOpen] = useState(false);
-    const [isMapOpen, setIsMapOpen] = useState(false);
-    const [scale, setScale] = useState(10000);
+    const [title, setTitle] = useState("");
+    const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
+    const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(undefined);
+    const [type, setType] = useState<KxDocumentType | null>(null);
+    const [scale, setScale] = useState(0);
+    const [language, setLanguage] = useState("");
     const [pages, setPages] = useState("");
+    const [description, setDescription] = useState("");
+    const [documents, setDocuments] = useState<KxDocument[]>([]);
+    const [error, setError] = useState("");
+    const [isMapOpen, setIsMapOpen] = useState(false);
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
 
+    const handleSubmit = async (e: React.FormEvent) => {
+         e.preventDefault();
+        const newDocument: KxDocument = {
+            title,
+            stakeholders,
+            scale_info: Scale.TEXT,
+            scale,
+            issuance_date: issuanceDate || new Date(),
+            type: type as KxDocumentType,
+            connections: 0,
+            language,
+            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            description,
+            pages: validatePageRangeString(pages),
+        };
+
+        try {
+            const createdDocument = await API.createKxDocument(newDocument);
+            if (createdDocument) {
+                setDocuments([...documents, createdDocument]);
+            } else {
+                setError("Failed to create document");
+            }
+            setIsOpen(false);
+        } catch (error) {
+            setError("Failed to create document");
+        }
+    };
 
     return (
         <>

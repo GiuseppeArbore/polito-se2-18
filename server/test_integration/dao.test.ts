@@ -2,7 +2,7 @@ import { describe, test } from "@jest/globals"
 import { db } from "../src/db/dao";
 import { AreaType, KxDocumentType, Scale, Stakeholders } from "../src/models/enum";
 import { KxDocument } from "../src/models/model";
-import { ObjectId } from "mongodb";
+import { ObjectId } from "mongoose";
 
 const list: ObjectId[] = [];
 const date = new Date();
