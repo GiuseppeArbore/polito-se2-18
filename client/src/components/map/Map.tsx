@@ -2,7 +2,6 @@ import mapboxgl, { LngLatLike } from "mapbox-gl"
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { Button, Card, Tab, TabGroup, TabList } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
-import { SelectedInsertContext } from "./insertContext";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -53,7 +52,6 @@ interface MapControlsProps {
 }
 
 const MapControls: React.FC<MapControlsProps> = (props) => {
-    const { selectedInsert, setSelectedInsert } = useContext(SelectedInsertContext);
     return (
         <Card
             className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50"
@@ -62,44 +60,9 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
                 <TabList variant="solid">
                     <Tab value="0">Point</Tab>
                     <Tab value="1">Area</Tab>
-                    <Tab value="2">Whole Municipality</Tab>
                 </TabList>
             </TabGroup>
             <div className="mt-4 px-2 flex justify-between space-x-2">
-                {selectedInsert === 0 &&
-                    <>
-
-                        <Button size="xs" variant="secondary" icon={RiDeleteBinFill} color="red" className="flex-1">Point</Button>
-                        <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
-
-                        <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
-                            props.onDone!(1);
-                        }} className="flex-1">Save</Button>
-                    </>
-                }
-
-                {selectedInsert === 1 &&
-                    <>
-                        <Button size="xs" variant="secondary" icon={RiDeleteBinFill} color="red" className="flex-1">Area</Button>
-                        <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
-
-                        <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
-                            props.onDone!(1);
-                        }} className="flex-1">Save</Button>
-
-                    </>
-                }
-
-                {selectedInsert === 2 &&
-                    <>
-                        <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
-
-                        <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
-                            props.onDone!(1);
-                        }} className="flex-1">Save</Button>
-                    </>
-
-                }
 
             </div>
         </Card>
