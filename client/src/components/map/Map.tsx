@@ -5,7 +5,11 @@ import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
 import FreehandMode from 'mapbox-gl-draw-freehand-mode'
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-
+import CutPolygonMode, {
+    drawStyles as cutPolygonDrawStyles,
+  } from "mapbox-gl-draw-cut-polygon-mode";
+import CutBar from "./CutBar";
+import KirunaStyle from "./theme";
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
 export interface SatMapProps {
@@ -89,23 +93,36 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
             zoom: props.zoom || defaultZoom,
             pitch: 40,
         });
+        
         var Draw = new MapboxDraw({
             displayControlsDefault: true,
             modes: {
-                ...MapboxDraw.modes,
+                ...CutPolygonMode(MapboxDraw.modes),
                 draw_polygon: FreehandMode
             },
-            controls: {
-                polygon: true,
-                trash: true,
-                line_string: false,
-                point: false,
-                combine_features: false,
-                uncombine_features: false,
-            }
+            styles: [...cutPolygonDrawStyles(KirunaStyle)],
+            userProperties: true,
+
         });
-        
-        mapRef.current.addControl(Draw, 'top-left');
+        const splitPolygon = () => {
+            try {
+              Draw?.changeMode("cut_polygon");
+            } catch (err) {
+              console.error(err);
+            }
+        };
+        var drawBar = new CutBar({
+            draw: Draw,
+            buttons: [
+              {
+                on: "click",
+                action: splitPolygon,
+                classes: ["split-icon"],
+              },
+            ],
+          });
+
+        mapRef.current.addControl(drawBar, 'top-left');
     }, []);
 
     useEffect(() => {
