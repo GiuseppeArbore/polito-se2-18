@@ -56,7 +56,7 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
         <Card
             className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50"
         >
-            <TabGroup className="mt-1 flex justify-center" onIndexChange={(index) => { setSelectedInsert(index) }}>
+            <TabGroup className="mt-1 flex justify-center" >
                 <TabList variant="solid">
                     <Tab value="0">Point</Tab>
                     <Tab value="1">Area</Tab>
