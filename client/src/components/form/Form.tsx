@@ -74,7 +74,7 @@ export function FormDialog() {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
-      setDescriptionError(!!description);
+      setDescriptionError(!description);
       return;
     }
 
@@ -367,7 +367,7 @@ export function FormDialog() {
                   className="mt-2"
                   value={description}
                   onBlur={() => {
-                    setDescriptionError(!!description);
+                    setDescriptionError(!description);
                   }}
                   error={descriptionError}
                   errorMessage="The description is mandatory"
