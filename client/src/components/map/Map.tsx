@@ -2,6 +2,8 @@ import mapboxgl from "mapbox-gl"
 import React, { useEffect, useRef } from "react";
 import { Button, Card, Tab, TabGroup, TabList } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -63,7 +65,6 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
                 </TabList>
             </TabGroup>
             <div className="mt-4 px-2 flex justify-between space-x-2">
-                <Button size="xs" variant="secondary" icon={RiDeleteBinFill} color="red" className="flex-1">Line</Button>
                 <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
                 <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
                     props.onDone!(1);
@@ -87,6 +88,18 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
             zoom: props.zoom || defaultZoom,
             pitch: 40,
         });
+        var Draw = new MapboxDraw({
+            displayControlsDefault: false,
+            controls: {
+                polygon: true,
+                trash: true,
+                line_string: false,
+                point: true,
+                combine_features: false,
+                uncombine_features: false,
+            }
+        });
+    
     }, []);
 
     useEffect(() => {
