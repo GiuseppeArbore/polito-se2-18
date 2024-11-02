@@ -52,7 +52,7 @@ interface MapControlsProps {
 }
 
 const MapControls: React.FC<MapControlsProps> = (props) => {
-    const [selectedInsert, setSelectedInsert] = useState(4);
+    const [selectedInsert, setSelectedInsert] = useState(0);
     return (
         <Card
             className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50"
