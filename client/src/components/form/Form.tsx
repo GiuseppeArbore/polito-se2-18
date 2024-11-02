@@ -19,6 +19,9 @@ import { useState } from "react";
 import locales from "./../../locales.json";
 import docTypes from "./../../docTypes.json";
 import { PreviewMap, SatMap } from "../map/Map";
+import API from "../../API";
+import { AreaType, KxDocumentType, Scale, Stakeholders } from "../../enum";
+import { KxDocument } from "../../model";
 import {
   RiArrowDownCircleLine,
   RiLinksLine,
@@ -49,7 +52,7 @@ export function FormDialog() {
     const [language, setLanguage] = useState("");
     const [pages, setPages] = useState("");
     const [description, setDescription] = useState("");
-    const [documents, setDocuments] = useState<KxDocument[]>([]);
+    // const [documents, setDocuments] = useState<KxDocument[]>([]);
     const [error, setError] = useState("");
     const [isMapOpen, setIsMapOpen] = useState(false);
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -78,7 +81,7 @@ export function FormDialog() {
         try {
             const createdDocument = await API.createKxDocument(newDocument);
             if (createdDocument) {
-                setDocuments([...documents, createdDocument]);
+                setDocuments([...documents, createdDocument.title]);
             } else {
                 setError("Failed to create document");
             }
