@@ -2,7 +2,7 @@ import mapboxgl, { LngLatLike } from "mapbox-gl"
 import React, { useEffect, useRef, useState, useContext } from "react";
 import { Button, Card, Tab, TabGroup, TabList } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
-import { InsertContext } from "./insertContext";
+import { SelectedInsertContext } from "./insertContext";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -53,7 +53,7 @@ interface MapControlsProps {
 }
 
 const MapControls: React.FC<MapControlsProps> = (props) => {
-    const { selectedInsert, setSelectedInsert } = useContext(InsertContext);
+    const { selectedInsert, setSelectedInsert } = useContext(SelectedInsertContext);
     return (
         <Card
             className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50"

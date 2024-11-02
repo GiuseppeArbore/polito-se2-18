@@ -1,15 +1,15 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 export const SelectedInsertContext = createContext<{
-    selectedInsertContext: number;
-    setSelectedInsertContext: React.Dispatch<React.SetStateAction<number>>;
+    selectedInsert: number;
+    setSelectedInsert: React.Dispatch<React.SetStateAction<number>>;
 } | undefined>(undefined);
 
 export const SelectedInsertProvider = ({ children }: { children: ReactNode }) => {
-    const [selectedInsertContext, setSelectedInsertContext] = useState(0);
+    const [selectedInsert, setSelectedInsert] = useState(0);
 
     return (
-        <SelectedInsertContext.Provider value={{ selectedInsertContext, setSelectedInsertContext }}>
+        <SelectedInsertContext.Provider value={{ selectedInsert, setSelectedInsert }}>
             {children}
         </SelectedInsertContext.Provider>
     );
