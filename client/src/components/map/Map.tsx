@@ -3,6 +3,7 @@ import React, { useEffect, useRef } from "react";
 import { Button, Card, Tab, TabGroup, TabList } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import FreehandMode from 'mapbox-gl-draw-freehand-mode'
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
@@ -89,17 +90,22 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
             pitch: 40,
         });
         var Draw = new MapboxDraw({
-            displayControlsDefault: false,
+            displayControlsDefault: true,
+            modes: {
+                ...MapboxDraw.modes,
+                draw_polygon: FreehandMode
+            },
             controls: {
                 polygon: true,
                 trash: true,
                 line_string: false,
-                point: true,
+                point: false,
                 combine_features: false,
                 uncombine_features: false,
             }
         });
-    
+        
+        mapRef.current.addControl(Draw, 'top-left');
     }, []);
 
     useEffect(() => {
