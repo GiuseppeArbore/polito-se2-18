@@ -8,10 +8,9 @@ import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import CutPolygonMode, {
     drawStyles as cutPolygonDrawStyles,
   } from "mapbox-gl-draw-cut-polygon-mode";
-import CutBar from "./CutBar";
-import KirunaStyle from "./theme";
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
-
+import { CutBar } from "mapbox-gl-draw-cut-polygon-mode";
+import { KxTheme } from "mapbox-gl-draw-cut-polygon-mode";
 export interface SatMapProps {
     zoom?: number,
     style?: React.CSSProperties,
@@ -100,8 +99,17 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
                 ...CutPolygonMode(MapboxDraw.modes),
                 draw_polygon: FreehandMode
             },
-            styles: [...cutPolygonDrawStyles(KirunaStyle)],
+            styles: [...cutPolygonDrawStyles(KxTheme)],
             userProperties: true,
+            controls: {
+                polygon: true,
+                trash: true,
+                line_string: false,
+                point: false,
+                combine_features: false,
+                uncombine_features: false,
+            }
+
 
         });
         const splitPolygon = () => {

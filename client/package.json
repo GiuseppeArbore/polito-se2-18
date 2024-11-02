@@ -14,7 +14,7 @@
     "@remixicon/react": "^4.5.0",
     "@tremor/react": "^3.3.0",
     "mapbox-gl": "^3.7.0",
-    "mapbox-gl-draw-cut-polygon-mode": "^2.0.0",
+    "mapbox-gl-draw-cut-polygon-mode": "github:lbordino/mapbox-gl-draw-cut-polygon-mode",
     "mapbox-gl-draw-freehand-mode": "github:lbordino/mapbox-gl-draw-freehand-mode",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
