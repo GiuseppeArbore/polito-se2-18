@@ -1,5 +1,5 @@
 import mapboxgl, { LngLatLike } from "mapbox-gl"
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { Button, Card, Tab, TabGroup, TabList } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
 
@@ -12,7 +12,7 @@ export interface SatMapProps {
 }
 
 const defaultZoom = 12;
-const center : LngLatLike = [20.26, 67.845];
+const center: LngLatLike = [20.26, 67.845];
 
 export const PreviewMap: React.FC<SatMapProps> = (props) => {
     const mapContainerRef = useRef<any>(null);
@@ -52,11 +52,12 @@ interface MapControlsProps {
 }
 
 const MapControls: React.FC<MapControlsProps> = (props) => {
+    const [selectedInsert, setSelectedInsert] = useState(4);
     return (
         <Card
             className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50"
         >
-            <TabGroup className="mt-1 flex justify-center">
+            <TabGroup className="mt-1 flex justify-center" onIndexChange={(index) => { setSelectedInsert(index) }}>
                 <TabList variant="solid">
                     <Tab value="1">Point</Tab>
                     <Tab value="2">Area</Tab>
@@ -64,11 +65,41 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
                 </TabList>
             </TabGroup>
             <div className="mt-4 px-2 flex justify-between space-x-2">
-                <Button size="xs" variant="secondary" icon={RiDeleteBinFill} color="red" className="flex-1">Line</Button>
-                <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
-                <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
-                    props.onDone!(1);
-                }} className="flex-1">Save</Button>
+                {selectedInsert === 0 &&
+                    <>
+
+                        <Button size="xs" variant="secondary" icon={RiDeleteBinFill} color="red" className="flex-1">Point</Button>
+                        <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
+
+                        <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
+                            props.onDone!(1);
+                        }} className="flex-1">Save</Button>
+                    </>
+                }
+
+                {selectedInsert === 1 &&
+                    <>
+                        <Button size="xs" variant="secondary" icon={RiDeleteBinFill} color="red" className="flex-1">Area</Button>
+                        <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
+
+                        <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
+                            props.onDone!(1);
+                        }} className="flex-1">Save</Button>
+
+                    </>
+                }
+
+                {selectedInsert === 2 &&
+                    <>
+                        <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
+
+                        <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
+                            props.onDone!(1);
+                        }} className="flex-1">Save</Button>
+                    </>
+
+                }
+
             </div>
         </Card>
     )
