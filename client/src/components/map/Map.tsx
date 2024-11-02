@@ -1,4 +1,4 @@
-import mapboxgl from "mapbox-gl"
+import mapboxgl, { LngLatLike } from "mapbox-gl"
 import React, { useEffect, useRef } from "react";
 import { Button, Card, Tab, TabGroup, TabList } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
@@ -12,6 +12,7 @@ export interface SatMapProps {
 }
 
 const defaultZoom = 12;
+const center : LngLatLike = [20.26, 67.845];
 
 export const PreviewMap: React.FC<SatMapProps> = (props) => {
     const mapContainerRef = useRef<any>(null);
@@ -24,7 +25,7 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
             container: mapContainerRef.current,
             //style: "mapbox://styles/mapbox/satellite-streets-v12",
             style: "mapbox://styles/mapbox/light-v11",
-            center: [20.26, 67.845],
+            center: center,
             zoom: props.zoom || defaultZoom,
             pitch: 40,
             interactive: false
@@ -83,7 +84,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: "mapbox://styles/mapbox/satellite-streets-v12",
-            center: [20.26, 67.845],
+            center: center,
             zoom: props.zoom || defaultZoom,
             pitch: 40,
         });
