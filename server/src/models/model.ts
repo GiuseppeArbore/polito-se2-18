@@ -8,12 +8,13 @@ export class KxDocument {
     scale: number;
     issuance_date?: Date;
     type?: KxDocumentType;
-    connections?: number;
+    connections_number?: number;
     language?: string;
     area_type?: AreaType;
     description?: string;
     _id?: ObjectId;
     pages?: PageRange[];
+    connections?: Connections;
 
     constructor(
         title: string,
@@ -22,7 +23,7 @@ export class KxDocument {
         scale_info: Scale,
         issuance_date?: Date,
         type?: KxDocumentType,
-        connections?: number,
+        connections_number?: number,
         language?: string,
         description?: string,
         area_type?: AreaType,
@@ -36,7 +37,7 @@ export class KxDocument {
         this.scale_info = scale_info;
         this.issuance_date = issuance_date;
         this.type = type;
-        this.connections = connections;
+        this.connections_number = connections_number;
         this.language = language;
         this.area_type = area_type;
         this.description = description;
@@ -44,3 +45,23 @@ export class KxDocument {
     }
 
 }
+
+class Connections {
+    direct: string[];
+    collateral: string[];
+    projection: string[];
+    update: string[];
+
+    constructor(
+        direct: string[],
+        collateral: string[],
+        projection: string[],
+        update: string[]
+    ) {
+        this.direct = direct;
+        this.collateral = collateral;
+        this.projection = projection;
+        this.update = update;
+    }
+}
+
