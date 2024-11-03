@@ -30,8 +30,8 @@ export function initRoutes(app: Application) {
                 return isDocCoords(v) &&  
                     (
                         (v.type === AreaType.ENTIRE_MUNICIPALITY) ||
-                        (v.type === AreaType.POINT && coordDistance(v.coordinates as [number, number], KIRUNA_COORDS) < 30) ||
-                        (v.type === AreaType.AREA && v.coordinates.every(c => c.every(c => coordDistance(c as [number, number], KIRUNA_COORDS) < 30)))
+                        (v.type === AreaType.POINT && coordDistance(v.coordinates as [number, number], KIRUNA_COORDS) < 100) ||
+                        (v.type === AreaType.AREA && v.coordinates.every(c => c.every(c => coordDistance(c as [number, number], KIRUNA_COORDS) < 100)))
                     )
             }).withMessage('Invalid document coordinates'),
         body('description').notEmpty().withMessage('Description is required'),
