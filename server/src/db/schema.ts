@@ -1,4 +1,4 @@
-import { AreaType, KxDocumentType, Scale, Stakeholders, PageRange } from "../models/enum";
+import { KxDocumentType, Scale, Stakeholders, PageRange, isDocCoords } from "../models/enum";
 const mongoose = require("mongoose");
 
 const DocumentSchema = new mongoose.Schema({
@@ -35,15 +35,15 @@ const DocumentSchema = new mongoose.Schema({
     },
     language: {
         type: String,
-        required: true
     },
     pages: {
         type: [{}],
-        default: null
     },
-    area_type: {
-        type: String,
-        enum: Object.values(AreaType),
+    doc_coordinates: {
+        type: {},
+        validate: {
+            validator: isDocCoords,
+        },
         required: true
     },
     description: {

@@ -46,27 +46,3 @@ export interface WholeMunicipality {
 }
 
 export type DocCoords = Point | Area | WholeMunicipality;
-
-export function isDocCoords(dc: any): dc is DocCoords {
-    return (
-        (dc.type) &&
-        (dc.type === AreaType.POINT &&
-            Object.keys(dc).length === 2 &&
-            dc.coordinates &&
-            Array.isArray(dc.coordinates) &&
-            dc.coordinates.every((c: any) => typeof c === "number")) ||
-        (dc.type === AreaType.AREA &&
-            Object.keys(dc).length === 2 &&
-            dc.coordinates &&
-            Array.isArray(dc.coordinates) &&
-            dc.coordinates.every(
-                (c: any) =>
-                    Array.isArray(c) &&
-                    c.every(
-                        (c: any) =>
-                            Array.isArray(c) && c.every((c: any) => typeof c === "number")
-                    )
-            )) ||
-        (dc.type === AreaType.ENTIRE_MUNICIPALITY && Object.keys(dc).length === 1)
-    );
-}

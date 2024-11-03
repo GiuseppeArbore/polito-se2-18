@@ -16,6 +16,7 @@
     "mapbox-gl": "^3.7.0",
     "mapbox-gl-draw-cut-polygon-mode": "github:lbordino/mapbox-gl-draw-cut-polygon-mode",
     "mapbox-gl-draw-freehand-mode": "github:lbordino/mapbox-gl-draw-freehand-mode",
+    "mongodb": "^6.10.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.11.2"
