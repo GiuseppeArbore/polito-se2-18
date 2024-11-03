@@ -2,7 +2,7 @@ import { Application } from 'express';
 import { createKxDocument } from './controller';
 import {validateRequest} from './errorHandlers';
 import { body } from 'express-validator';
-import { AreaType, KxDocumentType, Scale, Stakeholders } from './models/enum';
+import { isDocCoords, KxDocumentType, Scale, Stakeholders } from './models/enum';
 
 
 
@@ -24,8 +24,8 @@ export function initRoutes(app: Application) {
             .isIn(Object.values(KxDocumentType)).withMessage('Invalid document type'),
         body('language').optional().notEmpty().withMessage('Language is required')
             .isString().withMessage('Language must be a string'),
-        body('area_type').notEmpty().withMessage('Area type is required')
-            .isIn(Object.values(AreaType)).withMessage('Invalid area type value'),
+        body('doc_coordinates').notEmpty().withMessage('Document coordinates are required').isObject()
+            .custom(isDocCoords).withMessage('Invalid document coordinates'),
         body('description').notEmpty().withMessage('Description is required'),
         body('pages').optional().isArray().custom((v) => {
             if (!Array.isArray(v))

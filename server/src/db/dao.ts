@@ -77,22 +77,6 @@ class DAO {
         return false;
     }
     private fromResultToKxDocument(result: any): KxDocument {
-        if (result.pages) {
-            return {
-                title: result.title,
-                _id: result._id,
-                stakeholders: result.stakeholders,
-                scale: result.scale,
-                scale_info: result.scale_info,
-                issuance_date: result.issuance_date,
-                type: result.type,
-                connections: result.connections,
-                pages: result.pages,
-                area_type: result.area_type,
-                description: result.description,
-                language: result.language,
-            } as KxDocument;
-        }
         return {
             title: result.title,
             _id: result._id,
@@ -102,7 +86,8 @@ class DAO {
             issuance_date: result.issuance_date,
             type: result.type,
             connections: result.connections,
-            area_type: result.area_type,
+            pages: result.pages,
+            doc_coordinates: result.doc_coordinates,
             description: result.description,
             language: result.language,
         } as KxDocument;

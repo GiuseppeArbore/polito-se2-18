@@ -26,7 +26,7 @@ describe('Document Routes', () => {
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
             language: 'Swedish',
-            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
             description: 'This is a test document for unit testing.',
             pages: []
         };
@@ -46,7 +46,7 @@ describe('Document Routes', () => {
                 type: KxDocumentType.INFORMATIVE,
                 connections: 0,
                 language: 'Swedish',
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: 'This is a test document for unit testing.',
                 pages: []
             });
@@ -71,7 +71,7 @@ describe('Document Routes', () => {
                 type: KxDocumentType.INFORMATIVE,
                 connections: 0,
                 language: 'Swedish',
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: 'This is a test document unit testing.',
             });
 
@@ -90,7 +90,7 @@ describe('Document Routes', () => {
                 type: KxDocumentType.INFORMATIVE,
                 connections: 0,
                 language: 'Swedish',
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: 'This is a test document for unit testing.',
             });
 

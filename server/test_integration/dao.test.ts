@@ -17,7 +17,7 @@ beforeAll(async () => {
         type: KxDocumentType.INFORMATIVE,
         connections: 0,
         language: "Swedish",
-        area_type: AreaType.ENTIRE_MUNICIPALITY,
+        doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
         description: "Test"
     } as KxDocument);
     if (res && res._id) {
@@ -36,7 +36,7 @@ describe("Test DAO", () => {
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
             language: "Swedish",
-            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test",
         })
         if (res && res._id) {
@@ -58,7 +58,7 @@ describe("Test DAO", () => {
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
             language: "Swedish",
-            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test"
         })
     });
@@ -80,7 +80,7 @@ describe("Test DAO", () => {
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
             language: "Swedish",
-            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test"
         })
     });
@@ -100,7 +100,7 @@ describe("Test DAO", () => {
             type: KxDocumentType.INFORMATIVE,
             connections: 0,
             language: "Italian",
-            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test",
             pages: [2, [4, 8]]
         });

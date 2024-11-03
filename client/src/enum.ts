@@ -30,3 +30,19 @@ export enum AreaType {
 }
 
 export type PageRange = [number, number] | number;
+
+export interface Point {
+    type: AreaType.POINT,
+    coordinates: number[]
+}
+
+export interface Area {
+    type: AreaType.AREA,
+    coordinates: number[][][]
+}
+
+export interface WholeMunicipality {
+    type: AreaType.ENTIRE_MUNICIPALITY
+}
+
+export type DocCoords = Point | Area | WholeMunicipality;

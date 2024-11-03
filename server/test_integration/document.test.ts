@@ -32,7 +32,7 @@ describe("Integration Tests for Document API", () => {
                 type: KxDocumentType.INFORMATIVE,
                 connections: 0,
                 language: "Swedish",
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document for integration testing.",
                 pages: []
             });
@@ -54,7 +54,7 @@ describe("Integration Tests for Document API", () => {
                 type: KxDocumentType.INFORMATIVE,
                 connections: 0,
                 language: "Swedish",
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document with missing title."
             });
         expect(response.status).toBe(400);
@@ -76,7 +76,7 @@ describe("Integration Tests for Document API", () => {
                 type: KxDocumentType.INFORMATIVE,
                 connections: 0,
                 language: "Swedish",
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document for integration testing.",
                 pages: []
             });
@@ -105,7 +105,7 @@ describe("Integration Tests for Document API", () => {
                 type: KxDocumentType.INFORMATIVE,
                 connections: 0,
                 language: "Swedish",
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document for integration testing.",
                 pages: []
             });
@@ -128,7 +128,7 @@ describe("Integration Tests for Document API", () => {
                 type: KxDocumentType.INFORMATIVE,
                 connections: 0,
                 language: "Swedish",
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document with missing title."
             });
         expect(response.status).toBe(400);
