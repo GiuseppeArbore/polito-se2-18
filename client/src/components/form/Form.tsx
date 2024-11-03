@@ -1,3 +1,4 @@
+
 import {
   Card,
   Button,
@@ -16,8 +17,10 @@ import {
 } from "@tremor/react";
 import { useState } from "react";
 import locales from "./../../locales.json";
-import docTypes from "./../../docTypes.json";
 import { PreviewMap, SatMap } from "../map/Map";
+import API from "../../API";
+import { AreaType, KxDocumentType, Scale, Stakeholders } from "../../enum";
+import { KxDocument } from "../../model";
 import {
   RiArrowDownCircleLine,
   RiLinksLine,
@@ -39,17 +42,68 @@ export class Link {
 
 export function FormDialog() {
   const [isOpen, setIsOpen] = useState(false);
-  const [isMapOpen, setIsMapOpen] = useState(false);
+  const [title, setTitle] = useState("");
+  const [titleError, setTitleError] = useState(false);
+  const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
+  const [shError, setShError] = useState(false);
+  const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(
+    new Date()
+  );
+  const [type, setType] = useState<KxDocumentType | undefined>(undefined);
+  const [typeError, setTypeError] = useState(false);
   const [scale, setScale] = useState(10000);
+  const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState("");
+  const [description, setDescription] = useState<string | undefined>(undefined);
+  const [descriptionError, setDescriptionError] = useState(false);
+  // const [documents, setDocuments] = useState<KxDocument[]>([]);
+  const [error, setError] = useState("");
+  const [isMapOpen, setIsMapOpen] = useState(false);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
-
-  // For initializing
   const [documents, setDocuments] = useState<string[]>([
     "Doc 1",
     "Doc 2",
     "Doc 3",
   ]);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const tmpTitleError = title.length === 0;
+    const tmpShError = stakeholders.length === 0;
+    if (tmpTitleError || tmpShError) {
+      setTitleError(tmpTitleError);
+      setShError(tmpShError);
+      setTypeError(!type);
+      setDescriptionError(!description);
+      return;
+    }
+
+    const newDocument: KxDocument = {
+      title,
+      stakeholders,
+      scale_info: Scale.TEXT,
+      scale,
+      connections: 0,
+      area_type: AreaType.ENTIRE_MUNICIPALITY,
+      issuance_date: issuanceDate,
+      type: type,
+      language,
+      description,
+      pages: validatePageRangeString(pages),
+    };
+
+    try {
+      const createdDocument = await API.createKxDocument(newDocument);
+      if (createdDocument) {
+        setDocuments([...documents, createdDocument.title]);
+      } else {
+        setError("Failed to create document");
+      }
+      setIsOpen(false);
+    } catch (error) {
+      setError("Failed to create document");
+    }
+  };
 
   const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
   const [documentsForCollateral, setDocumentsForCollateral] = useState<
@@ -91,9 +145,16 @@ export function FormDialog() {
                     type="text"
                     id="title"
                     name="title"
+                    value={title}
+                    onValueChange={t => setTitle(t)}
                     autoComplete="title"
                     placeholder="Title"
                     className="mt-2"
+                    onBlur={() => {
+                      setTitleError(title.length === 0);
+                    }}
+                    error={titleError}
+                    errorMessage="The title is mandatory"
                     required
                   />
                 </div>
@@ -105,19 +166,27 @@ export function FormDialog() {
                     Stakeholders
                     <span className="text-red-500">*</span>
                   </label>
-                  <MultiSelect>
-                    <MultiSelectItem key="sh-1" value="1">
-                      Urban Developer
-                    </MultiSelectItem>
-                    <MultiSelectItem key="sh-2" value="2">
-                      Urban Planner
-                    </MultiSelectItem>
-                    <MultiSelectItem key="sh-3" value="3">
-                      Resident
-                    </MultiSelectItem>
-                    <MultiSelectItem key="sh-4" value="4">
-                      Visitor
-                    </MultiSelectItem>
+                  <MultiSelect
+                    id="stakeholders"
+                    name="stakeholders"
+                    className="mt-2"
+                    onBlur={() => {
+                      setShError(stakeholders.length === 0);
+                    }}
+                    onValueChange={s => setStakeholders(s.map(sh => Stakeholders[sh as keyof typeof Stakeholders]))}
+                    error={shError}
+                    errorMessage="You must select at least one stakeholder."
+                    required
+                  >
+                    {
+                      Object.entries(Stakeholders).map((dt) => {
+                        return (
+                          <MultiSelectItem key={`sh-${dt[0]}`} value={dt[0]}>
+                            {dt[1]}
+                          </MultiSelectItem>
+                        );
+                      })
+                    }
                   </MultiSelect>
                 </div>
                 <div className="col-span-full">
@@ -126,12 +195,16 @@ export function FormDialog() {
                     className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
                   >
                     Issuance date
+                    <span className="text-red-500">*</span>
                   </label>
                   <DatePicker
                     id="issuance-date"
                     className="mt-2"
+                    value={issuanceDate}
+                    onValueChange={d => setIssuanceDate(d)}
                     enableYearNavigation={true}
                     weekStartsOn={1}
+                    enableClear={false}
                   />
                 </div>
 
@@ -141,30 +214,29 @@ export function FormDialog() {
                     className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
                   >
                     Type
+                    <span className="text-red-500">*</span>
                   </label>
                   <SearchSelect
                     id="doc_type"
                     name="doc_type"
                     className="mt-2"
+                    onValueChange={t => setType(KxDocumentType[t as keyof typeof KxDocumentType])}
+                    onBlur={() => {
+                      setTypeError(!type);
+                    }}
+                    error={typeError}
+                    errorMessage="The type is mandatory"
                     required
                   >
-                    {docTypes.flatMap((dt, i, arr) => {
-                      const prev = arr.at(i - 1);
-                      const separator =
-                        prev && prev.category !== dt.category ? (
-                          <p
-                            className="text-tremor-label text-sm font-semibold italic ps-5 text-tremor-content-weak dark:text-dark-tremor-content-weak"
-                            key={`separator-${i}`}
-                          >
-                            {dt.category}
-                          </p>
-                        ) : null;
-                      return (
-                        <SearchSelectItem key={`type-${dt.id}`} value={dt.id}>
-                          {dt.name}
-                        </SearchSelectItem>
-                      );
-                    })}
+                    {
+                      Object.entries(KxDocumentType).map((dt) => {
+                        return (
+                          <SearchSelectItem key={`type-${dt[0]}`} value={dt[0]}>
+                            {dt[1]}
+                          </SearchSelectItem>
+                        );
+                      })
+                    }
                   </SearchSelect>
                 </div>
 
@@ -214,7 +286,13 @@ export function FormDialog() {
                   >
                     Language
                   </label>
-                  <SearchSelect id="language" name="language" className="mt-2">
+                  <SearchSelect
+                    id="language"
+                    name="language"
+                    className="mt-2"
+                    value={language}
+                    onValueChange={l => setLanguage(l)}
+                  >
                     {locales.map((l) => {
                       return (
                         <SearchSelectItem value={l.code} key={`lang-${l.code}`}>
@@ -280,12 +358,20 @@ export function FormDialog() {
                   className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
                 >
                   Description
+                  <span className="text-red-500">*</span>
                 </label>
                 <Textarea
                   id="description"
                   name="description"
                   placeholder="Description"
                   className="mt-2"
+                  value={description}
+                  onBlur={() => {
+                    setDescriptionError(!description);
+                  }}
+                  error={descriptionError}
+                  errorMessage="The description is mandatory"
+                  onValueChange={d => setDescription(d)}
                   style={{ minHeight: "200px" }}
                 />
               </div>
@@ -435,7 +521,7 @@ export function FormDialog() {
                 </Button>
                 <Button
                   className="w-full sm:w-auto"
-                  onClick={() => setIsOpen(false)}
+                  onClick={e => handleSubmit(e)}
                 >
                   Submit
                 </Button>
