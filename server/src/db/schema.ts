@@ -35,11 +35,9 @@ const DocumentSchema = new mongoose.Schema({
     },
     language: {
         type: String,
-        required: true
     },
     pages: {
         type: [{}],
-        default: null
     },
     area_type: {
         type: String,
