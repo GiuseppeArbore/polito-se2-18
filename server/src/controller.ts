@@ -12,7 +12,6 @@ export const createKxDocument = async (req: Request, res: Response, next: NextFu
         }
 
     } catch (error) {
-        console.log(`QUIIII ${error}`)
         next(error); 
     }
 };
