@@ -24,6 +24,18 @@ var DrawPolygone = new MapboxDraw({
 
 });
 
+var PreviewMapDraw = new MapboxDraw({
+  displayControlsDefault: false,
+  controls: {
+    polygon: false,
+    trash: false,
+    line_string: false,
+    point: false,
+    combine_features: false,
+    uncombine_features: false,
+}
+});
+
 const splitPolygon = () => {
     try {
       DrawPolygone?.changeMode("cut_polygon");
@@ -44,4 +56,4 @@ var DrawBarPolygon = new CutBar({
 
   
 
- export { DrawPolygone, DrawBarPolygon }; 
+ export { DrawPolygone, DrawBarPolygon, PreviewMapDraw }; 

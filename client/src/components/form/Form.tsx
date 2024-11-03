@@ -43,7 +43,7 @@ export function FormDialog() {
   const [scale, setScale] = useState(10000);
   const [pages, setPages] = useState("");
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
-
+  const [drawing, setDrawing] = useState(undefined);
   // For initializing
   const [documents, setDocuments] = useState<string[]>([
     "Doc 1",
@@ -254,6 +254,7 @@ export function FormDialog() {
                 onClick={() => setIsMapOpen(true)}
               >
                 <PreviewMap
+                  drawing={drawing}
                   style={{ minHeight: "300px", width: "100%" }}
                 ></PreviewMap>
               </Card>
@@ -267,8 +268,9 @@ export function FormDialog() {
                   style={{ maxWidth: "100%" }}
                 >
                   <SatMap
+                    drawing={drawing}
                     onCancel={() => setIsMapOpen(false)}
-                    onDone={() => setIsMapOpen(false)}
+                    onDone={(v) => {setDrawing(v); setIsMapOpen(false)}}
                     style={{ minHeight: "95vh", width: "100%" }}
                   ></SatMap>
                 </DialogPanel>
