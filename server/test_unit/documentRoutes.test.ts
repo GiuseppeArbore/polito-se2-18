@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { createKxDocument } from '../src/controller';
 import {app} from "../index";
 import { AreaType, KxDocumentType, Scale, Stakeholders } from '../src/models/enum';
+import { KIRUNA_COORDS } from '../src/utils';
 
 
 jest.mock('../src/controller', () => ({
@@ -97,6 +98,42 @@ describe('Document Routes', () => {
         expect(response.status).toBe(400);
         expect(response.body.errors[0].msg).toBe('Title is required');
         expect(response.body.errors[1].msg).toBe('Stakeholders are required');
+    });
+
+    test('Test 4 - POST /api/documents - should return error 400 (coordinates too far)', async () => {
+
+        const response = await request(app)
+            .post('/api/documents')
+            .send({
+                scale_info: Scale.TEXT,
+                scale: 10,
+                issuance_date: new Date().toISOString(),
+                type: KxDocumentType.INFORMATIVE,
+                connections: 0,
+                language: 'Swedish',
+                doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
+                description: 'This is a test document for unit testing.',
+            });
+
+        expect(response.status).toBe(400);
+    });
+
+    test('Test 5 - POST /api/documents - should return error 400 (polygon partially outside of range)', async () => {
+
+        const response = await request(app)
+            .post('/api/documents')
+            .send({
+                scale_info: Scale.TEXT,
+                scale: 10,
+                issuance_date: new Date().toISOString(),
+                type: KxDocumentType.INFORMATIVE,
+                connections: 0,
+                language: 'Swedish',
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [0, 0]]] },
+                description: 'This is a test document for unit testing.',
+            });
+
+        expect(response.status).toBe(400);
     });
     
 });

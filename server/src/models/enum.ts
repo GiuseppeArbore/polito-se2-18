@@ -24,9 +24,9 @@ export enum KxDocumentType {
 }
 
 export enum AreaType {
-    ENTIRE_MUNICIPALITY = "The entire municipality of Kiruna",
-    POINT = "A point in Kiruna",
-    AREA = "An area in Kiruna"
+    ENTIRE_MUNICIPALITY = "EntireMunicipality", //The entire municipality of Kiruna
+    POINT = "Point", //A point in Kiruna
+    AREA = "Polygon" //An area in Kiruna
 }
 
 export type PageRange = [number, number] | number;

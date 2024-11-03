@@ -112,6 +112,30 @@ describe("Test DAO", () => {
             expect(res2).toBeTruthy();
         }
     });
+    test("Test query with Point coordinates", async () => {
+        const res = await db.createKxDocument({
+            title: "test",
+            stakeholders: [],
+            scale_info: Scale.TEXT,
+            scale: 0,
+            issuance_date: date,
+            type: KxDocumentType.INFORMATIVE,
+            connections: 0,
+            language: "Italian",
+            doc_coordinates: {
+                type: AreaType.POINT,
+                coordinates: [20.26, 67.845]
+            },
+            description: "Test",
+        });
+        if (res && res._id) {
+            expect(res).toHaveProperty("_id");
+            const get = await db.getKxDocumentById(res._id.toString());
+            expect(get?.doc_coordinates).toEqual({type: AreaType.POINT, coordinates: [20.26, 67.845]});
+            const res2 = await db.deleteKxDocument(res._id.toString());
+            expect(res2).toBeTruthy();
+        }
+    });
 });
 
 afterAll(async () => {
