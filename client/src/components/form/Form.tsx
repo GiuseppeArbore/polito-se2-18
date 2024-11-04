@@ -139,11 +139,6 @@ export function FormDialog() {
     }
   }, [isOpen]);
 
-  const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
-  const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
-  const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
-  const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
-
 
   return (
     <>
