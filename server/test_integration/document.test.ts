@@ -203,7 +203,6 @@ describe("Integration Tests for Document API", () => {
                 scale: 10,
                 issuance_date: date,
                 type: KxDocumentType.INFORMATIVE,
-                connections: 0,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
                 description: "Test document 1"
@@ -218,7 +217,6 @@ describe("Integration Tests for Document API", () => {
                 scale: 10,
                 issuance_date: date,
                 type: KxDocumentType.INFORMATIVE,
-                connections: 0,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
                 description: "Test document 2"
@@ -250,14 +248,12 @@ describe("Integration Tests for Document API", () => {
                     scale: 10,
                     issuance_date: new Date(),
                     type: KxDocumentType.INFORMATIVE,
-                    connections: 0,
                     language: "Swedish",
                     doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                     description: `This is test document ${i + 1}.`,
-                    pages: []
                 });
             expect(response.status).toBe(201);
-            //documentIds.push(response.body._id);
+            documentIds.push(response.body._id);
         }
     
         
@@ -278,14 +274,12 @@ describe("Integration Tests for Document API", () => {
                     scale: 10,
                     issuance_date: new Date(),
                     type: KxDocumentType.INFORMATIVE,
-                    connections: 0,
                     language: "Swedish",
                     doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                     description: `This is test document ${i + 1}.`,
-                    pages: []
                 });
             expect(response.status).toBe(201);
-            //documentIds.push(response.body._id);
+            documentIds.push(response.body._id);
         }
     
         

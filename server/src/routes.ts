@@ -1,5 +1,6 @@
 
 import { createKxDocument, getAllKxDocuments} from './controller';
+import { validateRequest } from './errorHandlers';
 import e, { Application } from 'express';
 import { body } from 'express-validator';
 import { AreaType, isDocCoords, KxDocumentType, Scale, Stakeholders } from './models/enum';
