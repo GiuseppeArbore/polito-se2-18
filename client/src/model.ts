@@ -20,8 +20,6 @@ export class KxDocument {
         stakeholders: Stakeholders[],
         scale: number,
         scale_info: Scale,
-        lng: number, 
-        lat: number,
         issuance_date?: Date,
         type?: KxDocumentType,
         connections?: number,
