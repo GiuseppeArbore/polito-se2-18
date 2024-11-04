@@ -19,7 +19,7 @@ import { useState } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
 import API from "../../API";
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "../../enum";
+import { AreaType, DocCoords, KxDocumentType, Scale, Stakeholders } from "../../enum";
 import { KxDocument } from "../../model";
 import {
   RiArrowDownCircleLine,
@@ -59,6 +59,12 @@ export function FormDialog() {
   // const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [error, setError] = useState("");
   const [isMapOpen, setIsMapOpen] = useState(false);
+
+  const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
+  // Example usage
+  //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
+
+  const [docCoordinatesError, setDocCoordinatesError] = useState(false);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
   const [documents, setDocuments] = useState<string[]>([
     "Doc 1",
@@ -74,11 +80,12 @@ export function FormDialog() {
     e.preventDefault();
     const tmpTitleError = title.length === 0;
     const tmpShError = stakeholders.length === 0;
-    if (tmpTitleError || tmpShError) {
+    if (tmpTitleError || tmpShError || !type || !description || !docCoordinates) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
+      setDocCoordinatesError(!docCoordinates);
       return;
     }
 
@@ -87,7 +94,7 @@ export function FormDialog() {
       stakeholders,
       scale_info: Scale.TEXT,
       scale,
-      area_type: AreaType.ENTIRE_MUNICIPALITY,
+      doc_coordinates: docCoordinates,
       issuance_date: issuanceDate,
       type: type,
       language,
@@ -330,13 +337,14 @@ export function FormDialog() {
                 </div>
               </div>
               <Card
-                className="my-4 p-0 overflow-hidden cursor-pointer"
+                className={`my-4 p-0 overflow-hidden cursor-pointer ${docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"}`}
                 onClick={() => setIsMapOpen(true)}
               >
                 <PreviewMap
                   style={{ minHeight: "300px", width: "100%" }}
-                ></PreviewMap>
+                />
               </Card>
+              {docCoordinatesError ? <p className="tremor-TextInput-errorMessage text-sm text-red-500 mt-1">Please provide document coordinates</p> : null}
               <Dialog
                 open={isMapOpen}
                 onClose={(val) => setIsMapOpen(val)}

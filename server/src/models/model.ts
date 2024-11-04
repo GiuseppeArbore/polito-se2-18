@@ -1,4 +1,4 @@
-import { AreaType, KxDocumentType, PageRange, Scale, Stakeholders } from "./enum";
+import { DocCoords, KxDocumentType, PageRange, Scale, Stakeholders } from "./enum";
 import { ObjectId } from "mongoose";
 
 export class KxDocument {
@@ -9,7 +9,7 @@ export class KxDocument {
     issuance_date?: Date;
     type?: KxDocumentType;
     language?: string;
-    area_type?: AreaType;
+    doc_coordinates?: DocCoords;
     description?: string;
     _id?: ObjectId;
     pages?: PageRange[];
@@ -24,7 +24,7 @@ export class KxDocument {
         type?: KxDocumentType,
         language?: string,
         description?: string,
-        area_type?: AreaType,
+        doc_coordinates?: DocCoords,
         _id?: ObjectId,
         pages?: PageRange[]
     ) {
@@ -36,7 +36,7 @@ export class KxDocument {
         this.issuance_date = issuance_date;
         this.type = type;
         this.language = language;
-        this.area_type = area_type;
+        this.doc_coordinates = doc_coordinates;
         this.description = description;
         this.pages = pages;
     }

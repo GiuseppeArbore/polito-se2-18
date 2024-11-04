@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import { createKxDocument } from '../src/controller';
 import {app} from "../index";
 import { AreaType, KxDocumentType, Scale, Stakeholders } from '../src/models/enum';
+import { KIRUNA_COORDS } from '../src/utils';
 import { connections } from 'mongoose';
 
 
@@ -26,7 +27,7 @@ describe('Document Routes', () => {
             issuance_date: new Date().toISOString(),
             type: KxDocumentType.INFORMATIVE,
             language: 'Swedish',
-            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
             description: 'This is a test document for unit testing.',
             pages: [],
             connections: {
@@ -51,7 +52,7 @@ describe('Document Routes', () => {
                 issuance_date: new Date().toISOString(),
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: 'This is a test document for unit testing.',
                 pages: [],
                 connections: {
@@ -80,7 +81,7 @@ describe('Document Routes', () => {
                 issuance_date: new Date().toISOString(),
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: 'This is a test document unit testing.',
 
             });
@@ -99,7 +100,7 @@ describe('Document Routes', () => {
                 issuance_date: new Date().toISOString(),
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: 'This is a test document for unit testing.',
             });
 
@@ -108,7 +109,41 @@ describe('Document Routes', () => {
         expect(response.body.errors[1].msg).toBe('Stakeholders are required');
     });
 
-    test('Test 4 - POST /api/documents - should return error 400 (connection validation)', async () => {
+    test('Test 4 - POST /api/documents - should return error 400 (coordinates too far)', async () => {
+
+        const response = await request(app)
+            .post('/api/documents')
+            .send({
+                scale_info: Scale.TEXT,
+                scale: 10,
+                issuance_date: new Date().toISOString(),
+                type: KxDocumentType.INFORMATIVE,
+                language: 'Swedish',
+                doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
+                description: 'This is a test document for unit testing.',
+            });
+
+        expect(response.status).toBe(400);
+    });
+
+    test('Test 5 - POST /api/documents - should return error 400 (polygon partially outside of range)', async () => {
+
+        const response = await request(app)
+            .post('/api/documents')
+            .send({
+                scale_info: Scale.TEXT,
+                scale: 10,
+                issuance_date: new Date().toISOString(),
+                type: KxDocumentType.INFORMATIVE,
+                language: 'Swedish',
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [0, 0]]] },
+                description: 'This is a test document for unit testing.',
+            });
+
+        expect(response.status).toBe(400);
+    });
+
+    test('Test 6 - POST /api/documents - should return error 400 (connection validation)', async () => {
         const response = await request(app)
             .post('/api/documents')
             .send({
@@ -119,7 +154,7 @@ describe('Document Routes', () => {
                 issuance_date: new Date().toISOString(),
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: 'This is a test document unit testing.',
                 connections: {
                     direct: ['1', '2'],
