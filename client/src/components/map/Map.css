@@ -1,20 +1,6 @@
 .split-icon {
-  background-image: url('./scissors.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 60%;
-}
-
-.save-icon {
-  background-image: url('./floppy.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 60%;
-}
-
-.cancel-icon {
-  background-image: url('./x-lg.svg');
-  background-repeat: no-repeat;
-  background-position: center;
-  background-size: 60%;
-}
+    background-image: url('./scissors.svg');
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+  }

@@ -43,7 +43,7 @@ const splitPolygon = () => {
       console.error(err);
     }
 };
-var DrawBarPolygon = (saveAction: (path: any) => void, cancelAction: () => void)  => new CutBar({
+var DrawBarPolygon = new CutBar({
     draw: DrawPolygone,
     buttons: [
       {
@@ -51,16 +51,6 @@ var DrawBarPolygon = (saveAction: (path: any) => void, cancelAction: () => void)
         action: splitPolygon,
         classes: ["split-icon"],
       },
-      {
-        on: 'click',
-        action: saveAction,
-        classes: ['save-icon'],
-      },
-      {
-        on: 'click',
-        action: cancelAction,
-        classes: ['cancel-icon'],
-      }
     ],
   });
 
