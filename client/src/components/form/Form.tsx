@@ -57,6 +57,7 @@ export function FormDialog() {
   const [description, setDescription] = useState<string | undefined>(undefined);
   const [descriptionError, setDescriptionError] = useState(false);
   const [error, setError] = useState("");
+  const [message, setMessage] = useState("");
   const [isMapOpen, setIsMapOpen] = useState(false);
 
   const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
@@ -99,7 +100,7 @@ export function FormDialog() {
     try {
       const createdDocument = await API.createKxDocument(newDocument);
       if (createdDocument) {
-        setDocuments([...documents, createdDocument]);
+        setMessage("Document created successfully");
       } else {
         setError("Failed to create document");
       }
@@ -418,8 +419,8 @@ export function FormDialog() {
                   >
                     {documents.map((doc) => (
                       <MultiSelectItem
-                        key={`${doc._id}-direct`}
-                        value={doc.title}
+                        key={doc._id?.toString()}
+                        value={doc._id ? doc._id.toString() : ""}
                         className={
                           documentsForProjection.includes(doc.title) ||
                           documentsForDirect.includes(doc.title) ||
@@ -450,8 +451,8 @@ export function FormDialog() {
                   >
                     {documents.map((doc) => (
                       <MultiSelectItem
-                        key={`${doc._id}-collateral`}
-                        value={doc.title}
+                      key={doc._id?.toString()}
+                      value={doc._id ? doc._id.toString() : ""}
                         className={
                           documentsForProjection.includes(doc.title) ||
                           documentsForDirect.includes(doc.title) ||
@@ -479,8 +480,8 @@ export function FormDialog() {
                   >
                     {documents.map((doc) => (
                       <MultiSelectItem
-                        key={`${doc._id}-projection`}
-                        value={doc.title}
+                      key={doc._id?.toString()}
+                      value={doc._id ? doc._id.toString() : ""}
                         className={
                           documentsForProjection.includes(doc.title) ||
                           documentsForDirect.includes(doc.title) ||
@@ -508,8 +509,8 @@ export function FormDialog() {
                   >
                     {documents.map((doc) => (
                       <MultiSelectItem
-                        key={`${doc._id}-update`}
-                        value={doc.title}
+                      key={doc._id?.toString()}
+                      value={doc._id ? doc._id.toString() : ""}
                         className={
                           documentsForProjection.includes(doc.title) ||
                           documentsForDirect.includes(doc.title) ||
