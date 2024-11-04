@@ -11,6 +11,8 @@ export interface SatMapProps {
     zoom?: number,
     style?: React.CSSProperties,
     className?: string,
+    onDone?: (path: any) => void
+    onCancel?: () => void
 }
 
 const defaultZoom = 12;
@@ -58,29 +60,7 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
     )
 }
 
-interface MapControlsProps {
-    // path type is temporary
-    onDone?: (path: any) => void
-    onCancel?: () => void
-    drawing: any
-}
-
-const MapControls: React.FC<MapControlsProps> = (props) => {
-    return (
-        <Card
-            className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50"
-        >
-            <div className="px-2 flex justify-between space-x-2">
-                <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
-                <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
-                    props.onDone!(DrawPolygone.getAll());
-                }} className="flex-1">Save</Button>
-            </div>
-        </Card>
-    );
-};
-
-export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
+export const SatMap: React.FC<SatMapProps> = (props) => {
     const mapContainerRef = useRef<any>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
     
@@ -93,12 +73,13 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
             zoom: props.zoom || defaultZoom,
             pitch: 40,
         });
+        if (props.onDone && props.onCancel) {
+            mapRef.current.addControl(DrawBarPolygon(() => props.onDone!(DrawPolygone.getAll()), props.onCancel!), "top-left");
+        }
         mapRef.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
-        mapRef.current.addControl(DrawBarPolygon, "top-left")
         mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
         mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
         if(props.drawing) DrawPolygone.set(props.drawing);
-        
     }, []);
 
     useEffect(() => {
@@ -112,7 +93,6 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     return (
         <>
             <div className={props.className} ref={mapContainerRef} id="map" style={props.style} />
-            <MapControls onCancel={props.onCancel} onDone={props.onDone} drawing={props.drawing}></MapControls>
         </>
     )
 }
