@@ -18,7 +18,14 @@ import { useState } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
 import API from "../../API";
-import { AreaType, DocCoords, KxDocumentType, Scale, Stakeholders } from "../../enum";
+import {
+  AreaType,
+  DocCoords,
+  KxDocumentType,
+  Point,
+  Scale,
+  Stakeholders,
+} from "../../enum";
 import { KxDocument } from "../../model";
 import {
   RiArrowDownCircleLine,
@@ -33,7 +40,6 @@ import {
   validatePageRangeString,
 } from "../../utils";
 import "../../index.css";
-import { Marker } from "mapbox-gl";
 
 export class Link {
   connectionType: string = "";
@@ -60,9 +66,9 @@ export function FormDialog() {
   const [error, setError] = useState("");
   const [isMapOpen, setIsMapOpen] = useState(false);
 
-  const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
-  // Example usage
-  //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
+  const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(
+    undefined
+  );
 
   const [docCoordinatesError, setDocCoordinatesError] = useState(false);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -74,7 +80,10 @@ export function FormDialog() {
 
   const [lng, setLng] = useState<number>(20.26);
   const [lat, setLat] = useState<number>(67.845);
+
   const handleMapClick = (lng_: number, lat_: number) => {
+    const newPoint: Point = { type: AreaType.POINT, coordinates: [lng_, lat_] };
+    setDocCoordinates(newPoint);
     setLng(lng_);
     setLat(lat_);
   };
@@ -83,7 +92,13 @@ export function FormDialog() {
     e.preventDefault();
     const tmpTitleError = title.length === 0;
     const tmpShError = stakeholders.length === 0;
-    if (tmpTitleError || tmpShError || !type || !description || !docCoordinates) {
+    if (
+      tmpTitleError ||
+      tmpShError ||
+      !type ||
+      !description ||
+      !docCoordinates
+    ) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
@@ -104,8 +119,6 @@ export function FormDialog() {
       language,
       description,
       pages: validatePageRangeString(pages),
-      lng,
-      lat,
     };
 
     try {
@@ -348,7 +361,9 @@ export function FormDialog() {
                 </div>
               </div>
               <Card
-                className={`my-4 p-0 overflow-hidden cursor-pointer ${docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"}`}
+                className={`my-4 p-0 overflow-hidden cursor-pointer ${
+                  docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"
+                }`}
                 onClick={() => setIsMapOpen(true)}
               >
                 <PreviewMap
@@ -356,7 +371,11 @@ export function FormDialog() {
                   style={{ minHeight: "300px", width: "100%" }}
                 />
               </Card>
-              {docCoordinatesError ? <p className="tremor-TextInput-errorMessage text-sm text-red-500 mt-1">Please provide document coordinates</p> : null}
+              {docCoordinatesError ? (
+                <p className="tremor-TextInput-errorMessage text-sm text-red-500 mt-1">
+                  Please provide document coordinates
+                </p>
+              ) : null}
               <Dialog
                 open={isMapOpen}
                 onClose={(val) => setIsMapOpen(val)}

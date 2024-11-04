@@ -123,7 +123,6 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
 
 export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
   const { onMapClick, coordinates } = props;
-  console.log("coordinates: ", coordinates);
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
 

@@ -14,8 +14,6 @@ export class KxDocument {
     description?: string;
     _id?: ObjectId;
     pages?: PageRange[];
-    lng: number;
-    lat: number;
 
     constructor(
         title: string,
@@ -45,8 +43,6 @@ export class KxDocument {
         this.doc_coordinates = doc_coordinates;
         this.description = description;
         this.pages = pages;
-        this.lng = lng;
-        this.lat = lat;
     }
 
 }
