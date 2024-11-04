@@ -14,12 +14,16 @@ export class KxDocument {
     description?: string;
     _id?: ObjectId;
     pages?: PageRange[];
+    lng: number;
+    lat: number;
 
     constructor(
         title: string,
         stakeholders: Stakeholders[],
         scale: number,
         scale_info: Scale,
+        lng: number, 
+        lat: number,
         issuance_date?: Date,
         type?: KxDocumentType,
         connections?: number,
@@ -41,6 +45,8 @@ export class KxDocument {
         this.area_type = area_type;
         this.description = description;
         this.pages = pages;
+        this.lng = lng;
+        this.lat = lat;
     }
 
 }

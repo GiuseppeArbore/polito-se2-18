@@ -1,4 +1,3 @@
-
 import {
   Card,
   Button,
@@ -34,6 +33,7 @@ import {
   validatePageRangeString,
 } from "../../utils";
 import "../../index.css";
+import { Marker } from "mapbox-gl";
 
 export class Link {
   connectionType: string = "";
@@ -56,7 +56,7 @@ export function FormDialog() {
   const [pages, setPages] = useState("");
   const [description, setDescription] = useState<string | undefined>(undefined);
   const [descriptionError, setDescriptionError] = useState(false);
-  // const [documents, setDocuments] = useState<KxDocument[]>([]);
+
   const [error, setError] = useState("");
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -65,6 +65,13 @@ export function FormDialog() {
     "Doc 2",
     "Doc 3",
   ]);
+
+  const [lng, setLng] = useState<number>(20.26);
+  const [lat, setLat] = useState<number>(67.845);
+  const handleMapClick = (lng_: number, lat_: number) => {
+    setLng(lng_);
+    setLat(lat_);
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,6 +97,8 @@ export function FormDialog() {
       language,
       description,
       pages: validatePageRangeString(pages),
+      lng,
+      lat,
     };
 
     try {
@@ -146,7 +155,7 @@ export function FormDialog() {
                     id="title"
                     name="title"
                     value={title}
-                    onValueChange={t => setTitle(t)}
+                    onValueChange={(t) => setTitle(t)}
                     autoComplete="title"
                     placeholder="Title"
                     className="mt-2"
@@ -173,20 +182,24 @@ export function FormDialog() {
                     onBlur={() => {
                       setShError(stakeholders.length === 0);
                     }}
-                    onValueChange={s => setStakeholders(s.map(sh => Stakeholders[sh as keyof typeof Stakeholders]))}
+                    onValueChange={(s) =>
+                      setStakeholders(
+                        s.map(
+                          (sh) => Stakeholders[sh as keyof typeof Stakeholders]
+                        )
+                      )
+                    }
                     error={shError}
                     errorMessage="You must select at least one stakeholder."
                     required
                   >
-                    {
-                      Object.entries(Stakeholders).map((dt) => {
-                        return (
-                          <MultiSelectItem key={`sh-${dt[0]}`} value={dt[0]}>
-                            {dt[1]}
-                          </MultiSelectItem>
-                        );
-                      })
-                    }
+                    {Object.entries(Stakeholders).map((dt) => {
+                      return (
+                        <MultiSelectItem key={`sh-${dt[0]}`} value={dt[0]}>
+                          {dt[1]}
+                        </MultiSelectItem>
+                      );
+                    })}
                   </MultiSelect>
                 </div>
                 <div className="col-span-full">
@@ -201,7 +214,7 @@ export function FormDialog() {
                     id="issuance-date"
                     className="mt-2"
                     value={issuanceDate}
-                    onValueChange={d => setIssuanceDate(d)}
+                    onValueChange={(d) => setIssuanceDate(d)}
                     enableYearNavigation={true}
                     weekStartsOn={1}
                     enableClear={false}
@@ -220,7 +233,9 @@ export function FormDialog() {
                     id="doc_type"
                     name="doc_type"
                     className="mt-2"
-                    onValueChange={t => setType(KxDocumentType[t as keyof typeof KxDocumentType])}
+                    onValueChange={(t) =>
+                      setType(KxDocumentType[t as keyof typeof KxDocumentType])
+                    }
                     onBlur={() => {
                       setTypeError(!type);
                     }}
@@ -228,15 +243,13 @@ export function FormDialog() {
                     errorMessage="The type is mandatory"
                     required
                   >
-                    {
-                      Object.entries(KxDocumentType).map((dt) => {
-                        return (
-                          <SearchSelectItem key={`type-${dt[0]}`} value={dt[0]}>
-                            {dt[1]}
-                          </SearchSelectItem>
-                        );
-                      })
-                    }
+                    {Object.entries(KxDocumentType).map((dt) => {
+                      return (
+                        <SearchSelectItem key={`type-${dt[0]}`} value={dt[0]}>
+                          {dt[1]}
+                        </SearchSelectItem>
+                      );
+                    })}
                   </SearchSelect>
                 </div>
 
@@ -291,7 +304,7 @@ export function FormDialog() {
                     name="language"
                     className="mt-2"
                     value={language}
-                    onValueChange={l => setLanguage(l)}
+                    onValueChange={(l) => setLanguage(l)}
                   >
                     {locales.map((l) => {
                       return (
@@ -332,6 +345,7 @@ export function FormDialog() {
                 onClick={() => setIsMapOpen(true)}
               >
                 <PreviewMap
+                  coordinates={{ lng, lat }}
                   style={{ minHeight: "300px", width: "100%" }}
                 ></PreviewMap>
               </Card>
@@ -345,8 +359,14 @@ export function FormDialog() {
                   style={{ maxWidth: "100%" }}
                 >
                   <SatMap
+                    coordinates={{ lng: lng, lat: lat }}
+                    onMapClick={(lng, lat) => {
+                      handleMapClick(lng, lat);
+                    }}
                     onCancel={() => setIsMapOpen(false)}
-                    onDone={() => setIsMapOpen(false)}
+                    onDone={() => {
+                      setIsMapOpen(false);
+                    }}
                     style={{ minHeight: "95vh", width: "100%" }}
                   ></SatMap>
                 </DialogPanel>
@@ -371,7 +391,7 @@ export function FormDialog() {
                   }}
                   error={descriptionError}
                   errorMessage="The description is mandatory"
-                  onValueChange={d => setDescription(d)}
+                  onValueChange={(d) => setDescription(d)}
                   style={{ minHeight: "200px" }}
                 />
               </div>
@@ -521,7 +541,7 @@ export function FormDialog() {
                 </Button>
                 <Button
                   className="w-full sm:w-auto"
-                  onClick={e => handleSubmit(e)}
+                  onClick={(e) => handleSubmit(e)}
                 >
                   Submit
                 </Button>

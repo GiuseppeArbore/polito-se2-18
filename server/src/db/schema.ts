@@ -47,6 +47,15 @@ const DocumentSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true
-    }
+    },
+    lng: {
+        type: Number,
+        required: false
+    },
+    lat: {
+        type: Number,
+        required: false
+    },
+
 } );  
 export const Document = mongoose.model("Document", DocumentSchema);

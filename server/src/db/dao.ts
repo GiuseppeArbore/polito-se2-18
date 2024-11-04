@@ -91,6 +91,8 @@ class DAO {
                 area_type: result.area_type,
                 description: result.description,
                 language: result.language,
+                lng: result.lng, 
+                lat : result.lat
             } as KxDocument;
         }
         return {
@@ -105,6 +107,8 @@ class DAO {
             area_type: result.area_type,
             description: result.description,
             language: result.language,
+            lng: result.lng, 
+            lat : result.lat
         } as KxDocument;
     }
 }

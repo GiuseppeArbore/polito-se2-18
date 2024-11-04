@@ -10,6 +10,8 @@ export interface SatMapProps {
   zoom?: number;
   style?: React.CSSProperties;
   className?: string;
+  onMapClick?: (lng: number, lat: number) => void;
+  coordinates?: { lng: number; lat: number };
 }
 
 const defaultZoom = 12;
@@ -17,6 +19,7 @@ const defaultZoom = 12;
 export const PreviewMap: React.FC<SatMapProps> = (props) => {
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const markerRef = useRef<Marker | null>(null);
 
   useEffect(() => {
     if (mapRef.current) return;
@@ -31,6 +34,23 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
       interactive: false,
     });
   }, []);
+
+  useEffect(() => {
+    if (props.coordinates && mapRef.current) {
+      // Remove existing marker if present
+      if (markerRef.current) {
+        markerRef.current.remove();
+      }
+
+      // Create and add a new marker at the passed coordinates
+      markerRef.current = new Marker()
+        .setLngLat([props.coordinates.lng, props.coordinates.lat])
+        .addTo(mapRef.current);
+
+      // Optionally, center the map on the new marker
+      mapRef.current.setCenter([props.coordinates.lng, props.coordinates.lat]);
+    }
+  }, [props.coordinates]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -102,6 +122,8 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
 };
 
 export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
+  const { onMapClick, coordinates } = props;
+  console.log("coordinates: ", coordinates);
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
 
@@ -119,6 +141,17 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
       zoom: props.zoom || defaultZoom,
       pitch: 40,
     });
+
+    // Drawing the past/last point on the map in loading
+    if (
+      coordinates &&
+      coordinates.lng !== undefined &&
+      coordinates.lat !== undefined
+    ) {
+      new Marker()
+        .setLngLat([coordinates?.lng, coordinates?.lat])
+        .addTo(mapRef.current);
+    }
   }, []);
 
   useEffect(() => {
@@ -145,8 +178,10 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
 
       // Update point state
       setPoint({ lng, lat });
-      console.log("lng: ", lng);
-      console.log("lat:  ", lat);
+
+      if (onMapClick) {
+        onMapClick(lng, lat);
+      }
 
       // Create a new marker and add it to the map
       const newMarker = new Marker().setLngLat([lng, lat]).addTo(map);
@@ -164,7 +199,6 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
       }
     };
   }, []);
-
   return (
     <>
       <div
