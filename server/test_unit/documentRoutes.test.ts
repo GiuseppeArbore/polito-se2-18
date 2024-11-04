@@ -8,6 +8,7 @@ import { KIRUNA_COORDS } from '../src/utils';
 
 jest.mock('../src/controller', () => ({
     createKxDocument: jest.fn(),
+    getAllKxDocuments: jest.fn()
 }));
 
 

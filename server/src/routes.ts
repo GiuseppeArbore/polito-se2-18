@@ -1,5 +1,5 @@
 import { Application } from 'express';
-import { createKxDocument } from './controller';
+import { createKxDocument, getAllKxDocuments} from './controller';
 import {validateRequest} from './errorHandlers';
 import { body } from 'express-validator';
 import { AreaType, isDocCoords, KxDocumentType, Scale, Stakeholders } from './models/enum';
@@ -57,6 +57,7 @@ export function initRoutes(app: Application) {
         createKxDocument
     );
 
+    app.get('/api/documents', getAllKxDocuments);
     
 }
 

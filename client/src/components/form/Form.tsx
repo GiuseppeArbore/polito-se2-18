@@ -15,7 +15,7 @@ import {
   Badge,
   Callout,
 } from "@tremor/react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
 import API from "../../API";
@@ -56,7 +56,6 @@ export function FormDialog() {
   const [pages, setPages] = useState("");
   const [description, setDescription] = useState<string | undefined>(undefined);
   const [descriptionError, setDescriptionError] = useState(false);
-  // const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [error, setError] = useState("");
   const [isMapOpen, setIsMapOpen] = useState(false);
 
@@ -64,13 +63,11 @@ export function FormDialog() {
   // Example usage
   //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
 
+  
+
   const [docCoordinatesError, setDocCoordinatesError] = useState(false);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
-  const [documents, setDocuments] = useState<string[]>([
-    "Doc 1",
-    "Doc 2",
-    "Doc 3",
-  ]);
+  const [documents, setDocuments] = useState<KxDocument[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +99,7 @@ export function FormDialog() {
     try {
       const createdDocument = await API.createKxDocument(newDocument);
       if (createdDocument) {
-        setDocuments([...documents, createdDocument.title]);
+        setDocuments([...documents, createdDocument]);
       } else {
         setError("Failed to create document");
       }
@@ -112,13 +109,24 @@ export function FormDialog() {
     }
   };
 
+  useEffect(() => {
+    if (isOpen) {
+      const fetchDocuments = async () => {
+        try {
+          const docs = await API.getAllKxDocuments();
+          setDocuments(docs);
+        } catch (error) {
+          setError('Failed to fetch documents');
+        }
+      };
+
+      fetchDocuments();
+    }
+  }, [isOpen]);
+
   const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
-  const [documentsForCollateral, setDocumentsForCollateral] = useState<
-    string[]
-  >([]);
-  const [documentsForProjection, setDocumentsForProjection] = useState<
-    string[]
-  >([]);
+  const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
+  const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
   const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
 
   return (
@@ -410,18 +418,18 @@ export function FormDialog() {
                   >
                     {documents.map((doc) => (
                       <MultiSelectItem
-                        key={doc}
-                        value={doc}
+                        key={`${doc._id}-direct`}
+                        value={doc.title}
                         className={
-                          documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                          documentsForProjection.includes(doc.title) ||
+                          documentsForDirect.includes(doc.title) ||
+                          documentsForCollateral.includes(doc.title) ||
+                          documentsForUpdate.includes(doc.title)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
                       >
-                        {doc}
+                        {doc.title}
                       </MultiSelectItem>
                     ))}
                   </MultiSelect>
@@ -442,18 +450,18 @@ export function FormDialog() {
                   >
                     {documents.map((doc) => (
                       <MultiSelectItem
-                        key={doc}
-                        value={doc}
+                        key={`${doc._id}-collateral`}
+                        value={doc.title}
                         className={
-                          documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                          documentsForProjection.includes(doc.title) ||
+                          documentsForDirect.includes(doc.title) ||
+                          documentsForCollateral.includes(doc.title) ||
+                          documentsForUpdate.includes(doc.title)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
                       >
-                        {doc}
+                        {doc.title}
                       </MultiSelectItem>
                     ))}
                   </MultiSelect>
@@ -471,18 +479,18 @@ export function FormDialog() {
                   >
                     {documents.map((doc) => (
                       <MultiSelectItem
-                        key={doc}
-                        value={doc}
+                        key={`${doc._id}-projection`}
+                        value={doc.title}
                         className={
-                          documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                          documentsForProjection.includes(doc.title) ||
+                          documentsForDirect.includes(doc.title) ||
+                          documentsForCollateral.includes(doc.title) ||
+                          documentsForUpdate.includes(doc.title)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
                       >
-                        {doc}
+                        {doc.title}
                       </MultiSelectItem>
                     ))}
                   </MultiSelect>
@@ -500,18 +508,18 @@ export function FormDialog() {
                   >
                     {documents.map((doc) => (
                       <MultiSelectItem
-                        key={doc}
-                        value={doc}
+                        key={`${doc._id}-update`}
+                        value={doc.title}
                         className={
-                          documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                          documentsForProjection.includes(doc.title) ||
+                          documentsForDirect.includes(doc.title) ||
+                          documentsForCollateral.includes(doc.title) ||
+                          documentsForUpdate.includes(doc.title)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
                       >
-                        {doc}
+                        {doc.title}
                       </MultiSelectItem>
                     ))}
                   </MultiSelect>

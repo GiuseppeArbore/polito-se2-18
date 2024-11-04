@@ -2,6 +2,7 @@ import { describe, test } from "@jest/globals"
 import request from 'supertest';
 import {app} from "../index";
 import { AreaType, KxDocumentType, Scale, Stakeholders } from "../src/models/enum";
+import { KxDocument } from "../src/models/model";
 import {db} from "../src/db/dao";
 import { KIRUNA_COORDS } from "../src/utils";
 
@@ -193,7 +194,82 @@ describe("Integration Tests for Document API", () => {
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
                 description: "Test document"
             });
+            documentIds.push(response.body._id);
+            
         expect(response.status).toBe(201);
+    });
+
+
+    test("Test 9 - Should fetch multiple documents", async () => {
+        
+        const responsePost1 = await request(app)
+            .post('/api/documents')
+            .send({
+                title: "Document 1",
+                stakeholders: [Stakeholders.RESIDENT],
+                scale_info: Scale.TEXT,
+                scale: 10,
+                issuance_date: date,
+                type: KxDocumentType.INFORMATIVE,
+                connections: 0,
+                language: "Swedish",
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
+                description: "Test document 1"
+            });
+            documentIds.push(responsePost1.body._id);
+       const responsePost2 =  await request(app)
+            .post('/api/documents')
+            .send({
+                title: "Document 2",
+                stakeholders: [Stakeholders.RESIDENT],
+                scale_info: Scale.TEXT,
+                scale: 10,
+                issuance_date: date,
+                type: KxDocumentType.INFORMATIVE,
+                connections: 0,
+                language: "Swedish",
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
+                description: "Test document 2"
+            });
+    
+            documentIds.push(responsePost2.body._id);
+        const response = await request(app).get('/api/documents');
+    
+        
+        expect(response.status).toBe(200);
+        expect(response.body).toBeDefined();
+        expect(Array.isArray(response.body)).toBe(true);
+        expect(response.body.length).toBeGreaterThanOrEqual(2);
+        expect(response.body.some((doc: KxDocument) => doc.title === "Document 1")).toBe(true);
+        expect(response.body.some((doc: KxDocument) => doc.title === "Document 2")).toBe(true);
+    });
+
+    test("Test 10 - Insert 100 documents, wait 30 seconds, and delete them", async () => {
+        
+    
+        
+        for (let i = 0; i < 100; i++) {
+            const response = await request(app)
+                .post('/api/documents')
+                .send({
+                    title: `Document ${i + 1}`,
+                    stakeholders: [Stakeholders.RESIDENT],
+                    scale_info: Scale.TEXT,
+                    scale: 10,
+                    issuance_date: new Date(),
+                    type: KxDocumentType.INFORMATIVE,
+                    connections: 0,
+                    language: "Swedish",
+                    doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
+                    description: `This is test document ${i + 1}.`,
+                    pages: []
+                });
+            expect(response.status).toBe(201);
+            documentIds.push(response.body._id);
+        }
+    
+        
+       
     });
 });
 
