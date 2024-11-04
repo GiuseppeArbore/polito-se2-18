@@ -1,6 +1,6 @@
-import { Application } from 'express';
+import e, { Application } from 'express';
 import { createKxDocument } from './controller';
-import {validateRequest} from './errorHandlers';
+import { validateRequest } from './errorHandlers';
 import { body } from 'express-validator';
 import { AreaType, isDocCoords, KxDocumentType, Scale, Stakeholders } from './models/enum';
 import { coordDistance, KIRUNA_COORDS } from './utils';
@@ -9,7 +9,7 @@ import { coordDistance, KIRUNA_COORDS } from './utils';
 
 export function initRoutes(app: Application) {
 
-     const kxDocumentValidationChain = [
+    const kxDocumentValidationChain = [
         body('title').notEmpty().withMessage('Title is required'),
         body('stakeholders').notEmpty().withMessage('Stakeholders are required')
             .isArray().withMessage('Stakeholders must be an array')
@@ -44,9 +44,16 @@ export function initRoutes(app: Application) {
                     (typeof e === "number" && e >= 0 && Number.isInteger(e)));
             })
         }).withMessage('Invalid pages'),
+        body('connections').optional().isObject().custom((v) => {
+            if (typeof v !== 'object' || v === null) return false;
+            const lists = Object.values(v);
+            const allItems = lists.flat();
+            const uniqueItems = new Set(allItems);
+            return uniqueItems.size === allItems.length;
+        }).withMessage('Invalid connections'),
     ];
-    
-    app.get("/doc", async (req, res) => {
+
+    app.get("/doc", async (_, res) => {
         res.status(200).json({ ok: "ok" });
     });
 
@@ -57,7 +64,7 @@ export function initRoutes(app: Application) {
         createKxDocument
     );
 
-    
+
 }
 
 export default initRoutes;

@@ -29,10 +29,6 @@ const DocumentSchema = new mongoose.Schema({
         enum: Object.values(KxDocumentType),
         required: true
     },
-    connections: {
-        type: Number,
-        required: true
-    },
     language: {
         type: String,
     },
@@ -49,6 +45,14 @@ const DocumentSchema = new mongoose.Schema({
     description: {
         type: String,
         required: true
+    },
+    connections: {
+        type: {
+            direct: [String],
+            collateral: [String],
+            projection: [String],
+            update: [String]
+        }
     }
 } );  
 export const Document = mongoose.model("Document", DocumentSchema);

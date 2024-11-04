@@ -16,7 +16,6 @@ beforeAll(async () => {
         scale: 10,
         issuance_date: date,
         type: KxDocumentType.INFORMATIVE,
-        connections: 0,
         language: "Swedish",
         doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
         description: "Test"
@@ -35,7 +34,6 @@ describe("Test DAO", () => {
             scale_info: Scale.TEXT,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections: 0,
             language: "Swedish",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test",
@@ -57,7 +55,6 @@ describe("Test DAO", () => {
             scale_info: Scale.TEXT,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections: 0,
             language: "Swedish",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test"
@@ -79,7 +76,6 @@ describe("Test DAO", () => {
             scale_info: Scale.TEXT,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections: 0,
             language: "Swedish",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test"
@@ -99,7 +95,6 @@ describe("Test DAO", () => {
             scale: 0,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections: 0,
             language: "Italian",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test",
@@ -122,7 +117,6 @@ describe("Test DAO", () => {
             scale: 0,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections: 0,
             language: "Italian",
             doc_coordinates: {
                 type: AreaType.ENTIRE_MUNICIPALITY,
@@ -146,7 +140,6 @@ describe("Test DAO", () => {
             scale: 0,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections: 0,
             language: "Italian",
             doc_coordinates: {
                 type: AreaType.POINT,
@@ -171,7 +164,6 @@ describe("Test DAO", () => {
             scale: 0,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections: 0,
             language: "Italian",
             doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
             description: "Test",

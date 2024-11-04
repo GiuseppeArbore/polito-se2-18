@@ -71,6 +71,10 @@ export function FormDialog() {
     "Doc 2",
     "Doc 3",
   ]);
+  const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
+  const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
+  const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
+  const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -90,13 +94,18 @@ export function FormDialog() {
       stakeholders,
       scale_info: Scale.TEXT,
       scale,
-      connections: 0,
       doc_coordinates: docCoordinates,
       issuance_date: issuanceDate,
       type: type,
       language,
       description,
       pages: validatePageRangeString(pages),
+      connections: {
+        direct: documentsForDirect,
+        collateral: documentsForCollateral,
+        projection: documentsForProjection,
+        update: documentsForUpdate,
+      },
     };
 
     try {
@@ -112,14 +121,7 @@ export function FormDialog() {
     }
   };
 
-  const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
-  const [documentsForCollateral, setDocumentsForCollateral] = useState<
-    string[]
-  >([]);
-  const [documentsForProjection, setDocumentsForProjection] = useState<
-    string[]
-  >([]);
-  const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
+
 
   return (
     <>
@@ -414,9 +416,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -446,9 +448,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -475,9 +477,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -504,9 +506,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
