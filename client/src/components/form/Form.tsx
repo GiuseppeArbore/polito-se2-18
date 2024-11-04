@@ -56,7 +56,7 @@ export function FormDialog() {
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState("");
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
-  const [showMap, setShowMap] = useState<boolean>(false);
+  const [showMap, setShowMap] = useState<boolean>(true);
   const [description, setDescription] = useState<string | undefined>(undefined);
   const [descriptionError, setDescriptionError] = useState(false);
   // const [documents, setDocuments] = useState<KxDocument[]>([]);
@@ -68,7 +68,6 @@ export function FormDialog() {
   //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
 
   const [docCoordinatesError, setDocCoordinatesError] = useState(false);
-  const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
   const [documents, setDocuments] = useState<string[]>([
     "Doc 1",
     "Doc 2",
@@ -97,7 +96,7 @@ export function FormDialog() {
       stakeholders,
       scale_info: Scale.TEXT,
       scale,
-      doc_coordinates: docCoordinates,
+      doc_coordinates: !showMap ? { type: AreaType.ENTIRE_MUNICIPALITY } : docCoordinates,
       issuance_date: issuanceDate,
       type: type,
       language,
@@ -353,7 +352,7 @@ export function FormDialog() {
                 />
               </div>
 
-              {!showMap && (
+              {showMap && (
                 <>
                   <Card
                     className="my-4 p-0 overflow-hidden cursor-pointer"
@@ -381,14 +380,6 @@ export function FormDialog() {
                   </Dialog>
                 </>
               )}
-              <Card
-                className={`my-4 p-0 overflow-hidden cursor-pointer ${docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"}`}
-                onClick={() => setIsMapOpen(true)}
-              >
-                <PreviewMap
-                  style={{ minHeight: "300px", width: "100%" }}
-                />
-              </Card>
               {docCoordinatesError ? <p className="tremor-TextInput-errorMessage text-sm text-red-500 mt-1">Please provide document coordinates</p> : null}
               <Dialog
                 open={isMapOpen}
