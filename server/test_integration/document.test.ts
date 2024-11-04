@@ -32,7 +32,6 @@ describe("Integration Tests for Document API", () => {
                 scale: 10,
                 issuance_date: date,
                 type: KxDocumentType.INFORMATIVE,
-                connections: 0,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document for integration testing.",
@@ -54,7 +53,6 @@ describe("Integration Tests for Document API", () => {
                 scale: 10,
                 issuance_date: date,
                 type: KxDocumentType.INFORMATIVE,
-                connections: 0,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document with missing title."
@@ -76,7 +74,6 @@ describe("Integration Tests for Document API", () => {
                 scale: 10,
                 issuance_date: date,
                 type: KxDocumentType.INFORMATIVE,
-                connections: 0,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document for integration testing.",
@@ -105,7 +102,6 @@ describe("Integration Tests for Document API", () => {
                 scale: 10,
                 issuance_date: date,
                 type: KxDocumentType.INFORMATIVE,
-                connections: 0,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document for integration testing.",
@@ -128,7 +124,6 @@ describe("Integration Tests for Document API", () => {
                 scale: 10,
                 issuance_date: date,
                 type: KxDocumentType.INFORMATIVE,
-                connections: 0,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document with missing title."
@@ -149,7 +144,6 @@ describe("Integration Tests for Document API", () => {
                 scale: 10,
                 issuance_date: date,
                 type: KxDocumentType.INFORMATIVE,
-                connections: 0,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
                 description: "This is a test document with missing title."
@@ -169,7 +163,6 @@ describe("Integration Tests for Document API", () => {
                 scale: 10,
                 issuance_date: date,
                 type: KxDocumentType.INFORMATIVE,
-                connections: 0,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [1, 1]]] },
                 description: "This is a test document with missing title."
@@ -179,7 +172,7 @@ describe("Integration Tests for Document API", () => {
         expect(response.body.errors[0].msg).toBe('Invalid document coordinates');
     });
 
-    test("Test 8 - Should succeed", async () => {
+    test("Test 8 - Should succeed (correct area)", async () => {
         const response = await request(app)
             .post('/api/documents')
             .send({
@@ -189,7 +182,6 @@ describe("Integration Tests for Document API", () => {
                 scale: 10,
                 issuance_date: date,
                 type: KxDocumentType.INFORMATIVE,
-                connections: 0,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
                 description: "Test document"

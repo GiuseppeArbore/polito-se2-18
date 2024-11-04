@@ -68,7 +68,15 @@ export function FormDialog() {
 
   const [docCoordinatesError, setDocCoordinatesError] = useState(false);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
+
   const [documents, setDocuments] = useState<KxDocument[]>([]);
+
+
+  const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
+  const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
+  const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
+  const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
+
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -88,13 +96,18 @@ export function FormDialog() {
       stakeholders,
       scale_info: Scale.TEXT,
       scale,
-      connections: 0,
       doc_coordinates: docCoordinates,
       issuance_date: issuanceDate,
       type: type,
       language,
       description,
       pages: validatePageRangeString(pages),
+      connections: {
+        direct: documentsForDirect,
+        collateral: documentsForCollateral,
+        projection: documentsForProjection,
+        update: documentsForUpdate,
+      },
     };
 
     try {
@@ -109,6 +122,7 @@ export function FormDialog() {
       setError("Failed to create document");
     }
   };
+
 
   useEffect(() => {
     if (isOpen) {
@@ -129,6 +143,7 @@ export function FormDialog() {
   const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
   const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
   const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
+
 
   return (
     <>
@@ -422,10 +437,12 @@ export function FormDialog() {
                         key={doc._id?.toString()}
                         value={doc._id ? doc._id.toString() : ""}
                         className={
+
                           documentsForProjection.includes(doc.title) ||
                           documentsForDirect.includes(doc.title) ||
                           documentsForCollateral.includes(doc.title) ||
                           documentsForUpdate.includes(doc.title)
+
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
