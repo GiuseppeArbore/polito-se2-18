@@ -5,8 +5,6 @@ export class KxDocument {
     title: string;
     stakeholders: Stakeholders[];
     scale_info: Scale;
-    lng?: number;
-    lat?: number;
     scale: number;
     issuance_date?: Date;
     type?: KxDocumentType;
@@ -22,8 +20,6 @@ export class KxDocument {
         stakeholders: Stakeholders[],
         scale: number,
         scale_info: Scale,
-        lng?: number, 
-        lat?: number,
         issuance_date?: Date,
         type?: KxDocumentType,
         connections?: number,
@@ -38,8 +34,6 @@ export class KxDocument {
         this.stakeholders = stakeholders;
         this.scale = scale;
         this.scale_info = scale_info;
-        this.lng = lng;
-        this.lat = lat;
         this.issuance_date = issuance_date;
         this.type = type;
         this.connections = connections;

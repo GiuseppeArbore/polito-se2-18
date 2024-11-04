@@ -90,8 +90,6 @@ class DAO {
             doc_coordinates: result.doc_coordinates,
             description: result.description,
             language: result.language,
-            lng: result.lng, 
-            lat : result.lat
         } as KxDocument;
     }
 }
