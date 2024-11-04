@@ -2,7 +2,8 @@ import { describe, test } from "@jest/globals"
 import { db } from "../src/db/dao";
 import { AreaType, KxDocumentType, Scale, Stakeholders } from "../src/models/enum";
 import { KxDocument } from "../src/models/model";
-import { ObjectId } from "mongodb";
+import { ObjectId } from "mongoose";
+import { KIRUNA_COORDS } from "../src/utils";
 
 const list: ObjectId[] = [];
 const date = new Date();
@@ -15,9 +16,8 @@ beforeAll(async () => {
         scale: 10,
         issuance_date: date,
         type: KxDocumentType.INFORMATIVE,
-        connections: 0,
         language: "Swedish",
-        area_type: AreaType.ENTIRE_MUNICIPALITY,
+        doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
         description: "Test"
     } as KxDocument);
     if (res && res._id) {
@@ -34,9 +34,8 @@ describe("Test DAO", () => {
             scale_info: Scale.TEXT,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections: 0,
             language: "Swedish",
-            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test",
         })
         if (res && res._id) {
@@ -52,12 +51,12 @@ describe("Test DAO", () => {
             _id: list[0],
             stakeholders: [Stakeholders.RESIDENT],
             scale: 10,
+            pages: [],
             scale_info: Scale.TEXT,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections: 0,
             language: "Swedish",
-            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test"
         })
     });
@@ -72,13 +71,13 @@ describe("Test DAO", () => {
             title: "title 1",
             _id: list[0],
             stakeholders: [Stakeholders.RESIDENT],
+            pages: [],
             scale: 10,
             scale_info: Scale.TEXT,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections: 0,
             language: "Swedish",
-            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test"
         })
     });
@@ -96,9 +95,8 @@ describe("Test DAO", () => {
             scale: 0,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections: 0,
             language: "Italian",
-            area_type: AreaType.ENTIRE_MUNICIPALITY,
+            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
             description: "Test",
             pages: [2, [4, 8]]
         });
@@ -106,6 +104,74 @@ describe("Test DAO", () => {
             expect(res).toHaveProperty("_id");
             const get = await db.getKxDocumentById(res._id.toString());
             expect(get?.pages).toEqual([2, [4, 8]]);
+            const res2 = await db.deleteKxDocument(res._id.toString());
+            expect(res2).toBeTruthy();
+        }
+    });
+
+    test("Test query with whole municipality coordinates", async () => {
+        const res = await db.createKxDocument({
+            title: "test",
+            stakeholders: [],
+            scale_info: Scale.TEXT,
+            scale: 0,
+            issuance_date: date,
+            type: KxDocumentType.INFORMATIVE,
+            language: "Italian",
+            doc_coordinates: {
+                type: AreaType.ENTIRE_MUNICIPALITY,
+            },
+            description: "Test",
+        });
+        if (res && res._id) {
+            expect(res).toHaveProperty("_id");
+            const get = await db.getKxDocumentById(res._id.toString());
+            expect(get?.doc_coordinates).toEqual({type: AreaType.ENTIRE_MUNICIPALITY});
+            const res2 = await db.deleteKxDocument(res._id.toString());
+            expect(res2).toBeTruthy();
+        }
+    });
+
+    test("Test query with Point coordinates", async () => {
+        const res = await db.createKxDocument({
+            title: "test",
+            stakeholders: [],
+            scale_info: Scale.TEXT,
+            scale: 0,
+            issuance_date: date,
+            type: KxDocumentType.INFORMATIVE,
+            language: "Italian",
+            doc_coordinates: {
+                type: AreaType.POINT,
+                coordinates: [20.26, 67.845]
+            },
+            description: "Test",
+        });
+        if (res && res._id) {
+            expect(res).toHaveProperty("_id");
+            const get = await db.getKxDocumentById(res._id.toString());
+            expect(get?.doc_coordinates).toEqual({type: AreaType.POINT, coordinates: [20.26, 67.845]});
+            const res2 = await db.deleteKxDocument(res._id.toString());
+            expect(res2).toBeTruthy();
+        }
+    });
+
+    test("Test query with Area (Polygons)", async () => {
+        const res = await db.createKxDocument({
+            title: "test",
+            stakeholders: [],
+            scale_info: Scale.TEXT,
+            scale: 0,
+            issuance_date: date,
+            type: KxDocumentType.INFORMATIVE,
+            language: "Italian",
+            doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
+            description: "Test",
+        });
+        if (res && res._id) {
+            expect(res).toHaveProperty("_id");
+            const get = await db.getKxDocumentById(res._id.toString());
+            expect(get?.doc_coordinates).toEqual({ type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] });
             const res2 = await db.deleteKxDocument(res._id.toString());
             expect(res2).toBeTruthy();
         }

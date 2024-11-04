@@ -1,5 +1,5 @@
 import { DocCoords, KxDocumentType, PageRange, Scale, Stakeholders } from "./enum";
-import { ObjectId } from "mongoose";
+import { ObjectId } from "mongodb";
 
 export class KxDocument {
     title: string;
