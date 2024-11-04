@@ -1,4 +1,4 @@
-import { AreaType, KxDocumentType, PageRange, Scale, Stakeholders } from "./enum";
+import { DocCoords, KxDocumentType, PageRange, Scale, Stakeholders } from "./enum";
 import { ObjectId } from "mongodb";
 
 export class KxDocument {
@@ -10,7 +10,7 @@ export class KxDocument {
     type?: KxDocumentType;
     connections?: number;
     language?: string;
-    area_type?: AreaType;
+    doc_coordinates?: DocCoords;
     description?: string;
     _id?: ObjectId;
     pages?: PageRange[];
@@ -29,7 +29,7 @@ export class KxDocument {
         connections?: number,
         language?: string,
         description?: string,
-        area_type?: AreaType,
+        doc_coordinates?: DocCoords,
         _id?: ObjectId,
         pages?: PageRange[]
     ) {
@@ -42,7 +42,7 @@ export class KxDocument {
         this.type = type;
         this.connections = connections;
         this.language = language;
-        this.area_type = area_type;
+        this.doc_coordinates = doc_coordinates;
         this.description = description;
         this.pages = pages;
         this.lng = lng;
