@@ -43,19 +43,6 @@ export function initRoutes(app: Application) {
             const uniqueItems = new Set(allItems);
             return uniqueItems.size === allItems.length;
         }).withMessage('Invalid connections'),
-        body().custom(v => {
-            const connections = v.connections;
-            const connections_number = v.connections_number;
-            if (!connections && connections_number !== 0 || connections && !connections_number) {
-                return false;
-            } else if (connections && connections_number) {
-                if (Object.values(connections).flat().length !== connections_number) {
-                    return false;
-                }
-            }
-            return true;
-        }).withMessage('Connections number is not equal to the total number of connections')
-
     ];
 
     app.get("/doc", async (_, res) => {

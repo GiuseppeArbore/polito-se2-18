@@ -25,7 +25,6 @@ describe('Document Routes', () => {
             scale: 10,
             issuance_date: new Date().toISOString(),
             type: KxDocumentType.INFORMATIVE,
-            connections_number: 4,
             language: 'Swedish',
             area_type: AreaType.ENTIRE_MUNICIPALITY,
             description: 'This is a test document for unit testing.',
@@ -51,7 +50,6 @@ describe('Document Routes', () => {
                 scale: 10,
                 issuance_date: new Date().toISOString(),
                 type: KxDocumentType.INFORMATIVE,
-                connections_number: 4,
                 language: 'Swedish',
                 area_type: AreaType.ENTIRE_MUNICIPALITY,
                 description: 'This is a test document for unit testing.',
@@ -81,7 +79,6 @@ describe('Document Routes', () => {
                 scale: 10,
                 issuance_date: new Date().toISOString(),
                 type: KxDocumentType.INFORMATIVE,
-                connections_number: 0,
                 language: 'Swedish',
                 area_type: AreaType.ENTIRE_MUNICIPALITY,
                 description: 'This is a test document unit testing.',
@@ -101,7 +98,6 @@ describe('Document Routes', () => {
                 scale: 10,
                 issuance_date: new Date().toISOString(),
                 type: KxDocumentType.INFORMATIVE,
-                connections_number: 0,
                 language: 'Swedish',
                 area_type: AreaType.ENTIRE_MUNICIPALITY,
                 description: 'This is a test document for unit testing.',
@@ -122,7 +118,6 @@ describe('Document Routes', () => {
                 scale: 10,
                 issuance_date: new Date().toISOString(),
                 type: KxDocumentType.INFORMATIVE,
-                connections_number: 5,
                 language: 'Swedish',
                 area_type: AreaType.ENTIRE_MUNICIPALITY,
                 description: 'This is a test document unit testing.',
@@ -138,32 +133,4 @@ describe('Document Routes', () => {
         expect(response.body.errors[0].msg).toBe('Invalid connections');}
     );
 
-    test('Test 5 - POST /api/documents - should return error 400 (connection number invalid)', async () => {
-        const response = await request(app)
-            .post('/api/documents')
-            .send({
-                title: 'Unit Test Document',
-                stakeholders: [Stakeholders.RESIDENT],
-                scale_info: Scale.TEXT,
-                scale: 10,
-                issuance_date: new Date().toISOString(),
-                type: KxDocumentType.INFORMATIVE,
-                connections_number: 3,
-                language: 'Swedish',
-                area_type: AreaType.ENTIRE_MUNICIPALITY,
-                description: 'This is a test document unit testing.',
-                connections: {
-                    direct: ['1'],
-                    collateral: ['2'],
-                    projection: ['3'],
-                    update: ['4']
-                }
-            });
-
-        expect(response.status).toBe(400);
-        expect(response.body.errors[0].msg).toBe('Connections number is not equal to the total number of connections');}
-    );
-
-
-    
 });

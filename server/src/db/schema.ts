@@ -29,10 +29,6 @@ const DocumentSchema = new mongoose.Schema({
         enum: Object.values(KxDocumentType),
         required: true
     },
-    connections_number: {
-        type: Number,
-        required: true
-    },
     language: {
         type: String,
     },

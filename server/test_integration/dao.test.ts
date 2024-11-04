@@ -15,7 +15,6 @@ beforeAll(async () => {
         scale: 10,
         issuance_date: date,
         type: KxDocumentType.INFORMATIVE,
-        connections_number: 0,
         language: "Swedish",
         area_type: AreaType.ENTIRE_MUNICIPALITY,
         description: "Test"
@@ -34,7 +33,6 @@ describe("Test DAO", () => {
             scale_info: Scale.TEXT,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections_number: 0,
             language: "Swedish",
             area_type: AreaType.ENTIRE_MUNICIPALITY,
             description: "Test",
@@ -56,7 +54,6 @@ describe("Test DAO", () => {
             scale_info: Scale.TEXT,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections_number: 0,
             language: "Swedish",
             area_type: AreaType.ENTIRE_MUNICIPALITY,
             description: "Test"
@@ -78,7 +75,6 @@ describe("Test DAO", () => {
             scale_info: Scale.TEXT,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections_number: 0,
             language: "Swedish",
             area_type: AreaType.ENTIRE_MUNICIPALITY,
             description: "Test"
@@ -98,7 +94,6 @@ describe("Test DAO", () => {
             scale: 0,
             issuance_date: date,
             type: KxDocumentType.INFORMATIVE,
-            connections_number: 0,
             language: "Italian",
             area_type: AreaType.ENTIRE_MUNICIPALITY,
             description: "Test",

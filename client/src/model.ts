@@ -8,7 +8,6 @@ export class KxDocument {
     scale: number;
     issuance_date?: Date;
     type?: KxDocumentType;
-    connections_number?: number;
     language?: string;
     area_type?: AreaType;
     description?: string;
@@ -23,7 +22,6 @@ export class KxDocument {
         scale_info: Scale,
         issuance_date?: Date,
         type?: KxDocumentType,
-        connections_number?: number,
         language?: string,
         description?: string,
         area_type?: AreaType,
@@ -37,7 +35,6 @@ export class KxDocument {
         this.scale_info = scale_info;
         this.issuance_date = issuance_date;
         this.type = type;
-        this.connections_number = connections_number;
         this.language = language;
         this.area_type = area_type;
         this.description = description;

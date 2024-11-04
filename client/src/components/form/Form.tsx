@@ -87,7 +87,6 @@ export function FormDialog() {
       stakeholders,
       scale_info: Scale.TEXT,
       scale,
-      connections_number: documentsForDirect.length + documentsForCollateral.length + documentsForProjection.length + documentsForUpdate.length,
       area_type: AreaType.ENTIRE_MUNICIPALITY,
       issuance_date: issuanceDate,
       type: type,
