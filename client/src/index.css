@@ -13,3 +13,11 @@ body {
 .text-sm {
     font-size: smaller;
 }
+
+.primary {
+    background-color: #003d8e;
+}
+
+.secondary {
+    color:  #003d8e;
+}

@@ -131,7 +131,7 @@ export function FormDialog() {
 
   return (
     <>
-      <Button className="mx-auto block mb-2" onClick={() => setIsOpen(true)}>
+      <Button className="mx-auto block mb-2 primary" onClick={() => setIsOpen(true)}>
         Add new document
       </Button>
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
@@ -615,14 +615,14 @@ export function FormDialog() {
               <Divider />
               <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
                 <Button
-                  className="w-full sm:w-auto mt-4 sm:mt-0"
+                  className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
                   variant="light"
                   onClick={() => setIsOpen(false)}
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto primary"
                   onClick={e => handleSubmit(e)}
                 >
                   Submit
