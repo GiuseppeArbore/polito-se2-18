@@ -4,6 +4,8 @@ import { Button, Card, TabGroup, TabList, Tab, Divider } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill, RiHand, RiMapPinLine, RiScissorsCutFill, RiShapeLine } from "@remixicon/react";
 import { PreviewMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import CutPolygonMode, { drawStyles as cutPolygonDrawStyles } from "mapbox-gl-draw-cut-polygon-mode";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
 export interface SatMapProps {

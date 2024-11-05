@@ -389,7 +389,7 @@ export function FormDialog() {
                   <SatMap
                     drawing={drawing}
                     onCancel={() => setIsMapOpen(false)}
-                    onDone={(v) => {console.log(v); setDrawing(v); setIsMapOpen(false); }}
+                    onDone={(v) => {setDrawing(v); setIsMapOpen(false); }}
                     style={{ minHeight: "95vh", width: "100%" }}
                   ></SatMap>
                 </DialogPanel>
