@@ -74,6 +74,8 @@ interface MapControlsProps {
   // path type is temporary
   onDone?: (path: number) => void;
   onCancel?: () => void;
+  activeTab: number;
+  setActiveTab: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const MapControls: React.FC<MapControlsProps> = (props) => {
@@ -81,9 +83,32 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
     <Card className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50">
       <TabGroup className="mt-1 flex justify-center">
         <TabList variant="solid">
-          <Tab value="1">Point</Tab>
-          <Tab value="2">Area</Tab>
-          <Tab value="3">Whole Municipality</Tab>
+          <Tab
+            value="1"
+            onClick={() => {
+              props.setActiveTab(1);
+              console.log("1");
+            }}
+          >
+            Point
+          </Tab>
+          <Tab
+            value="2"
+            onClick={() => {
+              props.setActiveTab(2);
+              console.log("2");
+            }}
+          >
+            Area
+          </Tab>
+          <Tab
+            value="3"
+            onClick={() => {
+              props.setActiveTab(3);
+            }}
+          >
+            Whole Municipality
+          </Tab>
         </TabList>
       </TabGroup>
       <div className="mt-4 px-2 flex justify-between space-x-2">
@@ -130,6 +155,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
   const [point, setPoint] = useState<{ lng: number; lat: number } | null>(null);
   const [isClosedByDone, setIsClosedByDone] = useState<boolean>(false);
   const markerRef = useRef<Marker | null>(null);
+  const [activeTab, setActiveTab] = useState<number>(1);
 
   useEffect(() => {
     if (mapRef.current) return;
@@ -184,12 +210,10 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
       }
 
       // Create a new marker and add it to the map
-
-      //if (props.onDone) {
+      console.log("active Tab: ", activeTab);
       const newMarker = new Marker().setLngLat([lng, lat]).addTo(map);
       // Store the reference to the new marker
       markerRef.current = newMarker;
-      //}
     };
 
     map.on("click", handleMapClick);
@@ -210,6 +234,8 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         style={props.style}
       />
       <MapControls
+        activeTab={activeTab}
+        setActiveTab={setActiveTab}
         onCancel={props.onCancel}
         onDone={props.onDone}
       ></MapControls>
