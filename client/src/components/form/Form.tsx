@@ -14,7 +14,7 @@ import {
   Textarea,
   Badge,
   Callout,
-  Switch,
+  Switch
 } from "@tremor/react";
 import { useState } from "react";
 import locales from "./../../locales.json";
@@ -81,6 +81,8 @@ export function FormDialog() {
   const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
   const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
   const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
+  const [showErrorAlert, setShowErrorAlert] = useState(false);
+  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -92,6 +94,8 @@ export function FormDialog() {
       setTypeError(!type);
       setDescriptionError(!description);
       hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
+      setError("Please fill all the required fields");
+      setShowErrorAlert(true);
       return;
     }
 
@@ -118,12 +122,15 @@ export function FormDialog() {
       const createdDocument = await API.createKxDocument(newDocument);
       if (createdDocument) {
         setDocuments([...documents, createdDocument.title]);
+        setShowSuccessAlert(true);
       } else {
         setError("Failed to create document");
+        setShowErrorAlert(true);
       }
       setIsOpen(false);
     } catch (error) {
       setError("Failed to create document");
+      setShowErrorAlert(true);
     }
   };
 
@@ -135,10 +142,12 @@ export function FormDialog() {
         Add new document
       </Button>
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
+
         <DialogPanel
           className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
           style={{ maxWidth: "80vw" }}
         >
+
           <div className="sm:mx-auto sm:max-w-2xl">
             <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
               Add new document
@@ -354,7 +363,7 @@ export function FormDialog() {
                   className="ml-2"
                   onClick={() => setShowGeoInfo(!showGeoInfo)}
                 >
-                  <RiInformation2Line className="text-2xl text-gray-500" />
+                  <RiInformation2Line className="text-2xl" style={{ color: "#003d8e" }} />
                 </a>
               </div>
               {showGeoInfo &&
@@ -364,8 +373,8 @@ export function FormDialog() {
                   title="Geolocalization guide"
                   color="gray"
                 >
-                  To specify the Geolocalization of the document, use the the 
-                  switch to select the entire municipality or click the map 
+                  To specify the Geolocalization of the document, use the the
+                  switch to select the entire municipality or click the map
                   to select a specific area or point.
                 </Callout>
               }
@@ -468,7 +477,7 @@ export function FormDialog() {
                   className="ml-2"
                   onClick={() => setShowConnectionsInfo(!showConnectionsInfo)}
                 >
-                  <RiInformation2Line className="text-2xl text-gray-500" />
+                  <RiInformation2Line className="text-2xl" style={{ color: "#003d8e" }} />
                 </a>
               </div>
 
@@ -631,7 +640,37 @@ export function FormDialog() {
             </form>
           </div>
         </DialogPanel>
+        <Dialog open={showErrorAlert} onClose={() => setShowErrorAlert(false)}>
+          <DialogPanel className="w-full max-w-md p-6">
+            <h3 className="text-lg font-medium text-red-600">Error</h3>
+            <p className="mt-2 text-sm text-gray-600">
+              {error}
+            </p>
+            <div className="mt-4 flex justify-end">
+              <Button className="primary" onClick={() => setShowErrorAlert(false)}>
+                Close
+              </Button>
+            </div>
+          </DialogPanel>
+        </Dialog>
+
+        <Dialog open={showSuccessAlert} onClose={() => setShowSuccessAlert(false)}>
+          <DialogPanel className="w-full max-w-md p-6">
+            <h3 className="text-lg font-medium text-green-600">Success</h3>
+            <p className="mt-2 text-sm text-gray-600">
+              Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget
+              lacinia odio sem nec elit. Cras mattis consectetur purus sit amet
+              fermentum.
+            </p>
+            <div className="mt-4 flex justify-end">
+              <Button className="primary" onClick={() => setShowSuccessAlert(false)}>
+                Close
+              </Button>
+            </div>
+          </DialogPanel>
+        </Dialog>
       </Dialog>
+
     </>
   );
 }
