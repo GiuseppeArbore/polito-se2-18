@@ -53,7 +53,7 @@ export function FormDialog() {
   );
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
   const [typeError, setTypeError] = useState(false);
-  const [scale, setScale] = useState(10000);
+  const [scale, setScale] = useState(1);
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState("");
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -64,6 +64,8 @@ export function FormDialog() {
   const [error, setError] = useState("");
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [showConnectionsInfo, setShowConnectionsInfo] = useState(false);
+  const [showGeoInfo, setShowGeoInfo] = useState(false);
+
 
   const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
   // Example usage
@@ -341,6 +343,32 @@ export function FormDialog() {
                 </div>
               </div>
               <Divider />
+              <div className="col-span-full sm:col-span-3 flex flex-row">
+                <label
+                  htmlFor="Geolocalization"
+                  className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                >
+                  Geolocalization
+                </label>
+                <a
+                  className="ml-2"
+                  onClick={() => setShowGeoInfo(!showGeoInfo)}
+                >
+                  <RiInformation2Line className="text-2xl text-gray-500" />
+                </a>
+              </div>
+              {showGeoInfo &&
+                <Callout
+                  className="mb-6"
+                  style={{ border: "none" }}
+                  title="Geolocalization guide"
+                  color="gray"
+                >
+                  To specify the Geolocalization of the document, use the the 
+                  switch to select the entire municipality or click the map 
+                  to select a specific area or point.
+                </Callout>
+              }
               <div className="flex items-center space-x-3">
                 <label htmlFor="switch" className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
                   Select the whole Municipality {' '}
@@ -399,7 +427,9 @@ export function FormDialog() {
                   ></SatMap>
                 </DialogPanel>
               </Dialog>
+
               <Divider />
+
               <div className="col-span-full">
                 <label
                   htmlFor="description"
@@ -423,6 +453,10 @@ export function FormDialog() {
                   style={{ minHeight: "200px" }}
                 />
               </div>
+
+              <Divider />
+
+
               <div className="col-span-full sm:col-span-3 flex flex-row">
                 <label
                   htmlFor="Connections"
@@ -442,7 +476,7 @@ export function FormDialog() {
                 <Callout
                   className="mb-6"
                   style={{ border: "none" }}
-                  title="Connections"
+                  title="Connections guide"
                   color="gray"
                 >
                   To specify connections in the graph, use each dropdown to select
