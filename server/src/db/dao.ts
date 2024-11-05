@@ -49,15 +49,15 @@ class DAO {
         return null;
     }
     async getAlldocuments(): Promise<KxDocument[]> {
-        const result = await Document.find().exec();
-        if (result) {
-            const list = result.map((doc: any) => {
-                return this.fromResultToKxDocument(doc);
-            });
-            return list;
-        }
-        return [];
+    const result = await Document.find().sort({ title: 1 }).exec(); 
+    if (result) {
+        const list = result.map((doc: any) => {
+            return this.fromResultToKxDocument(doc);
+        });
+        return list;
     }
+    return [];
+}
     async createKxDocument(document: KxDocument): Promise<KxDocument | null> {
         const newDocument = new Document(document);
         const result = await newDocument.save();

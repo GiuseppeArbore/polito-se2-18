@@ -19,8 +19,7 @@ export const createKxDocument = async (req: Request, res: Response, next: NextFu
 export const getAllKxDocuments = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const documents: KxDocument[] = await db.getAlldocuments();
-        const sortedDocuments = documents.sort((a, b) => a.title.localeCompare(b.title));
-        res.status(200).json(sortedDocuments);
+        res.status(200).json(documents);
     } catch (error) {
         next(error);
     }
