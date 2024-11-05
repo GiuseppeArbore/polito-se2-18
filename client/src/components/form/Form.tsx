@@ -56,7 +56,7 @@ export function FormDialog() {
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState("");
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
-  const [showMap, setShowMap] = useState<boolean>(true);
+  const [hideMap, setHideMap] = useState<boolean>(false);
   const [description, setDescription] = useState<string | undefined>(undefined);
   const [descriptionError, setDescriptionError] = useState(false);
   // const [documents, setDocuments] = useState<KxDocument[]>([]);
@@ -87,7 +87,7 @@ export function FormDialog() {
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
-      setDocCoordinatesError(!docCoordinates);
+      hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
       return;
     }
 
@@ -96,7 +96,7 @@ export function FormDialog() {
       stakeholders,
       scale_info: Scale.TEXT,
       scale,
-      doc_coordinates: !showMap ? { type: AreaType.ENTIRE_MUNICIPALITY } : docCoordinates,
+      doc_coordinates: hideMap ? { type: AreaType.ENTIRE_MUNICIPALITY } : docCoordinates,
       issuance_date: issuanceDate,
       type: type,
       language,
@@ -347,12 +347,12 @@ export function FormDialog() {
                 <Switch
                   id="switch"
                   name="switch"
-                  checked={showMap}
-                  onChange={setShowMap}
+                  checked={hideMap}
+                  onChange={setHideMap}
                 />
               </div>
 
-              {showMap && (
+              {!hideMap && (
                 <>
                   <Card
                     className="my-4 p-0 overflow-hidden cursor-pointer"
