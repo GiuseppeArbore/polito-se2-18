@@ -433,10 +433,10 @@ export function FormDialog() {
                         value={doc._id ? doc._id.toString() : ""}
                         className={
 
-                          documentsForProjection.includes(doc._id?.toString() || "") ||
-                          documentsForDirect.includes(doc._id?.toString() || "") ||
-                          documentsForCollateral.includes(doc._id?.toString() || "") ||
-                          documentsForUpdate.includes(doc._id?.toString() || "")
+                          (doc._id && documentsForProjection.includes(doc._id.toString())) ||
+                          (doc._id && documentsForDirect.includes(doc._id.toString())) ||
+                          (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
+                          (doc._id && documentsForUpdate.includes(doc._id.toString()))
 
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
@@ -466,10 +466,10 @@ export function FormDialog() {
                       key={doc._id?.toString()}
                       value={doc._id ? doc._id.toString() : ""}
                         className={
-                          documentsForProjection.includes(doc._id?.toString() || "") ||
-                          documentsForDirect.includes(doc._id?.toString() || "") ||
-                          documentsForCollateral.includes(doc._id?.toString() || "") ||
-                          documentsForUpdate.includes(doc._id?.toString() || "")
+                          (doc._id && documentsForProjection.includes(doc._id.toString())) ||
+                          (doc._id && documentsForDirect.includes(doc._id.toString())) ||
+                          (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
+                          (doc._id && documentsForUpdate.includes(doc._id.toString()))
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -495,10 +495,10 @@ export function FormDialog() {
                       key={doc._id?.toString()}
                       value={doc._id ? doc._id.toString() : ""}
                         className={
-                          documentsForProjection.includes(doc._id?.toString() || "") ||
-                          documentsForDirect.includes(doc._id?.toString() || "") ||
-                          documentsForCollateral.includes(doc._id?.toString() || "") ||
-                          documentsForUpdate.includes(doc._id?.toString() || "")
+                          (doc._id && documentsForProjection.includes(doc._id.toString())) ||
+                          (doc._id && documentsForDirect.includes(doc._id.toString())) ||
+                          (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
+                          (doc._id && documentsForUpdate.includes(doc._id.toString()))
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -524,10 +524,10 @@ export function FormDialog() {
                       key={doc._id?.toString()}
                       value={doc._id ? doc._id.toString() : ""}
                         className={
-                          documentsForProjection.includes(doc._id?.toString() || "") ||
-                          documentsForDirect.includes(doc._id?.toString() || "") ||
-                          documentsForCollateral.includes(doc._id?.toString() || "") ||
-                          documentsForUpdate.includes(doc._id?.toString() || "")
+                          (doc._id && documentsForProjection.includes(doc._id.toString())) ||
+                          (doc._id && documentsForDirect.includes(doc._id.toString())) ||
+                          (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
+                          (doc._id && documentsForUpdate.includes(doc._id.toString()))
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }

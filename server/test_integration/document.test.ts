@@ -236,56 +236,5 @@ describe("Integration Tests for Document API", () => {
         expect(response.body.some((doc: KxDocument) => doc.title === "Document 2")).toBe(true);
     });
 
-    test("Test 10 - Insert 100 documents for testing ui", async () => {
-        
-    
-        
-        for (let i = 0; i < 100; i++) {
-            const response = await request(app)
-                .post('/api/documents')
-                .send({
-                    title: `Document ${i + 1}`,
-                    stakeholders: [Stakeholders.RESIDENT],
-                    scale_info: Scale.TEXT,
-                    scale: 10,
-                    issuance_date: new Date(),
-                    type: KxDocumentType.INFORMATIVE,
-                    language: "Swedish",
-                    doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
-                    description: `This is test document ${i + 1}.`,
-                });
-            expect(response.status).toBe(201);
-            documentIds.push(response.body._id);
-        }
-    
-        
-       
-    });
-
-    test("Test 10 - Insert 1000 documents for testing ui", async () => {
-        
-    
-        
-        for (let i = 0; i < 1000; i++) {
-            const response = await request(app)
-                .post('/api/documents')
-                .send({
-                    title: `Document ${i + 1}`,
-                    stakeholders: [Stakeholders.RESIDENT],
-                    scale_info: Scale.TEXT,
-                    scale: 10,
-                    issuance_date: new Date(),
-                    type: KxDocumentType.INFORMATIVE,
-                    language: "Swedish",
-                    doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
-                    description: `This is test document ${i + 1}.`,
-                });
-            expect(response.status).toBe(201);
-            documentIds.push(response.body._id);
-        }
-    
-        
-       
-    },10000);
 });
 
