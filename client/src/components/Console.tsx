@@ -27,7 +27,7 @@ export default function Fatturato() {
                         <Tab>
                             Notes
                         </Tab>
-                        
+
                     </TabList>
                 </TabGroup>
             </div>
@@ -40,9 +40,9 @@ export default function Fatturato() {
 
                 <Col numColSpanLg={1}>
                     <div className="space-y-6">
-                    <FormDialog />
+                        <FormDialog />
 
-                        <Card>
+                        {/* <Card>
                             <Text>Select</Text>
                             <Select
                                 className="mt-2" value={groupKey} onValueChange={setGroupKey}
@@ -63,13 +63,17 @@ export default function Fatturato() {
                                     5
                                 </SelectItem>
                             </Select>
-                        </Card>
+                        </Card> */}
                         <Card>
-                            <Metric>EUR 1,995</Metric>
-                            <Title>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Title>
-                            <Subtitle>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Subtitle>
-                            <Text>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Text>
-                            <Text>Drei Weieren is an <Bold>oasis of peace</Bold> in the middle of <Italic>St.Gallen.</Italic></Text>
+                            <Metric>KIRUNA</Metric>
+                            <Title>How to move a city</Title>
+                            <Subtitle>Mapping the process of Kiruna relocation.</Subtitle>
+                            <Text>
+                                Kiruna, a Swedish city, is being relocated in phases since 2010 to prevent damage from mining activities.
+                            </Text>
+                        </Card>
+                        <Card className="hidden lg:block w-full h-40">
+                            <img src="/kiruna.png" alt="Kiruna" className="w-full h-full object-contain" />
                         </Card>
                     </div>
                 </Col>
