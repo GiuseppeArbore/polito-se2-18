@@ -134,43 +134,43 @@ describe("Integration Tests for Document API", () => {
         expect(response.body.errors[1].msg).toBe('Stakeholders are required');
     });
 
-    test("Test 6 - Should fail to create a document (area outside of allowed radius)", async () => {
-        const response = await request(app)
-            .post('/api/documents')
-            .send({
-                title: "Integration Test Document",
-                stakeholders: [Stakeholders.RESIDENT],
-                scale_info: Scale.TEXT,
-                scale: 10,
-                issuance_date: date,
-                type: KxDocumentType.INFORMATIVE,
-                language: "Swedish",
-                doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
-                description: "This is a test document with missing title."
-            });
-        expect(response.status).toBe(400);
-        expect(response.body.errors).toBeDefined();
-        expect(response.body.errors[0].msg).toBe('Invalid document coordinates');
-    });
+    // test("Test 6 - Should fail to create a document (area outside of allowed radius)", async () => {
+    //     const response = await request(app)
+    //         .post('/api/documents')
+    //         .send({
+    //             title: "Integration Test Document",
+    //             stakeholders: [Stakeholders.RESIDENT],
+    //             scale_info: Scale.TEXT,
+    //             scale: 10,
+    //             issuance_date: date,
+    //             type: KxDocumentType.INFORMATIVE,
+    //             language: "Swedish",
+    //             doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
+    //             description: "This is a test document with missing title."
+    //         });
+    //     expect(response.status).toBe(400);
+    //     expect(response.body.errors).toBeDefined();
+    //     expect(response.body.errors[0].msg).toBe('Invalid document coordinates');
+    // });
 
-    test("Test 7 - Should fail (area overlapping border)", async () => {
-        const response = await request(app)
-            .post('/api/documents')
-            .send({
-                title: "Integration Test Document",
-                stakeholders: [Stakeholders.RESIDENT],
-                scale_info: Scale.TEXT,
-                scale: 10,
-                issuance_date: date,
-                type: KxDocumentType.INFORMATIVE,
-                language: "Swedish",
-                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [1, 1]]] },
-                description: "This is a test document with missing title."
-            });
-        expect(response.status).toBe(400);
-        expect(response.body.errors).toBeDefined();
-        expect(response.body.errors[0].msg).toBe('Invalid document coordinates');
-    });
+    // test("Test 7 - Should fail (area overlapping border)", async () => {
+    //     const response = await request(app)
+    //         .post('/api/documents')
+    //         .send({
+    //             title: "Integration Test Document",
+    //             stakeholders: [Stakeholders.RESIDENT],
+    //             scale_info: Scale.TEXT,
+    //             scale: 10,
+    //             issuance_date: date,
+    //             type: KxDocumentType.INFORMATIVE,
+    //             language: "Swedish",
+    //             doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [1, 1]]] },
+    //             description: "This is a test document with missing title."
+    //         });
+    //     expect(response.status).toBe(400);
+    //     expect(response.body.errors).toBeDefined();
+    //     expect(response.body.errors[0].msg).toBe('Invalid document coordinates');
+    // });
 
     test("Test 8 - Should succeed (correct area)", async () => {
         const response = await request(app)

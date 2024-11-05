@@ -82,7 +82,7 @@ export function FormDialog() {
     e.preventDefault();
     const tmpTitleError = title.length === 0;
     const tmpShError = stakeholders.length === 0;
-    if (tmpTitleError || tmpShError || !type || !description || !docCoordinates) {
+    if (tmpTitleError || tmpShError || !type || !description) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
