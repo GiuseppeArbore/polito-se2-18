@@ -14,6 +14,7 @@ import {
   Textarea,
   Badge,
   Callout,
+  Switch,
 } from "@tremor/react";
 import { useState } from "react";
 import locales from "./../../locales.json";
@@ -41,6 +42,7 @@ export class Link {
 }
 
 export function FormDialog() {
+  const [drawing, setDrawing] = useState<any>(undefined);
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState(false);
@@ -54,7 +56,8 @@ export function FormDialog() {
   const [scale, setScale] = useState(10000);
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState("");
-  const [drawing, setDrawing] = useState<any>(undefined);
+  const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
+  const [hideMap, setHideMap] = useState<boolean>(false);
   const [description, setDescription] = useState<string | undefined>(undefined);
   const [descriptionError, setDescriptionError] = useState(false);
   // const [documents, setDocuments] = useState<KxDocument[]>([]);
@@ -65,12 +68,15 @@ export function FormDialog() {
   //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
 
   const [docCoordinatesError, setDocCoordinatesError] = useState(false);
-  const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
   const [documents, setDocuments] = useState<string[]>([
     "Doc 1",
     "Doc 2",
     "Doc 3",
   ]);
+  const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
+  const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
+  const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
+  const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,23 +109,28 @@ export function FormDialog() {
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
-      setDocCoordinatesError(!draw);
+      hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!drawing);
       return;
     }
-    
+
 
     const newDocument: KxDocument = {
       title,
       stakeholders,
       scale_info: Scale.TEXT,
       scale,
-      connections: 0,
-      doc_coordinates: draw,
+      doc_coordinates: hideMap ? { type: AreaType.ENTIRE_MUNICIPALITY } : drawing,
       issuance_date: issuanceDate,
       type: type,
       language,
       description,
       pages: validatePageRangeString(pages),
+      connections: {
+        direct: documentsForDirect,
+        collateral: documentsForCollateral,
+        projection: documentsForProjection,
+        update: documentsForUpdate,
+      },
     };
 
     try {
@@ -145,14 +156,7 @@ export function FormDialog() {
     }
   };
 
-  const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
-  const [documentsForCollateral, setDocumentsForCollateral] = useState<
-    string[]
-  >([]);
-  const [documentsForProjection, setDocumentsForProjection] = useState<
-    string[]
-  >([]);
-  const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
+
 
   return (
     <>
@@ -367,15 +371,50 @@ export function FormDialog() {
                   />
                 </div>
               </div>
-              <Card
-                className={`my-4 p-0 overflow-hidden cursor-pointer ${docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"}`}
-                onClick={() => setIsMapOpen(true)}
-              >
-                <PreviewMap
-                  drawing={drawing}
-                  style={{ minHeight: "300px", width: "100%" }}
+              <Divider />
+              <div className="flex items-center space-x-3">
+                <label htmlFor="switch" className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                  Select the whole Municipality {' '}
+                  <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Kiruna</span>
+                </label>
+                <Switch
+                  id="switch"
+                  name="switch"
+                  checked={hideMap}
+                  onChange={setHideMap}
                 />
-              </Card>
+              </div>
+
+              {!hideMap && (
+                <>
+                  <Card
+                    className={`my-4 p-0 overflow-hidden cursor-pointer ${docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"}`}
+                    onClick={() => setIsMapOpen(true)}
+                  >
+                    <PreviewMap
+                      drawing={drawing}
+                      style={{ minHeight: "300px", width: "100%" }}
+                    />
+                    <Dialog
+                      open={isMapOpen}
+                      onClose={() => setIsMapOpen(false)}
+                      static={true}
+                    >
+                      <DialogPanel
+                        className="p-0 overflow-hidden"
+                        style={{ maxWidth: "100%" }}
+                      >
+                        <SatMap
+                          onCancel={() => setIsMapOpen(false)}
+                          onDone={() => setIsMapOpen(false)}
+                          style={{ minHeight: "95vh", width: "100%" }} drawing={drawing}>
+
+                        </SatMap>
+                      </DialogPanel>
+                    </Dialog>
+                  </Card>
+                </>
+              )}
               {docCoordinatesError ? <p className="tremor-TextInput-errorMessage text-sm text-red-500 mt-1">Please provide document coordinates</p> : null}
               <Dialog
                 open={isMapOpen}
@@ -389,7 +428,7 @@ export function FormDialog() {
                   <SatMap
                     drawing={drawing}
                     onCancel={() => setIsMapOpen(false)}
-                    onDone={(v) => {setDrawing(v); setIsMapOpen(false); }}
+                    onDone={(v) => { setDrawing(v); setIsMapOpen(false); }}
                     style={{ minHeight: "95vh", width: "100%" }}
                   ></SatMap>
                 </DialogPanel>
@@ -449,9 +488,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -481,9 +520,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -510,9 +549,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -539,9 +578,9 @@ export function FormDialog() {
                         value={doc}
                         className={
                           documentsForProjection.includes(doc) ||
-                          documentsForDirect.includes(doc) ||
-                          documentsForCollateral.includes(doc) ||
-                          documentsForUpdate.includes(doc)
+                            documentsForDirect.includes(doc) ||
+                            documentsForCollateral.includes(doc) ||
+                            documentsForUpdate.includes(doc)
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
