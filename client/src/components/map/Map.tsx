@@ -1,7 +1,6 @@
 import mapboxgl, { LngLatLike } from "mapbox-gl"
-import React, { useEffect, useRef, useState, useContext } from "react";
-import { Button, Card, Tab, TabGroup, TabList } from "@tremor/react";
-import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
+import React, { useEffect, useRef } from "react";
+import { Card, Tab, TabGroup, TabList } from "@tremor/react";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
