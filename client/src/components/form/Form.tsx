@@ -14,7 +14,7 @@ import {
   Badge,
   Callout,
 } from "@tremor/react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
 import API from "../../API";
@@ -81,9 +81,12 @@ export function FormDialog() {
   const [lng, setLng] = useState<number>(20.26);
   const [lat, setLat] = useState<number>(67.845);
 
+  const [selectedCoordinate, setSelectedCoordinate] = useState<any>(undefined);
+
   const handleMapClick = (lng_: number, lat_: number) => {
     const newPoint: Point = { type: AreaType.POINT, coordinates: [lng_, lat_] };
     setDocCoordinates(newPoint);
+    setSelectedCoordinate({ lng: lng_, lat: lat_ });
     setLng(lng_);
     setLat(lat_);
   };
@@ -367,7 +370,10 @@ export function FormDialog() {
                 onClick={() => setIsMapOpen(true)}
               >
                 <PreviewMap
-                  coordinates={{ lng, lat }}
+                  key={
+                    selectedCoordinate ? selectedCoordinate.lng : "undefined"
+                  }
+                  coordinates={selectedCoordinate}
                   style={{ minHeight: "300px", width: "100%" }}
                 />
               </Card>
@@ -386,11 +392,15 @@ export function FormDialog() {
                   style={{ maxWidth: "100%" }}
                 >
                   <SatMap
-                    coordinates={{ lng: lng, lat: lat }}
+                    coordinates={selectedCoordinate}
                     onMapClick={(lng, lat) => {
                       handleMapClick(lng, lat);
                     }}
-                    onCancel={() => setIsMapOpen(false)}
+                    onCancel={() => {
+                      setIsMapOpen(false);
+                      setSelectedCoordinate(undefined);
+                      setDocCoordinates(undefined);
+                    }}
                     onDone={() => {
                       setIsMapOpen(false);
                     }}

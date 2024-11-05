@@ -128,6 +128,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
 
   // Saving the Doc's point
   const [point, setPoint] = useState<{ lng: number; lat: number } | null>(null);
+  const [isClosedByDone, setIsClosedByDone] = useState<boolean>(false);
   const markerRef = useRef<Marker | null>(null);
 
   useEffect(() => {
@@ -183,10 +184,12 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
       }
 
       // Create a new marker and add it to the map
-      const newMarker = new Marker().setLngLat([lng, lat]).addTo(map);
 
+      //if (props.onDone) {
+      const newMarker = new Marker().setLngLat([lng, lat]).addTo(map);
       // Store the reference to the new marker
       markerRef.current = newMarker;
+      //}
     };
 
     map.on("click", handleMapClick);
