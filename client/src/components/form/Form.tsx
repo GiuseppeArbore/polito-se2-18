@@ -14,6 +14,7 @@ import {
   Textarea,
   Badge,
   Callout,
+  Switch,
 } from "@tremor/react";
 import { useState } from "react";
 import locales from "./../../locales.json";
@@ -54,6 +55,8 @@ export function FormDialog() {
   const [scale, setScale] = useState(10000);
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState("");
+  const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
+  const [hideMap, setHideMap] = useState<boolean>(false);
   const [description, setDescription] = useState<string | undefined>(undefined);
   const [descriptionError, setDescriptionError] = useState(false);
   // const [documents, setDocuments] = useState<KxDocument[]>([]);
@@ -65,7 +68,6 @@ export function FormDialog() {
   //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
 
   const [docCoordinatesError, setDocCoordinatesError] = useState(false);
-  const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
   const [documents, setDocuments] = useState<string[]>([
     "Doc 1",
     "Doc 2",
@@ -80,12 +82,12 @@ export function FormDialog() {
     e.preventDefault();
     const tmpTitleError = title.length === 0;
     const tmpShError = stakeholders.length === 0;
-    if (tmpTitleError || tmpShError || !type || !description || !docCoordinates) {
+    if (tmpTitleError || tmpShError || !type || !description || (!docCoordinates && !hideMap)) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
-      setDocCoordinatesError(!docCoordinates);
+      hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
       return;
     }
 
@@ -94,7 +96,7 @@ export function FormDialog() {
       stakeholders,
       scale_info: Scale.TEXT,
       scale,
-      doc_coordinates: docCoordinates,
+      doc_coordinates: hideMap ? { type: AreaType.ENTIRE_MUNICIPALITY } : docCoordinates,
       issuance_date: issuanceDate,
       type: type,
       language,
@@ -336,14 +338,48 @@ export function FormDialog() {
                   />
                 </div>
               </div>
-              <Card
-                className={`my-4 p-0 overflow-hidden cursor-pointer ${docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"}`}
-                onClick={() => setIsMapOpen(true)}
-              >
-                <PreviewMap
-                  style={{ minHeight: "300px", width: "100%" }}
+              <Divider />
+              <div className="flex items-center space-x-3">
+                <label htmlFor="switch" className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                  Select the whole Municipality {' '}
+                  <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Kiruna</span>
+                </label>
+                <Switch
+                  id="switch"
+                  name="switch"
+                  checked={hideMap}
+                  onChange={setHideMap}
                 />
-              </Card>
+              </div>
+
+              {!hideMap && (
+                <>
+                  <Card
+                    className="my-4 p-0 overflow-hidden cursor-pointer"
+                    onClick={() => setIsMapOpen(true)}
+                  >
+                    <PreviewMap
+                      style={{ minHeight: "300px", width: "100%" }}
+                    ></PreviewMap>
+                  </Card>
+                  <Dialog
+                    open={isMapOpen}
+                    onClose={() => setIsMapOpen(false)}
+                    static={true}
+                  >
+                    <DialogPanel
+                      className="p-0 overflow-hidden"
+                      style={{ maxWidth: "100%" }}
+                    >
+                      <SatMap
+                        onCancel={() => setIsMapOpen(false)}
+                        onDone={() => setIsMapOpen(false)}
+                        style={{ minHeight: "95vh", width: "100%" }}
+                      ></SatMap>
+                    </DialogPanel>
+                  </Dialog>
+                </>
+              )}
               {docCoordinatesError ? <p className="tremor-TextInput-errorMessage text-sm text-red-500 mt-1">Please provide document coordinates</p> : null}
               <Dialog
                 open={isMapOpen}
