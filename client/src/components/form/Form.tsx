@@ -27,6 +27,7 @@ import {
   RiLinksLine,
   RiLoopLeftLine,
   RiProjector2Line,
+  RiInformation2Line
 } from "@remixicon/react";
 
 import {
@@ -62,6 +63,7 @@ export function FormDialog() {
   // const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [error, setError] = useState("");
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [showConnectionsInfo, setShowConnectionsInfo] = useState(false);
 
   const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
   // Example usage
@@ -421,24 +423,41 @@ export function FormDialog() {
                   style={{ minHeight: "200px" }}
                 />
               </div>
-              <Divider />
-              <Callout
-                className="mb-6"
-                style={{ border: "none" }}
-                title="Connections"
-                color="blue"
-              >
-                To specify connections in the graph, use each dropdown to select
-                the nodes you want to connect. The dropdowns correspond to
-                different types of connections. Simply click on a dropdown under
-                the relevant connection type (e.g., Direct, Collateral) and
-                choose one or more nodes to establish that specific connection.
-              </Callout>
+              <div className="col-span-full sm:col-span-3 flex flex-row">
+                <label
+                  htmlFor="Connections"
+                  className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                >
+                  Connections
+                </label>
+                <a
+                  className="ml-2"
+                  onClick={() => setShowConnectionsInfo(!showConnectionsInfo)}
+                >
+                  <RiInformation2Line className="text-2xl text-gray-500" />
+                </a>
+              </div>
+
+              {showConnectionsInfo &&
+                <Callout
+                  className="mb-6"
+                  style={{ border: "none" }}
+                  title="Connections"
+                  color="gray"
+                >
+                  To specify connections in the graph, use each dropdown to select
+                  the nodes you want to connect. The dropdowns correspond to
+                  different types of connections. Simply click on a dropdown under
+                  the relevant connection type (e.g., Direct, Collateral) and
+                  choose one or more nodes to establish that specific connection.
+                </Callout>
+              }
 
               <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-2">
                 {/* Direct Section */}
                 <div className="col-span-full sm:col-span-1">
-                  <Badge icon={RiLinksLine} className="flex items-center ">
+                  <Badge icon={RiLinksLine} className="text-sm flex items-center gap-2"
+                    color="gray">
                     <span className="text-sm">Direct</span>
                   </Badge>
                   <MultiSelect
@@ -470,6 +489,7 @@ export function FormDialog() {
                   <Badge
                     icon={RiArrowDownCircleLine}
                     className="text-sm flex items-center gap-2"
+                    color="gray"
                   >
                     <span className="text-sm">Collateral</span>
                   </Badge>
@@ -499,7 +519,8 @@ export function FormDialog() {
 
                 {/* Projection Section */}
                 <div className="col-span-full sm:col-span-1">
-                  <Badge icon={RiProjector2Line}>
+                  <Badge icon={RiProjector2Line} className="text-sm flex items-center gap-2"
+                    color="gray">
                     <span className="text-sm">Projection</span>
                   </Badge>
                   <MultiSelect
@@ -528,7 +549,8 @@ export function FormDialog() {
 
                 {/* Update Section */}
                 <div className="col-span-full sm:col-span-1">
-                  <Badge icon={RiLoopLeftLine} className="icon">
+                  <Badge icon={RiLoopLeftLine} className="text-sm flex items-center gap-2"
+                    color="gray">
                     <span className="text-sm icon-text">Update</span>
                   </Badge>
                   <MultiSelect
