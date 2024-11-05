@@ -87,7 +87,7 @@ export function FormDialog() {
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
-      setDocCoordinatesError(!docCoordinates);
+      //setDocCoordinatesError(!docCoordinates);
       return;
     }
 
@@ -424,7 +424,7 @@ export function FormDialog() {
                   </Badge>
                   <MultiSelect
                     value={documentsForDirect}
-                    onValueChange={setDocumentsForDirect}
+                    onValueChange={(values) => setDocumentsForDirect(values)}
                     className="mt-2"
                   >
                     {documents.map((doc) => (
@@ -433,10 +433,10 @@ export function FormDialog() {
                         value={doc._id ? doc._id.toString() : ""}
                         className={
 
-                          documentsForProjection.includes(doc.title) ||
-                          documentsForDirect.includes(doc.title) ||
-                          documentsForCollateral.includes(doc.title) ||
-                          documentsForUpdate.includes(doc.title)
+                          documentsForProjection.includes(doc._id?.toString() || "") ||
+                          documentsForDirect.includes(doc._id?.toString() || "") ||
+                          documentsForCollateral.includes(doc._id?.toString() || "") ||
+                          documentsForUpdate.includes(doc._id?.toString() || "")
 
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
@@ -458,7 +458,7 @@ export function FormDialog() {
                   </Badge>
                   <MultiSelect
                     value={documentsForCollateral}
-                    onValueChange={setDocumentsForCollateral}
+                    onValueChange={(values) => setDocumentsForCollateral(values)}
                     className="mt-2"
                   >
                     {documents.map((doc) => (
@@ -466,10 +466,10 @@ export function FormDialog() {
                       key={doc._id?.toString()}
                       value={doc._id ? doc._id.toString() : ""}
                         className={
-                          documentsForProjection.includes(doc.title) ||
-                          documentsForDirect.includes(doc.title) ||
-                          documentsForCollateral.includes(doc.title) ||
-                          documentsForUpdate.includes(doc.title)
+                          documentsForProjection.includes(doc._id?.toString() || "") ||
+                          documentsForDirect.includes(doc._id?.toString() || "") ||
+                          documentsForCollateral.includes(doc._id?.toString() || "") ||
+                          documentsForUpdate.includes(doc._id?.toString() || "")
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -487,7 +487,7 @@ export function FormDialog() {
                   </Badge>
                   <MultiSelect
                     value={documentsForProjection}
-                    onValueChange={setDocumentsForProjection}
+                    onValueChange={(values) => setDocumentsForProjection(values)}
                     className="mt-2"
                   >
                     {documents.map((doc) => (
@@ -495,10 +495,10 @@ export function FormDialog() {
                       key={doc._id?.toString()}
                       value={doc._id ? doc._id.toString() : ""}
                         className={
-                          documentsForProjection.includes(doc.title) ||
-                          documentsForDirect.includes(doc.title) ||
-                          documentsForCollateral.includes(doc.title) ||
-                          documentsForUpdate.includes(doc.title)
+                          documentsForProjection.includes(doc._id?.toString() || "") ||
+                          documentsForDirect.includes(doc._id?.toString() || "") ||
+                          documentsForCollateral.includes(doc._id?.toString() || "") ||
+                          documentsForUpdate.includes(doc._id?.toString() || "")
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -516,7 +516,7 @@ export function FormDialog() {
                   </Badge>
                   <MultiSelect
                     value={documentsForUpdate}
-                    onValueChange={setDocumentsForUpdate}
+                    onValueChange={(values) => setDocumentsForUpdate(values)}
                     className="mt-2"
                   >
                     {documents.map((doc) => (
@@ -524,10 +524,10 @@ export function FormDialog() {
                       key={doc._id?.toString()}
                       value={doc._id ? doc._id.toString() : ""}
                         className={
-                          documentsForProjection.includes(doc.title) ||
-                          documentsForDirect.includes(doc.title) ||
-                          documentsForCollateral.includes(doc.title) ||
-                          documentsForUpdate.includes(doc.title)
+                          documentsForProjection.includes(doc._id?.toString() || "") ||
+                          documentsForDirect.includes(doc._id?.toString() || "") ||
+                          documentsForCollateral.includes(doc._id?.toString() || "") ||
+                          documentsForUpdate.includes(doc._id?.toString() || "")
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }

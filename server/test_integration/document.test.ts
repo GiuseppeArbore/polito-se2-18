@@ -229,12 +229,14 @@ describe("Integration Tests for Document API", () => {
         expect(response.status).toBe(200);
         expect(response.body).toBeDefined();
         expect(Array.isArray(response.body)).toBe(true);
-        expect(response.body.length).toBeGreaterThanOrEqual(2);
+        expect(response.body.length).toEqual(4);
+        expect(response.body.some((doc: KxDocument) => doc.title === "Integration Test Document")).toBe(true);
+        expect(response.body.some((doc: KxDocument) => doc.title === "Integration Test Document")).toBe(true);
         expect(response.body.some((doc: KxDocument) => doc.title === "Document 1")).toBe(true);
         expect(response.body.some((doc: KxDocument) => doc.title === "Document 2")).toBe(true);
     });
 
-    test("Test 10 - Insert 100 documents", async () => {
+    test("Test 10 - Insert 100 documents for testing ui", async () => {
         
     
         
@@ -260,7 +262,7 @@ describe("Integration Tests for Document API", () => {
        
     });
 
-    test("Test 10 - Insert 1000 documents", async () => {
+    test("Test 10 - Insert 1000 documents for testing ui", async () => {
         
     
         
