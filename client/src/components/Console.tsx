@@ -2,9 +2,10 @@ import { Card, Title, Text, Grid, Col, DateRangePicker, Metric, Subtitle, Bold, 
 import { useState, useMemo } from "react";
 import { FormDialog } from "./form/Form";
 import { MultiSelect, MultiSelectItem } from '@tremor/react';
+import { PreviewMap } from "./map/Map";
 
 
-export default function Fatturato() {
+export default function Console() {
 
     const today = new Date(Date.now());
     const [groupKey, setGroupKey] = useState("1");
@@ -22,27 +23,26 @@ export default function Fatturato() {
                             Map
                         </Tab>
                         <Tab>
-                            Insights
+                            List
                         </Tab>
                         <Tab>
-                            Notes
+                            Timeline
                         </Tab>
-                        
                     </TabList>
                 </TabGroup>
             </div>
             <Grid numItemsLg={6} className="gap-6 mt-6">
                 <Col numColSpanLg={5}>
-                    <Card className="h-full">
+                    <Card className="h-full p-0 m-0" style={{margin:0, padding:0}}>
                         {renderCurrentSelection(selectedView)}
                     </Card>
                 </Col>
 
                 <Col numColSpanLg={1}>
                     <div className="space-y-6">
-                    <FormDialog />
+                        <FormDialog />
 
-                        <Card>
+                        {/* <Card>
                             <Text>Select</Text>
                             <Select
                                 className="mt-2" value={groupKey} onValueChange={setGroupKey}
@@ -63,13 +63,17 @@ export default function Fatturato() {
                                     5
                                 </SelectItem>
                             </Select>
-                        </Card>
+                        </Card> */}
                         <Card>
-                            <Metric>EUR 1,995</Metric>
-                            <Title>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Title>
-                            <Subtitle>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Subtitle>
-                            <Text>Drei Weieren is an oasis of peace in the middle of St.Gallen.</Text>
-                            <Text>Drei Weieren is an <Bold>oasis of peace</Bold> in the middle of <Italic>St.Gallen.</Italic></Text>
+                            <Metric>KIRUNA</Metric>
+                            <Title>How to move a city</Title>
+                            <Subtitle>Mapping the process of Kiruna relocation.</Subtitle>
+                            <Text>
+                                Kiruna, a Swedish city, is being relocated in phases since 2010 to prevent damage from mining activities.
+                            </Text>
+                        </Card>
+                        <Card className="hidden lg:block w-full h-40">
+                            <img src="/kiruna.png" alt="Kiruna" className="w-full h-full object-contain" />
                         </Card>
                     </div>
                 </Col>
@@ -86,20 +90,23 @@ export default function Fatturato() {
         switch (selectedView) {
             case 0:
                 return (
-                    <>
-                        <Card> Pag 1</Card>
-                    </>
+                   <>
+                  <PreviewMap
+                      style={{  margin: 0, minHeight: "300px", width: "100%", height: "100%", borderRadius: 8}}
+                      drawing={undefined}
+                    ></PreviewMap>
+                   </>
                 );
             case 1:
                 return (
                     <>
-                        <Card>Pag 2</Card>
+                       List
                     </>
                 );
             case 2:
                 return (
                     <>
-                        <Card>Pag 4</Card>
+                       Timeline
                     </>
                 );
         }

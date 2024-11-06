@@ -14,7 +14,7 @@ import {
   Textarea,
   Badge,
   Callout,
-  Switch,
+  Switch
 } from "@tremor/react";
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
@@ -27,6 +27,7 @@ import {
   RiLinksLine,
   RiLoopLeftLine,
   RiProjector2Line,
+  RiInformation2Line
 } from "@remixicon/react";
 
 import {
@@ -35,6 +36,8 @@ import {
   validatePageRangeString,
 } from "../../utils";
 import "../../index.css";
+import { toast } from "../../utils/toaster";
+import { Toaster } from "../toast/Toaster";
 
 export class Link {
   connectionType: string = "";
@@ -62,13 +65,18 @@ export function FormDialog() {
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
   const [isMapOpen, setIsMapOpen] = useState(false);
+  const [showConnectionsInfo, setShowConnectionsInfo] = useState(false);
+  const [showGeoInfo, setShowGeoInfo] = useState(false);
 
+
+  const [docCoordinates, _ ] = useState<DocCoords | undefined>(undefined);
   // Example usage
   //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
 
   
 
   const [docCoordinatesError, setDocCoordinatesError] = useState(false);
+
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
 
   const [documents, setDocuments] = useState<KxDocument[]>([]);
@@ -109,7 +117,15 @@ export function FormDialog() {
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
-      hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!drawing);
+      hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
+      setError("Please fill all the required fields");
+      toast({
+              title: "Error",
+              description: "Please fill all the required fields",
+              variant: "error",
+              duration: 3000,
+            })
+
       return;
     }
 
@@ -137,6 +153,14 @@ export function FormDialog() {
       const createdDocument = await API.createKxDocument(newDocument);
       if (createdDocument) {
         setDocuments([...documents, createdDocument]);
+        toast({
+          title: "Success",
+          description:
+            "The document has been created successfully",
+          variant: "success",
+          duration: 3000,
+        })
+
         setTitle("");
         setStakeholders([]);
         setScale(0);
@@ -148,14 +172,50 @@ export function FormDialog() {
         setDrawing(undefined);
         setPageRanges([]);
       } else {
-        setError("Failed to create document");
+        toast({
+          title: "Error",
+          description: "Failed to create document",
+          variant: "error",
+          duration: 3000,
+        })
       }
       setIsOpen(false);
-    } catch (error) {
-      setError("Failed to create document");
+    } catch (error:any) {
+      toast({
+        title: "Error",
+        description: "Failed to create document",
+        variant: "error",
+        duration: 3000,
+      })
     }
+    clearForm();
   };
 
+  function clearForm() {
+    setTitle("");
+    setTitleError(false);
+    setStakeholders([]);
+    setShError(false);
+    setIssuanceDate(new Date());
+    setType(undefined);
+    setTypeError(false);
+    setScale(10000);
+    setLanguage(undefined);
+    setPages("");
+    setPageRanges([]);
+    setHideMap(false);
+    setDescription(undefined);
+    setDescriptionError(false);
+    setError("");
+    setIsMapOpen(false);
+    setShowConnectionsInfo(false);
+    setShowGeoInfo(false);
+    setDocCoordinatesError(false);
+    setDocumentsForDirect([]);
+    setDocumentsForCollateral([]);
+    setDocumentsForProjection([]);
+    setDocumentsForUpdate([]);
+  }
 
   useEffect(() => {
     if (isOpen) {
@@ -175,7 +235,7 @@ export function FormDialog() {
 
   return (
     <>
-      <Button className="mx-auto block mb-2" onClick={() => setIsOpen(true)}>
+      <Button className="w-full primary" onClick={() => {setIsOpen(true); clearForm() }}>
         Add new document
       </Button>
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
@@ -387,6 +447,32 @@ export function FormDialog() {
                 </div>
               </div>
               <Divider />
+              <div className="col-span-full sm:col-span-3 flex flex-row">
+                <label
+                  htmlFor="Geolocalization"
+                  className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                >
+                  Geolocalization
+                </label>
+                <a
+                  className="ml-2"
+                  onClick={() => setShowGeoInfo(!showGeoInfo)}
+                >
+                  <RiInformation2Line className="text-2xl" style={{ color: "#003d8e" }} />
+                </a>
+              </div>
+              {showGeoInfo &&
+                <Callout
+                  className="mb-6"
+                  style={{ border: "none" }}
+                  title="Geolocalization guide"
+                  color="gray"
+                >
+                  To specify the Geolocalization of the document, use the
+                  switch to select the entire municipality or click on the map
+                  to select a specific area or point.
+                </Callout>
+              }
               <div className="flex items-center space-x-3">
                 <label htmlFor="switch" className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
                   Select the whole Municipality {' '}
@@ -431,7 +517,9 @@ export function FormDialog() {
                   ></SatMap>
                 </DialogPanel>
               </Dialog>
+
               <Divider />
+
               <div className="col-span-full">
                 <label
                   htmlFor="description"
@@ -455,24 +543,45 @@ export function FormDialog() {
                   style={{ minHeight: "200px" }}
                 />
               </div>
+
               <Divider />
-              <Callout
-                className="mb-6"
-                style={{ border: "none" }}
-                title="Connections"
-                color="blue"
-              >
-                To specify connections in the graph, use each dropdown to select
-                the nodes you want to connect. The dropdowns correspond to
-                different types of connections. Simply click on a dropdown under
-                the relevant connection type (e.g., Direct, Collateral) and
-                choose one or more nodes to establish that specific connection.
-              </Callout>
+
+
+              <div className="col-span-full sm:col-span-3 flex flex-row">
+                <label
+                  htmlFor="Connections"
+                  className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                >
+                  Connections
+                </label>
+                <a
+                  className="ml-2"
+                  onClick={() => setShowConnectionsInfo(!showConnectionsInfo)}
+                >
+                  <RiInformation2Line className="text-2xl" style={{ color: "#003d8e" }} />
+                </a>
+              </div>
+
+              {showConnectionsInfo &&
+                <Callout
+                  className="mb-6"
+                  style={{ border: "none" }}
+                  title="Connections guide"
+                  color="gray"
+                >
+                  To specify connections in the graph, use each dropdown to select
+                  the nodes you want to connect. The dropdowns correspond to
+                  different types of connections. Simply click on a dropdown under
+                  the relevant connection type (e.g., Direct, Collateral) and
+                  choose one or more nodes to establish that specific connection.
+                </Callout>
+              }
 
               <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-2">
                 {/* Direct Section */}
                 <div className="col-span-full sm:col-span-1">
-                  <Badge icon={RiLinksLine} className="flex items-center ">
+                  <Badge icon={RiLinksLine} className="text-sm flex items-center gap-2"
+                    color="gray">
                     <span className="text-sm">Direct</span>
                   </Badge>
                   <MultiSelect
@@ -506,6 +615,7 @@ export function FormDialog() {
                   <Badge
                     icon={RiArrowDownCircleLine}
                     className="text-sm flex items-center gap-2"
+                    color="gray"
                   >
                     <span className="text-sm">Collateral</span>
                   </Badge>
@@ -535,7 +645,8 @@ export function FormDialog() {
 
                 {/* Projection Section */}
                 <div className="col-span-full sm:col-span-1">
-                  <Badge icon={RiProjector2Line}>
+                  <Badge icon={RiProjector2Line} className="text-sm flex items-center gap-2"
+                    color="gray">
                     <span className="text-sm">Projection</span>
                   </Badge>
                   <MultiSelect
@@ -564,7 +675,8 @@ export function FormDialog() {
 
                 {/* Update Section */}
                 <div className="col-span-full sm:col-span-1">
-                  <Badge icon={RiLoopLeftLine} className="icon">
+                  <Badge icon={RiLoopLeftLine} className="text-sm flex items-center gap-2"
+                    color="gray">
                     <span className="text-sm icon-text">Update</span>
                   </Badge>
                   <MultiSelect
@@ -595,14 +707,14 @@ export function FormDialog() {
               <Divider />
               <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
                 <Button
-                  className="w-full sm:w-auto mt-4 sm:mt-0"
+                  className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
                   variant="light"
                   onClick={() => setIsOpen(false)}
                 >
                   Cancel
                 </Button>
                 <Button
-                  className="w-full sm:w-auto"
+                  className="w-full sm:w-auto primary"
                   onClick={e => handleSubmit(e)}
                 >
                   Submit
@@ -612,6 +724,7 @@ export function FormDialog() {
           </div>
         </DialogPanel>
       </Dialog>
+      <Toaster/>
     </>
   );
 }
