@@ -82,6 +82,7 @@ export function FormDialog() {
   const [lat, setLat] = useState<number>(67.845);
 
   const [selectedCoordinate, setSelectedCoordinate] = useState<any>(undefined);
+  const [savedCoordinate, setSavedCoordinate] = useState<any>(undefined);
 
   const handleMapClick = (lng_: number, lat_: number) => {
     const newPoint: Point = { type: AreaType.POINT, coordinates: [lng_, lat_] };
@@ -150,7 +151,6 @@ export function FormDialog() {
   const [isCancelling, setIsCancelling] = useState(false);
 
   const resetForm = () => {
-    console.log("reset");
     setTitle("");
     setTitleError(false);
     setStakeholders([]);
@@ -168,13 +168,6 @@ export function FormDialog() {
     setDocCoordinatesError(false);
     setSelectedCoordinate(undefined);
     //setIsCancelling(false);
-  };
-
-  const handleCancel = () => {
-    console.log("handleCancel, isCanceling: ", isCancelling);
-    setIsCancelling(true);
-    setIsOpen(false);
-    resetForm();
   };
 
   useEffect(() => {
@@ -412,7 +405,7 @@ export function FormDialog() {
                   key={
                     selectedCoordinate ? selectedCoordinate.lng : "undefined"
                   }
-                  coordinates={selectedCoordinate}
+                  savedCoordinates={savedCoordinate}
                   style={{ minHeight: "300px", width: "100%" }}
                 />
               </Card>
@@ -435,18 +428,18 @@ export function FormDialog() {
                   <SatMap
                     activeTab={activeTab}
                     setActiveTab={setActiveTab}
-                    coordinates={selectedCoordinate}
+                    savedCoordinates={savedCoordinate}
                     onMapClick={(lng, lat) => {
                       handleMapClick(lng, lat);
                     }}
                     onCancel={() => {
                       setIsMapOpen(false);
-
                       setSelectedCoordinate(undefined);
                       setDocCoordinates(undefined);
                     }}
                     onDone={() => {
                       setIsMapOpen(false);
+                      setSavedCoordinate(selectedCoordinate);
                     }}
                     style={{ minHeight: "95vh", width: "100%" }}
                   ></SatMap>

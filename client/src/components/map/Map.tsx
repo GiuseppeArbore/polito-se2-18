@@ -14,7 +14,7 @@ export interface SatMapProps {
   style?: React.CSSProperties;
   className?: string;
   onMapClick?: (lng: number, lat: number) => void;
-  coordinates?: { lng: number; lat: number };
+  savedCoordinates?: { lng: number; lat: number };
 }
 
 const defaultZoom = 12;
@@ -38,7 +38,7 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
   }, []);
 
   useEffect(() => {
-    if (props.coordinates && mapRef.current) {
+    if (props.savedCoordinates && mapRef.current) {
       // Remove existing marker if present
       if (markerRef.current) {
         markerRef.current.remove();
@@ -46,13 +46,16 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
 
       // Create and add a new marker at the passed coordinates
       markerRef.current = new Marker()
-        .setLngLat([props.coordinates.lng, props.coordinates.lat])
+        .setLngLat([props.savedCoordinates.lng, props.savedCoordinates.lat])
         .addTo(mapRef.current);
 
       // Optionally, center the map on the new marker
-      mapRef.current.setCenter([props.coordinates.lng, props.coordinates.lat]);
+      mapRef.current.setCenter([
+        props.savedCoordinates.lng,
+        props.savedCoordinates.lat,
+      ]);
     }
-  }, [props.coordinates]);
+  }, [props.savedCoordinates]);
 
   useEffect(() => {
     if (!mapRef.current) return;
@@ -147,7 +150,7 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
 };
 
 export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
-  const { onMapClick, coordinates } = props;
+  const { onMapClick, savedCoordinates } = props;
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
 
@@ -234,15 +237,15 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     mapRef.current.addControl(draw);
     // Drawing the past/last point on the map in loading
     if (
-      coordinates &&
-      coordinates.lng !== undefined &&
-      coordinates.lat !== undefined
+      savedCoordinates &&
+      savedCoordinates.lng !== undefined &&
+      savedCoordinates.lat !== undefined
     ) {
       const pointFeature: Feature<Point> = {
         type: "Feature",
         geometry: {
           type: "Point",
-          coordinates: [coordinates.lng, coordinates.lat],
+          coordinates: [savedCoordinates.lng, savedCoordinates.lat],
         },
         properties: {},
       };
