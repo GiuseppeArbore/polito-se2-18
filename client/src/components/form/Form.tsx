@@ -68,9 +68,12 @@ export function FormDialog() {
   const [showConnectionsInfo, setShowConnectionsInfo] = useState(false);
   const [showGeoInfo, setShowGeoInfo] = useState(false);
 
+
   const [docCoordinates, _ ] = useState<DocCoords | undefined>(undefined);
   // Example usage
   //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
+
+  
 
   const [docCoordinatesError, setDocCoordinatesError] = useState(false);
 

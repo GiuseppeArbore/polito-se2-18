@@ -93,6 +93,7 @@ export default function Console() {
                    <>
                   <PreviewMap
                       style={{  margin: 0, minHeight: "300px", width: "100%", height: "100%", borderRadius: 8}}
+                      drawing={undefined}
                     ></PreviewMap>
                    </>
                 );
