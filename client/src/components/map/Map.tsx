@@ -37,12 +37,23 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
         });
         mapRef.current.addControl(PreviewMapDraw, 'bottom-right');
         if (props.drawing) PreviewMapDraw.set(props.drawing);
-    }, [mapContainerRef.current, mapRef.current]);
+    }, [mapContainerRef.current]);
 
     useMemo(() => {
         if (props.drawing) {
             mapRef.current?.remove();
             mapRef.current = null;
+            mapRef.current = new mapboxgl.Map({
+                container: mapContainerRef.current,
+                //style: "mapbox://styles/mapbox/satellite-streets-v12",
+                style: "mapbox://styles/mapbox/light-v11",
+                center: center,
+                zoom: props.zoom || defaultZoom,
+                pitch: 40,
+                interactive: false
+            });
+            mapRef.current.addControl(PreviewMapDraw, 'bottom-right');
+            if (props.drawing) PreviewMapDraw.set(props.drawing);
         }
     }, [props.drawing]);
 
