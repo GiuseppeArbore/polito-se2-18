@@ -131,20 +131,18 @@ export function FormDialog() {
           duration: 3000,
         })
       } else {
-        setError("Failed to create document");
         toast({
           title: "Error",
-          description: error,
+          description: "Failed to create document",
           variant: "error",
           duration: 3000,
         })
       }
       setIsOpen(false);
     } catch (error:any) {
-      setError("Failed to create document");
       toast({
         title: "Error",
-        description: error,
+        description: "Failed to create document",
         variant: "error",
         duration: 3000,
       })
@@ -185,12 +183,10 @@ export function FormDialog() {
         Add new document
       </Button>
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
-
         <DialogPanel
           className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
           style={{ maxWidth: "80vw" }}
         >
-
           <div className="sm:mx-auto sm:max-w-2xl">
             <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
               Add new document
@@ -416,8 +412,8 @@ export function FormDialog() {
                   title="Geolocalization guide"
                   color="gray"
                 >
-                  To specify the Geolocalization of the document, use the the
-                  switch to select the entire municipality or click the map
+                  To specify the Geolocalization of the document, use the
+                  switch to select the entire municipality or click on the map
                   to select a specific area or point.
                 </Callout>
               }

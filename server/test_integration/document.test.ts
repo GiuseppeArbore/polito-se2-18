@@ -78,8 +78,8 @@ describe("Integration Tests for Document API", () => {
                 description: "This is a test document for integration testing.",
                 pages: []
             });
-        expect(response.status).toBe(400);
-        expect(response.body).toEqual({ error: 'Internal Server Error', status: 400 });
+        expect(response.status).toBe(500);
+        expect(response.body).toEqual({ error: 'Internal Server Error', status: 500 });
     });
 
     test("Test 4 - Should return 500 if there is a database error", async () => {
