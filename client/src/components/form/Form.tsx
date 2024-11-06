@@ -653,22 +653,19 @@ export function FormDialog() {
             </div>
           </DialogPanel>
         </Dialog>
-
-        <Dialog open={showSuccessAlert} onClose={() => setShowSuccessAlert(false)}>
-          <DialogPanel className="w-full max-w-md p-6">
-            <h3 className="text-lg font-medium text-green-600">Success</h3>
-            <p className="mt-2 text-sm text-gray-600">
-              Duis mollis, est non commodo luctus, nisi erat porttitor ligula, eget
-              lacinia odio sem nec elit. Cras mattis consectetur purus sit amet
-              fermentum.
-            </p>
-            <div className="mt-4 flex justify-end">
-              <Button className="primary" onClick={() => setShowSuccessAlert(false)}>
-                Close
-              </Button>
-            </div>
-          </DialogPanel>
-        </Dialog>
+      </Dialog>
+      <Dialog open={showSuccessAlert} onClose={() => setShowSuccessAlert(false)}>
+        <DialogPanel className="w-full max-w-md p-6">
+          <h3 className="text-lg font-medium text-green-600">Success</h3>
+          <p className="mt-2 text-sm text-gray-600">
+            Document created successfully
+          </p>
+          <div className="mt-4 flex justify-end">
+            <Button className="primary" onClick={() => setShowSuccessAlert(false)}>
+              Close
+            </Button>
+          </div>
+        </DialogPanel>
       </Dialog>
 
     </>
