@@ -144,7 +144,42 @@ export function FormDialog() {
   const [documentsForProjection, setDocumentsForProjection] = useState<
     string[]
   >([]);
+
   const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
+  const [activeTab, setActiveTab] = useState<number>(1);
+  const [isCancelling, setIsCancelling] = useState(false);
+
+  const resetForm = () => {
+    console.log("reset");
+    setTitle("");
+    setTitleError(false);
+    setStakeholders([]);
+    setShError(false);
+    setIssuanceDate(new Date());
+    setType(undefined);
+    setTypeError(false);
+    setScale(10000);
+    setLanguage(undefined);
+    setPages("");
+    setDescription(undefined);
+    setDescriptionError(false);
+    setError("");
+    setDocCoordinates(undefined);
+    setDocCoordinatesError(false);
+    setSelectedCoordinate(undefined);
+    //setIsCancelling(false);
+  };
+
+  const handleCancel = () => {
+    console.log("handleCancel, isCanceling: ", isCancelling);
+    setIsCancelling(true);
+    setIsOpen(false);
+    resetForm();
+  };
+
+  useEffect(() => {
+    console.log("isCancelling..", isCancelling);
+  }, [isCancelling]);
 
   return (
     <>
@@ -183,7 +218,11 @@ export function FormDialog() {
                     placeholder="Title"
                     className="mt-2"
                     onBlur={() => {
-                      setTitleError(title.length === 0);
+                      console.log("onBlur: ", isCancelling);
+                      if (!isCancelling) {
+                        setTitleError(title.length === 0);
+                      }
+                      setIsCancelling(false); // Reset after onBlur
                     }}
                     error={titleError}
                     errorMessage="The title is mandatory"
@@ -384,7 +423,9 @@ export function FormDialog() {
               ) : null}
               <Dialog
                 open={isMapOpen}
-                onClose={(val) => setIsMapOpen(val)}
+                onClose={(val) => {
+                  setIsMapOpen(val);
+                }}
                 static={true}
               >
                 <DialogPanel
@@ -392,12 +433,15 @@ export function FormDialog() {
                   style={{ maxWidth: "100%" }}
                 >
                   <SatMap
+                    activeTab={activeTab}
+                    setActiveTab={setActiveTab}
                     coordinates={selectedCoordinate}
                     onMapClick={(lng, lat) => {
                       handleMapClick(lng, lat);
                     }}
                     onCancel={() => {
                       setIsMapOpen(false);
+
                       setSelectedCoordinate(undefined);
                       setDocCoordinates(undefined);
                     }}
@@ -572,7 +616,12 @@ export function FormDialog() {
                 <Button
                   className="w-full sm:w-auto mt-4 sm:mt-0"
                   variant="light"
-                  onClick={() => setIsOpen(false)}
+                  onClick={() => {
+                    console.log("Cancel button clicked"); // Check if this logs in the console
+                    setIsCancelling(true);
+                    setIsOpen(false);
+                    resetForm();
+                  }}
                 >
                   Cancel
                 </Button>

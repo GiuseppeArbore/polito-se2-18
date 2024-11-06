@@ -1,0 +1,8 @@
+/* Override the default point (marker) style */
+.mapbox-gl-draw-point {
+    /* background-color: red;  */
+    border-radius: 50%;    
+    width: 15px;            
+    height: 15px;
+    border: 2px solid white;
+  }

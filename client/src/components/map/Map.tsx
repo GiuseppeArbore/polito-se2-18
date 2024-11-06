@@ -2,6 +2,9 @@ import mapboxgl, { Marker } from "mapbox-gl";
 import React, { useEffect, useRef, useState } from "react";
 import { Button, Card, Tab, TabGroup, TabList } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill } from "@remixicon/react";
+import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import { Feature, Point } from "geojson";
+import "./Map.css";
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
@@ -26,7 +29,6 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
 
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
-      //style: "mapbox://styles/mapbox/satellite-streets-v12",
       style: "mapbox://styles/mapbox/light-v11",
       center: [20.26, 67.845],
       zoom: props.zoom || defaultZoom,
@@ -87,7 +89,6 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
             value="1"
             onClick={() => {
               props.setActiveTab(1);
-              console.log("1");
             }}
           >
             Point
@@ -96,7 +97,6 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
             value="2"
             onClick={() => {
               props.setActiveTab(2);
-              console.log("2");
             }}
           >
             Area
@@ -153,9 +153,72 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
 
   // Saving the Doc's point
   const [point, setPoint] = useState<{ lng: number; lat: number } | null>(null);
-  const [isClosedByDone, setIsClosedByDone] = useState<boolean>(false);
-  const markerRef = useRef<Marker | null>(null);
+  //const markerRef = useRef<Marker | null>(null);
   const [activeTab, setActiveTab] = useState<number>(1);
+  const drawRef = useRef<MapboxDraw | undefined>();
+  const draw = new MapboxDraw({
+    displayControlsDefault: false,
+    controls: {
+      point: true,
+    },
+  });
+
+  function deleteAllPoints() {
+    // Get all features currently drawn
+    const allFeatures = draw.getAll();
+    // Filter for points only
+    const points = allFeatures.features.filter(
+      (feature) => feature.geometry.type === "Point"
+    );
+
+    // Delete each point
+    points.forEach((point: any) => {
+      draw.delete(point);
+    });
+  }
+  const resetMap = () => {
+    if (lastPointId) {
+      draw.delete(lastPointId);
+    }
+    lastPointId;
+
+    setPoint(null);
+    setActiveTab(1); // Reset active tab
+
+    // Reset any additional state or map settings as needed
+    if (drawRef.current) {
+      drawRef.current.deleteAll(); // Remove all drawn features
+    }
+  };
+  let lastPointId: string | null = null;
+
+  function addOrReplacePoint(lng: number, lat: number) {
+    // If there's an existing point, remove it first
+    if (lastPointId) {
+      draw.delete(lastPointId);
+    }
+    lastPointId = null;
+    // Define the new point feature
+    const pointFeature: Feature<Point> = {
+      type: "Feature",
+      geometry: {
+        type: "Point",
+        coordinates: [lng, lat],
+      },
+      properties: {},
+    };
+
+    // Add the new point to the map and store its ID
+    lastPointId = draw.add(pointFeature)[0];
+  }
+
+  // Call resetMap function when the component is closed
+  const handleClose = () => {
+    resetMap();
+    if (props.onCancel) {
+      props.onCancel(); // Call the onCancel prop to notify parent component
+    }
+  };
 
   useEffect(() => {
     if (mapRef.current) return;
@@ -168,15 +231,22 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
       pitch: 40,
     });
 
+    mapRef.current.addControl(draw);
     // Drawing the past/last point on the map in loading
     if (
       coordinates &&
       coordinates.lng !== undefined &&
       coordinates.lat !== undefined
     ) {
-      new Marker()
-        .setLngLat([coordinates?.lng, coordinates?.lat])
-        .addTo(mapRef.current);
+      const pointFeature: Feature<Point> = {
+        type: "Feature",
+        geometry: {
+          type: "Point",
+          coordinates: [coordinates.lng, coordinates.lat],
+        },
+        properties: {},
+      };
+      draw.add(pointFeature);
     }
   }, []);
 
@@ -197,11 +267,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     const handleMapClick = (event: mapboxgl.MapMouseEvent) => {
       const { lng, lat } = event.lngLat;
 
-      // If a point already exists, remove the existing marker
-      if (markerRef.current) {
-        markerRef.current.remove();
-      }
-
+      deleteAllPoints();
       // Update point state
       setPoint({ lng, lat });
 
@@ -209,22 +275,20 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         onMapClick(lng, lat);
       }
 
-      // Create a new marker and add it to the map
-      console.log("active Tab: ", activeTab);
-      const newMarker = new Marker().setLngLat([lng, lat]).addTo(map);
-      // Store the reference to the new marker
-      markerRef.current = newMarker;
+      addOrReplacePoint(lng, lat);
     };
 
-    map.on("click", handleMapClick);
+    if (activeTab === 1) {
+      map.on("click", handleMapClick);
+    }
 
     return () => {
       map.off("click", handleMapClick);
-      if (markerRef.current) {
-        markerRef.current.remove(); // Remove the marker when the component unmounts
+      if (drawRef.current) {
+        drawRef.current.deleteAll(); // Remove all drawn features
       }
     };
-  }, []);
+  }, [activeTab, mapRef]);
   return (
     <>
       <div
@@ -236,7 +300,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
       <MapControls
         activeTab={activeTab}
         setActiveTab={setActiveTab}
-        onCancel={props.onCancel}
+        onCancel={handleClose}
         onDone={props.onDone}
       ></MapControls>
     </>
