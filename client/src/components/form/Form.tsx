@@ -36,7 +36,6 @@ import {
   validatePageRangeString,
 } from "../../utils";
 import "../../index.css";
-import { ToastSuccess } from "./Toasts";
 import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 
@@ -70,16 +69,12 @@ export function FormDialog() {
   const [showGeoInfo, setShowGeoInfo] = useState(false);
 
 
-  const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
+  const [docCoordinates, _ ] = useState<DocCoords | undefined>(undefined);
   // Example usage
   //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
 
   const [docCoordinatesError, setDocCoordinatesError] = useState(false);
-  const [documents, setDocuments] = useState<string[]>([
-    "Doc 1",
-    "Doc 2",
-    "Doc 3",
-  ]);
+  const [documents, setDocuments] = useState<string[]>([]);
   const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
   const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
   const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
@@ -96,12 +91,12 @@ export function FormDialog() {
       setDescriptionError(!description);
       hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
       setError("Please fill all the required fields");
-     toast({
-            title: "Error",
-            description: error,
-            variant: "error",
-            duration: 3000,
-          })
+      toast({
+              title: "Error",
+              description: "Please fill all the required fields",
+              variant: "error",
+              duration: 3000,
+            })
       return;
     }
 
@@ -154,13 +149,39 @@ export function FormDialog() {
         duration: 3000,
       })
     }
+    clearForm();
   };
 
+  function clearForm() {
+    setTitle("");
+    setTitleError(false);
+    setStakeholders([]);
+    setShError(false);
+    setIssuanceDate(new Date());
+    setType(undefined);
+    setTypeError(false);
+    setScale(1);
+    setLanguage(undefined);
+    setPages("");
+    setPageRanges([]);
+    setHideMap(false);
+    setDescription(undefined);
+    setDescriptionError(false);
+    setError("");
+    setIsMapOpen(false);
+    setShowConnectionsInfo(false);
+    setShowGeoInfo(false);
+    setDocCoordinatesError(false);
+    setDocumentsForDirect([]);
+    setDocumentsForCollateral([]);
+    setDocumentsForProjection([]);
+    setDocumentsForUpdate([]);
+  }
 
 
   return (
     <>
-      <Button className="w-full primary" onClick={() => setIsOpen(true)}>
+      <Button className="w-full primary" onClick={() => {setIsOpen(true); clearForm() }}>
         Add new document
       </Button>
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
