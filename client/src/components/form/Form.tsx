@@ -55,7 +55,7 @@ export function FormDialog() {
   );
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
   const [typeError, setTypeError] = useState(false);
-  const [scale, setScale] = useState(1);
+  const [scale, setScale] = useState(10000);
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState("");
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -160,7 +160,7 @@ export function FormDialog() {
     setIssuanceDate(new Date());
     setType(undefined);
     setTypeError(false);
-    setScale(1);
+    setScale(10000);
     setLanguage(undefined);
     setPages("");
     setPageRanges([]);
