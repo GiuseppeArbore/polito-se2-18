@@ -36,6 +36,9 @@ import {
   validatePageRangeString,
 } from "../../utils";
 import "../../index.css";
+import { ToastSuccess } from "./Toasts";
+import { toast } from "../../utils/toaster";
+import { Toaster } from "../toast/Toaster";
 
 export class Link {
   connectionType: string = "";
@@ -81,8 +84,6 @@ export function FormDialog() {
   const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
   const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
   const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
-  const [showErrorAlert, setShowErrorAlert] = useState(false);
-  const [showSuccessAlert, setShowSuccessAlert] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -95,7 +96,12 @@ export function FormDialog() {
       setDescriptionError(!description);
       hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
       setError("Please fill all the required fields");
-      setShowErrorAlert(true);
+     toast({
+            title: "Error",
+            description: error,
+            variant: "error",
+            duration: 3000,
+          })
       return;
     }
 
@@ -122,15 +128,31 @@ export function FormDialog() {
       const createdDocument = await API.createKxDocument(newDocument);
       if (createdDocument) {
         setDocuments([...documents, createdDocument.title]);
-        setShowSuccessAlert(true);
+        toast({
+          title: "Success",
+          description:
+            "The document has been created successfully",
+          variant: "success",
+          duration: 3000,
+        })
       } else {
         setError("Failed to create document");
-        setShowErrorAlert(true);
+        toast({
+          title: "Error",
+          description: error,
+          variant: "error",
+          duration: 3000,
+        })
       }
       setIsOpen(false);
-    } catch (error) {
+    } catch (error:any) {
       setError("Failed to create document");
-      setShowErrorAlert(true);
+      toast({
+        title: "Error",
+        description: error,
+        variant: "error",
+        duration: 3000,
+      })
     }
   };
 
@@ -640,34 +662,8 @@ export function FormDialog() {
             </form>
           </div>
         </DialogPanel>
-        <Dialog open={showErrorAlert} onClose={() => setShowErrorAlert(false)}>
-          <DialogPanel className="w-full max-w-md p-6">
-            <h3 className="text-lg font-medium text-red-600">Error</h3>
-            <p className="mt-2 text-sm text-gray-600">
-              {error}
-            </p>
-            <div className="mt-4 flex justify-end">
-              <Button className="primary" onClick={() => setShowErrorAlert(false)}>
-                Close
-              </Button>
-            </div>
-          </DialogPanel>
-        </Dialog>
       </Dialog>
-      <Dialog open={showSuccessAlert} onClose={() => setShowSuccessAlert(false)}>
-        <DialogPanel className="w-full max-w-md p-6">
-          <h3 className="text-lg font-medium text-green-600">Success</h3>
-          <p className="mt-2 text-sm text-gray-600">
-            Document created successfully
-          </p>
-          <div className="mt-4 flex justify-end">
-            <Button className="primary" onClick={() => setShowSuccessAlert(false)}>
-              Close
-            </Button>
-          </div>
-        </DialogPanel>
-      </Dialog>
-
+      <Toaster/>
     </>
   );
 }
