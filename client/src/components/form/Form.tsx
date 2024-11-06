@@ -45,6 +45,7 @@ export class Link {
 }
 
 export function FormDialog() {
+  const [drawing, setDrawing] = useState<any>(undefined);
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState(false);
@@ -84,7 +85,29 @@ export function FormDialog() {
     e.preventDefault();
     const tmpTitleError = title.length === 0;
     const tmpShError = stakeholders.length === 0;
-    if (tmpTitleError || tmpShError || !type || !description || (!docCoordinates && !hideMap)) {
+    let draw: DocCoords | undefined;
+    if(drawing === undefined){
+      setDocCoordinatesError(false);
+      return;
+    }
+    if (drawing.features.length === 1 && drawing.features[0].geometry.type === "Point") {
+      draw = {
+        type: AreaType.POINT,
+        coordinates: drawing.features[0].geometry.coordinates,
+      };
+    } else if (drawing.features.length >= 1) {
+      //TODO: add support for multiple polygons
+      let cord = drawing.features.map((f: any) => f.geometry.coordinates).length === 1 ? drawing.features[0].geometry.coordinates : setDocCoordinatesError(true);
+      draw = {
+        type: AreaType.AREA,
+        coordinates: cord,
+      };
+    } else {
+      draw = {
+        type: AreaType.ENTIRE_MUNICIPALITY
+      };
+    }
+    if (tmpTitleError || tmpShError || !type || !description || !draw ) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
@@ -97,15 +120,17 @@ export function FormDialog() {
               variant: "error",
               duration: 3000,
             })
+
       return;
     }
+
 
     const newDocument: KxDocument = {
       title,
       stakeholders,
       scale_info: Scale.TEXT,
       scale,
-      doc_coordinates: hideMap ? { type: AreaType.ENTIRE_MUNICIPALITY } : docCoordinates,
+      doc_coordinates: hideMap ? { type: AreaType.ENTIRE_MUNICIPALITY } : drawing,
       issuance_date: issuanceDate,
       type: type,
       language,
@@ -130,6 +155,16 @@ export function FormDialog() {
           variant: "success",
           duration: 3000,
         })
+        setTitle("");
+        setStakeholders([]);
+        setScale(0);
+        setIssuanceDate(new Date());
+        setType(undefined);
+        setLanguage(undefined);
+        setDescription("");
+        setPages("");
+        setDrawing(undefined);
+        setPageRanges([]);
       } else {
         toast({
           title: "Error",
@@ -433,29 +468,14 @@ export function FormDialog() {
               {!hideMap && (
                 <>
                   <Card
-                    className="my-4 p-0 overflow-hidden cursor-pointer"
+                    className={`my-4 p-0 overflow-hidden cursor-pointer ${docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"}`}
                     onClick={() => setIsMapOpen(true)}
                   >
                     <PreviewMap
+                      drawing={drawing}
                       style={{ minHeight: "300px", width: "100%" }}
-                    ></PreviewMap>
+                    />
                   </Card>
-                  <Dialog
-                    open={isMapOpen}
-                    onClose={() => setIsMapOpen(false)}
-                    static={true}
-                  >
-                    <DialogPanel
-                      className="p-0 overflow-hidden"
-                      style={{ maxWidth: "100%" }}
-                    >
-                      <SatMap
-                        onCancel={() => setIsMapOpen(false)}
-                        onDone={() => setIsMapOpen(false)}
-                        style={{ minHeight: "95vh", width: "100%" }}
-                      ></SatMap>
-                    </DialogPanel>
-                  </Dialog>
                 </>
               )}
               {docCoordinatesError ? <p className="tremor-TextInput-errorMessage text-sm text-red-500 mt-1">Please provide document coordinates</p> : null}
@@ -469,8 +489,9 @@ export function FormDialog() {
                   style={{ maxWidth: "100%" }}
                 >
                   <SatMap
+                    drawing={drawing}
                     onCancel={() => setIsMapOpen(false)}
-                    onDone={() => setIsMapOpen(false)}
+                    onDone={(v) => { setDrawing(v); setIsMapOpen(false); }}
                     style={{ minHeight: "95vh", width: "100%" }}
                   ></SatMap>
                 </DialogPanel>
