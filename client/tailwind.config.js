@@ -60,7 +60,7 @@ module.exports = {
         },
         // TODO: Add dark mode theme
         // dark mode
-        /*"dark-tremor": {
+        "dark-tremor": {
           brand: {
             faint: "#0B1229", // custom
             muted: "#172554", // blue-950
@@ -88,7 +88,8 @@ module.exports = {
             strong: "#f9fafb", // gray-50
             inverted: "#000000", // black
           },
-        },*/
+
+        },
       },
       boxShadow: {
         // light
@@ -142,5 +143,6 @@ module.exports = {
         /^(fill-(?:slate|gray|zinc|neutral|stone|red|orange|amber|yellow|lime|green|emerald|teal|cyan|sky|blue|indigo|violet|purple|fuchsia|pink|rose)-(?:50|100|200|300|400|500|600|700|800|900|950))$/,
     },
   ],
-  plugins: [require("@headlessui/tailwindcss")],
+  plugins: [require('@headlessui/tailwindcss'), require('@tailwindcss/forms')],
+
 }
