@@ -38,13 +38,12 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
         });
         mapRef.current.addControl(PreviewMapDraw, 'bottom-right');
         if (props.drawing) PreviewMapDraw.set(props.drawing);
-    }, [mapContainerRef.current]);
+    }, [mapContainerRef.current, mapRef.current]);
 
     useMemo(() => {
         if (props.drawing) {
-            mapRef.current?.removeControl(PreviewMapDraw);
-            mapRef.current?.addControl(PreviewMapDraw, 'bottom-right');
-            PreviewMapDraw.set(props.drawing);
+            mapRef.current?.remove();
+            mapRef.current = null;
         }
     }, [props.drawing]);
 
