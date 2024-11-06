@@ -1,11 +1,10 @@
 import mapboxgl, { LngLatLike } from "mapbox-gl"
-import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Card, TabGroup, TabList, Tab, Divider } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill, RiHand, RiMapPinLine, RiScissorsCutFill, RiShapeLine } from "@remixicon/react";
 import { PreviewMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import CutPolygonMode, { drawStyles as cutPolygonDrawStyles } from "mapbox-gl-draw-cut-polygon-mode";
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
+
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
 export interface SatMapProps {
@@ -56,7 +55,7 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
     }, [props.zoom]);
 
     return (
-        <div className={props.className} ref={mapContainerRef} id="map" style={props.style}></div>
+        <div className={props.className} ref={mapContainerRef} id="map" style={{...props.style, ...{pointerEvents: "none"}}} ></div>
     )
 }
 
