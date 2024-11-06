@@ -138,7 +138,7 @@ export function FormDialog() {
 
   return (
     <>
-      <Button className="mx-auto block mb-2 primary" onClick={() => setIsOpen(true)}>
+      <Button className="w-full primary" onClick={() => setIsOpen(true)}>
         Add new document
       </Button>
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>

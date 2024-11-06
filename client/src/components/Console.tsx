@@ -2,9 +2,10 @@ import { Card, Title, Text, Grid, Col, DateRangePicker, Metric, Subtitle, Bold, 
 import { useState, useMemo } from "react";
 import { FormDialog } from "./form/Form";
 import { MultiSelect, MultiSelectItem } from '@tremor/react';
+import { PreviewMap } from "./map/Map";
 
 
-export default function Fatturato() {
+export default function Console() {
 
     const today = new Date(Date.now());
     const [groupKey, setGroupKey] = useState("1");
@@ -22,18 +23,17 @@ export default function Fatturato() {
                             Map
                         </Tab>
                         <Tab>
-                            Insights
+                            List
                         </Tab>
                         <Tab>
-                            Notes
+                            Timeline
                         </Tab>
-
                     </TabList>
                 </TabGroup>
             </div>
             <Grid numItemsLg={6} className="gap-6 mt-6">
                 <Col numColSpanLg={5}>
-                    <Card className="h-full">
+                    <Card className="h-full p-0 m-0" style={{margin:0, padding:0}}>
                         {renderCurrentSelection(selectedView)}
                     </Card>
                 </Col>
@@ -90,20 +90,22 @@ export default function Fatturato() {
         switch (selectedView) {
             case 0:
                 return (
-                    <>
-                        <Card> Pag 1</Card>
-                    </>
+                   <>
+                  <PreviewMap
+                      style={{  margin: 0, minHeight: "300px", width: "100%", height: "100%", borderRadius: 8}}
+                    ></PreviewMap>
+                   </>
                 );
             case 1:
                 return (
                     <>
-                        <Card>Pag 2</Card>
+                       List
                     </>
                 );
             case 2:
                 return (
                     <>
-                        <Card>Pag 4</Card>
+                       Timeline
                     </>
                 );
         }
