@@ -9,6 +9,7 @@ import { connections } from 'mongoose';
 
 jest.mock('../src/controller', () => ({
     createKxDocument: jest.fn(),
+    getAllKxDocuments: jest.fn()
 }));
 
 

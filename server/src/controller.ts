@@ -15,3 +15,13 @@ export const createKxDocument = async (req: Request, res: Response, next: NextFu
         next(error); 
     }
 };
+
+export const getAllKxDocuments = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const documents: KxDocument[] = await db.getAlldocuments();
+        res.status(200).json(documents);
+    } catch (error) {
+        next(error);
+    }
+};
+
