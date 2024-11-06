@@ -91,16 +91,12 @@ export function FormDialog() {
     const tmpTitleError = title.length === 0;
     const tmpShError = stakeholders.length === 0;
     let draw: DocCoords | undefined;
-    if(drawing === undefined && !hideMap ){
-      setDocCoordinatesError(true);
-      return;
-    }
-    if (!hideMap && (drawing.features.length === 1 && drawing.features[0].geometry.type === "Point")) {
+    if (!hideMap && (drawing && drawing.features.length === 1 && drawing.features[0].geometry.type === "Point")) {
       draw = {
         type: AreaType.POINT,
         coordinates: drawing.features[0].geometry.coordinates,
       };
-    } else if (!hideMap && (drawing.features.length >= 1)) {
+    } else if (!hideMap && (drawing && drawing.features.length >= 1)) {
       //TODO: add support for multiple polygons
       let cord = drawing.features.map((f: any) => f.geometry.coordinates).length === 1 ? drawing.features[0].geometry.coordinates : setDocCoordinatesError(true);
       draw = {
@@ -112,12 +108,13 @@ export function FormDialog() {
         type: AreaType.ENTIRE_MUNICIPALITY
       };
     }
-    if (tmpTitleError || tmpShError || !type || !description || !draw ) {
+    if (tmpTitleError || tmpShError || !type || !description || !draw || (drawing === undefined && !hideMap) ) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
       hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
+      setDocCoordinatesError(true);
       setError("Please fill all the required fields");
       toast({
               title: "Error",
@@ -269,9 +266,6 @@ export function FormDialog() {
                     autoComplete="title"
                     placeholder="Title"
                     className="mt-2"
-                    onBlur={() => {
-                      setTitleError(title.length === 0);
-                    }}
                     error={titleError}
                     errorMessage="The title is mandatory"
                     required
@@ -289,9 +283,6 @@ export function FormDialog() {
                     id="stakeholders"
                     name="stakeholders"
                     className="mt-2"
-                    onBlur={() => {
-                      setShError(stakeholders.length === 0);
-                    }}
                     onValueChange={s => setStakeholders(s.map(sh => Stakeholders[sh as keyof typeof Stakeholders]))}
                     error={shError}
                     errorMessage="You must select at least one stakeholder."
@@ -340,9 +331,6 @@ export function FormDialog() {
                     name="doc_type"
                     className="mt-2"
                     onValueChange={t => setType(KxDocumentType[t as keyof typeof KxDocumentType])}
-                    onBlur={() => {
-                      setTypeError(!type);
-                    }}
                     error={typeError}
                     errorMessage="The type is mandatory"
                     required
@@ -433,10 +421,6 @@ export function FormDialog() {
                     name="pages"
                     onValueChange={(v: string) => {
                       setPages(v);
-                    }}
-                    onBlur={() => {
-                      const range = validatePageRangeString(pages);
-                      setPageRanges(range);
                     }}
                     error={!pageRanges ? true : false}
                     errorMessage='Invalid page range. Examples of valid ranges: "10" or "1-5" or "1-5,6"'
@@ -534,9 +518,6 @@ export function FormDialog() {
                   placeholder="Description"
                   className="mt-2"
                   value={description}
-                  onBlur={() => {
-                    setDescriptionError(!description);
-                  }}
                   error={descriptionError}
                   errorMessage="The description is mandatory"
                   onValueChange={d => setDescription(d)}
