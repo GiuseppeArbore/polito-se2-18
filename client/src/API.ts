@@ -26,6 +26,29 @@ const API_URL = 'http://localhost:3001/api';
         }
     }
 };
+const getAllKxDocuments = async (): Promise<KxDocument[]> => {
+    try {
+        const response = await fetch(API_URL + "/documents", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
 
-const API ={createKxDocument};
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+
+        const data: KxDocument[] = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to fetch documents: ${error.message}`);
+        } else {
+            throw new Error('Failed to fetch documents: Unknown error');
+        }
+    }
+};
+
+const API = { createKxDocument, getAllKxDocuments };
 export default API;

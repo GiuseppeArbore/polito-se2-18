@@ -40,7 +40,7 @@ const DocumentSchema = new mongoose.Schema({
         validate: {
             validator: isDocCoords,
         },
-        required: true
+        //required: true
     },
     description: {
         type: String,

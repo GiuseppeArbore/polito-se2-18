@@ -1,6 +1,7 @@
-import e, { Application } from 'express';
-import { createKxDocument } from './controller';
+
+import { createKxDocument, getAllKxDocuments} from './controller';
 import { validateRequest } from './errorHandlers';
+import e, { Application } from 'express';
 import { body } from 'express-validator';
 import { AreaType, isDocCoords, KxDocumentType, Scale, Stakeholders } from './models/enum';
 import { coordDistance, KIRUNA_COORDS } from './utils';
@@ -25,15 +26,15 @@ export function initRoutes(app: Application) {
             .isIn(Object.values(KxDocumentType)).withMessage('Invalid document type'),
         body('language').optional().notEmpty().withMessage('Language is required')
             .isString().withMessage('Language must be a string'),
-        body('doc_coordinates').notEmpty().withMessage('Document coordinates are required').isObject()
-            .custom((v) => {
-                return isDocCoords(v) &&  
-                    (
-                        (v.type === AreaType.ENTIRE_MUNICIPALITY) ||
-                        (v.type === AreaType.POINT && coordDistance(v.coordinates as [number, number], KIRUNA_COORDS) < 100) ||
-                        (v.type === AreaType.AREA && v.coordinates.every(c => c.every(c => coordDistance(c as [number, number], KIRUNA_COORDS) < 100)))
-                    )
-            }).withMessage('Invalid document coordinates'),
+        // body('doc_coordinates').notEmpty().withMessage('Document coordinates are required').isObject()
+        //     .custom((v) => {
+        //         return isDocCoords(v) &&  
+        //             (
+        //                 (v.type === AreaType.ENTIRE_MUNICIPALITY) ||
+        //                 (v.type === AreaType.POINT && coordDistance(v.coordinates as [number, number], KIRUNA_COORDS) < 100) ||
+        //                 (v.type === AreaType.AREA && v.coordinates.every(c => c.every(c => coordDistance(c as [number, number], KIRUNA_COORDS) < 100)))
+        //             )
+        //     }).withMessage('Invalid document coordinates'),
         body('description').notEmpty().withMessage('Description is required'),
         body('pages').optional().isArray().custom((v) => {
             if (!Array.isArray(v))
@@ -64,6 +65,7 @@ export function initRoutes(app: Application) {
         createKxDocument
     );
 
+    app.get('/api/documents', getAllKxDocuments);
 
 }
 
