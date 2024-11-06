@@ -55,7 +55,7 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
     }, [props.zoom]);
 
     return (
-        <div className={props.className} ref={mapContainerRef} id="map" style={{...props.style, ...{pointerEvents: "none"}}} ></div>
+        <div className={props.className} ref={mapContainerRef} id="map" style={{...props.style, ...{pointerEvents: "none", touchAction: "none"}}} ></div>
     )
 }
 
