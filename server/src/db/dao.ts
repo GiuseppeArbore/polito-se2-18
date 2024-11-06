@@ -1,24 +1,32 @@
 import { KxDocument } from "../models/model";
 import { Document } from "./schema";
 import mongoose from 'mongoose';
+import dotenv from 'dotenv'; 
 
 
 class DAO {
     private static instance: DAO;
     private constructor() {
-        this.connectToDB();
+        const str = process.env.MONGO_CONN_STR; 
+        console.log('conn_string', str); 
+        this.connectToDB(str);
     }
 
     static getInstance(): DAO {
         if (!DAO.instance) {
+            
             DAO.instance = new DAO();
         }
         return DAO.instance;
     }
 
-    private async connectToDB() {
+    private async connectToDB(conn_string: string | undefined ) {
+        let conn :string = "mongodb://localhost:27017/kiruna-ex";
+        if(conn_string) {
+            conn = conn_string;
+        }
         try {
-            await mongoose.connect('mongodb://localhost:27017/kiruna-ex', {
+            await mongoose.connect(conn, {
                 autoCreate: true,
             });
         } catch (error) {

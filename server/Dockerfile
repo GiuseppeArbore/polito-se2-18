@@ -1,6 +1,9 @@
 # Use the official Node.js image as a base
 FROM node:21
 
+# Set the environment variable
+ENV MONGO_CONN_STR mongodb://db:27017/kiruna-ex
+
 # Set the working directory in the container
 WORKDIR /app
 

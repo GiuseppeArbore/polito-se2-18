@@ -159,7 +159,6 @@ export function FormDialog() {
         })
 
         setTitle("");
-        setStakeholders([]);
         setScale(0);
         setIssuanceDate(new Date());
         setType(undefined);
