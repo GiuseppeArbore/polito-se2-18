@@ -211,6 +211,7 @@ export function FormDialog() {
     setDocumentsForCollateral([]);
     setDocumentsForProjection([]);
     setDocumentsForUpdate([]);
+    setDrawing(undefined);
   }
 
   useEffect(() => {
