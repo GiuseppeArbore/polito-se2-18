@@ -33,7 +33,7 @@ export default function Console() {
             </div>
             <Grid numItemsLg={6} className="gap-6 mt-6">
                 <Col numColSpanLg={5}>
-                    <Card className="h-full p-0 m-0" style={{margin:0, padding:0}}>
+                    <Card className="h-full p-0 m-0" style={{ margin: 0, padding: 0 }}>
                         {renderCurrentSelection(selectedView)}
                     </Card>
                 </Col>
@@ -80,9 +80,9 @@ export default function Console() {
 
             </Grid>
             <Card className="mt-6">
-                <>
-                    Bottom diagram
-                </>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                        <div>Diagram Coming soon...</div>
+                </div>
             </Card>
         </main >
     );
@@ -90,24 +90,26 @@ export default function Console() {
         switch (selectedView) {
             case 0:
                 return (
-                   <>
-                  <PreviewMap
-                      style={{  margin: 0, minHeight: "300px", width: "100%", height: "100%", borderRadius: 8}}
-                      drawing={undefined}
-                    ></PreviewMap>
-                   </>
+                    <>
+                        <PreviewMap
+                            style={{ margin: 0, minHeight: "300px", width: "100%", height: "100%", borderRadius: 8 }}
+                            drawing={undefined}
+                        ></PreviewMap>
+                    </>
                 );
             case 1:
                 return (
                     <>
-                       List
+                        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                            <div>Coming soon...</div>
+                        </div>
                     </>
                 );
             case 2:
                 return (
-                    <>
-                       Timeline
-                    </>
+                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                        <div>Coming soon...</div>
+                    </div>
                 );
         }
 
