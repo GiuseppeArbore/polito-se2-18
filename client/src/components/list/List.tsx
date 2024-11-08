@@ -6,19 +6,30 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { KxDocument } from "../../model";
 import locales from "../../locales.json";
+import { Button, Flex } from '@tremor/react';
+import { useNavigate } from 'react-router-dom';
+import { RiDeleteBin2Fill, RiDeleteBinLine, RiEditLine, RiInfoI } from '@remixicon/react';
 interface ListProps {
     documents: KxDocument[];
 }
 
 function List(props: ListProps) {
+    const navigator = useNavigate();
     const gridRef = useRef<AgGridReact<KxDocument>>(null);
     const onFirstDataRendered = useCallback(() => {
         onGridReady();
         gridRef.current!.api.sizeColumnsToFit();
-    }, []);;
-
+    }, []);
+    const infoButton =  (str: String, doc: KxDocument) => {
+                return (
+                    <Flex justifyContent="between" className='mt-1'>
+                        <Button size="xs" icon={RiInfoI} onClick={() => navigator('/documents/info')} />
+                        <Button size="xs" icon={RiEditLine} onClick={() => {}} />
+                        <Button size="xs" icon={RiDeleteBinLine} onClick={() => {}} />
+                    </Flex>
+                );
+    }
     const [colDefs, _ ] = useState<ColDef<KxDocument>[]>([
-        { headerName: "ID", minWidth: 100, enableRowGroup: true, valueFormatter: () => { return ""} },
         { headerName: "Title", field: "title", minWidth: 170, enableRowGroup: false,  filter: true, sortable: true },
         { headerName: "Stakeholders", field: "stakeholders", enableRowGroup: false,  filter: true,},
         { headerName: "Scale", field: "scale", enableRowGroup: true,  filter: true, valueFormatter: (params: { value: string | number; }) => {
@@ -32,6 +43,8 @@ function List(props: ListProps) {
              return locales.find((l) => l.code === params.value)?.name || "" 
         }},
         { headerName: "Pages", field: "pages", enableRowGroup: false,  filter: true  },
+        { headerName: "Controls", minWidth: 30, enableRowGroup: true, valueFormatter: () => { return ""}, cellRenderer: (val: { params: String; }) =>  infoButton(val.params, {} as KxDocument)  },
+
     ]);
     const autoGroupColumnDef = {
         sortable: false,
