@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+    padding: 2%;
+}
+
+.no-click {
+    pointer-events: none;
+ }
+
+.text-sm {
+    font-size: smaller;
+}
+
+.primary {
+    background-color: #003d8e;
+}
+
+.secondary {
+    color:  #003d8e;
+}
