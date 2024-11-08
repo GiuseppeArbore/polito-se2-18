@@ -10,6 +10,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { KxDocument } from "../model";
 import { KxDocumentType, Stakeholders } from "../enum";
+import { PreviewMap } from './map/Map';
 
 
 
@@ -95,6 +96,16 @@ export default function Document() {
                         {description}
                     </AccordionBody>
                 </Accordion>
+
+                <Card
+                    className={`my-4 p-0 overflow-hidden cursor-pointer ${ "ring-tremor-ring"}`}
+                    onClick={() => setIsMapOpen(true)}
+                  >
+                    <PreviewMap
+                      drawing={undefined}
+                      style={{ minHeight: "300px", width: "100%" }}
+                    />
+                  </Card>
 
 
 
