@@ -62,3 +62,7 @@ class Connections {
     }
 }
 
+export class Link {
+    connectionType: string = "";
+    documents: string[] = [];
+  }

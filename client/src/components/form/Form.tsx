@@ -39,12 +39,12 @@ import "../../index.css";
 import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 
-export class Link {
-  connectionType: string = "";
-  documents: string[] = [];
+interface FormDialogProps {
+  documents: KxDocument[];
 }
 
-export function FormDialog() {
+
+export function FormDialog(props: FormDialogProps) {
   const [drawing, setDrawing] = useState<any>(undefined);
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -214,20 +214,7 @@ export function FormDialog() {
     setDrawing(undefined);
   }
 
-  useEffect(() => {
-    if (isOpen) {
-      const fetchDocuments = async () => {
-        try {
-          const docs = await API.getAllKxDocuments();
-          setDocuments(docs);
-        } catch (error) {
-          setError('Failed to fetch documents');
-        }
-      };
-
-      fetchDocuments();
-    }
-  }, [isOpen]);
+  
 
 
   return (
