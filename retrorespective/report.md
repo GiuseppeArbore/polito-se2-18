@@ -1,4 +1,4 @@
-# TEMPLATE FOR RETROSPECTIVE (Team 18)
+# RETROSPECTIVE (Team 18)
 
 The retrospective should include _at least_ the following
 sections:
@@ -13,7 +13,7 @@ sections:
 
 **Process Measures**
 
-For this sprint, the team selected **3 stories** to complete, with a total of **16 story points** planned and committed to by the end. The initial estimation made during the planning meeting was **80 hours**, while the actual time spent was **79 hours and 25 minutes**, completing the sprint slightly under the planned estimate.
+For this sprint, the team selected **3 stories** to complete, with a total of **23 story points** planned and committed to by the end. The initial estimation made during the planning meeting was **80 hours**, while the actual time spent was **79 hours and 25 minutes**, completing the sprint slightly under the planned estimate.
   
 
 **Sum-up**
@@ -85,7 +85,7 @@ This project’s high completion accuracy, combined with thorough quality checks
 
 - What caused your errors in estimation (if any)?
 
-  > Lack of familiarity with a library like MapBox.
+  > Lack of familiarity with the map library.
 
 - What lessons did you learn (both positive and negative) in this sprint?
 
@@ -94,7 +94,7 @@ This project’s high completion accuracy, combined with thorough quality checks
   > Increase information sharing and communication within the team.
 
 - Which improvement goals set in the previous retrospective were you able to achieve?
-  > Propose one or two better coordinate git workflow
+  > Propose one or two modification to git workflow. 
    > The one was achieved by The revised Git best practices document which has been updated for greater precision
 - Which ones you were not able to achieve? Why?
   > The team was unable to achieve the goal of improving the task division. This was due to the team's lack of familiarity with the technologies used in the project, which made it difficult to accurately estimate the time required for each task.
@@ -103,10 +103,10 @@ This project’s high completion accuracy, combined with thorough quality checks
 
 - Improvement goals for the next sprint and how to achieve them (technical tasks, team coordination, etc.)
 
-  > Improve task division.
-  > Prepare demos more thoroughly.
-  > Enhance time management, and reassign tasks if necessary.
-  > Strengthen internal communication.
+  - [ ] Improve task division.
+  - [ ] Prepare demos more thoroughly.
+  - [ ] Enhance time management, and reassign tasks if necessary.
+  - [ ] Strengthen internal communication.
 
 - One thing you are proud of as a Team!!
   > A supportive spirit, along with a strong commitment to doing the project well, is a fantastic quality in the team. It leads to great results and an enjoyable collaboration.
