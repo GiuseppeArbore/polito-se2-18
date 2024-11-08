@@ -1,4 +1,4 @@
-import { RiShareLine } from '@remixicon/react';
+import { RiShareLine, RiEditBoxLine } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import {
     Accordion,
@@ -12,10 +12,11 @@ import { KxDocumentType, Stakeholders } from "../enum";
 import { PreviewMap } from './map/Map';
 
 
-
 export default function Document() {
     const { id } = useParams();
     const [share, setShare] = useState(false);
+    const [ showEditDocument, setShowEditDocument] = useState(false);
+    const [ showEditDescription, setShowEditDescription] = useState(false);
 
     const [title, setTitle] = useState("Adjusted development plan for Kiruna");
     const [stakeholders, setStakeholders] = useState<Stakeholders[]>([Stakeholders.RESIDENT, Stakeholders.URBAN_DEVELOPER]);
@@ -44,7 +45,7 @@ export default function Document() {
             <Card>
                 <div className='flex flex-row '>
 
-                    <div className="flex flex-col items-start justify-between lg:w-1/2 lg:border-r lg:border-gray-300 me-6">
+                    <div className="flex flex-col items-start justify-between lg:w-1/2 lg:border-r lg:border-gray-300 w-full max-w-full lg:max-w-none">
                         <div className="flex items-center justify-between mb-2 space-x-2">
                             <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Title:</i>
                             <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {title} ({id}) </i>
@@ -79,13 +80,18 @@ export default function Document() {
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Pages:</i>
                             <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages} </i>
                         </div>
+                        <i className="ml-auto self-end" onClick={() => setShowEditDocument(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-6" /></i>
+
 
                     </div>
-                    <div className='hidden lg:flex flex-col items-start col space-y-2 w-1/2'>
+                    <div className='hidden lg:flex flex-col items-start col space-y-2 w-1/2 h-300 ms-6'>
                         <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Description:</i>
                         <i className='text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong'> {description}  </i>
                     </div>
-                    <i onClick={() => setShare(true)}><RiShareLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                    <div className='hidden lg:flex flex-col space-y-2 h-300 justify-between'>
+                        <i onClick={() => setShare(true)} className="self-start"><RiShareLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                        <i className="self-start" onClick={() => setShowEditDescription(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                    </div>
                     <Dialog open={share} onClose={() => setShare(false)} static={true}>
                         <DialogPanel>
                             <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Share "{title}"</h3>
@@ -101,7 +107,7 @@ export default function Document() {
                                         readOnly
                                     />
                                 </div>
-                            
+
                                 <Button
                                     className="mt-4 w-1/6 flex flex-col items-center justify-between"
                                     onClick={() => {
@@ -119,11 +125,13 @@ export default function Document() {
                             </Button>
                         </DialogPanel>
                     </Dialog>
+
                 </div>
                 <Accordion className='lg:hidden'>
                     <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Description</AccordionHeader>
-                    <AccordionBody className="leading-6">
+                    <AccordionBody className="leading-6 flex flex-col">
                         {description}
+                        <i className="self-end" onClick={() => setShowEditDescription(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
                     </AccordionBody>
                 </Accordion>
 
