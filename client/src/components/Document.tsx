@@ -181,7 +181,10 @@ For example, the central square now takes its final shape, as well as the large 
           <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Description</AccordionHeader>
           <AccordionBody className="leading-6 flex flex-col">
             {description}
-            <i className="self-end" onClick={() => setShowEditDescription(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+            <FormDescriptionDialog
+              description={description}
+              setDescription={setDescription}
+            />
           </AccordionBody>
         </Accordion>
 
