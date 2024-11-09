@@ -1,6 +1,6 @@
 import { RiShareLine, RiEditBoxLine } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
-import { FormDocumentDescription, FormDocumentInformation } from "./form/Form";
+import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "./form/Form";
 import { FileUpload } from './DragDrop';
 
 import {
@@ -44,17 +44,9 @@ export default function Document() {
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
 
 
-  const [description, setDescription] = useState<string | undefined>(` This document is the update of the Development 
-                                                                        Plan, one year after its creation, modifications are 
-                                                                        made to the general master plan, which is publi
-                                                                        shed under the name 'Adjusted Development 
-                                                                        Plan91,' and still represents the version used today 
-                                                                        after 10 years. Certainly, there are no drastic differen
-                                                                        ces compared to the previous plan, but upon careful 
-                                                                        comparison, several modified elements stand out. 
-                                                                        For example, the central square now takes its final 
-                                                                        shape, as well as the large school complex just north 
-                                                                        of it, which appears for the first time`);
+  const [description, setDescription] = useState<string | undefined>(`This document is the update of the Development Plan, one year after its creation, modifications are made to the general master plan, which is published under the name 'Adjusted Development Plan91,' and still represents the version used today after 10 years.
+Certainly, there are no drastic differences compared to the previous plan, but upon careful comparison, several modified elements stand out. 
+For example, the central square now takes its final shape, as well as the large school complex just north of it, which appears for the first time`);
 
 
 
@@ -145,7 +137,10 @@ export default function Document() {
           </div>
           <div className='hidden lg:flex flex-col space-y-2 h-300 justify-between'>
             <i onClick={() => setShare(true)} className="self-start"><RiShareLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
-            <i className="self-start" onClick={() => setShowEditDescription(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+            <FormDescriptionDialog
+              description={description}
+              setDescription={setDescription}
+            />
           </div>
           <Dialog open={share} onClose={() => setShare(false)} static={true}>
             <DialogPanel>
@@ -200,9 +195,7 @@ export default function Document() {
         </Card>
 
       </Card>
-      <FileUpload></FileUpload>
-
-
+      
 
     </div>
   );
@@ -456,6 +449,72 @@ export function FormInfoDialog(
             {infoform()}
 
 
+          </div>
+        </DialogPanel>
+      </Dialog>
+      <Toaster />
+    </>
+  );
+}
+
+export function FormDescriptionDialog(
+  {
+    description,
+    setDescription,
+  }: {
+    description: string | undefined;
+    setDescription: React.Dispatch<React.SetStateAction<string | undefined>>;
+  }
+) {
+  const [isOpen, setIsOpen] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleDescriptionSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (description === undefined || description.length === 0) {
+      setError("Please fill the description field");
+      return;
+    }
+    setIsOpen(false);
+  };
+
+  return (
+    <>
+      <i className="self-start" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+      <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
+        <DialogPanel
+          className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
+          style={{ maxWidth: "80vw" }}
+        >
+          <div className="sm:mx-auto sm:max-w-2xl">
+            <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+              Add description
+            </h3>
+            <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+              Add the description of the document
+            </p>
+            <form action="#" method="post" className="mt-8">
+              <FormDocumentDescription
+                description={description}
+                setDescription={setDescription} descriptionError={false} setDescriptionError={function (value: React.SetStateAction<boolean>): void {
+                  throw new Error('Function not implemented.');
+                } }              />
+              <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+                <Button
+                  className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                  variant="light"
+                  onClick={() => setIsOpen(false)}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="w-full sm:w-auto primary"
+                  onClick={e => handleDescriptionSubmit(e)}
+                >
+                  Submit
+                </Button>
+              </div>
+            </form>
           </div>
         </DialogPanel>
       </Dialog>
