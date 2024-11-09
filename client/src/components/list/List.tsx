@@ -18,38 +18,42 @@ function List(props: ListProps) {
     const gridRef = useRef<AgGridReact<KxDocument>>(null);
     const onFirstDataRendered = useCallback(() => {
         onGridReady();
-        gridRef.current!.api.sizeColumnsToFit();
     }, []);
-    const infoButton =  (str: String, doc: KxDocument) => {
-                return (
-                    <Flex justifyContent="between" className='mt-1'>
-                        <Button size="xs" icon={RiInfoI} onClick={() => navigator('/documents/info')} />
-                        <Button size="xs" icon={RiEditLine} onClick={() => {}} />
-                        <Button size="xs" icon={RiDeleteBinLine} onClick={() => {}} />
-                    </Flex>
-                );
+    const infoButton = (str: String, doc: KxDocument) => {
+        return (
+            <Flex justifyContent="between" className='mt-1'>
+                <Button size="xs" icon={RiInfoI} onClick={() => navigator('/documents/info')} />
+                <Button size="xs" icon={RiEditLine} onClick={() => { }} />
+                <Button size="xs" icon={RiDeleteBinLine} onClick={() => { }} />
+            </Flex>
+        );
     }
-    const [colDefs, _ ] = useState<ColDef<KxDocument>[]>([
-        { headerName: "Title", field: "title", minWidth: 170, enableRowGroup: false,  filter: true, sortable: true },
-        { headerName: "Stakeholders", field: "stakeholders", enableRowGroup: false,  filter: true,},
-        { headerName: "Scale", field: "scale", enableRowGroup: true,  filter: true, valueFormatter: (params: { value: string | number; }) => {
-             return params.value !== undefined ? "1:" + params.value.toLocaleString() : ""
-        }},
-        { headerName: "Issuance Date", field: "issuance_date", valueFormatter: (params: { value: string | number; }) => {
-             return params.value !== undefined ? new Date(params.value).toLocaleDateString() : ""
-        }},
-        { headerName: "Type", field: "type", enableRowGroup: true,  filter: true},
-        { headerName: "Language", field: "language", enableRowGroup: true,  filter: true, valueFormatter: (params: { value: string | number; }) => {
-             return locales.find((l) => l.code === params.value)?.name || "" 
-        }},
-        { headerName: "Pages", field: "pages", enableRowGroup: false,  filter: true  },
-        { headerName: "Controls", minWidth: 30, enableRowGroup: false, valueFormatter: () => { return ""}, cellRenderer: (val: { params: String; }) =>  infoButton(val.params, {} as KxDocument)  },
+    const [colDefs, _] = useState<ColDef<KxDocument>[]>([
+        { headerName: "Title", field: "title", enableRowGroup: false, filter: true, sortable: true },
+        { headerName: "Stakeholders", field: "stakeholders", enableRowGroup: false, filter: true, },
+        {
+            headerName: "Scale", field: "scale", enableRowGroup: true, filter: true, valueFormatter: (params: { value: string | number; }) => {
+                return params.value !== undefined ? "1:" + params.value.toLocaleString() : ""
+            }
+        },
+        {
+            headerName: "Issuance Date", field: "issuance_date", valueFormatter: (params: { value: string | number; }) => {
+                return params.value !== undefined ? new Date(params.value).toLocaleDateString() : ""
+            }
+        },
+        { headerName: "Type", field: "type", enableRowGroup: true, filter: true },
+        {
+            headerName: "Language", field: "language", enableRowGroup: true, filter: true, valueFormatter: (params: { value: string | number; }) => {
+                return locales.find((l) => l.code === params.value)?.name || ""
+            }
+        },
+        { headerName: "Pages", field: "pages", enableRowGroup: false, filter: true },
+        { headerName: "Controls", minWidth: 30, enableRowGroup: false, valueFormatter: () => { return "" }, cellRenderer: (val: { params: String; }) => infoButton(val.params, {} as KxDocument) },
 
     ]);
     const autoGroupColumnDef = {
         sortable: false,
         headerName: 'Group',
-        minWidth: 200,
     };
     const gridOptions: GridOptions<KxDocument> = {
         columnDefs: colDefs,
@@ -86,17 +90,21 @@ function List(props: ListProps) {
     };
 
     function onGridReady() {
-        gridRef.current!.api.sizeColumnsToFit();
+        const allColumnIds: string[] = [];
+        gridRef.current!.api!.getColumns()!.forEach((column) => {
+            allColumnIds.push(column.getId());
+        });
+        gridRef.current!.api!.autoSizeColumns(allColumnIds, false);
     }
 
     const rowData = useMemo(() => {
         return props.documents;
     }, [props.documents]);
 
-   
+
 
     const defaultColDef: ColDef = {
-        flex: 1,
+       
     };
 
     return (
@@ -112,11 +120,12 @@ function List(props: ListProps) {
                 defaultColDef={defaultColDef}
                 onFirstDataRendered={onFirstDataRendered}
                 gridOptions={gridOptions}
+                onGridReady={onGridReady}
                 ref={gridRef}
                 animateRows={true}
                 rowSelection={{
                     mode: 'multiRow',
-                  }}
+                }}
             />
         </div>
     );
