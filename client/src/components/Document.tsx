@@ -1,7 +1,8 @@
 import { RiShareLine, RiEditBoxLine } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "./form/Form";
-import { FileUpload } from './DragDrop';
+import API from '../API';
+//import { FileUpload } from './DragDrop';
 
 import {
   Accordion,
@@ -23,11 +24,13 @@ import {
 import { PreviewMap } from './map/Map';
 import { toast } from "./../utils/toaster";
 import { Toaster } from "./toast/Toaster";
-import API from '../API';
 
 
 export default function Document() {
-  const { id } = useParams();
+  const { id } = useParams<string>();
+  if (!id) {
+    return <div>Document not found</div>;
+  }
   const [share, setShare] = useState(false);
   const [showEditDocument, setShowEditDocument] = useState(false);
   const [showEditDescription, setShowEditDescription] = useState(false);
@@ -140,6 +143,7 @@ For example, the central square now takes its final shape, as well as the large 
             <FormDescriptionDialog
               description={description}
               setDescription={setDescription}
+              id={id}
             />
           </div>
           <Dialog open={share} onClose={() => setShare(false)} static={true}>
@@ -184,6 +188,7 @@ For example, the central square now takes its final shape, as well as the large 
             <FormDescriptionDialog
               description={description}
               setDescription={setDescription}
+              id={id}
             />
           </AccordionBody>
         </Accordion>
@@ -198,6 +203,7 @@ For example, the central square now takes its final shape, as well as the large 
         </Card>
 
       </Card>
+
       
 
     </div>
@@ -464,9 +470,11 @@ export function FormDescriptionDialog(
   {
     description,
     setDescription,
+    id
   }: {
     description: string | undefined;
     setDescription: React.Dispatch<React.SetStateAction<string | undefined>>;
+    id: string;
   }
 ) {
   const [isOpen, setIsOpen] = useState(false);
@@ -477,6 +485,33 @@ export function FormDescriptionDialog(
     if (description === undefined || description.length === 0) {
       setError("Please fill the description field");
       return;
+    }
+    //API call to update description
+    try {
+      const updatedDocument = await API.updateKxDocumentDescription(id, description);
+      if (updatedDocument) {
+        toast({
+          title: "Success",
+          description:
+            "The description has been updated successfully",
+          variant: "success",
+          duration: 3000,
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update description",
+          variant: "error",
+          duration: 3000,
+        })
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to update description",
+        variant: "error",
+        duration: 3000,
+      })
     }
     setIsOpen(false);
   };
