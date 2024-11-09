@@ -13,6 +13,7 @@ import { toast } from "../utils/toaster";
 export default function Console() {
     const [documents, setDocuments] = useState<KxDocument[]>([]);
     const [selectedView, setSelectedView] = useState(0);
+    const [refreshNeeded, setRefreshNeeded] = useState(false);
     useEffect(() => {
           const fetchDocuments = async () => {
             try {
@@ -28,7 +29,8 @@ export default function Console() {
             }
           };
           fetchDocuments();
-      }, [selectedView]);
+          setRefreshNeeded(false);
+      }, [selectedView, refreshNeeded]);
 
     return (
         <main>
@@ -58,7 +60,7 @@ export default function Console() {
 
                 <Col numColSpanLg={1}>
                     <div className="space-y-6">
-                        <FormDialog documents={documents} />
+                        <FormDialog documents={documents} refresh={()=>setRefreshNeeded(true)} />
 
                         {/* <Card>
                             <Text>Select</Text>

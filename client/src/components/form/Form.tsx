@@ -41,6 +41,7 @@ import { Toaster } from "../toast/Toaster";
 
 interface FormDialogProps {
   documents: KxDocument[];
+  refresh: () => void;
 }
 
 
@@ -157,7 +158,7 @@ export function FormDialog(props: FormDialogProps) {
           variant: "success",
           duration: 3000,
         })
-
+        props.refresh();
         setTitle("");
         setScale(0);
         setIssuanceDate(new Date());

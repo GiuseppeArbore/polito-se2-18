@@ -8,7 +8,7 @@ import { KxDocument } from "../../model";
 import locales from "../../locales.json";
 import { Button, Flex } from '@tremor/react';
 import { useNavigate } from 'react-router-dom';
-import { RiDeleteBin2Fill, RiDeleteBinLine, RiEditLine, RiInfoI } from '@remixicon/react';
+import { RiDeleteBinLine, RiEditLine, RiInfoI } from '@remixicon/react';
 interface ListProps {
     documents: KxDocument[];
 }
@@ -43,7 +43,7 @@ function List(props: ListProps) {
              return locales.find((l) => l.code === params.value)?.name || "" 
         }},
         { headerName: "Pages", field: "pages", enableRowGroup: false,  filter: true  },
-        { headerName: "Controls", minWidth: 30, enableRowGroup: true, valueFormatter: () => { return ""}, cellRenderer: (val: { params: String; }) =>  infoButton(val.params, {} as KxDocument)  },
+        { headerName: "Controls", minWidth: 30, enableRowGroup: false, valueFormatter: () => { return ""}, cellRenderer: (val: { params: String; }) =>  infoButton(val.params, {} as KxDocument)  },
 
     ]);
     const autoGroupColumnDef = {
