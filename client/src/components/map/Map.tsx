@@ -1,6 +1,6 @@
 import mapboxgl, { LngLatLike } from "mapbox-gl"
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Card, TabGroup, TabList, Tab, Divider } from "@tremor/react";
+import { Button, Card, TabGroup, TabList, Tab, Divider, TextInput } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill, RiHand, RiMapPinLine, RiScissorsCutFill, RiShapeLine } from "@remixicon/react";
 import { PreviewMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
@@ -116,7 +116,12 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
                         <></>
                         : index === 1 ?
                             <>
-                                <p className="text-sm italic mx-2">Click to add a Point</p>
+                                <div className="space-y-2 flex flex-col items-center">
+                                    <p className="text-sm italic mx-2">Click on the map to add a Point or insert manually coordinates</p>
+                                    <TextInput placeholder="Latitude"  />
+                                    <TextInput placeholder="Longitude"  />
+                                </div>
+
                                 <div className="mt-2 flex justify-center space-x-2">
                                     <Button size="xs" variant="secondary" icon={RiDeleteBinFill} color="red" className="flex-1" onClick={() => { PreviewMapDraw.deleteAll(); PreviewMapDraw.changeMode("draw_point") }}>Remove point</Button>
                                 </div>
