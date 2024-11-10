@@ -9,6 +9,9 @@ import locales from "../../locales.json";
 import { Button, Flex } from '@tremor/react';
 import { useNavigate } from 'react-router-dom';
 import { RiDeleteBinLine, RiEditLine, RiInfoI } from '@remixicon/react';
+import API from '../../API';
+import { toast } from '../../utils/toaster';
+import { ObjectId } from 'mongodb';
 interface ListProps {
     documents: KxDocument[];
 }
@@ -19,12 +22,31 @@ function List(props: ListProps) {
     const onFirstDataRendered = useCallback(() => {
         onGridReady();
     }, []);
-    const infoButton = (str: String, doc: KxDocument) => {
+    const infoButton = (rowNode: any) => {
+        console.log(rowNode)
         return (
-            <Flex justifyContent="between" className='mt-1'>
-                <Button size="xs" icon={RiInfoI} onClick={() => navigator('/documents/info')} />
-                <Button size="xs" icon={RiEditLine} onClick={() => { }} />
-                <Button size="xs" icon={RiDeleteBinLine} onClick={() => { }} />
+            <Flex justifyContent="evenly" className='mt-1'>
+                <Button size="xs" icon={RiInfoI} onClick={() => navigator('/documents/' + rowNode.value)} />
+                <Button size="xs" icon={RiDeleteBinLine} onClick={async () => {
+                    try {
+                        await API.deleteKxDocument(rowNode.value);
+                        gridRef.current?.api?.applyTransaction({ remove: [rowNode.data] });
+                        toast({
+                            title: "Success",
+                            description:
+                              "The document has been delete successfully",
+                            variant: "success",
+                            duration: 3000,
+                          })
+                    } catch (error) {
+                        toast({
+                            title: "Error",
+                            description: "Failed to delete documents",
+                            variant: "error",
+                            duration: 3000,
+                          })
+                    }
+                }} />
             </Flex>
         );
     }
@@ -48,7 +70,7 @@ function List(props: ListProps) {
             }
         },
         { headerName: "Pages", field: "pages", enableRowGroup: false, filter: true },
-        { headerName: "Controls", minWidth: 30, enableRowGroup: false, valueFormatter: () => { return "" }, cellRenderer: (val: { params: String; }) => infoButton(val.params, {} as KxDocument) },
+        { headerName: "Controls", field: '_id', minWidth: 30, enableRowGroup: false, cellRenderer: (params: any) => infoButton(params)},
 
     ]);
     const autoGroupColumnDef = {
@@ -104,7 +126,7 @@ function List(props: ListProps) {
 
 
     const defaultColDef: ColDef = {
-       
+
     };
 
     return (

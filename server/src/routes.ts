@@ -1,5 +1,5 @@
 
-import { createKxDocument, getAllKxDocuments} from './controller';
+import { createKxDocument, getAllKxDocuments, deleteKxDocument} from './controller';
 import { validateRequest } from './errorHandlers';
 import e, { Application } from 'express';
 import { body } from 'express-validator';
@@ -67,6 +67,7 @@ export function initRoutes(app: Application) {
 
     app.get('/api/documents', getAllKxDocuments);
 
+    app.delete('/api/documents/:id', deleteKxDocument);
 }
 
 export default initRoutes;

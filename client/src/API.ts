@@ -50,5 +50,23 @@ const getAllKxDocuments = async (): Promise<KxDocument[]> => {
     }
 };
 
-const API = { createKxDocument, getAllKxDocuments };
+const deleteKxDocument = async (id: String): Promise<void> => {
+    try {
+        const response = await fetch(`${API_URL}/documents/${id}`, {
+            method: 'DELETE',
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to delete document: ${error.message}`);
+        } else {
+            throw new Error('Failed to delete document: Unknown error');
+        }
+    }
+};
+
+const API = { createKxDocument, getAllKxDocuments, deleteKxDocument };
 export default API;
