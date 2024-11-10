@@ -392,7 +392,7 @@ export function FormInfoDialog(
 
   function infoform() {
     return (
-      <form action="#" method="post" className="mt-8">
+      <form action="" method="patch" className="mt-8">
 
         <FormDocumentInformation
           title={title}
@@ -450,10 +450,10 @@ export function FormInfoDialog(
         >
           <div className="sm:mx-auto sm:max-w-2xl">
             <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-              Add new document
+              Update document
             </h3>
             <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-              Add all the information about the document
+              Update the informations about the document
             </p>
             {infoform()}
 
@@ -526,12 +526,12 @@ export function FormDescriptionDialog(
         >
           <div className="sm:mx-auto sm:max-w-2xl">
             <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-              Add description
+              Update description
             </h3>
             <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-              Add the description of the document
+              Update the description of the document
             </p>
-            <form action="#" method="post" className="mt-8">
+            <form action="" method="patch" className="mt-8">
               <FormDocumentDescription
                 description={description}
                 setDescription={setDescription} descriptionError={false} setDescriptionError={function (value: React.SetStateAction<boolean>): void {
