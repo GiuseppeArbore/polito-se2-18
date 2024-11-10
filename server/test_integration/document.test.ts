@@ -5,11 +5,12 @@ import { AreaType, KxDocumentType, Scale, Stakeholders } from "../src/models/enu
 import { KxDocument } from "../src/models/model";
 import {db} from "../src/db/dao";
 import { KIRUNA_COORDS } from "../src/utils";
+import { mongoose } from "@typegoose/typegoose";
 
 
 
 const date = new Date();
-let documentIds: string[] = [];
+let documentIds: mongoose.Types.ObjectId[] = [];
 
 describe("Integration Tests for Document API", () => {
     
@@ -35,8 +36,11 @@ describe("Integration Tests for Document API", () => {
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document for integration testing.",
-                pages: []
-            });
+                pages: [],
+                connections: {
+                    direct: [], collateral: [], projection: [], update: []
+                },
+            } as KxDocument);
         expect(response.status).toBe(201);
         expect(response.body).toHaveProperty('_id');
         expect(response.body.title).toBe("Integration Test Document");
@@ -55,7 +59,10 @@ describe("Integration Tests for Document API", () => {
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
-                description: "This is a test document with missing title."
+                description: "This is a test document with missing title.",
+                connections: {
+                    direct: [], collateral: [], projection: [], update: []
+                },
             });
         expect(response.status).toBe(400);
         expect(response.body.errors).toBeDefined();
@@ -77,8 +84,11 @@ describe("Integration Tests for Document API", () => {
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document for integration testing.",
-                pages: []
-            });
+                pages: [],
+                connections: {
+                    direct: [], collateral: [], projection: [], update: []
+                },
+            } as KxDocument);
         expect(response.status).toBe(500);
         expect(response.body).toEqual({ error: 'Internal Server Error', status: 500 });
     });
@@ -105,8 +115,11 @@ describe("Integration Tests for Document API", () => {
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
                 description: "This is a test document for integration testing.",
-                pages: []
-            });
+                pages: [],
+                connections: {
+                    direct: [], collateral: [], projection: [], update: []
+                }
+            } as KxDocument);
 
         expect(response.status).toBe(500);
         expect(response.body).toEqual({ error: 'Internal Server Error', status: 500 });
@@ -126,7 +139,10 @@ describe("Integration Tests for Document API", () => {
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
-                description: "This is a test document with missing title."
+                description: "This is a test document with missing title.",
+                connections: {
+                    direct: [], collateral: [], projection: [], update: []
+                }
             });
         expect(response.status).toBe(400);
         expect(response.body.errors).toBeDefined();
@@ -134,43 +150,43 @@ describe("Integration Tests for Document API", () => {
         expect(response.body.errors[1].msg).toBe('Stakeholders are required');
     });
 
-    // test("Test 6 - Should fail to create a document (area outside of allowed radius)", async () => {
-    //     const response = await request(app)
-    //         .post('/api/documents')
-    //         .send({
-    //             title: "Integration Test Document",
-    //             stakeholders: [Stakeholders.RESIDENT],
-    //             scale_info: Scale.TEXT,
-    //             scale: 10,
-    //             issuance_date: date,
-    //             type: KxDocumentType.INFORMATIVE,
-    //             language: "Swedish",
-    //             doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
-    //             description: "This is a test document with missing title."
-    //         });
-    //     expect(response.status).toBe(400);
-    //     expect(response.body.errors).toBeDefined();
-    //     expect(response.body.errors[0].msg).toBe('Invalid document coordinates');
-    // });
+    test("Test 6 - Should fail to create a document (area outside of allowed radius)", async () => {
+        const response = await request(app)
+            .post('/api/documents')
+            .send({
+                title: "Integration Test Document",
+                stakeholders: [Stakeholders.RESIDENT],
+                scale_info: Scale.TEXT,
+                scale: 10,
+                issuance_date: date,
+                type: KxDocumentType.INFORMATIVE,
+                language: "Swedish",
+                doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
+                description: "This is a test document with missing title."
+            });
+        expect(response.status).toBe(400);
+        expect(response.body.errors).toBeDefined();
+        expect(response.body.errors[0].msg).toBe('Invalid document coordinates');
+    });
 
-    // test("Test 7 - Should fail (area overlapping border)", async () => {
-    //     const response = await request(app)
-    //         .post('/api/documents')
-    //         .send({
-    //             title: "Integration Test Document",
-    //             stakeholders: [Stakeholders.RESIDENT],
-    //             scale_info: Scale.TEXT,
-    //             scale: 10,
-    //             issuance_date: date,
-    //             type: KxDocumentType.INFORMATIVE,
-    //             language: "Swedish",
-    //             doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [1, 1]]] },
-    //             description: "This is a test document with missing title."
-    //         });
-    //     expect(response.status).toBe(400);
-    //     expect(response.body.errors).toBeDefined();
-    //     expect(response.body.errors[0].msg).toBe('Invalid document coordinates');
-    // });
+    test("Test 7 - Should fail (area overlapping border)", async () => {
+        const response = await request(app)
+            .post('/api/documents')
+            .send({
+                title: "Integration Test Document",
+                stakeholders: [Stakeholders.RESIDENT],
+                scale_info: Scale.TEXT,
+                scale: 10,
+                issuance_date: date,
+                type: KxDocumentType.INFORMATIVE,
+                language: "Swedish",
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [1, 1]]] },
+                description: "This is a test document with missing title."
+            });
+        expect(response.status).toBe(400);
+        expect(response.body.errors).toBeDefined();
+        expect(response.body.errors[0].msg).toBe('Invalid document coordinates');
+    });
 
     test("Test 8 - Should succeed (correct area)", async () => {
         const response = await request(app)
@@ -184,8 +200,11 @@ describe("Integration Tests for Document API", () => {
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
-                description: "Test document"
-            });
+                description: "Test document",
+                connections: {
+                    direct: [], collateral: [], projection: [], update: []
+                }
+            } as KxDocument);
             documentIds.push(response.body._id);
             
         expect(response.status).toBe(201);
@@ -205,8 +224,11 @@ describe("Integration Tests for Document API", () => {
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
-                description: "Test document 1"
-            });
+                description: "Test document 1",
+                connections: {
+                    direct: [], collateral: [], projection: [], update: []
+                }
+            } as KxDocument);
             documentIds.push(responsePost1.body._id);
        const responsePost2 =  await request(app)
             .post('/api/documents')
@@ -219,7 +241,10 @@ describe("Integration Tests for Document API", () => {
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
-                description: "Test document 2"
+                description: "Test document 2",
+                connections: {
+                    direct: [], collateral: [], projection: [], update: []
+                }
             });
     
             documentIds.push(responsePost2.body._id);
