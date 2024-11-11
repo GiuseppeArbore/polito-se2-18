@@ -30,7 +30,9 @@ export default function Document() {
     const [description, setDescription] = useState<string | undefined>("");
 
     useEffect(() => {
-        API.getKxDocumentById(id!).then((document) => {
+        const fetchDocument = async () => {
+            try {
+            const document = await API.getKxDocumentById(id!);
             setDoc(document);
             setTitle(document.title);
             setStakeholders(document.stakeholders);
@@ -40,10 +42,13 @@ export default function Document() {
             setLanguage(document.language || "");
             setPages(document.pages || "");
             setDescription(document.description || "");
-        }).catch((error) => {
+            } catch (error) {
             console.error("Failed to fetch document:", error);
             navigate("/404");
-        });
+            }
+        };
+
+        fetchDocument();
     });
 
 
