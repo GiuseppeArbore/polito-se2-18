@@ -1,12 +1,14 @@
 import MapboxDraw from "@mapbox/mapbox-gl-draw";
-import FreehandMode from 'mapbox-gl-draw-freehand-mode'
-import CutPolygonMode, { drawStyles as cutPolygonDrawStyles } from "mapbox-gl-draw-cut-polygon-mode";
+import FreehandMode from "mapbox-gl-draw-freehand-mode";
+import CutPolygonMode, {
+  drawStyles as cutPolygonDrawStyles,
+} from "mapbox-gl-draw-cut-polygon-mode";
 import { passing_draw_polygon } from "mapbox-gl-draw-passing-mode";
 
 var PreviewMapDraw = new MapboxDraw({
   modes: {
     ...CutPolygonMode(MapboxDraw.modes, passing_draw_polygon),
-    draw_polygon: FreehandMode
+    draw_polygon: FreehandMode,
   },
   displayControlsDefault: false,
   controls: {
@@ -16,7 +18,17 @@ var PreviewMapDraw = new MapboxDraw({
     point: false,
     combine_features: false,
     uncombine_features: false,
-}
+  },
+  styles: [
+    {
+      id: "gl-draw-point-invisible",
+      type: "circle",
+      filter: ["all", ["==", "$type", "Point"]],
+      paint: {
+        "circle-radius": 0,
+      },
+    },
+  ],
 });
 
-export { PreviewMapDraw }; 
+export { PreviewMapDraw };

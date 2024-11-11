@@ -1,4 +1,3 @@
-
 import {
   Card,
   Button,
@@ -14,20 +13,26 @@ import {
   Textarea,
   Badge,
   Callout,
-  Switch
+  Switch,
 } from "@tremor/react";
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
 import API from "../../API";
-import { AreaType, DocCoords, KxDocumentType, Scale, Stakeholders } from "../../enum";
+import {
+  AreaType,
+  DocCoords,
+  KxDocumentType,
+  Scale,
+  Stakeholders,
+} from "../../enum";
 import { KxDocument } from "../../model";
 import {
   RiArrowDownCircleLine,
   RiLinksLine,
   RiLoopLeftLine,
   RiProjector2Line,
-  RiInformation2Line
+  RiInformation2Line,
 } from "@remixicon/react";
 
 import {
@@ -68,12 +73,8 @@ export function FormDialog() {
   const [showConnectionsInfo, setShowConnectionsInfo] = useState(false);
   const [showGeoInfo, setShowGeoInfo] = useState(false);
 
-
-  const [docCoordinates, _ ] = useState<DocCoords | undefined>(undefined);
-  // Example usage
+  const [docCoordinates, _] = useState<DocCoords | undefined>(undefined);
   //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
-
-  
 
   const [docCoordinatesError, setDocCoordinatesError] = useState(false);
 
@@ -81,51 +82,70 @@ export function FormDialog() {
 
   const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
-  const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
-  const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
+  const [documentsForCollateral, setDocumentsForCollateral] = useState<
+    string[]
+  >([]);
+  const [documentsForProjection, setDocumentsForProjection] = useState<
+    string[]
+  >([]);
   const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
-
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const tmpTitleError = title.length === 0;
     const tmpShError = stakeholders.length === 0;
     let draw: DocCoords | undefined;
-    if (!hideMap && (drawing && drawing.features.length === 1 && drawing.features[0].geometry.type === "Point")) {
+    if (
+      !hideMap &&
+      drawing &&
+      drawing.features.length === 1 &&
+      drawing.features[0].geometry.type === "Point"
+    ) {
       draw = {
         type: AreaType.POINT,
         coordinates: drawing.features[0].geometry.coordinates,
       };
-    } else if (!hideMap && (drawing && drawing.features.length >= 1)) {
+    } else if (!hideMap && drawing && drawing.features.length >= 1) {
       //TODO: add support for multiple polygons
-      let cord = drawing.features.map((f: any) => f.geometry.coordinates).length === 1 ? drawing.features[0].geometry.coordinates : setDocCoordinatesError(true);
+      let cord =
+        drawing.features.map((f: any) => f.geometry.coordinates).length === 1
+          ? drawing.features[0].geometry.coordinates
+          : setDocCoordinatesError(true);
       draw = {
         type: AreaType.AREA,
         coordinates: cord,
       };
     } else {
       draw = {
-        type: AreaType.ENTIRE_MUNICIPALITY
+        type: AreaType.ENTIRE_MUNICIPALITY,
       };
     }
-    if (tmpTitleError || tmpShError || !type || !description || !draw || (drawing === undefined && !hideMap) ) {
+    if (
+      tmpTitleError ||
+      tmpShError ||
+      !type ||
+      !description ||
+      !draw ||
+      (drawing === undefined && !hideMap)
+    ) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
-      hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
+      hideMap
+        ? setDocCoordinatesError(false)
+        : setDocCoordinatesError(!docCoordinates);
       setDocCoordinatesError(true);
       setError("Please fill all the required fields");
       toast({
-              title: "Error",
-              description: "Please fill all the required fields",
-              variant: "error",
-              duration: 3000,
-            })
+        title: "Error",
+        description: "Please fill all the required fields",
+        variant: "error",
+        duration: 3000,
+      });
 
       return;
     }
-
 
     const newDocument: KxDocument = {
       title,
@@ -152,11 +172,10 @@ export function FormDialog() {
         setDocuments([...documents, createdDocument]);
         toast({
           title: "Success",
-          description:
-            "The document has been created successfully",
+          description: "The document has been created successfully",
           variant: "success",
           duration: 3000,
-        })
+        });
 
         setTitle("");
         setScale(0);
@@ -173,16 +192,16 @@ export function FormDialog() {
           description: "Failed to create document",
           variant: "error",
           duration: 3000,
-        })
+        });
       }
       setIsOpen(false);
-    } catch (error:any) {
+    } catch (error: any) {
       toast({
         title: "Error",
         description: "Failed to create document",
         variant: "error",
         duration: 3000,
-      })
+      });
     }
     clearForm();
   };
@@ -221,7 +240,7 @@ export function FormDialog() {
           const docs = await API.getAllKxDocuments();
           setDocuments(docs);
         } catch (error) {
-          setError('Failed to fetch documents');
+          setError("Failed to fetch documents");
         }
       };
 
@@ -229,10 +248,15 @@ export function FormDialog() {
     }
   }, [isOpen]);
 
-
   return (
     <>
-      <Button className="w-full primary" onClick={() => {setIsOpen(true); clearForm() }}>
+      <Button
+        className="w-full primary"
+        onClick={() => {
+          setIsOpen(true);
+          clearForm();
+        }}
+      >
         Add new document
       </Button>
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
@@ -262,7 +286,7 @@ export function FormDialog() {
                     id="title"
                     name="title"
                     value={title}
-                    onValueChange={t => setTitle(t)}
+                    onValueChange={(t) => setTitle(t)}
                     autoComplete="title"
                     placeholder="Title"
                     className="mt-2"
@@ -283,20 +307,24 @@ export function FormDialog() {
                     id="stakeholders"
                     name="stakeholders"
                     className="mt-2"
-                    onValueChange={s => setStakeholders(s.map(sh => Stakeholders[sh as keyof typeof Stakeholders]))}
+                    onValueChange={(s) =>
+                      setStakeholders(
+                        s.map(
+                          (sh) => Stakeholders[sh as keyof typeof Stakeholders]
+                        )
+                      )
+                    }
                     error={shError}
                     errorMessage="You must select at least one stakeholder."
                     required
                   >
-                    {
-                      Object.entries(Stakeholders).map((dt) => {
-                        return (
-                          <MultiSelectItem key={`sh-${dt[0]}`} value={dt[0]}>
-                            {dt[1]}
-                          </MultiSelectItem>
-                        );
-                      })
-                    }
+                    {Object.entries(Stakeholders).map((dt) => {
+                      return (
+                        <MultiSelectItem key={`sh-${dt[0]}`} value={dt[0]}>
+                          {dt[1]}
+                        </MultiSelectItem>
+                      );
+                    })}
                   </MultiSelect>
                 </div>
                 <div className="col-span-full">
@@ -311,7 +339,7 @@ export function FormDialog() {
                     id="issuance-date"
                     className="mt-2"
                     value={issuanceDate}
-                    onValueChange={d => setIssuanceDate(d)}
+                    onValueChange={(d) => setIssuanceDate(d)}
                     enableYearNavigation={true}
                     weekStartsOn={1}
                     enableClear={false}
@@ -330,20 +358,20 @@ export function FormDialog() {
                     id="doc_type"
                     name="doc_type"
                     className="mt-2"
-                    onValueChange={t => setType(KxDocumentType[t as keyof typeof KxDocumentType])}
+                    onValueChange={(t) =>
+                      setType(KxDocumentType[t as keyof typeof KxDocumentType])
+                    }
                     error={typeError}
                     errorMessage="The type is mandatory"
                     required
                   >
-                    {
-                      Object.entries(KxDocumentType).map((dt) => {
-                        return (
-                          <SearchSelectItem key={`type-${dt[0]}`} value={dt[0]}>
-                            {dt[1]}
-                          </SearchSelectItem>
-                        );
-                      })
-                    }
+                    {Object.entries(KxDocumentType).map((dt) => {
+                      return (
+                        <SearchSelectItem key={`type-${dt[0]}`} value={dt[0]}>
+                          {dt[1]}
+                        </SearchSelectItem>
+                      );
+                    })}
                   </SearchSelect>
                 </div>
 
@@ -398,7 +426,7 @@ export function FormDialog() {
                     name="language"
                     className="mt-2"
                     value={language}
-                    onValueChange={l => setLanguage(l)}
+                    onValueChange={(l) => setLanguage(l)}
                   >
                     {locales.map((l) => {
                       return (
@@ -442,25 +470,33 @@ export function FormDialog() {
                   className="ml-2"
                   onClick={() => setShowGeoInfo(!showGeoInfo)}
                 >
-                  <RiInformation2Line className="text-2xl" style={{ color: "#003d8e" }} />
+                  <RiInformation2Line
+                    className="text-2xl"
+                    style={{ color: "#003d8e" }}
+                  />
                 </a>
               </div>
-              {showGeoInfo &&
+              {showGeoInfo && (
                 <Callout
                   className="mb-6"
                   style={{ border: "none" }}
                   title="Geolocalization guide"
                   color="gray"
                 >
-                  To specify the Geolocalization of the document, use the
-                  switch to select the entire municipality or click on the map
-                  to select a specific area or point.
+                  To specify the Geolocalization of the document, use the switch
+                  to select the entire municipality or click on the map to
+                  select a specific area or point.
                 </Callout>
-              }
+              )}
               <div className="flex items-center space-x-3">
-                <label htmlFor="switch" className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-                  Select the whole Municipality {' '}
-                  <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Kiruna</span>
+                <label
+                  htmlFor="switch"
+                  className="text-tremor-default text-tremor-content dark:text-dark-tremor-content"
+                >
+                  Select the whole Municipality{" "}
+                  <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                    Kiruna
+                  </span>
                 </label>
                 <Switch
                   id="switch"
@@ -473,7 +509,9 @@ export function FormDialog() {
               {!hideMap && (
                 <>
                   <Card
-                    className={`my-4 p-0 overflow-hidden cursor-pointer ${docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"}`}
+                    className={`my-4 p-0 overflow-hidden cursor-pointer ${
+                      docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"
+                    }`}
                     onClick={() => setIsMapOpen(true)}
                   >
                     <PreviewMap
@@ -483,7 +521,11 @@ export function FormDialog() {
                   </Card>
                 </>
               )}
-              {docCoordinatesError ? <p className="tremor-TextInput-errorMessage text-sm text-red-500 mt-1">Please provide document coordinates</p> : null}
+              {docCoordinatesError ? (
+                <p className="tremor-TextInput-errorMessage text-sm text-red-500 mt-1">
+                  Please provide document coordinates
+                </p>
+              ) : null}
               <Dialog
                 open={isMapOpen}
                 onClose={(val) => setIsMapOpen(val)}
@@ -496,7 +538,10 @@ export function FormDialog() {
                   <SatMap
                     drawing={drawing}
                     onCancel={() => setIsMapOpen(false)}
-                    onDone={(v) => { setDrawing(v); setIsMapOpen(false); }}
+                    onDone={(v) => {
+                      setDrawing(v);
+                      setIsMapOpen(false);
+                    }}
                     style={{ minHeight: "95vh", width: "100%" }}
                   ></SatMap>
                 </DialogPanel>
@@ -520,13 +565,12 @@ export function FormDialog() {
                   value={description}
                   error={descriptionError}
                   errorMessage="The description is mandatory"
-                  onValueChange={d => setDescription(d)}
+                  onValueChange={(d) => setDescription(d)}
                   style={{ minHeight: "200px" }}
                 />
               </div>
 
               <Divider />
-
 
               <div className="col-span-full sm:col-span-3 flex flex-row">
                 <label
@@ -539,30 +583,37 @@ export function FormDialog() {
                   className="ml-2"
                   onClick={() => setShowConnectionsInfo(!showConnectionsInfo)}
                 >
-                  <RiInformation2Line className="text-2xl" style={{ color: "#003d8e" }} />
+                  <RiInformation2Line
+                    className="text-2xl"
+                    style={{ color: "#003d8e" }}
+                  />
                 </a>
               </div>
 
-              {showConnectionsInfo &&
+              {showConnectionsInfo && (
                 <Callout
                   className="mb-6"
                   style={{ border: "none" }}
                   title="Connections guide"
                   color="gray"
                 >
-                  To specify connections in the graph, use each dropdown to select
-                  the nodes you want to connect. The dropdowns correspond to
-                  different types of connections. Simply click on a dropdown under
-                  the relevant connection type (e.g., Direct, Collateral) and
-                  choose one or more nodes to establish that specific connection.
+                  To specify connections in the graph, use each dropdown to
+                  select the nodes you want to connect. The dropdowns correspond
+                  to different types of connections. Simply click on a dropdown
+                  under the relevant connection type (e.g., Direct, Collateral)
+                  and choose one or more nodes to establish that specific
+                  connection.
                 </Callout>
-              }
+              )}
 
               <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-2">
                 {/* Direct Section */}
                 <div className="col-span-full sm:col-span-1">
-                  <Badge icon={RiLinksLine} className="text-sm flex items-center gap-2"
-                    color="gray">
+                  <Badge
+                    icon={RiLinksLine}
+                    className="text-sm flex items-center gap-2"
+                    color="gray"
+                  >
                     <span className="text-sm">Direct</span>
                   </Badge>
                   <MultiSelect
@@ -575,12 +626,18 @@ export function FormDialog() {
                         key={doc._id?.toString()}
                         value={doc._id ? doc._id.toString() : ""}
                         className={
-
-                          (doc._id && documentsForProjection.includes(doc._id.toString())) ||
-                          (doc._id && documentsForDirect.includes(doc._id.toString())) ||
-                          (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
-                          (doc._id && documentsForUpdate.includes(doc._id.toString()))
-
+                          (doc._id &&
+                            documentsForProjection.includes(
+                              doc._id.toString()
+                            )) ||
+                          (doc._id &&
+                            documentsForDirect.includes(doc._id.toString())) ||
+                          (doc._id &&
+                            documentsForCollateral.includes(
+                              doc._id.toString()
+                            )) ||
+                          (doc._id &&
+                            documentsForUpdate.includes(doc._id.toString()))
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -602,18 +659,28 @@ export function FormDialog() {
                   </Badge>
                   <MultiSelect
                     value={documentsForCollateral}
-                    onValueChange={(values) => setDocumentsForCollateral(values)}
+                    onValueChange={(values) =>
+                      setDocumentsForCollateral(values)
+                    }
                     className="mt-2"
                   >
                     {documents.map((doc) => (
                       <MultiSelectItem
-                      key={doc._id?.toString()}
-                      value={doc._id ? doc._id.toString() : ""}
+                        key={doc._id?.toString()}
+                        value={doc._id ? doc._id.toString() : ""}
                         className={
-                          (doc._id && documentsForProjection.includes(doc._id.toString())) ||
-                          (doc._id && documentsForDirect.includes(doc._id.toString())) ||
-                          (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
-                          (doc._id && documentsForUpdate.includes(doc._id.toString()))
+                          (doc._id &&
+                            documentsForProjection.includes(
+                              doc._id.toString()
+                            )) ||
+                          (doc._id &&
+                            documentsForDirect.includes(doc._id.toString())) ||
+                          (doc._id &&
+                            documentsForCollateral.includes(
+                              doc._id.toString()
+                            )) ||
+                          (doc._id &&
+                            documentsForUpdate.includes(doc._id.toString()))
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -626,24 +693,37 @@ export function FormDialog() {
 
                 {/* Projection Section */}
                 <div className="col-span-full sm:col-span-1">
-                  <Badge icon={RiProjector2Line} className="text-sm flex items-center gap-2"
-                    color="gray">
+                  <Badge
+                    icon={RiProjector2Line}
+                    className="text-sm flex items-center gap-2"
+                    color="gray"
+                  >
                     <span className="text-sm">Projection</span>
                   </Badge>
                   <MultiSelect
                     value={documentsForProjection}
-                    onValueChange={(values) => setDocumentsForProjection(values)}
+                    onValueChange={(values) =>
+                      setDocumentsForProjection(values)
+                    }
                     className="mt-2"
                   >
                     {documents.map((doc) => (
                       <MultiSelectItem
-                      key={doc._id?.toString()}
-                      value={doc._id ? doc._id.toString() : ""}
+                        key={doc._id?.toString()}
+                        value={doc._id ? doc._id.toString() : ""}
                         className={
-                          (doc._id && documentsForProjection.includes(doc._id.toString())) ||
-                          (doc._id && documentsForDirect.includes(doc._id.toString())) ||
-                          (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
-                          (doc._id && documentsForUpdate.includes(doc._id.toString()))
+                          (doc._id &&
+                            documentsForProjection.includes(
+                              doc._id.toString()
+                            )) ||
+                          (doc._id &&
+                            documentsForDirect.includes(doc._id.toString())) ||
+                          (doc._id &&
+                            documentsForCollateral.includes(
+                              doc._id.toString()
+                            )) ||
+                          (doc._id &&
+                            documentsForUpdate.includes(doc._id.toString()))
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -656,8 +736,11 @@ export function FormDialog() {
 
                 {/* Update Section */}
                 <div className="col-span-full sm:col-span-1">
-                  <Badge icon={RiLoopLeftLine} className="text-sm flex items-center gap-2"
-                    color="gray">
+                  <Badge
+                    icon={RiLoopLeftLine}
+                    className="text-sm flex items-center gap-2"
+                    color="gray"
+                  >
                     <span className="text-sm icon-text">Update</span>
                   </Badge>
                   <MultiSelect
@@ -667,13 +750,21 @@ export function FormDialog() {
                   >
                     {documents.map((doc) => (
                       <MultiSelectItem
-                      key={doc._id?.toString()}
-                      value={doc._id ? doc._id.toString() : ""}
+                        key={doc._id?.toString()}
+                        value={doc._id ? doc._id.toString() : ""}
                         className={
-                          (doc._id && documentsForProjection.includes(doc._id.toString())) ||
-                          (doc._id && documentsForDirect.includes(doc._id.toString())) ||
-                          (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
-                          (doc._id && documentsForUpdate.includes(doc._id.toString()))
+                          (doc._id &&
+                            documentsForProjection.includes(
+                              doc._id.toString()
+                            )) ||
+                          (doc._id &&
+                            documentsForDirect.includes(doc._id.toString())) ||
+                          (doc._id &&
+                            documentsForCollateral.includes(
+                              doc._id.toString()
+                            )) ||
+                          (doc._id &&
+                            documentsForUpdate.includes(doc._id.toString()))
                             ? "opacity-50 cursor-not-allowed no-click"
                             : ""
                         }
@@ -696,7 +787,7 @@ export function FormDialog() {
                 </Button>
                 <Button
                   className="w-full sm:w-auto primary"
-                  onClick={e => handleSubmit(e)}
+                  onClick={(e) => handleSubmit(e)}
                 >
                   Submit
                 </Button>
@@ -705,7 +796,7 @@ export function FormDialog() {
           </div>
         </DialogPanel>
       </Dialog>
-      <Toaster/>
+      <Toaster />
     </>
   );
 }
