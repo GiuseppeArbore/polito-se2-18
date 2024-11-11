@@ -1,4 +1,4 @@
-import { RiShareLine } from '@remixicon/react';
+import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import {
     Accordion,
@@ -38,6 +38,8 @@ export default function Document() {
                                                                         shape, as well as the large school complex just north 
                                                                         of it, which appears for the first time`);
 
+
+    const [showCheck, setShowCheck] = useState(false);
 
     return (
         <div>
@@ -101,17 +103,16 @@ export default function Document() {
                                         readOnly
                                     />
                                 </div>
-                            
+
                                 <Button
                                     className="mt-4 w-1/6 flex flex-col items-center justify-between"
                                     onClick={() => {
                                         navigator.clipboard.writeText(`http://localhost:1420/documents/${id}`);
-                                        alert("Link copied to clipboard!");
-                                        setShare(false);
+                                        setShowCheck(true);
+                                        setTimeout(() => setShowCheck(false), 1500);
                                     }}
                                 >
-
-                                    <RiShareLine className="mr-2" />
+                                    {showCheck ? <RiCheckDoubleLine className="mr-2" /> : <RiFileCopyLine className="mr-2" />}
                                 </Button>
                             </div>
                             <Button className="mt-8 w-full secondary" onClick={() => setShare(false)}>
