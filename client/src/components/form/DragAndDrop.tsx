@@ -1,6 +1,7 @@
 import React from 'react';
-import { RiDeleteBinLine, RiFileLine } from '@remixicon/react';
-import { Divider, Select, SelectItem, TextInput } from '@tremor/react';
+import { RiDeleteBinLine, RiFileLine, RiInformation2Line } from '@remixicon/react';
+import { Callout, Divider, Select, SelectItem, TextInput } from '@tremor/react';
+import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
 interface File {
@@ -13,6 +14,7 @@ function classNames(...classes: string[]) {
 }
 
 export function FileUpload() {
+    const [showAttachmentInfo, setShowAttachmentInfo] = useState(false);
     const [files, setFiles] = React.useState<File[]>([]);
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop: (acceptedFiles) =>
@@ -60,17 +62,39 @@ export function FileUpload() {
     return (
         <>
             <div className="sm:mx-auto sm:max-w-3xl">
-                <h2 className="font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+            <div className="col-span-full sm:col-span-3 flex flex-row">
+                <label
+                  htmlFor="Attachments"
+                  className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                >
                     Add original resources
-                </h2>
-                <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                </label>
+                <a
+                className="ml-2"
+                onClick={() => setShowAttachmentInfo(!showAttachmentInfo)}
+                >
+                <RiInformation2Line className="text-2xl" style={{ color: "#003d8e" }} />
+                </a>
+                </div>
+
+                {showAttachmentInfo &&
+                <Callout
+                  className="mb-6"
+                  style={{ border: "none" }}
+                  title="Attachment guide"
+                  color="gray"
+                >
                     Add original resources about the document you are uploading.
+                    You can Drag&Drop or click to upload files.
+                </Callout>
+              }
+                <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
                 </p>
                 <div className="mt-6 grid grid-cols-1 gap-4 sm:grid-cols-6">
                     <div className="col-span-full">
                         <label
                             htmlFor="file-upload-2"
-                            className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+                            className="text-tremor-default font-medium dark:text-dark-tremor-content-strong"
                         >
                             File(s) upload
                         </label>
