@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from './db/dao';
-import { KxDocument } from './models/model';
+import { KxDocumentModel, KxDocument } from './models/model';
+import { mongoose } from '@typegoose/typegoose';
 
 export const createKxDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const document: KxDocument = req.body;
+        const document = await KxDocumentModel.create(req.body);
         const createdDocument = await db.createKxDocument(document);
-   
+
         if (createdDocument) {
             res.status(201).json(createdDocument);
         }
@@ -27,7 +28,7 @@ export const getAllKxDocuments = async (req: Request, res: Response, next: NextF
 
 export const deleteKxDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
-        const id = req.params.id;
+        const id = new mongoose.Types.ObjectId(req.params.id);
         const isDeleted = await db.deleteKxDocument(id);
         if (isDeleted) {
             res.status(204).send();
