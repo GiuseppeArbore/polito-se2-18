@@ -160,18 +160,19 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                 touchAction: "auto" 
             }}
         >
-            <button
+                <div
                 className="primary text-sm font-bold"
                 style={{
                     position: 'absolute',
                     top: '10px',
                     left: '10px',
                     zIndex: 1,
-                    padding: '10px',
+                    padding: '15px',
                     backgroundColor: 'white',
-                    color: '#4A4A4A', 
-                    border: 'none',
-                    borderRadius: '4px',
+                    color: '#4A4A4A',
+                    border: '1px solid #ccc', 
+                    borderRadius: '8px', 
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                     cursor: 'pointer',
                     fontWeight: 'bold',
                     fontFamily: 'inherit',
@@ -179,7 +180,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                 }}
             >
                 {props.entireMunicipalityCount} documents refer to the Entire Municipality of Kiruna
-            </button>
+            </div>
         </div>
     )
 }
