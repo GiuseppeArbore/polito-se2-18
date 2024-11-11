@@ -261,5 +261,47 @@ describe("Integration Tests for Document API", () => {
         expect(response.body.some((doc: KxDocument) => doc.title === "Document 2")).toBe(true);
     });
 
+    test("Test 10 - Should fetch a document with specified id", async () => {
+        const postResponse = await request(app)
+            .post('/api/documents')
+            .send({
+                title: "Test Document for Fetch",
+                stakeholders: [Stakeholders.RESIDENT],
+                scale_info: Scale.TEXT,
+                scale: 10,
+                issuance_date: date,
+                type: KxDocumentType.INFORMATIVE,
+                language: "Swedish",
+                doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
+                description: "This is a test document for fetching.",
+                pages: [],
+                connections: {
+                    direct: [], collateral: [], projection: [], update: []
+                }
+            } as KxDocument);
+
+        expect(postResponse.status).toBe(201);
+        const documentId = postResponse.body._id;
+
+        const getResponse = await request(app).get(`/api/documents/${documentId}`);
+        expect(getResponse.status).toBe(200);
+        expect(getResponse.body).toBeDefined();
+        expect(getResponse.body.title).toBe("Test Document for Fetch");
+        expect(getResponse.body.stakeholders).toEqual([Stakeholders.RESIDENT]);
+        expect(getResponse.body.scale).toBe(10);
+        expect(getResponse.body.issuance_date).toBe(date.toISOString());
+        expect(getResponse.body.type).toBe(KxDocumentType.INFORMATIVE);
+        expect(getResponse.body.language).toBe("Swedish");
+        expect(getResponse.body.doc_coordinates).toEqual({ type: AreaType.ENTIRE_MUNICIPALITY });
+        expect(getResponse.body.description).toBe("This is a test document for fetching.");
+        expect(getResponse.body.pages).toEqual([]);
+    });
+
+    test("Test 11 - Should return 404 if document not found", async () => {
+        const response = await request(app).get(`/api/documents/no-document`);
+        expect(response.status).toBe(404);
+        expect(response.body).toEqual({ error: 'Document not found', status: 404 });
+    });
+
 });
 
