@@ -6,37 +6,45 @@ import {
     AccordionHeader,
     AccordionList,
 } from '@tremor/react';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom';
 import { KxDocumentType, Stakeholders } from "../enum";
 import { PreviewMap } from './map/Map';
+import API from '../API';
+import { KxDocument, PageRange } from '../model';
 
 
 
 export default function Document() {
     const { id } = useParams();
+    const [doc, setDoc] = useState<KxDocument | null>(null);
     const [share, setShare] = useState(false);
 
-    const [title, setTitle] = useState("Adjusted development plan for Kiruna");
-    const [stakeholders, setStakeholders] = useState<Stakeholders[]>([Stakeholders.RESIDENT, Stakeholders.URBAN_DEVELOPER]);
-    const [scale, setScale] = useState(7500);
-    const [issuanceDate, setIssuanceDate] = useState<Date | undefined | string>(
-        "2015"
-    );
-    const [type, setType] = useState<KxDocumentType | undefined>(KxDocumentType.DESIGN);
-    const [language, setLanguage] = useState<string | undefined>("Swedish");
-    const [pages, setPages] = useState("1");
-    const [description, setDescription] = useState<string | undefined>(` This document is the update of the Development 
-                                                                        Plan, one year after its creation, modifications are 
-                                                                        made to the general master plan, which is publi
-                                                                        shed under the name 'Adjusted Development 
-                                                                        Plan91,' and still represents the version used today 
-                                                                        after 10 years. Certainly, there are no drastic differen
-                                                                        ces compared to the previous plan, but upon careful 
-                                                                        comparison, several modified elements stand out. 
-                                                                        For example, the central square now takes its final 
-                                                                        shape, as well as the large school complex just north 
-                                                                        of it, which appears for the first time`);
+    const [title, setTitle] = useState("");
+    const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
+    const [scale, setScale] = useState("");
+    const [issuanceDate, setIssuanceDate] = useState<Date | undefined | string>("");
+    const [type, setType] = useState<KxDocumentType | undefined>(undefined);
+    const [language, setLanguage] = useState<string | undefined>("");
+    const [pages, setPages] = useState<PageRange[] | "">("");
+    const [description, setDescription] = useState<string | undefined>("");
+
+    useEffect(() => {
+        API.getKxDocumentById(id!).then((document) => {
+            setDoc(document);
+            setTitle(document.title);
+            setStakeholders(document.stakeholders);
+            setScale(document.scale.toString());
+            setIssuanceDate(document.issuance_date);
+            setType(document.type);
+            setLanguage(document.language || "");
+            setPages(document.pages || "");
+            setDescription(document.description || "");
+        }).catch((error) => {
+            console.error("PIZZA Failed to fetch document:", error);
+            //window.location.href = "/page-not-found";
+        });
+    } );
 
 
     const [showCheck, setShowCheck] = useState(false);

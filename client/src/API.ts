@@ -50,5 +50,26 @@ const getAllKxDocuments = async (): Promise<KxDocument[]> => {
     }
 };
 
-const API = { createKxDocument, getAllKxDocuments };
+const getKxDocumentById = async (id: string): Promise<KxDocument> => {
+    try {
+        const response = await fetch(API_URL + `/documents/${id}`, {
+            method: 'GET',
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+
+        const data: KxDocument = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to fetch document: ${error.message}`);
+        } else {
+            throw new Error('Failed to fetch document: Unknown error');
+        }
+    }
+};
+
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById };
 export default API;
