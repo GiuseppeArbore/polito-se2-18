@@ -11,6 +11,7 @@ import { KxDocumentType, Stakeholders } from "../enum";
 import { PreviewMap } from './map/Map';
 import API from '../API';
 import { KxDocument, PageRange } from '../model';
+import { mongoose } from '@typegoose/typegoose';
 
 
 
@@ -32,7 +33,7 @@ export default function Document() {
     useEffect(() => {
         const fetchDocument = async () => {
             try {
-            const document = await API.getKxDocumentById(id!);
+            const document = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
             setDoc(document);
             setTitle(document.title);
             setStakeholders(document.stakeholders);
