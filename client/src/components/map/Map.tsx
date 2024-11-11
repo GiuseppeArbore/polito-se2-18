@@ -173,7 +173,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                     border: '1px solid #ccc', 
                     borderRadius: '8px', 
                     boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                    cursor: 'pointer',
                     fontWeight: 'bold',
                     fontFamily: 'inherit',
                     fontSize: '0.75rem'
