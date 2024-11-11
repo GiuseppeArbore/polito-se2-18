@@ -15,6 +15,8 @@ export default function DeleteDialog(open: boolean, setOpen: (bool: boolean) => 
                 </p>
                 <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
                 <Button
+                color="red"
+                    style={{ color: 'red' }}
                     className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
                     variant="light"
                     onClick={() => setOpen(false)}
@@ -22,13 +24,15 @@ export default function DeleteDialog(open: boolean, setOpen: (bool: boolean) => 
                     Cancel
                 </Button>
                 <Button
+                    color="red"
                     className="w-full sm:w-auto primary"
                     onClick={() => {
                         deleteFn();
                         setOpen(false);
                     }}
+                    style={{ backgroundColor: 'red' }}
                 >
-                    Submit
+                    Delete
                 </Button>
                 </div>
             </DialogPanel>
