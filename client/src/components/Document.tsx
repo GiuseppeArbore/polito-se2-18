@@ -3,11 +3,10 @@ import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import {
     Accordion,
     AccordionBody,
-    AccordionHeader,
-    AccordionList,
+    AccordionHeader
 } from '@tremor/react';
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { KxDocumentType, Stakeholders } from "../enum";
 import { PreviewMap } from './map/Map';
 import API from '../API';
@@ -16,6 +15,7 @@ import { KxDocument, PageRange } from '../model';
 
 
 export default function Document() {
+    const navigate = useNavigate();
     const { id } = useParams();
     const [doc, setDoc] = useState<KxDocument | null>(null);
     const [share, setShare] = useState(false);
@@ -41,10 +41,10 @@ export default function Document() {
             setPages(document.pages || "");
             setDescription(document.description || "");
         }).catch((error) => {
-            console.error("PIZZA Failed to fetch document:", error);
-            //window.location.href = "/page-not-found";
+            console.error("Failed to fetch document:", error);
+            navigate("/404");
         });
-    } );
+    });
 
 
     const [showCheck, setShowCheck] = useState(false);
@@ -100,14 +100,14 @@ export default function Document() {
                         <DialogPanel>
                             <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Share "{title}"</h3>
                             <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-                                Share the link of the document with your friends and colleagues.
+                                Share the link of the document.
                             </p>
                             <div className="flex flex-row justify-between">
                                 <div className="mt-4 w-full  me-2">
                                     <input
                                         type="text"
                                         className="w-full p-2 border border-tremor-border rounded-md"
-                                        value={`http://localhost:1420/documents/${id}`}
+                                        value={window.location.href}
                                         readOnly
                                     />
                                 </div>
@@ -115,7 +115,7 @@ export default function Document() {
                                 <Button
                                     className="mt-4 w-1/6 flex flex-col items-center justify-between"
                                     onClick={() => {
-                                        navigator.clipboard.writeText(`http://localhost:1420/documents/${id}`);
+                                        navigator.clipboard.writeText(window.location.href);
                                         setShowCheck(true);
                                         setTimeout(() => setShowCheck(false), 1500);
                                     }}

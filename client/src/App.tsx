@@ -9,7 +9,7 @@ export default function App() {
     <Routes>
       <Route path="/" element={<Console />} />
       <Route path="/documents/:id" element={<Document />} />
-      <Route path="/page-not-found" element={<NotFound />} />
+      <Route path="/*" element={<NotFound />} />
     </Routes>
   );
 
