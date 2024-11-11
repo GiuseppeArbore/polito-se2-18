@@ -44,7 +44,7 @@ export class Link {
   documents: string[] = [];
 }
 
-export function FormDialog() {
+export function FormDialog(props: any) {
   const [drawing, setDrawing] = useState<any>(undefined);
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
@@ -185,6 +185,7 @@ export function FormDialog() {
       })
     }
     clearForm();
+    props.setNewDocumentCreated(true);
   };
 
   function clearForm() {

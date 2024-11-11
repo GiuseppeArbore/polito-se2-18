@@ -2,8 +2,10 @@ import mapboxgl, { LngLatLike } from "mapbox-gl"
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Card, TabGroup, TabList, Tab, Divider } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill, RiHand, RiMapPinLine, RiScissorsCutFill, RiShapeLine } from "@remixicon/react";
-import { PreviewMapDraw } from "./DrawBar";
+import { DashboardMapDraw, PreviewMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import StaticMode from '@mapbox/mapbox-gl-draw-static-mode';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -12,6 +14,7 @@ export interface SatMapProps {
     zoom?: number,
     style?: React.CSSProperties,
     className?: string,
+    entireMunicipalityCount?: number,
 }
 
 const defaultZoom = 12;
@@ -45,7 +48,6 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
             mapRef.current = null;
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
-                //style: "mapbox://styles/mapbox/satellite-streets-v12",
                 style: "mapbox://styles/mapbox/light-v11",
                 center: center,
                 zoom: props.zoom || defaultZoom,
@@ -67,6 +69,118 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
 
     return (
         <div className={props.className} ref={mapContainerRef} id="map" style={{...props.style, ...{pointerEvents: "none", touchAction: "none"}}} ></div>
+    )
+}
+
+export const DashboardMap: React.FC<SatMapProps> = (props) => {
+
+    const mapContainerRef = useRef<any>(null);
+    const mapRef = useRef<mapboxgl.Map | null>(null);
+
+    useEffect(() => {
+        if (mapRef.current) return;
+
+        const modes = MapboxDraw.modes;
+        modes.static = StaticMode;
+
+        mapRef.current = new mapboxgl.Map({
+            container: mapContainerRef.current,
+            style: "mapbox://styles/mapbox/satellite-streets-v12",
+            center: center,
+            zoom: props.zoom || defaultZoom,
+            pitch: 40,
+            interactive: true 
+        });
+
+        
+
+        mapRef.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+        mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
+        mapRef.current.addControl(DashboardMapDraw, 'bottom-right');
+
+        mapRef.current.on('load', function() {
+            DashboardMapDraw.changeMode('static'); 
+        });
+
+        if (props.drawing) {
+            DashboardMapDraw.set(props.drawing);
+        }
+    }, [mapContainerRef.current]);
+
+    useEffect(() => {
+        if (props.drawing) {
+            mapRef.current?.remove();
+            mapRef.current = null;
+
+            const modes = MapboxDraw.modes;
+            modes.static = StaticMode;
+
+            mapRef.current = new mapboxgl.Map({
+                container: mapContainerRef.current,
+                style: "mapbox://styles/mapbox/satellite-streets-v12",
+                center: center,
+                zoom: props.zoom || defaultZoom,
+                pitch: 40,
+                interactive: true
+            });
+
+            
+
+            mapRef.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+            mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+            mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
+            mapRef.current.addControl(DashboardMapDraw, 'bottom-right');
+
+            mapRef.current.on('load', function() {
+                DashboardMapDraw.changeMode('static');
+            });
+
+            if (props.drawing) {
+                DashboardMapDraw.set(props.drawing);
+            }
+        }
+    }, [props.drawing]);
+
+    useEffect(() => {
+        if (!mapRef.current) return;
+
+        const map = mapRef.current;
+        map.setZoom(props.zoom || defaultZoom);
+    }, [props.zoom]);
+
+    return (
+        <div
+            className={props.className}
+            ref={mapContainerRef}
+            id="map"
+            style={{
+                ...props.style,
+                pointerEvents: "auto",
+                touchAction: "auto" 
+            }}
+        >
+            <button
+                className="primary text-sm font-bold"
+                style={{
+                    position: 'absolute',
+                    top: '10px',
+                    left: '10px',
+                    zIndex: 1,
+                    padding: '10px',
+                    backgroundColor: 'white',
+                    color: '#4A4A4A', 
+                    border: 'none',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontWeight: 'bold',
+                    fontFamily: 'inherit',
+                    fontSize: '0.75rem'
+                }}
+            >
+                {props.entireMunicipalityCount} documents refers to the Entire Municipality of Kiruna
+            </button>
+        </div>
     )
 }
 

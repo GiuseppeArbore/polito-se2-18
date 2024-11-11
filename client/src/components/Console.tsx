@@ -1,8 +1,10 @@
 import { Card, Title, Text, Grid, Col, DateRangePicker, Metric, Subtitle, Bold, Italic, Select, SelectItem, TabGroup, TabList, Tab, DateRangePickerItem, DateRangePickerValue } from "@tremor/react";
-import { useState, useMemo } from "react";
+import API from '../API'; // Adjust the path as necessary
+import { useState, useMemo, useEffect } from "react";
 import { FormDialog } from "./form/Form";
 import { MultiSelect, MultiSelectItem } from '@tremor/react';
-import { PreviewMap } from "./map/Map";
+import { DashboardMap, PreviewMap } from "./map/Map";
+import { KxDocument } from "../model";
 
 
 export default function Console() {
@@ -11,6 +13,48 @@ export default function Console() {
     const [groupKey, setGroupKey] = useState("1");
     const [selectedView, setSelectedView] = useState(0);
     const [selectedDocuments, setselectedDocuments] = useState<string[]>(['doc1']);
+    const [documents, setDocuments] = useState<KxDocument[]>([]);
+    const [entireMunicipalityCount, setEntireMunicipalityCount] = useState(0);
+    const [newDocumentCreated, setNewDocumentCreated] = useState(true);
+
+    useEffect(() => {
+        const fetchDocuments = async () => {
+            try {
+                const response = await API.getAllKxDocuments();
+                setDocuments(response);
+    
+                let count = 0;
+                const filteredDocuments = response.filter(doc => {
+                    if (doc.doc_coordinates?.type === "EntireMunicipality") {
+                        count++;
+                        return false;
+                    }
+                    return true;
+                });
+                setEntireMunicipalityCount(count);
+                setDocuments(filteredDocuments);
+            } catch (error) {
+                console.error('Error fetching documents:', error);
+            }
+        };
+    
+        if (newDocumentCreated) {
+            fetchDocuments();
+            setNewDocumentCreated(false); 
+        }
+    }, [newDocumentCreated]);
+
+    const drawing = {
+        type: 'FeatureCollection',
+        features: documents.map(doc => ({
+            type: 'Feature',
+            geometry: doc.doc_coordinates,
+            properties: {
+                title: doc.title,
+                description: doc.description
+            }
+        }))
+    };
 
     return (
         <main>
@@ -40,7 +84,7 @@ export default function Console() {
 
                 <Col numColSpanLg={1}>
                     <div className="space-y-6">
-                        <FormDialog />
+                        <FormDialog setNewDocumentCreated={setNewDocumentCreated}/>
 
                         {/* <Card>
                             <Text>Select</Text>
@@ -91,10 +135,11 @@ export default function Console() {
             case 0:
                 return (
                     <>
-                        <PreviewMap
+                        <DashboardMap
                             style={{ margin: 0, minHeight: "300px", width: "100%", height: "100%", borderRadius: 8 }}
-                            drawing={undefined}
-                        ></PreviewMap>
+                            drawing={drawing}
+                            entireMunicipalityCount={entireMunicipalityCount}
+                        ></DashboardMap>
                     </>
                 );
             case 1:
