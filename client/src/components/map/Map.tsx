@@ -178,7 +178,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                     fontSize: '0.75rem'
                 }}
             >
-                {props.entireMunicipalityCount} documents refers to the Entire Municipality of Kiruna
+                {props.entireMunicipalityCount} documents refer to the Entire Municipality of Kiruna
             </button>
         </div>
     )

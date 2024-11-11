@@ -1,5 +1,5 @@
 import { Card, Title, Text, Grid, Col, DateRangePicker, Metric, Subtitle, Bold, Italic, Select, SelectItem, TabGroup, TabList, Tab, DateRangePickerItem, DateRangePickerValue } from "@tremor/react";
-import API from '../API'; // Adjust the path as necessary
+import API from '../API';
 import { useState, useMemo, useEffect } from "react";
 import { FormDialog } from "./form/Form";
 import { MultiSelect, MultiSelectItem } from '@tremor/react';
