@@ -1,3 +1,4 @@
+import { mongoose } from '@typegoose/typegoose';
 import { KxDocument } from './model';
 
 const API_URL = 'http://localhost:3001/api';
@@ -50,7 +51,7 @@ const getAllKxDocuments = async (): Promise<KxDocument[]> => {
     }
 };
 
-const getKxDocumentById = async (id: string): Promise<KxDocument> => {
+const getKxDocumentById = async (id: mongoose.Types.ObjectId): Promise<KxDocument> => {
     try {
         const response = await fetch(API_URL + `/documents/${id}`, {
             method: 'GET',
