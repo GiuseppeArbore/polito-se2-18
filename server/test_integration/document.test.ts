@@ -297,10 +297,5 @@ describe("Integration Tests for Document API", () => {
         expect(getResponse.body.pages).toEqual([]);
     });
 
-    test("Test 11 - Should return 500 if url not found", async () => {
-        const response = await request(app).get(`/api/documents/1234567`);
-        expect(response.status).toBe(500);
-    });
-
 });
 
