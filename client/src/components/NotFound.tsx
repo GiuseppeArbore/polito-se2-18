@@ -1,9 +1,9 @@
+
 export const NotFound = () => {
     return (
-        <>
-            <h1>Error 404</h1>
-            <h2>Sorry, the page you are looking for does not exist</h2>
-        </>
+        <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '90vh' }}>
+            <img src="/error404.jpg" alt="404 Not Found" style={{ width: '50%' }} />
+        </div>
 
     );
 };
