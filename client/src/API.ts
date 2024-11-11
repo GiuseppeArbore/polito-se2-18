@@ -54,6 +54,14 @@ const getKxDocumentById = async (id: string): Promise<KxDocument> => {
     try {
         const response = await fetch(API_URL + `/documents/${id}`, {
             method: 'GET',
+const updateKxDocumentDescription = async (documentId: string, description: string): Promise<KxDocument | null> => {
+    try {
+        const response = await fetch(API_URL + `/documents/${documentId}`, {
+            method: 'PATCH',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ description }),
         });
 
         if (!response.ok) {
@@ -72,4 +80,12 @@ const getKxDocumentById = async (id: string): Promise<KxDocument> => {
 };
 
 const API = { createKxDocument, getAllKxDocuments, getKxDocumentById };
+            throw new Error(`Failed to update document: ${error.message}`);
+        } else {
+            throw new Error('Failed to update document: Unknown error');
+        }
+    }
+}
+
+const API = { createKxDocument, getAllKxDocuments, updateKxDocumentDescription };
 export default API;
