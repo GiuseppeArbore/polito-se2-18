@@ -86,6 +86,9 @@ export function FileUpload() {
                 >
                     Add original resources about the document you are uploading.
                     You can Drag&Drop or click to upload files.
+                    If you've to add more than one file, you can do it by clicking on the "choose file(s)" button.
+                    If you want to add more files using drag and drop, you can do it by dragging all the files to the upload area.
+                    If you want to remove a file, click on the trash icon.
                 </Callout>
               }
                 <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
@@ -133,7 +136,7 @@ export function FileUpload() {
                         </div>
                         <p className="mt-2 text-tremor-label leading-5 text-tremor-content dark:text-dark-tremor-content sm:flex sm:items-center sm:justify-between">
                             <span>All file types are allowed to upload.</span>
-                            <span className="pl-1 sm:pl-0">Max. size per file: 50MB</span>
+                            <span className="pl-1 sm:pl-0">Coming soon: Max. size per file</span>
                         </p>
                         {filesList.length > 0 && (
                             <>
