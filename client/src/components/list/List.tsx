@@ -6,13 +6,14 @@ import "ag-grid-community/styles/ag-theme-quartz.css";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { KxDocument } from "../../model";
 
-import { Button, Flex } from '@tremor/react';
+import { Badge, Button, Flex } from '@tremor/react';
 import { useNavigate } from 'react-router-dom';
 import { RiDeleteBinLine, RiEditLine, RiInfoI } from '@remixicon/react';
 import { toast } from '../../utils/toaster';
 import locales from "../../locales.json";
 import API from '../../API';
 import DeleteDialog from './DeleteDialog';
+import { Stakeholders } from '../../enum';
 
 interface ListProps {
     documents: KxDocument[];
@@ -37,11 +38,23 @@ function List(props: ListProps) {
             </Flex>
         );
     }
-    
-   const KxColDefs:  ColDef<KxDocument>[] = [
+    const StakeholdersRenderer = (params: any) => {
+        return (
+            <div className="flex flex-wrap gap-1 mt-2" >
+                {params.value.map((stakeholder: Stakeholders, index: number) => {
+                    return (
+                        <Badge key={index} className="text-sm">
+                            <span className="text-sm">{stakeholder}</span>
+                        </Badge>
+                    );
+                })}
+            </div>
+        );
+    }
+    const KxColDefs: ColDef<KxDocument>[] = [
         { headerName: "Title", field: "title", enableRowGroup: false, filter: true, sortable: true },
         { headerName: "Type", field: "type", enableRowGroup: true, filter: true },
-        { headerName: "Stakeholders", field: "stakeholders", enableRowGroup: false, filter: true, },
+        { headerName: "Stakeholders", field: "stakeholders", enableRowGroup: false, filter: true, cellRenderer: (params: any) => StakeholdersRenderer(params) },
         {
             headerName: "Scale", field: "scale", enableRowGroup: true, filter: true, valueFormatter: (params: { value: string | number; }) => {
                 return params.value !== undefined ? "1:" + params.value.toLocaleString() : ""
@@ -73,10 +86,10 @@ function List(props: ListProps) {
         },
         { headerName: "Pages", field: "pages", enableRowGroup: false, filter: true },
         { headerName: "Controls", field: '_id', minWidth: 30, enableRowGroup: false, cellRenderer: (params: any) => infoButton(params) },
-    
-    ] ;
-   
-    
+
+    ];
+
+
     const autoGroupColumnDef = {
         sortable: false,
         headerName: 'Group',
@@ -160,17 +173,17 @@ function List(props: ListProps) {
                         toast({
                             title: "Success",
                             description:
-                              "The document has been delete successfully",
+                                "The document has been delete successfully",
                             variant: "success",
                             duration: 3000,
-                          })
+                        })
                     } catch (error) {
                         toast({
                             title: "Error",
                             description: "Failed to delete documents",
                             variant: "error",
                             duration: 3000,
-                          })
+                        })
                     }
                 }, rowNode.current?.title)
             }
