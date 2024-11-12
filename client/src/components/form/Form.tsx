@@ -116,7 +116,6 @@ export function FormDialog() {
       setTypeError(!type);
       setDescriptionError(!description);
       hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
-      setDocCoordinatesError(true);
       setError("Please fill all the required fields");
       toast({
               title: "Error",
