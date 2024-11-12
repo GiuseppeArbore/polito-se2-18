@@ -19,16 +19,16 @@ var PreviewMapDraw = new MapboxDraw({
     combine_features: false,
     uncombine_features: false,
   },
-  styles: [
-    {
-      id: "gl-draw-point-invisible",
-      type: "circle",
-      filter: ["all", ["==", "$type", "Point"]],
-      paint: {
-        "circle-radius": 0,
-      },
-    },
-  ],
+  // styles: [
+  //   {
+  //     id: "gl-draw-point-invisible",
+  //     type: "circle",
+  //     filter: ["all", ["==", "$type", "Point"]],
+  //     paint: {
+  //       "circle-radius": 0,
+  //     },
+  //   },
+  // ],
 });
 
 export { PreviewMapDraw };

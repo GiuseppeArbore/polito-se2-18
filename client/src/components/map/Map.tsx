@@ -290,6 +290,8 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
       };
 
       // Set the updated data on the source
+      //if (props.drawing && props.drawing.feature[0].geometry.type === "Point")
+      //console.log("point");
       source.setData(updatedData);
     });
   };
@@ -308,12 +310,12 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
-    loadImage();
+    //loadImage();
 
     if (props.drawing) PreviewMapDraw.set(props.drawing);
 
     // click listener
-    onClick(mapRef);
+    //onClick(mapRef);
   }, []);
 
   useEffect(() => {
