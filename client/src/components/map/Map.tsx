@@ -168,7 +168,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                         top: '10px',
                         left: '10px',
                         zIndex: 1,
-                        padding: '5px',
+                        padding: '10px',
                         backgroundColor: 'white',
                         color: '#4A4A4A',
                         border: '1px solid #ccc', 
@@ -176,7 +176,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                         boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
                         fontWeight: 'bold',
                         fontFamily: 'inherit',
-                        fontSize: '0.75rem',
+                        fontSize: '0.80rem',
                     }}
                     >   <div className="flex items-center">
                         Documents covering the entire municipality: {props.entireMunicipalityCount}<RiFileLine style={{ marginLeft: '-2px', fontSize: '16px', color: '#4A4A4A', transform: 'scale(0.80)' }} />
