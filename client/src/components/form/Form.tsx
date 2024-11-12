@@ -586,7 +586,7 @@ export function FormDialog() {
                             : ""
                         }
                       >
-                        {doc.title}
+                        {doc.title }
                       </MultiSelectItem>
                     ))}
                   </MultiSelect>
@@ -649,7 +649,7 @@ export function FormDialog() {
                             : ""
                         }
                       >
-                        {doc.title}
+                        {doc.title }
                       </MultiSelectItem>
                     ))}
                   </MultiSelect>
@@ -679,7 +679,7 @@ export function FormDialog() {
                             : ""
                         }
                       >
-                        {doc.title}
+                        {doc.title + doc._id}
                       </MultiSelectItem>
                     ))}
                   </MultiSelect>
