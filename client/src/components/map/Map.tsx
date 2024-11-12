@@ -1,11 +1,11 @@
 import mapboxgl, { LngLatLike } from "mapbox-gl"
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Card, TabGroup, TabList, Tab, Divider } from "@tremor/react";
+import { Button, Card, TabGroup, TabList, Tab, Divider, TextInput } from "@tremor/react";
 import { RiCheckFill, RiCloseLine, RiDeleteBinFill, RiHand, RiMapPinLine, RiScissorsCutFill, RiShapeLine, RiArrowDownSLine } from "@remixicon/react";
 import { DashboardMapDraw, PreviewMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import StaticMode from '@mapbox/mapbox-gl-draw-static-mode';
-import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import { Feature, FeatureCollection, Position } from "geojson"
+import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
 import { RiFileLine } from '@remixicon/react';
 import { KxDocument } from "../../model";
 import {
@@ -23,7 +23,7 @@ import "../../css/map.css"
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
 export interface SatMapProps {
-    drawing: any,
+    drawing: FeatureCollection | undefined,
     zoom?: number,
     style?: React.CSSProperties,
     className?: string,
@@ -93,9 +93,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
     useEffect(() => {
         if (mapRef.current) return;
 
-        const modes = MapboxDraw.modes;
-        modes.static = StaticMode;
-
         mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: "mapbox://styles/mapbox/satellite-streets-v12",
@@ -125,9 +122,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         if (props.drawing) {
             mapRef.current?.remove();
             mapRef.current = null;
-
-            const modes = MapboxDraw.modes;
-            modes.static = StaticMode;
 
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
@@ -223,9 +217,6 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
     useEffect(() => {
         if (mapRef.current) return;
 
-        const modes = MapboxDraw.modes;
-        modes.static = StaticMode;
-
         mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: "mapbox://styles/mapbox/satellite-streets-v12",
@@ -255,9 +246,6 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
         if (props.drawing) {
             mapRef.current?.remove();
             mapRef.current = null;
-
-            const modes = MapboxDraw.modes;
-            modes.static = StaticMode;
 
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
@@ -310,13 +298,39 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
 
 interface MapControlsProps {
     // path type is temporary
-    onDone: (path: any) => void
+    onDone: (path: FeatureCollection) => void
     onCancel: () => void
-    drawing: any
+    drawing: FeatureCollection | undefined
 }
 
-const MapControls: React.FC<MapControlsProps> = (props) => {
+const MapControls: React.FC<MapControlsProps & {setFeature: (_: Feature) => void}> = (props) => {
     const [index, setIndex] = useState(0);
+    const [pointCoords, setPointCoords] = useState<[string, string]>(["", ""]);
+    function str2pos(str: [string, string]): Position {
+        return [Number(str[0]), Number(str[1])];
+    }
+    function pos2str(pos: Position): [string, string] {
+        return [pos[0].toString(), pos[1].toString()];
+    }
+
+    const emptyPointFeature: Feature = {
+        type: "Feature",
+        properties: {},
+        geometry: { type: "Point", coordinates: [] }
+    }
+    // structuredClone is necessary to avoid modifying the prop's original value.
+    const feature = structuredClone(props?.drawing?.features?.at?.(0)); 
+    const geometry = feature?.geometry;
+    const pos = geometry?.type === "Point" ? geometry.coordinates : [NaN, NaN];
+
+    useEffect(() => {
+        if (geometry?.type === "Point") {
+            setIndex(1);
+            setPointCoords(pos2str(pos));
+        } else if (geometry?.type === "Polygon") {
+            setIndex(2);
+        }
+    }, [geometry?.type, pos?.[0], pos?.[1]]);
 
     // Note:
     // React's useEffect() are run starting from the children. This means that we cannot change
@@ -348,31 +362,112 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
                     <Tab value="3" icon={RiShapeLine}>Area</Tab>
                 </TabList>
             </TabGroup>
-            <div className="mt-4 px-2 space-x-2">
+            <div className="mt-4 px-2">
                 {
                     index === 0 ?
                         <></>
                         : index === 1 ?
                             <>
-                                <p className="text-sm italic mx-2">Click to add a Point</p>
-                                <div className="mt-2 flex justify-center space-x-2">
-                                    <Button size="xs" variant="secondary" icon={RiDeleteBinFill} color="red" className="flex-1" onClick={() => { PreviewMapDraw.deleteAll(); PreviewMapDraw.changeMode("draw_point") }}>Remove point</Button>
+                                <p className="text-sm italic mx-2">Click on the map or type the coordinates to add a Point</p>
+                                <div className="mt-2">
+                                    <TextInput
+                                        value={pointCoords[0]}
+                                        onValueChange={(longitude) => {
+                                            const tmp = Number(longitude);
+                                            const newCoords: [string, string] = [isNaN(tmp) ? pointCoords[0] : longitude, pointCoords[1]];
+                                            setPointCoords(newCoords);
+                                            if (newCoords.every(c => (!isNaN(Number(c)) && c !== ""))) {
+                                                let tmp = feature?.geometry.type === "Point" ? feature : emptyPointFeature;
+                                                tmp.geometry = { ...tmp.geometry, type: "Point", coordinates: str2pos(newCoords) }
+                                                PreviewMapDraw.changeMode("simple_select");
+                                                PreviewMapDraw.set({
+                                                    type: "FeatureCollection",
+                                                    features: [
+                                                        tmp
+                                                    ]
+                                                });
+                                            }
+                                        }}
+                                        icon={() => (
+                                            <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
+                                                Longitude
+                                            </p>
+                                        )}
+                                        className="mt-1 pl-9 rounded-b-none"
+                                    />
+                                    <TextInput
+                                        value={pointCoords[1]}
+                                        onValueChange={(latitude) => {
+                                            const tmp = Number(latitude);
+                                            const newCoords: [string, string] = [pointCoords[0], isNaN(tmp) ? pointCoords[1] : latitude];
+                                            setPointCoords(newCoords);
+                                            if (newCoords.every(c => (!isNaN(Number(c)) && c !== ""))) {
+                                                let tmp = feature?.geometry.type === "Point" ? feature : emptyPointFeature;
+                                                tmp.geometry = { ...tmp.geometry, type: "Point", coordinates: str2pos(newCoords) }
+                                                PreviewMapDraw.changeMode("simple_select");
+                                                PreviewMapDraw.set({
+                                                    type: "FeatureCollection",
+                                                    features: [
+                                                        tmp
+                                                    ]
+                                                });
+                                            }
+                                        }}
+                                        icon={() => (
+                                            <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
+                                                Latitude
+                                            </p>
+                                        )}
+                                        className="pl-9 border-t-0 rounded-t-none"
+                                    />
+                                </div>
+                                <div className="mt-2 flex justify-center ">
+                                    <Button
+                                        size="xs"
+                                        variant="secondary"
+                                        icon={RiDeleteBinFill}
+                                        color="red"
+                                        className="flex-1"
+                                        onClick={() => {
+                                            setPointCoords(["", ""]);
+                                            PreviewMapDraw.deleteAll();
+                                            PreviewMapDraw.changeMode("draw_point");
+                                        }}>
+                                        Remove point
+                                    </Button>
                                 </div>
                             </>
                             : index === 2 ?
                                 <>
                                     <p className="text-sm italic mx-2">Click to add points; to terminate a selection, double click on the last point.</p>
                                     <div className="mt-2 flex justify-center space-x-2">
-                                        <Button size="xs" variant="secondary" icon={RiDeleteBinFill} color="red" className="flex-1" onClick={() => { PreviewMapDraw.deleteAll(); PreviewMapDraw.changeMode("draw_polygon") }}>Remove area</Button>
-                                        <Button size="xs" variant="secondary" icon={RiScissorsCutFill} className="flex-1" onClick={() => {
-                                            if (PreviewMapDraw.getMode() === "draw_polygon")
-                                                return;
-                                            const features = PreviewMapDraw.getAll().features.map((f: any) => f.id);
-                                            if (features.length === 0)
-                                                return;
-                                            PreviewMapDraw.changeMode("simple_select", { featureIds: features });
-                                            PreviewMapDraw.changeMode("cut_polygon");
-                                        }}>Cut in shape</Button>
+                                        <Button
+                                            size="xs"
+                                            variant="secondary"
+                                            icon={RiDeleteBinFill}
+                                            color="red"
+                                            className="flex-1"
+                                            onClick={() => {
+                                                PreviewMapDraw.deleteAll();
+                                                PreviewMapDraw.changeMode("draw_polygon");
+                                            }}>
+                                            Remove area
+                                        </Button>
+                                        <Button
+                                            size="xs"
+                                            variant="secondary"
+                                            icon={RiScissorsCutFill}
+                                            className="flex-1" onClick={() => {
+                                                if (PreviewMapDraw.getMode() === "draw_polygon")
+                                                    return;
+                                                const features = PreviewMapDraw.getAll().features.map((f: any) => f.id);
+                                                if (features.length === 0)
+                                                    return;
+                                                PreviewMapDraw.changeMode("simple_select", { featureIds: features });
+                                                PreviewMapDraw.changeMode("cut_polygon");
+                                            }}>
+                                            Cut in shape
+                                        </Button>
                                     </div>
                                 </>
                                 : null
@@ -382,6 +477,8 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
             <div className="px-2 flex justify-between space-x-2">
                 <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
                 <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
+                    // This changeMode is necessary, otherwise the MapDraw might contain malformed data
+                    PreviewMapDraw.changeMode("simple_select");
                     props.onDone(PreviewMapDraw.getAll());
                 }} className="flex-1">Save</Button>
             </div>
@@ -392,6 +489,7 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
 export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     const mapContainerRef = useRef<any>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
+    const [tmpDrawing, setTmpDrawing] = useState<FeatureCollection | undefined>(props.drawing);
 
     useEffect(() => {
         if (mapRef.current) return;
@@ -406,7 +504,20 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         mapRef.current.addControl(PreviewMapDraw, "top-left")
         mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
         mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
-        if (props.drawing) PreviewMapDraw.set(props.drawing);
+
+        mapRef.current.on('draw.create', (e: DrawCreateEvent) => {
+            setTmpDrawing({type: "FeatureCollection", features: e.features});
+        });
+        mapRef.current.on('draw.delete', () => {
+            setTmpDrawing(undefined);
+        });
+        mapRef.current.on('draw.update', (e: DrawUpdateEvent) => {
+            setTmpDrawing({type: "FeatureCollection", features: e.features});
+        });
+
+        if (props.drawing) {
+            PreviewMapDraw.set(props.drawing);
+        }
     }, []);
 
     useEffect(() => {
@@ -420,7 +531,14 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     return (
         <>
             <div className={props.className} ref={mapContainerRef} id="map" style={props.style} />
-            <MapControls onCancel={props.onCancel} onDone={props.onDone} drawing={props.drawing}></MapControls>
+            <MapControls
+                onCancel={props.onCancel}
+                onDone={props.onDone}
+                setFeature={(f) => {
+                    PreviewMapDraw.set({type: "FeatureCollection", features: [f]});
+                }}
+                drawing={tmpDrawing}
+            />
         </>
     )
 }
