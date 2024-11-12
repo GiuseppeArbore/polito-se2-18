@@ -151,39 +151,39 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
     }, [props.zoom]);
 
     return (
-        <div
-            className={props.className}
-            ref={mapContainerRef}
-            id="map"
-            style={{
-                ...props.style,
-                pointerEvents: "auto",
-                touchAction: "auto" 
-            }}
-        >       
-                    <div
-                    className="primary text-sm font-bold"
-                    style={{
-                        position: 'absolute',
-                        top: '10px',
-                        left: '10px',
-                        zIndex: 1,
-                        padding: '10px',
-                        backgroundColor: 'white',
-                        color: '#4A4A4A',
-                        border: '1px solid #ccc', 
-                        borderRadius: '8px', 
-                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                        fontWeight: 'bold',
-                        fontFamily: 'inherit',
-                        fontSize: '0.80rem',
-                    }}
-                    >   <div className="flex items-center">
-                        Documents covering the entire municipality: {props.entireMunicipalityCount}<RiFileLine style={{ marginLeft: '-2px', fontSize: '16px', color: '#4A4A4A', transform: 'scale(0.80)' }} />
-                        </div>
-                    </div>
-                
-        </div>
+        <>
+            <div
+                className={props.className}
+                ref={mapContainerRef}
+                id="map"
+                style={{
+                    ...props.style,
+                    pointerEvents: "auto",
+                    touchAction: "auto"
+                }}
+            />
+            <div
+                className="primary text-sm font-bold"
+                style={{
+                    position: 'absolute',
+                    top: '10px',
+                    left: '10px',
+                    zIndex: 1,
+                    padding: '10px',
+                    backgroundColor: 'white',
+                    color: '#4A4A4A',
+                    border: '1px solid #ccc',
+                    borderRadius: '8px',
+                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                    fontWeight: 'bold',
+                    fontFamily: 'inherit',
+                    fontSize: '0.80rem',
+                }}
+            >   <div className="flex items-center">
+                    Documents covering the entire municipality: {props.entireMunicipalityCount}<RiFileLine style={{ marginLeft: '-2px', fontSize: '16px', color: '#4A4A4A', transform: 'scale(0.80)' }} />
+                </div>
+            </div>
+        </>
     )
 }
 
