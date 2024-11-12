@@ -30,7 +30,7 @@ function List(props: ListProps) {
         return (
             <Flex justifyContent="evenly" className='mt-1'>
                 <Button size="xs" icon={RiInfoI} onClick={() => navigator('/documents/' + params.value)} />
-                <Button size="xs" icon={RiDeleteBinLine} onClick={async () => {
+                <Button style={{ backgroundColor: 'red' }} color="red" size="xs" icon={RiDeleteBinLine} onClick={async () => {
                     setDeleteConfirm(true);
                     rowNode.current = params.data;
                 }} />
@@ -53,7 +53,7 @@ function List(props: ListProps) {
             }
         },
         {
-            headerName: "Map Type", field: "doc_coordinates", enableRowGroup: true, filter: true, valueFormatter: (params: any) => {
+            headerName: "Area Type", field: "doc_coordinates", enableRowGroup: true, filter: true, valueFormatter: (params: any) => {
                 if (params.value) {
                     if (params.value.type === "EntireMunicipality") {
                         return "Entire Municipality";
