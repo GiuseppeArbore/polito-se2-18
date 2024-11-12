@@ -6,6 +6,7 @@ import { DashboardMapDraw, PreviewMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import StaticMode from '@mapbox/mapbox-gl-draw-static-mode';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import { RiFileLine } from '@remixicon/react';
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -159,27 +160,29 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                 pointerEvents: "auto",
                 touchAction: "auto" 
             }}
-        >
-                <div
-                className="primary text-sm font-bold"
-                style={{
-                    position: 'absolute',
-                    top: '10px',
-                    left: '10px',
-                    zIndex: 1,
-                    padding: '15px',
-                    backgroundColor: 'white',
-                    color: '#4A4A4A',
-                    border: '1px solid #ccc', 
-                    borderRadius: '8px', 
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                    fontWeight: 'bold',
-                    fontFamily: 'inherit',
-                    fontSize: '0.75rem'
-                }}
-            >
-                {props.entireMunicipalityCount} documents refer to the Entire Municipality of Kiruna
-            </div>
+        >       
+                    <div
+                    className="primary text-sm font-bold"
+                    style={{
+                        position: 'absolute',
+                        top: '10px',
+                        left: '10px',
+                        zIndex: 1,
+                        padding: '5px',
+                        backgroundColor: 'white',
+                        color: '#4A4A4A',
+                        border: '1px solid #ccc', 
+                        borderRadius: '8px', 
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                        fontWeight: 'bold',
+                        fontFamily: 'inherit',
+                        fontSize: '0.75rem',
+                    }}
+                    >   <div className="flex items-center">
+                        Documents covering the entire municipality: {props.entireMunicipalityCount}<RiFileLine style={{ marginLeft: '-2px', fontSize: '16px', color: '#4A4A4A', transform: 'scale(0.80)' }} />
+                        </div>
+                    </div>
+                
         </div>
     )
 }
