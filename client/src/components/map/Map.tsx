@@ -173,7 +173,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                     touchAction: "auto"
                 }}
             />
-            <DropdownMenu>
+            <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                     <Button
                         variant="primary"
