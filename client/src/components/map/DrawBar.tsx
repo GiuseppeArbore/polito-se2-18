@@ -4,6 +4,9 @@ import CutPolygonMode, {
   drawStyles as cutPolygonDrawStyles,
 } from "mapbox-gl-draw-cut-polygon-mode";
 import { passing_draw_polygon } from "mapbox-gl-draw-passing-mode";
+import StaticMode from '@mapbox/mapbox-gl-draw-static-mode';
+import customDrawStyles from '../../utils/drawStyles';
+
 
 var PreviewMapDraw = new MapboxDraw({
   modes: {
@@ -18,17 +21,25 @@ var PreviewMapDraw = new MapboxDraw({
     point: false,
     combine_features: false,
     uncombine_features: false,
-  },
-  // styles: [
-  //   {
-  //     id: "gl-draw-point-invisible",
-  //     type: "circle",
-  //     filter: ["all", ["==", "$type", "Point"]],
-  //     paint: {
-  //       "circle-radius": 0,
-  //     },
-  //   },
-  // ],
+},
 });
 
-export { PreviewMapDraw };
+var DashboardMapDraw = new MapboxDraw({
+  modes: {
+    ...CutPolygonMode(MapboxDraw.modes, passing_draw_polygon),
+    draw_polygon: FreehandMode,
+    static: StaticMode
+  },
+  displayControlsDefault: false,
+  controls: {
+    polygon: false,
+    trash: false,
+    line_string: false,
+    point: false,
+    combine_features: false,
+    uncombine_features: false,
+},
+  styles: customDrawStyles
+});
+
+export { PreviewMapDraw, DashboardMapDraw }; 
