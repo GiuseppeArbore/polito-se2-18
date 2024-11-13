@@ -22,7 +22,8 @@
     "mapbox-gl-draw-passing-mode": "github:lbordino/mapbox-gl-draw-passing-mode",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.11.2"
+    "react-router-dom": "^6.11.2",
+    "react-dropzone": "^11.4.2"
   },
   "devDependencies": {
     "@tremor/react": "^3.3.0",

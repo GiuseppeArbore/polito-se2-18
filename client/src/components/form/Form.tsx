@@ -39,6 +39,7 @@ import {
 import "../../index.css";
 import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
+import { FileUpload } from "./DragAndDrop";
 
 export class Link {
   connectionType: string = "";
@@ -115,7 +116,6 @@ export function FormDialog() {
       setTypeError(!type);
       setDescriptionError(!description);
       hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
-      setDocCoordinatesError(true);
       setError("Please fill all the required fields");
       toast({
               title: "Error",
@@ -687,6 +687,14 @@ export function FormDialog() {
               </div>
 
               <Divider />
+
+              <FileUpload />
+               
+                    
+
+
+              <Divider />
+
               <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
                 <Button
                   className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
