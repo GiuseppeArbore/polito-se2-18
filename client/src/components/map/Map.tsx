@@ -159,7 +159,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       // Load custom icon for points
       mapRef.current.on("load", () => {
         mapRef.current?.loadImage(
-          `${window.location.origin}/location-pin.png`,
+          `${window.location.origin}/pin.png`,
           (error, image: any) => {
             if (error) throw error;
             if (!mapRef.current?.hasImage("pin-icon")) {
@@ -188,7 +188,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         mapRef.current?.on("click", "document-points", (e: any) => {
           const coordinates = e.features[0].geometry.coordinates.slice();
           const { id, title, description } = e.features[0].properties;
-          console.log("e.features[0].properties: ", e.features[0].properties);
+
           new mapboxgl.Popup()
             .setLngLat(coordinates)
             .setHTML(
@@ -449,40 +449,6 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     );
   };
 
-  const onClick = (map: any) => {
-    map.current.on("click", (e: any) => {
-      const coordinates = [e.lngLat.lng, e.lngLat.lat];
-
-      // Get the source and update it with a new point feature
-      const source = mapRef.current?.getSource(
-        "custom-icon-layer"
-      ) as mapboxgl.GeoJSONSource;
-
-      const currentData = source._data as GeoJSON.FeatureCollection;
-
-      // Add a new point feature at the click location
-      const newFeature: Feature<Geometry> = {
-        type: "Feature",
-        geometry: {
-          type: "Point",
-          coordinates: coordinates,
-        },
-        properties: {},
-      };
-
-      // Update the source data with the new feature
-      const updatedData = {
-        ...currentData,
-        features: [newFeature],
-      };
-
-      // Set the updated data on the source
-      //if (props.drawing && props.drawing.feature[0].geometry.type === "Point")
-      //console.log("point");
-      source.setData(updatedData);
-    });
-  };
-
   useEffect(() => {
     if (mapRef.current) return;
     mapRef.current = new mapboxgl.Map({
@@ -497,12 +463,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
-    //loadImage();
-
     if (props.drawing) PreviewMapDraw.set(props.drawing);
-
-    // click listener
-    //onClick(mapRef);
   }, []);
 
   useEffect(() => {
