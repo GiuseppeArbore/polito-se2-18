@@ -18,7 +18,7 @@ export function FileUpload() {
     const [files, setFiles] = React.useState<File[]>([]);
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop: (acceptedFiles) =>
-            setFiles(acceptedFiles.map(file => ({ path: file.name, size: file.size }))),
+            setFiles(files.concat(acceptedFiles.map(file => ({ path: file.name, size: file.size })))),
     });
 
     const filesList = files.map((file) => (
@@ -86,8 +86,8 @@ export function FileUpload() {
                 >
                     Add original resources about the document you are uploading.
                     You can Drag&Drop or click to upload files.
-                    If you've to add more than one file, you can do it by clicking on the "choose file(s)" button.
-                    If you want to add more files using drag and drop, you can do it by dragging all the files to the upload area.
+                    You can upload multiple files at once or one by one.
+                    You can upload a directory with files and the files will be uploaded individually.
                     If you want to remove a file, click on the trash icon.
                 </Callout>
               }
