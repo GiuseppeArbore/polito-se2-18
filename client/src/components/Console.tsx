@@ -20,7 +20,6 @@ import {
 import API from "../API";
 import { useState, useMemo, useEffect } from "react";
 import { FormDialog } from "./form/Form";
-import { MultiSelect, MultiSelectItem } from "@tremor/react";
 import { DashboardMap, PreviewMap } from "./map/Map";
 import { KxDocument } from "../model";
 
@@ -77,6 +76,7 @@ export default function Console() {
       type: "Feature",
       geometry: doc.doc_coordinates,
       properties: {
+        id: doc._id,
         title: doc.title,
         description: doc.description,
       },

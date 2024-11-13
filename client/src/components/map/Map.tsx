@@ -155,6 +155,63 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       if (props.drawing) {
         DashboardMapDraw.set(props.drawing);
       }
+
+      // Load custom icon for points
+      mapRef.current.on("load", () => {
+        mapRef.current?.loadImage(
+          `${window.location.origin}/location-pin.png`,
+          (error, image: any) => {
+            if (error) throw error;
+            if (!mapRef.current?.hasImage("pin-icon")) {
+              mapRef.current?.addImage("pin-icon", image);
+            }
+
+            // Add points to map from props.drawing
+            mapRef.current?.addSource("documents", {
+              type: "geojson",
+              data: props.drawing,
+            });
+
+            mapRef.current?.addLayer({
+              id: "document-points",
+              type: "symbol",
+              source: "documents",
+              layout: {
+                "icon-image": "pin-icon",
+                "icon-size": 1,
+              },
+            });
+          }
+        );
+
+        // Click event to show popup with document title
+        mapRef.current?.on("click", "document-points", (e: any) => {
+          const coordinates = e.features[0].geometry.coordinates.slice();
+          const { id, title, description } = e.features[0].properties;
+          console.log("e.features[0].properties: ", e.features[0].properties);
+          new mapboxgl.Popup()
+            .setLngLat(coordinates)
+            .setHTML(
+              `<strong><a href="/documents/${id}" > ${title}</a></strong><p>${description}</p>`
+            )
+            .addTo(mapRef.current as any);
+        });
+
+        // Change the cursor to pointer when hovering over a point
+        mapRef.current?.on("mouseenter", "document-points", () => {
+          const canvas = mapRef.current?.getCanvas();
+          if (canvas) {
+            canvas.style.cursor = "pointer";
+          }
+        });
+
+        mapRef.current?.on("mouseleave", "document-points", () => {
+          const canvas = mapRef.current?.getCanvas();
+          if (canvas) {
+            canvas.style.cursor = "";
+          }
+        });
+      });
     }
   }, [props.drawing]);
 
