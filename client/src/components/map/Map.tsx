@@ -1,11 +1,12 @@
-import mapboxgl, { LngLatLike } from "mapbox-gl"
+import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl"
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Card, TabGroup, TabList, Tab, Divider, TextInput } from "@tremor/react";
-import { RiCheckFill, RiCloseLine, RiDeleteBinFill, RiHand, RiMapPinLine, RiScissorsCutFill, RiShapeLine, RiArrowDownSLine } from "@remixicon/react";
+import { Button, Card, TabGroup, TabList, Tab, Divider, TextInput, Icon } from "@tremor/react";
+import { RiCheckFill, RiCloseLine, RiCrosshair2Fill, RiDeleteBinFill, RiHand, RiInfoI, RiInformation2Line, RiMapPinLine, RiScissorsCutFill, RiShapeLine, RiArrowDownSLine } from "@remixicon/react";
 import { DashboardMapDraw, PreviewMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { Feature, FeatureCollection, Position } from "geojson"
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
+import { coordDistance } from "../../utils";
 import { RiFileLine } from '@remixicon/react';
 import { KxDocument } from "../../model";
 import {
@@ -303,9 +304,17 @@ interface MapControlsProps {
     drawing: FeatureCollection | undefined
 }
 
-const MapControls: React.FC<MapControlsProps & {setFeature: (_: Feature) => void}> = (props) => {
+const MapControls: React.FC<
+    MapControlsProps &
+    {
+        bounds: LngLatBounds | null,
+        flyTo: (coords: LngLatLike) => void,
+        setFeature: (_: Feature) => void
+    }
+> = (props) => {
     const [index, setIndex] = useState(0);
     const [pointCoords, setPointCoords] = useState<[string, string]>(["", ""]);
+    const [coordsError, setCoordsError] = useState(false);
     function str2pos(str: [string, string]): Position {
         return [Number(str[0]), Number(str[1])];
     }
@@ -331,6 +340,19 @@ const MapControls: React.FC<MapControlsProps & {setFeature: (_: Feature) => void
             setIndex(2);
         }
     }, [geometry?.type, pos?.[0], pos?.[1]]);
+
+    useEffect(() => {
+        const dist = coordDistance(center.toReversed() as [number, number], str2pos(pointCoords).toReversed() as [number, number]);
+        if (dist <= 100 || pointCoords.find(c => c === "") !== undefined) {
+            setCoordsError(false);
+        } else {
+            setCoordsError(true);
+        }
+        if (index === 1 && PreviewMapDraw.getMode() === "simple_select" && pointCoords.every(c => c === "")) {
+            PreviewMapDraw.deleteAll();
+            PreviewMapDraw.changeMode("draw_point");
+        }
+    }, [pointCoords[0], pointCoords[1]]);
 
     // Note:
     // React's useEffect() are run starting from the children. This means that we cannot change
@@ -374,6 +396,7 @@ const MapControls: React.FC<MapControlsProps & {setFeature: (_: Feature) => void
                                         value={pointCoords[0]}
                                         onValueChange={(longitude) => {
                                             const tmp = Number(longitude);
+                                            if (tmp < 0 || tmp > 180) return;
                                             const newCoords: [string, string] = [isNaN(tmp) ? pointCoords[0] : longitude, pointCoords[1]];
                                             setPointCoords(newCoords);
                                             if (newCoords.every(c => (!isNaN(Number(c)) && c !== ""))) {
@@ -388,6 +411,7 @@ const MapControls: React.FC<MapControlsProps & {setFeature: (_: Feature) => void
                                                 });
                                             }
                                         }}
+                                        error={coordsError}
                                         icon={() => (
                                             <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
                                                 Longitude
@@ -399,6 +423,7 @@ const MapControls: React.FC<MapControlsProps & {setFeature: (_: Feature) => void
                                         value={pointCoords[1]}
                                         onValueChange={(latitude) => {
                                             const tmp = Number(latitude);
+                                            if (tmp < -90 || tmp > 90) return;
                                             const newCoords: [string, string] = [pointCoords[0], isNaN(tmp) ? pointCoords[1] : latitude];
                                             setPointCoords(newCoords);
                                             if (newCoords.every(c => (!isNaN(Number(c)) && c !== ""))) {
@@ -413,6 +438,8 @@ const MapControls: React.FC<MapControlsProps & {setFeature: (_: Feature) => void
                                                 });
                                             }
                                         }}
+                                        error={coordsError}
+                                        errorMessage="All points must be within 100Km of Kiruna"
                                         icon={() => (
                                             <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
                                                 Latitude
@@ -420,6 +447,20 @@ const MapControls: React.FC<MapControlsProps & {setFeature: (_: Feature) => void
                                         )}
                                         className="pl-9 border-t-0 rounded-t-none"
                                     />
+                                    {
+                                        !coordsError && pointCoords.every(c => c !== "") && !props.bounds?.contains(str2pos(pointCoords) as LngLatLike) ?
+                                            <div className="flex justify-center mt-2">
+                                                <Button
+                                                    icon={RiCrosshair2Fill}
+                                                    size="xs"
+                                                    variant="light"
+                                                    onClick={() => {props.flyTo(str2pos(pointCoords) as LngLatLike)}}
+                                                >
+                                                    Navigate to point
+                                                </Button>
+                                            </div>
+                                            : null
+                                    }
                                 </div>
                                 <div className="mt-2 flex justify-center ">
                                     <Button
@@ -476,7 +517,7 @@ const MapControls: React.FC<MapControlsProps & {setFeature: (_: Feature) => void
             <Divider />
             <div className="px-2 flex justify-between space-x-2">
                 <Button size="xs" variant="secondary" icon={RiCloseLine} onClick={props.onCancel} className="flex-1">Cancel</Button>
-                <Button size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
+                <Button disabled={coordsError} size="xs" variant="primary" icon={RiCheckFill} onClick={() => {
                     // This changeMode is necessary, otherwise the MapDraw might contain malformed data
                     PreviewMapDraw.changeMode("simple_select");
                     props.onDone(PreviewMapDraw.getAll());
@@ -490,6 +531,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     const mapContainerRef = useRef<any>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
     const [tmpDrawing, setTmpDrawing] = useState<FeatureCollection | undefined>(props.drawing);
+    const [mapBounds, setMapBounds] = useState<LngLatBounds | null>(null);
 
     useEffect(() => {
         if (mapRef.current) return;
@@ -505,6 +547,9 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
         mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
 
+        mapRef.current.on('move', (e) => {
+            setMapBounds(e.target.getBounds());
+        });
         mapRef.current.on('draw.create', (e: DrawCreateEvent) => {
             setTmpDrawing({type: "FeatureCollection", features: e.features});
         });
@@ -538,6 +583,13 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
                     PreviewMapDraw.set({type: "FeatureCollection", features: [f]});
                 }}
                 drawing={tmpDrawing}
+                bounds={mapBounds}
+                flyTo={(coords: LngLatLike) => {
+                    mapRef.current?.flyTo({
+                        center: coords,
+                        zoom: props.zoom || defaultZoom
+                    })
+                }}
             />
         </>
     )
