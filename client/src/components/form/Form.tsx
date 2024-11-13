@@ -20,8 +20,9 @@ import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
 import API from "../../API";
-import { AreaType, DocCoords, KxDocumentType, Scale, Stakeholders } from "../../enum";
-import { KxDocument } from "../../model";
+import { AreaType, KxDocumentType, Scale, Stakeholders } from "../../enum";
+import { DocCoords, KxDocument } from "../../model";
+import { mongoose } from "@typegoose/typegoose";
 import {
   RiArrowDownCircleLine,
   RiLinksLine,
@@ -55,7 +56,7 @@ export function FormDialog({
   const [titleError, setTitleError] = useState(false);
   const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
   const [shError, setShError] = useState(false);
-  const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(
+  const [issuanceDate, setIssuanceDate] = useState<Date>(
     new Date()
   );
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
@@ -134,7 +135,7 @@ export function FormDialog({
     const newDocument: KxDocument = {
       title,
       stakeholders,
-      scale_info: Scale.TEXT,
+      //scale_info: Scale.TEXT,
       scale,
       doc_coordinates: draw,
       issuance_date: issuanceDate,
@@ -143,10 +144,10 @@ export function FormDialog({
       description,
       pages: validatePageRangeString(pages),
       connections: {
-        direct: documentsForDirect,
-        collateral: documentsForCollateral,
-        projection: documentsForProjection,
-        update: documentsForUpdate,
+        direct: documentsForDirect.map(d => new mongoose.Types.ObjectId(d)),
+        collateral: documentsForCollateral.map(d => new mongoose.Types.ObjectId(d)),
+        projection: documentsForProjection.map(d => new mongoose.Types.ObjectId(d)),
+        update: documentsForUpdate.map(d => new mongoose.Types.ObjectId(d)),
       },
     };
 
@@ -316,7 +317,7 @@ export function FormDialog({
                     id="issuance-date"
                     className="mt-2"
                     value={issuanceDate}
-                    onValueChange={d => setIssuanceDate(d)}
+                    onValueChange={d => setIssuanceDate(d!)}
                     enableYearNavigation={true}
                     weekStartsOn={1}
                     enableClear={false}
@@ -590,7 +591,7 @@ export function FormDialog({
                             : ""
                         }
                       >
-                        {doc.title}
+                        {doc.title }
                       </MultiSelectItem>
                     ))}
                   </MultiSelect>
@@ -653,7 +654,7 @@ export function FormDialog({
                             : ""
                         }
                       >
-                        {doc.title}
+                        {doc.title }
                       </MultiSelectItem>
                     ))}
                   </MultiSelect>
@@ -683,7 +684,7 @@ export function FormDialog({
                             : ""
                         }
                       >
-                        {doc.title}
+                        {doc.title + doc._id}
                       </MultiSelectItem>
                     ))}
                   </MultiSelect>
