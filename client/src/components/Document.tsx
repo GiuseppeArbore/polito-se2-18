@@ -29,7 +29,7 @@ export default function Document() {
     const [language, setLanguage] = useState<string | undefined>("");
     const [pages, setPages] = useState<PageRange[] | "">("");
     const [description, setDescription] = useState<string | undefined>("");
-    const [entireMunicipalityDocuments, setEntireMunicipalityDocuments] = useState<KxDocument[]>([]);
+    const [entireMunicipality, setEntireMunicipality] = useState(false);
 
     useEffect(() => {
         const fetchDocument = async () => {
@@ -61,7 +61,7 @@ export default function Document() {
             };
             setDrawings(geoJSON);
         }else{
-            setEntireMunicipalityDocuments(prevDocuments => [...prevDocuments, document]);
+            setEntireMunicipality(true);
         }
     
         
@@ -171,16 +171,37 @@ export default function Document() {
                     </AccordionBody>
                 </Accordion>
 
-                <Card
-                    className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
-                >
-                    <DocumentPageMap
-                        drawing={drawings}
-                        style={{ minHeight: "300px", width: "100%" }}
-                        entireMunicipalityDocuments={entireMunicipalityDocuments}
-                    />
-                </Card>
-
+             
+                    {!entireMunicipality ? (
+                        <Card
+                        className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
+                        >
+                            <DocumentPageMap
+                                drawing={drawings}
+                                style={{ minHeight: "300px", width: "100%" }}
+                            />
+                        </Card>
+                    ) : (
+                        <div className="flex justify-left items-start pt-10">
+                            <div className='w-full sm:w-2/3 md:w-1/2 lg:w-1/3'
+                                style={{
+                                    backgroundColor: 'white',
+                                    color: '#4A4A4A',
+                                    border: '1px solid #ccc',
+                                    padding: '16px 24px',
+                                    fontSize: '14px',
+                                    borderRadius: '8px',
+                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
+                                }}
+                            >
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                    <span>
+                                        The document covers the entire municipality
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
             </Card>
 
 

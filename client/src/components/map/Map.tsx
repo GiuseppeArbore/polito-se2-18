@@ -323,34 +323,7 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
                     pointerEvents: "auto",
                     touchAction: "auto"
                 }}
-            />
-           
-                   {(props.entireMunicipalityDocuments?.length ?? 0) > 0 && <div
-                       style={{
-                        backgroundColor: 'white',
-                        color: '#4A4A4A',
-                        border: '1px solid #ccc',
-                        position: 'absolute',
-                        top: '10px',
-                        left: '10px',
-                        zIndex: 1,
-                        padding: '16px 24px',
-                        fontSize: '14px',
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        alignItems: 'center',
-                        borderRadius: '8px', 
-                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', 
-                    }}
-                    >
-                        <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <span>
-                              The Document covers the entire municipality
-                            </span>
-                        </div>
-                    </div>
-}
-              
+            /> 
         </>
     );
 }
