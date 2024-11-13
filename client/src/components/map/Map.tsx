@@ -222,13 +222,135 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>
                         {props.entireMunicipalityDocuments?.map((doc, index) => (
-                            <DropdownMenuItem key={index}>
+                            <DropdownMenuItem 
+                            key={index}
+                            onClick={() => window.location.href = `/documents/${doc._id}`}>
                                 {doc.title}
                             </DropdownMenuItem>
                         ))}
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
+        </>
+    );
+}
+
+export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
+
+    const mapContainerRef = useRef<any>(null);
+    const mapRef = useRef<mapboxgl.Map | null>(null);
+
+    useEffect(() => {
+        if (mapRef.current) return;
+
+        const modes = MapboxDraw.modes;
+        modes.static = StaticMode;
+
+        mapRef.current = new mapboxgl.Map({
+            container: mapContainerRef.current,
+            style: "mapbox://styles/mapbox/satellite-streets-v12",
+            center: center,
+            zoom: props.zoom || defaultZoom,
+            pitch: 40,
+            interactive: true 
+        });
+
+        
+
+        mapRef.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+        mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
+        mapRef.current.addControl(DashboardMapDraw, 'bottom-right');
+
+        mapRef.current.on('load', function() {
+            DashboardMapDraw.changeMode('static'); 
+        });
+
+        if (props.drawing) {
+            DashboardMapDraw.set(props.drawing);
+        }
+    }, [mapContainerRef.current]);
+
+    useEffect(() => {
+        if (props.drawing) {
+            mapRef.current?.remove();
+            mapRef.current = null;
+
+            const modes = MapboxDraw.modes;
+            modes.static = StaticMode;
+
+            mapRef.current = new mapboxgl.Map({
+                container: mapContainerRef.current,
+                style: "mapbox://styles/mapbox/satellite-streets-v12",
+                center: center,
+                zoom: props.zoom || defaultZoom,
+                pitch: 40,
+                interactive: true
+            });
+
+            
+
+            mapRef.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+            mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+            mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
+            mapRef.current.addControl(DashboardMapDraw, 'bottom-right');
+
+            mapRef.current.on('load', function() {
+                DashboardMapDraw.changeMode('static');
+            });
+
+            if (props.drawing) {
+                DashboardMapDraw.set(props.drawing);
+            }
+        }
+    }, [props.drawing]);
+
+    useEffect(() => {
+        if (!mapRef.current) return;
+
+        const map = mapRef.current;
+        map.setZoom(props.zoom || defaultZoom);
+    }, [props.zoom]);
+
+    return (
+        <>
+            <div
+                className={props.className}
+                ref={mapContainerRef}
+                id="map"
+                style={{
+                    ...props.style,
+                    pointerEvents: "auto",
+                    touchAction: "auto"
+                }}
+            />
+           
+                   {(props.entireMunicipalityDocuments?.length ?? 0) > 0 && <div
+                       style={{
+                        backgroundColor: 'white',
+                        color: '#4A4A4A',
+                        border: '1px solid #ccc',
+                        position: 'absolute',
+                        top: '10px',
+                        left: '10px',
+                        zIndex: 1,
+                        padding: '16px 24px',
+                        fontSize: '14px',
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        alignItems: 'center',
+                        borderRadius: '8px', 
+                        boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)', 
+                    }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            <span>
+                              The Document covers the entire municipality
+                            </span>
+                        </div>
+                    </div>
+}
+              
         </>
     );
 }

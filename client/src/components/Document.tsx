@@ -8,7 +8,7 @@ import {
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { KxDocumentType, Stakeholders } from "../enum";
-import { PreviewMap } from './map/Map';
+import { DocumentPageMap, PreviewMap } from './map/Map';
 import API from '../API';
 import { KxDocument, PageRange } from '../model';
 import { mongoose } from '@typegoose/typegoose';
@@ -20,7 +20,7 @@ export default function Document() {
     const { id } = useParams();
     const [doc, setDoc] = useState<KxDocument | null>(null);
     const [share, setShare] = useState(false);
-
+    const [drawings, setDrawings] = useState<any>("")
     const [title, setTitle] = useState("");
     const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
     const [scale, setScale] = useState("");
@@ -29,6 +29,7 @@ export default function Document() {
     const [language, setLanguage] = useState<string | undefined>("");
     const [pages, setPages] = useState<PageRange[] | "">("");
     const [description, setDescription] = useState<string | undefined>("");
+    const [entireMunicipalityDocuments, setEntireMunicipalityDocuments] = useState<KxDocument[]>([]);
 
     useEffect(() => {
         const fetchDocument = async () => {
@@ -43,6 +44,27 @@ export default function Document() {
             setLanguage(document.language || "");
             setPages(document.pages || "");
             setDescription(document.description || "");
+            if(document.doc_coordinates.type !=="EntireMunicipality"){
+            const geoJSON = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        geometry: document.doc_coordinates,
+                        properties: {
+                            title: document.title,
+                            description: document.description,
+                            id: document._id
+                        }
+                    }
+                ]
+            };
+            setDrawings(geoJSON);
+        }else{
+            setEntireMunicipalityDocuments(prevDocuments => [...prevDocuments, document]);
+        }
+    
+        
             } catch (error) {
             console.error("Failed to fetch document:", error);
             navigate("/404");
@@ -50,10 +72,11 @@ export default function Document() {
         };
 
         fetchDocument();
-    });
+    },[]);
 
 
     const [showCheck, setShowCheck] = useState(false);
+    
 
     return (
         <div>
@@ -151,9 +174,10 @@ export default function Document() {
                 <Card
                     className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
                 >
-                    <PreviewMap
-                        drawing={undefined}
+                    <DocumentPageMap
+                        drawing={drawings}
                         style={{ minHeight: "300px", width: "100%" }}
+                        entireMunicipalityDocuments={entireMunicipalityDocuments}
                     />
                 </Card>
 
