@@ -7,6 +7,7 @@ import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import StaticMode from '@mapbox/mapbox-gl-draw-static-mode';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { RiFileLine } from '@remixicon/react';
+import { KxDocument } from "../../model";
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -15,7 +16,7 @@ export interface SatMapProps {
     zoom?: number,
     style?: React.CSSProperties,
     className?: string,
-    entireMunicipalityCount?: number,
+    entireMunicipalityDocuments?: KxDocument[],
 }
 
 const defaultZoom = 12;
@@ -180,7 +181,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                     fontSize: '0.80rem',
                 }}
             >   <div className="flex items-center">
-                    Documents covering the entire municipality: {props.entireMunicipalityCount}<RiFileLine style={{ marginLeft: '-2px', fontSize: '16px', color: '#4A4A4A', transform: 'scale(0.80)' }} />
+                    Documents covering the entire municipality: {props.entireMunicipalityDocuments?.length}<RiFileLine style={{ marginLeft: '-2px', fontSize: '16px', color: '#4A4A4A', transform: 'scale(0.80)' }} />
                 </div>
             </div>
         </>

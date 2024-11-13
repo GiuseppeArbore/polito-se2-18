@@ -14,25 +14,19 @@ export default function Console() {
     const [selectedView, setSelectedView] = useState(0);
     const [selectedDocuments, setselectedDocuments] = useState<string[]>(['doc1']);
     const [documents, setDocuments] = useState<KxDocument[]>([]);
-    const [entireMunicipalityCount, setEntireMunicipalityCount] = useState(0);
+    const [entireMunicipalityDocuments, setEntireMunicipalityDocuments] = useState<KxDocument[]>([]);
     const [newDocumentCreated, setNewDocumentCreated] = useState(true);
 
     useEffect(() => {
         const fetchDocuments = async () => {
             try {
                 const response = await API.getAllKxDocuments();
-                setDocuments(response);
-    
-                let count = 0;
-                const filteredDocuments = response.filter(doc => {
-                    if (doc.doc_coordinates?.type === "EntireMunicipality") {
-                        count++;
-                        return false;
-                    }
-                    return true;
-                });
-                setEntireMunicipalityCount(count);
-                setDocuments(filteredDocuments);
+                
+                const entireMunicipalityDocs = response.filter(doc => doc.doc_coordinates?.type === "EntireMunicipality");
+                const otherDocs = response.filter(doc => doc.doc_coordinates?.type !== "EntireMunicipality");
+
+                setEntireMunicipalityDocuments(entireMunicipalityDocs);
+                setDocuments(otherDocs);
             } catch (error) {
                 console.error('Error fetching documents:', error);
             }
@@ -51,7 +45,8 @@ export default function Console() {
             geometry: doc.doc_coordinates,
             properties: {
                 title: doc.title,
-                description: doc.description
+                description: doc.description,
+                id: doc._id
             }
         }))
     };
@@ -138,7 +133,7 @@ export default function Console() {
                         <DashboardMap
                             style={{ margin: 0, minHeight: "300px", width: "100%", height: "100%", borderRadius: 8 }}
                             drawing={drawing}
-                            entireMunicipalityCount={entireMunicipalityCount}
+                            entireMunicipalityDocuments={entireMunicipalityDocuments}
                         ></DashboardMap>
                     </>
                 );
