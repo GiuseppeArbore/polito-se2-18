@@ -1,13 +1,22 @@
 import mapboxgl, { LngLatLike } from "mapbox-gl"
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Card, TabGroup, TabList, Tab, Divider } from "@tremor/react";
-import { RiCheckFill, RiCloseLine, RiDeleteBinFill, RiHand, RiMapPinLine, RiScissorsCutFill, RiShapeLine } from "@remixicon/react";
+import { RiCheckFill, RiCloseLine, RiDeleteBinFill, RiHand, RiMapPinLine, RiScissorsCutFill, RiShapeLine, RiArrowDownSLine } from "@remixicon/react";
 import { DashboardMapDraw, PreviewMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import StaticMode from '@mapbox/mapbox-gl-draw-static-mode';
 import MapboxDraw from '@mapbox/mapbox-gl-draw';
 import { RiFileLine } from '@remixicon/react';
 import { KxDocument } from "../../model";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./DropDownMenu"
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -163,29 +172,58 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                     touchAction: "auto"
                 }}
             />
-            <div
-                className="primary text-sm font-bold"
-                style={{
-                    position: 'absolute',
-                    top: '10px',
-                    left: '10px',
-                    zIndex: 1,
-                    padding: '10px',
-                    backgroundColor: 'white',
-                    color: '#4A4A4A',
-                    border: '1px solid #ccc',
-                    borderRadius: '8px',
-                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                    fontWeight: 'bold',
-                    fontFamily: 'inherit',
-                    fontSize: '0.80rem',
-                }}
-            >   <div className="flex items-center">
-                    Documents covering the entire municipality: {props.entireMunicipalityDocuments?.length}<RiFileLine style={{ marginLeft: '-2px', fontSize: '16px', color: '#4A4A4A', transform: 'scale(0.80)' }} />
-                </div>
-            </div>
+            <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                    <Button
+                        variant="primary"
+                        style={{
+                            backgroundColor: 'white',
+                            color: '#4A4A4A',
+                            border: '1px solid #ccc',
+                            position: 'absolute',
+                            top: '10px',
+                            left: '10px',
+                            zIndex: 1,
+                        }}
+                    >
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            Documents covering the entire municipality: {props.entireMunicipalityDocuments?.length}
+                            <RiFileLine
+                                style={{
+                                    fontSize: '16px',
+                                    color: '#4A4A4A',
+                                    transform: 'scale(0.80)',
+                                    marginLeft: '8px',
+                                }}
+                            />
+                            <RiArrowDownSLine
+                                style={{
+                                    fontSize: '16px',
+                                    color: '#4A4A4A',
+                                    marginLeft: '4px',
+                                }}
+                            />
+                        </div>
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent
+                    style={{
+                        marginLeft: '170px',
+                    }}
+                >
+                    <DropdownMenuLabel>Documents</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                        {props.entireMunicipalityDocuments?.map((doc, index) => (
+                            <DropdownMenuItem key={index}>
+                                {doc.title}
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuGroup>
+                </DropdownMenuContent>
+            </DropdownMenu>
         </>
-    )
+    );
 }
 
 interface MapControlsProps {
