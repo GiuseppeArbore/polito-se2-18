@@ -17,6 +17,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "./DropDownMenu"
+import "../../index.css"
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -184,16 +185,25 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                             top: '10px',
                             left: '10px',
                             zIndex: 1,
+                            padding: '8px 12px',
+                            fontSize: '14px',
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
                         }}
                     >
                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                            Documents covering the entire municipality: {props.entireMunicipalityDocuments?.length}
+                            <span className="document-text">
+                                Documents covering the entire municipality:
+                            </span>
+                            <span style={{ marginLeft: '5px' }}>
+                                {props.entireMunicipalityDocuments?.length}
+                            </span>
                             <RiFileLine
                                 style={{
                                     fontSize: '16px',
                                     color: '#4A4A4A',
                                     transform: 'scale(0.80)',
-                                    marginLeft: '8px',
                                 }}
                             />
                             <RiArrowDownSLine
@@ -206,11 +216,8 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                         </div>
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent
-                    style={{
-                        marginLeft: '170px',
-                    }}
-                >
+    
+                <DropdownMenuContent>
                     <DropdownMenuLabel>Documents</DropdownMenuLabel>
                     <DropdownMenuSeparator />
                     <DropdownMenuGroup>

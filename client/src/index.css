@@ -21,3 +21,9 @@ body {
 .secondary {
     color:  #003d8e;
 }
+@media (max-width: 600px) {
+    .document-text {
+      display: none;
+    }
+  }
+
