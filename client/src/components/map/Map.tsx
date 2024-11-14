@@ -177,10 +177,27 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
 
             // if there is any points, then we can add the source and layer
             if (pointsAssignedToDocs) {
+              function addJitterToPoints(geojsonData: any) {
+                const jitterAmount = 0.0009; // Adjust this value for more or less jitter
+                geojsonData.features.forEach((feature: any) => {
+                  if (feature.geometry.type === "Point") {
+                    // Add a random offset to each coordinate
+                    feature.geometry.coordinates[0] +=
+                      (Math.random() - 0.5) * jitterAmount;
+                    feature.geometry.coordinates[1] +=
+                      (Math.random() - 0.5) * jitterAmount;
+                  }
+                });
+                return geojsonData;
+              }
+
+              // Apply jitter to your data and add it as a source
+              const jitteredGeoJSON = addJitterToPoints(pointsAssignedToDocs);
               //Add points to map from pointsAssignedToDocs
               mapRef.current?.addSource("documents", {
                 type: "geojson",
-                data: pointsAssignedToDocs,
+                data: jitteredGeoJSON,
+                cluster: false, // disable clustering
               });
 
               mapRef.current?.addLayer({
@@ -191,7 +208,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                   "icon-image": "pin-icon",
                   "icon-size": 1,
                 },
-                
               });
             }
           }
