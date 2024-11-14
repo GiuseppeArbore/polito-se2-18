@@ -1,16 +1,36 @@
 import { Card, Title, Text, Grid, Col, DateRangePicker, Metric, Subtitle, Bold, Italic, Select, SelectItem, TabGroup, TabList, Tab, DateRangePickerItem, DateRangePickerValue } from "@tremor/react";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import { FormDialog } from "./form/Form";
 import { MultiSelect, MultiSelectItem } from '@tremor/react';
 import { PreviewMap } from "./map/Map";
+import List from "./list/List";
+import { KxDocument } from "../model";
+import API from "../API";
+import { Toaster } from "./toast/Toaster";
+import { toast } from "../utils/toaster";
 
 
 export default function Console() {
-
-    const today = new Date(Date.now());
-    const [groupKey, setGroupKey] = useState("1");
+    const [documents, setDocuments] = useState<KxDocument[]>([]);
     const [selectedView, setSelectedView] = useState(0);
-    const [selectedDocuments, setselectedDocuments] = useState<string[]>(['doc1']);
+    const [refreshNeeded, setRefreshNeeded] = useState(false);
+    useEffect(() => {
+          const fetchDocuments = async () => {
+            try {
+              const docs = await API.getAllKxDocuments();
+              setDocuments(docs);
+            } catch (error) {
+              toast({
+                title: "Error",
+                description: "Failed to retrieve documents",
+                variant: "error",
+                duration: 3000,
+              })
+            }
+          };
+          fetchDocuments();
+          setRefreshNeeded(false);
+      }, [selectedView, refreshNeeded]);
 
     return (
         <main>
@@ -40,7 +60,7 @@ export default function Console() {
 
                 <Col numColSpanLg={1}>
                     <div className="space-y-6">
-                        <FormDialog />
+                        <FormDialog documents={documents} refresh={()=>setRefreshNeeded(true)} />
 
                         {/* <Card>
                             <Text>Select</Text>
@@ -84,6 +104,7 @@ export default function Console() {
                         <div>Diagram Coming soon...</div>
                 </div>
             </Card>
+            <Toaster/>
         </main >
     );
     function renderCurrentSelection(selectedView: number = 0) {
@@ -101,7 +122,7 @@ export default function Console() {
                 return (
                     <>
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                            <div>Coming soon...</div>
+                           <List documents={documents} />
                         </div>
                     </>
                 );

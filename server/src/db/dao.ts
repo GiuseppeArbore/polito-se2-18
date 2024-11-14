@@ -78,7 +78,7 @@ class DAO {
         const result = await KxDocumentModel.deleteOne({
             _id: id
         }).exec();
-        if (result) {
+        if (result.deletedCount === 1) {
             return true;
 
         }
