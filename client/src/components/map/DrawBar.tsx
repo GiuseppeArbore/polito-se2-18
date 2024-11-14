@@ -41,7 +41,8 @@ var DashboardMapDraw = new MapboxDraw({
 },
 styles: [...selectFeatureDrawStyles(customDrawStyles)],
 userProperties: true,
-//selectHighlightColor: "red",
+selectHighlightColor: "red",
+selectionRadius: 15,
 });
 
 
