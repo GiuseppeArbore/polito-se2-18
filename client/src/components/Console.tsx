@@ -1,11 +1,10 @@
 import { Card, Title, Text, Grid, Col, DateRangePicker, Metric, Subtitle, Bold, Italic, Select, SelectItem, TabGroup, TabList, Tab, DateRangePickerItem, DateRangePickerValue } from "@tremor/react";
-import { useState, useMemo, useEffect } from "react";
+import API from '../API';
+import { useState, useEffect } from "react";
 import { FormDialog } from "./form/Form";
-import { MultiSelect, MultiSelectItem } from '@tremor/react';
-import { PreviewMap } from "./map/Map";
-import List from "./list/List";
+import { DashboardMap } from "./map/Map";
 import { KxDocument } from "../model";
-import API from "../API";
+import List from "./list/List";
 import { Toaster } from "./toast/Toaster";
 import { toast } from "../utils/toaster";
 
@@ -13,11 +12,18 @@ import { toast } from "../utils/toaster";
 export default function Console() {
     const [documents, setDocuments] = useState<KxDocument[]>([]);
     const [selectedView, setSelectedView] = useState(0);
-    const [refreshNeeded, setRefreshNeeded] = useState(false);
+    const [refreshNeeded, setRefreshNeeded] = useState(true);
+    const [entireMunicipalityDocuments, setEntireMunicipalityDocuments] = useState<KxDocument[]>([]);
+    const [pointOrAreaDocuments, setPointOrAreaDocuments] = useState<KxDocument[]>([]);
     useEffect(() => {
           const fetchDocuments = async () => {
             try {
               const docs = await API.getAllKxDocuments();
+              const entireMunicipalityDocs = docs.filter(doc => doc.doc_coordinates?.type === "EntireMunicipality");
+              const otherDocs = docs.filter(doc => doc.doc_coordinates?.type !== "EntireMunicipality");
+
+              setEntireMunicipalityDocuments(entireMunicipalityDocs);
+              setPointOrAreaDocuments(otherDocs);
               setDocuments(docs);
             } catch (error) {
               toast({
@@ -28,9 +34,24 @@ export default function Console() {
               })
             }
           };
-          fetchDocuments();
-          setRefreshNeeded(false);
+          if (refreshNeeded) {
+              fetchDocuments();
+              setRefreshNeeded(false);
+          }
       }, [selectedView, refreshNeeded]);
+
+    const drawing = {
+        type: 'FeatureCollection',
+        features: pointOrAreaDocuments.map(doc => ({
+            type: 'Feature',
+            geometry: doc.doc_coordinates,
+            properties: {
+                title: doc.title,
+                description: doc.description,
+                id: doc._id
+            }
+        }))
+    };
 
     return (
         <main>
@@ -112,10 +133,11 @@ export default function Console() {
             case 0:
                 return (
                     <>
-                        <PreviewMap
+                        <DashboardMap
                             style={{ margin: 0, minHeight: "300px", width: "100%", height: "100%", borderRadius: 8 }}
-                            drawing={undefined}
-                        ></PreviewMap>
+                            drawing={drawing}
+                            entireMunicipalityDocuments={entireMunicipalityDocuments}
+                        ></DashboardMap>
                     </>
                 );
             case 1:

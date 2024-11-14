@@ -1,9 +1,24 @@
 import mapboxgl, { LngLatLike } from "mapbox-gl"
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { Button, Card, TabGroup, TabList, Tab, Divider } from "@tremor/react";
-import { RiCheckFill, RiCloseLine, RiDeleteBinFill, RiHand, RiMapPinLine, RiScissorsCutFill, RiShapeLine } from "@remixicon/react";
-import { PreviewMapDraw } from "./DrawBar";
+import { RiCheckFill, RiCloseLine, RiDeleteBinFill, RiHand, RiMapPinLine, RiScissorsCutFill, RiShapeLine, RiArrowDownSLine } from "@remixicon/react";
+import { DashboardMapDraw, PreviewMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
+import StaticMode from '@mapbox/mapbox-gl-draw-static-mode';
+import MapboxDraw from '@mapbox/mapbox-gl-draw';
+import { RiFileLine } from '@remixicon/react';
+import { KxDocument } from "../../model";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./DropDownMenu"
+import "../../index.css"
+import "../../css/map.css"
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -12,6 +27,7 @@ export interface SatMapProps {
     zoom?: number,
     style?: React.CSSProperties,
     className?: string,
+    entireMunicipalityDocuments?: KxDocument[],
 }
 
 const defaultZoom = 12;
@@ -45,7 +61,6 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
             mapRef.current = null;
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
-                //style: "mapbox://styles/mapbox/satellite-streets-v12",
                 style: "mapbox://styles/mapbox/light-v11",
                 center: center,
                 zoom: props.zoom || defaultZoom,
@@ -68,6 +83,229 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
     return (
         <div className={props.className} ref={mapContainerRef} id="map" style={{...props.style, ...{pointerEvents: "none", touchAction: "none"}}} ></div>
     )
+}
+
+export const DashboardMap: React.FC<SatMapProps> = (props) => {
+
+    const mapContainerRef = useRef<any>(null);
+    const mapRef = useRef<mapboxgl.Map | null>(null);
+
+    useEffect(() => {
+        if (mapRef.current) return;
+
+        const modes = MapboxDraw.modes;
+        modes.static = StaticMode;
+
+        mapRef.current = new mapboxgl.Map({
+            container: mapContainerRef.current,
+            style: "mapbox://styles/mapbox/satellite-streets-v12",
+            center: center,
+            zoom: props.zoom || defaultZoom,
+            pitch: 40,
+            interactive: true 
+        });
+
+        
+
+        mapRef.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+        mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
+        mapRef.current.addControl(DashboardMapDraw, 'bottom-right');
+
+        mapRef.current.on('load', function() {
+            DashboardMapDraw.changeMode('static'); 
+        });
+
+        if (props.drawing) {
+            DashboardMapDraw.set(props.drawing);
+        }
+    }, [mapContainerRef.current]);
+
+    useEffect(() => {
+        if (props.drawing) {
+            mapRef.current?.remove();
+            mapRef.current = null;
+
+            const modes = MapboxDraw.modes;
+            modes.static = StaticMode;
+
+            mapRef.current = new mapboxgl.Map({
+                container: mapContainerRef.current,
+                style: "mapbox://styles/mapbox/satellite-streets-v12",
+                center: center,
+                zoom: props.zoom || defaultZoom,
+                pitch: 40,
+                interactive: true
+            });
+
+            
+
+            mapRef.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+            mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+            mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
+            mapRef.current.addControl(DashboardMapDraw, 'bottom-right');
+
+            mapRef.current.on('load', function() {
+                DashboardMapDraw.changeMode('static');
+            });
+
+            if (props.drawing) {
+                DashboardMapDraw.set(props.drawing);
+            }
+        }
+    }, [props.drawing]);
+
+    useEffect(() => {
+        if (!mapRef.current) return;
+
+        const map = mapRef.current;
+        map.setZoom(props.zoom || defaultZoom);
+    }, [props.zoom]);
+
+    return (
+        <>
+            <div
+                className={props.className}
+                ref={mapContainerRef}
+                id="map"
+                style={{
+                    ...props.style,
+                    pointerEvents: "auto",
+                    touchAction: "auto"
+                }}
+            />
+            <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                    <Button className="button-whole-Kiruna" variant="primary">
+                        <div style={{ display: 'flex', alignItems: 'center' }}>
+                            Whole Kiruna: {props.entireMunicipalityDocuments?.length}
+                            <RiFileLine
+                            style={{
+                                fontSize: '1rem',
+                                color: '#4A4A4A',
+                                transform: 'scale(0.80)',
+                            }}
+                        />
+                        <RiArrowDownSLine
+                            style={{
+                                fontSize: '1rem',
+                                color: '#4A4A4A',
+                                marginLeft: '0.25rem',
+                            }}
+                        />
+                        </div>
+                    </Button>
+                </DropdownMenuTrigger>
+    
+                <DropdownMenuContent>
+                    <DropdownMenuLabel>Documents</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                        {props.entireMunicipalityDocuments?.map((doc, index) => (
+                            <DropdownMenuItem 
+                            key={index}
+                            onClick={() => window.location.href = `/documents/${doc._id}`}>
+                                {doc.title}
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuGroup>
+                </DropdownMenuContent>
+            </DropdownMenu>
+        </>
+    );
+}
+
+export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
+
+    const mapContainerRef = useRef<any>(null);
+    const mapRef = useRef<mapboxgl.Map | null>(null);
+
+    useEffect(() => {
+        if (mapRef.current) return;
+
+        const modes = MapboxDraw.modes;
+        modes.static = StaticMode;
+
+        mapRef.current = new mapboxgl.Map({
+            container: mapContainerRef.current,
+            style: "mapbox://styles/mapbox/satellite-streets-v12",
+            center: center,
+            zoom: props.zoom || defaultZoom,
+            pitch: 40,
+            interactive: true 
+        });
+
+        
+
+        mapRef.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+        mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+        mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
+        mapRef.current.addControl(DashboardMapDraw, 'bottom-right');
+
+        mapRef.current.on('load', function() {
+            DashboardMapDraw.changeMode('static'); 
+        });
+
+        if (props.drawing) {
+            DashboardMapDraw.set(props.drawing);
+        }
+    }, [mapContainerRef.current]);
+
+    useEffect(() => {
+        if (props.drawing) {
+            mapRef.current?.remove();
+            mapRef.current = null;
+
+            const modes = MapboxDraw.modes;
+            modes.static = StaticMode;
+
+            mapRef.current = new mapboxgl.Map({
+                container: mapContainerRef.current,
+                style: "mapbox://styles/mapbox/satellite-streets-v12",
+                center: center,
+                zoom: props.zoom || defaultZoom,
+                pitch: 40,
+                interactive: true
+            });
+
+            
+
+            mapRef.current.addControl(new mapboxgl.ScaleControl(), 'bottom-right');
+            mapRef.current.addControl(new mapboxgl.NavigationControl(), 'bottom-right');
+            mapRef.current.addControl(new mapboxgl.FullscreenControl(), 'bottom-right');
+            mapRef.current.addControl(DashboardMapDraw, 'bottom-right');
+
+            mapRef.current.on('load', function() {
+                DashboardMapDraw.changeMode('static');
+            });
+
+            if (props.drawing) {
+                DashboardMapDraw.set(props.drawing);
+            }
+        }
+    }, [props.drawing]);
+
+    useEffect(() => {
+        if (!mapRef.current) return;
+
+        const map = mapRef.current;
+        map.setZoom(props.zoom || defaultZoom);
+    }, [props.zoom]);
+
+    return (
+        <>
+            <div
+                className={props.className}
+                ref={mapContainerRef}
+                id="map"
+                style={{
+                    ...props.style,
+                    pointerEvents: "auto",
+                    touchAction: "auto"
+                }}
+            /> 
+        </>
+    );
 }
 
 interface MapControlsProps {

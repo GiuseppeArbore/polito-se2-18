@@ -82,7 +82,6 @@ export function FormDialog(props: FormDialogProps) {
 
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
 
-  const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
   const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
   const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
@@ -151,7 +150,7 @@ export function FormDialog(props: FormDialogProps) {
     try {
       const createdDocument = await API.createKxDocument(newDocument);
       if (createdDocument) {
-        setDocuments([...documents, createdDocument]);
+        props.refresh();
         toast({
           title: "Success",
           description:
@@ -159,7 +158,6 @@ export function FormDialog(props: FormDialogProps) {
           variant: "success",
           duration: 3000,
         })
-        props.refresh();
         setTitle("");
         setScale(0);
         setIssuanceDate(new Date());
@@ -559,7 +557,7 @@ export function FormDialog(props: FormDialogProps) {
                     onValueChange={(values) => setDocumentsForDirect(values)}
                     className="mt-2"
                   >
-                    {documents.map((doc) => (
+                    {props.documents.map((doc) => (
                       <MultiSelectItem
                         key={doc._id?.toString()}
                         value={doc._id ? doc._id.toString() : ""}
@@ -594,7 +592,7 @@ export function FormDialog(props: FormDialogProps) {
                     onValueChange={(values) => setDocumentsForCollateral(values)}
                     className="mt-2"
                   >
-                    {documents.map((doc) => (
+                    {props.documents.map((doc) => (
                       <MultiSelectItem
                       key={doc._id?.toString()}
                       value={doc._id ? doc._id.toString() : ""}
@@ -624,7 +622,7 @@ export function FormDialog(props: FormDialogProps) {
                     onValueChange={(values) => setDocumentsForProjection(values)}
                     className="mt-2"
                   >
-                    {documents.map((doc) => (
+                    {props.documents.map((doc) => (
                       <MultiSelectItem
                       key={doc._id?.toString()}
                       value={doc._id ? doc._id.toString() : ""}
@@ -654,7 +652,7 @@ export function FormDialog(props: FormDialogProps) {
                     onValueChange={(values) => setDocumentsForUpdate(values)}
                     className="mt-2"
                   >
-                    {documents.map((doc) => (
+                    {props.documents.map((doc) => (
                       <MultiSelectItem
                       key={doc._id?.toString()}
                       value={doc._id ? doc._id.toString() : ""}
