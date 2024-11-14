@@ -1,3 +1,4 @@
+
 import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -646,13 +647,13 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     mapRef.current.on("move", (e) => {
       setMapBounds(e.target.getBounds());
     });
-    mapRef.current.on("draw.create", (e: DrawCreateEvent) => {
+    mapRef.current.on("draw.create", (e: MapboxDraw.DrawCreateEvent) => {
       setTmpDrawing({ type: "FeatureCollection", features: e.features });
     });
     mapRef.current.on("draw.delete", () => {
       setTmpDrawing(undefined);
     });
-    mapRef.current.on("draw.update", (e: DrawUpdateEvent) => {
+    mapRef.current.on("draw.update", (e: MapboxDraw.DrawUpdateEvent) => {
       setTmpDrawing({ type: "FeatureCollection", features: e.features });
     });
 
