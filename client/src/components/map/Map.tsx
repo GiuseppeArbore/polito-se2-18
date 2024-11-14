@@ -176,39 +176,23 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             />
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                    <Button
-                        variant="primary"
-                        style={{
-                            backgroundColor: 'white',
-                            color: '#4A4A4A',
-                            border: '1px solid #ccc',
-                            position: 'absolute',
-                            top: '10px',
-                            left: '10px',
-                            zIndex: 1,
-                            padding: '8px 12px',
-                            fontSize: '14px',
-                            display: 'flex',
-                            justifyContent: 'space-between',
-                            alignItems: 'center',
-                        }}
-                    >
+                    <Button className="button-whole-Kiruna" variant="primary">
                         <div style={{ display: 'flex', alignItems: 'center' }}>
                             Whole Kiruna: {props.entireMunicipalityDocuments?.length}
                             <RiFileLine
-                                style={{
-                                    fontSize: '16px',
-                                    color: '#4A4A4A',
-                                    transform: 'scale(0.80)',
-                                }}
-                            />
-                            <RiArrowDownSLine
-                                style={{
-                                    fontSize: '16px',
-                                    color: '#4A4A4A',
-                                    marginLeft: '4px',
-                                }}
-                            />
+                            style={{
+                                fontSize: '1rem',
+                                color: '#4A4A4A',
+                                transform: 'scale(0.80)',
+                            }}
+                        />
+                        <RiArrowDownSLine
+                            style={{
+                                fontSize: '1rem',
+                                color: '#4A4A4A',
+                                marginLeft: '0.25rem',
+                            }}
+                        />
                         </div>
                     </Button>
                 </DropdownMenuTrigger>

@@ -1,4 +1,4 @@
-.button-primary {
+.button-whole-Kiruna {
     background-color: white;
     color: #4A4A4A;
     border: 1px solid #ccc;
@@ -11,4 +11,9 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+}
+
+.button-whole-Kiruna:hover {
+    background-color: #f0f0f0;
+    border-color: #b0b0b0; 
 }
