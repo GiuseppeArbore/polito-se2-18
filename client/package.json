@@ -24,10 +24,11 @@
     "mapbox-gl-draw-cut-polygon-mode": "github:lbordino/mapbox-gl-draw-cut-polygon-mode",
     "mapbox-gl-draw-freehand-mode": "github:lbordino/mapbox-gl-draw-freehand-mode",
     "mapbox-gl-draw-passing-mode": "github:lbordino/mapbox-gl-draw-passing-mode",
+    "mapbox-gl-draw-select-mode": "^1.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.11.2",
-    "react-dropzone": "^11.4.2"
+    "react-dropzone": "^11.4.2",
+    "react-router-dom": "^6.11.2"
   },
   "devDependencies": {
     "@tremor/react": "^3.3.0",

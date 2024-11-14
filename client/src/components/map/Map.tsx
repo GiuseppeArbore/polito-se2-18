@@ -23,7 +23,7 @@ import {
   RiShapeLine,
   RiArrowDownSLine,
 } from "@remixicon/react";
-import { DashboardMapDraw, PreviewMapDraw } from "./DrawBar";
+import { DashboardMapDraw, PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { Feature, FeatureCollection, Position } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
@@ -169,7 +169,13 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       mapRef.current.addControl(DashboardMapDraw, "bottom-right");
 
       mapRef.current.on("load", function () {
-        DashboardMapDraw.changeMode("static");
+        DashboardMapDraw.changeMode("select_feature", {
+          /// you can override the highlight color for this operation:
+          selectHighlightColor: "white",
+          onSelect(selectedFeatureID:any) {
+            alert(`Selected Feature ID: ${selectedFeatureID}`);
+          },
+        });
       });
 
       if (props.drawing) {
@@ -258,14 +264,14 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
     mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
-    mapRef.current.addControl(DashboardMapDraw, "bottom-right");
+    mapRef.current.addControl(DocumentMapDraw, "bottom-right");
 
     mapRef.current.on("load", function () {
-      DashboardMapDraw.changeMode("static");
+      DocumentMapDraw.changeMode("static");
     });
 
     if (props.drawing) {
-      DashboardMapDraw.set(props.drawing);
+      DocumentMapDraw.set(props.drawing);
     }
   }, [mapContainerRef.current]);
 
@@ -292,14 +298,14 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
         new mapboxgl.FullscreenControl(),
         "bottom-right"
       );
-      mapRef.current.addControl(DashboardMapDraw, "bottom-right");
+      mapRef.current.addControl(DocumentMapDraw, "bottom-right");
 
       mapRef.current.on("load", function () {
-        DashboardMapDraw.changeMode("static");
+        DocumentMapDraw.changeMode("static");
       });
 
       if (props.drawing) {
-        DashboardMapDraw.set(props.drawing);
+        DocumentMapDraw.set(props.drawing);
       }
     }
   }, [props.drawing]);
