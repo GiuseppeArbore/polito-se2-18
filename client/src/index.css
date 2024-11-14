@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-    padding: 2%;
+    padding: 2% !important;
 }
 
 .no-click {

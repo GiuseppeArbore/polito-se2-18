@@ -193,12 +193,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                         }}
                     >
                         <div style={{ display: 'flex', alignItems: 'center' }}>
-                            <span className="document-text">
-                                Documents covering the entire municipality:
-                            </span>
-                            <span style={{ marginLeft: '5px' }}>
-                                {props.entireMunicipalityDocuments?.length}
-                            </span>
+                            Whole Kiruna: {props.entireMunicipalityDocuments?.length}
                             <RiFileLine
                                 style={{
                                     fontSize: '16px',
