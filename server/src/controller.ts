@@ -26,6 +26,21 @@ export const getAllKxDocuments = async (req: Request, res: Response, next: NextF
     }
 };
 
+
+export const getKxDocumentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const document: KxDocument | null = await db.getKxDocumentById(new mongoose.Types.ObjectId(req.params.id));
+        if (document) {
+            res.status(200).json(document);
+        } else {
+            console.log("Document not found");
+            res.status(404).send();
+        }
+    } catch (error) {
+        console.log("Error in getKxDocumentById");
+        next(error);
+    }
+};
 export const deleteKxDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const id = new mongoose.Types.ObjectId(req.params.id);

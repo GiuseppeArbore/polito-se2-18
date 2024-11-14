@@ -5,12 +5,14 @@ import {app} from "../index";
 import { AreaType, KxDocumentType, Scale, Stakeholders } from '../src/models/enum';
 import { KIRUNA_COORDS } from '../src/utils';
 import { connections } from 'mongoose';
+import {get} from 'http';
 
 
 jest.mock('../src/controller', () => ({
     createKxDocument: jest.fn(),
     getAllKxDocuments: jest.fn(),
-    deleteKxDocument: jest.fn()
+    getKxDocumentById: jest.fn(),
+	deleteKxDocument: jest.fn()
 }));
 
 
@@ -68,8 +70,6 @@ describe('Document Routes', () => {
         expect(response.body).toHaveProperty('_id', '12345');
         expect(response.body.title).toBe('Unit Test Document');
     });
-
-   
 
     test('Test 2 - POST /api/documents - should return error 400 (missing title)', async () => {
 
@@ -169,5 +169,7 @@ describe('Document Routes', () => {
         expect(response.status).toBe(400);
         expect(response.body.errors[0].msg).toBe('Invalid connections');}
     );
+
+    
 
 });

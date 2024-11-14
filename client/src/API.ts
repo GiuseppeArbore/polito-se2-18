@@ -51,6 +51,26 @@ const getAllKxDocuments = async (): Promise<KxDocument[]> => {
     }
 };
 
+const getKxDocumentById = async (id: mongoose.Types.ObjectId): Promise<KxDocument> => {
+    try {
+        const response = await fetch(API_URL + `/documents/${id}`, {
+            method: 'GET',
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+
+        const data: KxDocument = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to fetch document: ${error.message}`);
+        } else {
+            throw new Error('Failed to fetch document: Unknown error');
+        }
+    }
+};
 const deleteKxDocument = async (id: mongoose.Types.ObjectId): Promise<void> => {
     try {
         const response = await fetch(`${API_URL}/documents/${id}`, {
@@ -65,9 +85,12 @@ const deleteKxDocument = async (id: mongoose.Types.ObjectId): Promise<void> => {
             throw new Error(`Failed to delete document: ${error.message}`);
         } else {
             throw new Error('Failed to delete document: Unknown error');
+
+
+
         }
     }
 };
 
-const API = { createKxDocument, getAllKxDocuments, deleteKxDocument };
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument };
 export default API;
