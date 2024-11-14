@@ -41,7 +41,7 @@ function List(props: ListProps) {
     const StakeholdersRenderer = (params: any) => {
         return (
             <div className="flex flex-wrap gap-1 mt-2" >
-                {params.value.map((stakeholder: Stakeholders, index: number) => {
+                {params.value && params.value.map((stakeholder: Stakeholders, index: number) => {
                     return (
                         <Badge key={index} className="text-sm">
                             <span className="text-sm">{stakeholder}</span>
