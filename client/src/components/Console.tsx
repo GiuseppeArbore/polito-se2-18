@@ -3,10 +3,11 @@ import API from '../API';
 import { useState, useEffect } from "react";
 import { FormDialog } from "./form/Form";
 import { DashboardMap } from "./map/Map";
-import { KxDocument } from "../model";
+import { Area, KxDocument, Point } from "../model";
 import List from "./list/List";
 import { Toaster } from "./toast/Toaster";
 import { toast } from "../utils/toaster";
+import { FeatureCollection } from "geojson"
 
 
 export default function Console() {
@@ -40,11 +41,11 @@ export default function Console() {
           }
       }, [selectedView, refreshNeeded]);
 
-    const drawing = {
+    const drawing: FeatureCollection = {
         type: 'FeatureCollection',
         features: pointOrAreaDocuments.map(doc => ({
             type: 'Feature',
-            geometry: doc.doc_coordinates,
+            geometry: doc.doc_coordinates as Area | Point,
             properties: {
                 title: doc.title,
                 description: doc.description,

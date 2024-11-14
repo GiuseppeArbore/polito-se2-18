@@ -19,6 +19,7 @@ import {
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
+import { FeatureCollection } from "geojson"
 import API from "../../API";
 import { AreaType, KxDocumentType, Scale, Stakeholders } from "../../enum";
 import { DocCoords, KxDocument } from "../../model";
@@ -48,7 +49,7 @@ interface FormDialogProps {
 
 
 export function FormDialog(props: FormDialogProps) {
-  const [drawing, setDrawing] = useState<any>(undefined);
+  const [drawing, setDrawing] = useState<FeatureCollection | undefined>(undefined);
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState(false);
@@ -98,12 +99,12 @@ export function FormDialog(props: FormDialogProps) {
         type: AreaType.POINT,
         coordinates: drawing.features[0].geometry.coordinates,
       };
-    } else if (!hideMap && (drawing && drawing.features.length >= 1)) {
+    } else if (!hideMap && (drawing && drawing.features.length >= 1) && drawing.features[0].geometry.type === "Polygon") {
       //TODO: add support for multiple polygons
       let cord = drawing.features.map((f: any) => f.geometry.coordinates).length === 1 ? drawing.features[0].geometry.coordinates : setDocCoordinatesError(true);
       draw = {
         type: AreaType.AREA,
-        coordinates: cord,
+        coordinates: cord as number[][][],
       };
     } else {
       draw = {
