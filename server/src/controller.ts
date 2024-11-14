@@ -26,6 +26,7 @@ export const getAllKxDocuments = async (req: Request, res: Response, next: NextF
     }
 };
 
+
 export const getKxDocumentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const document: KxDocument | null = await db.getKxDocumentById(new mongoose.Types.ObjectId(req.params.id));
@@ -40,4 +41,17 @@ export const getKxDocumentById = async (req: Request, res: Response, next: NextF
         next(error);
     }
 };
+export const deleteKxDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const id = new mongoose.Types.ObjectId(req.params.id);
+        const isDeleted = await db.deleteKxDocument(id);
+        if (isDeleted) {
+            res.status(204).send();
+        } else {
+            res.status(404).json("Document not found");
+        }
+    } catch (error) {
+        next(error);
+    }
+}
 

@@ -1,46 +1,48 @@
 import { Card, Title, Text, Grid, Col, DateRangePicker, Metric, Subtitle, Bold, Italic, Select, SelectItem, TabGroup, TabList, Tab, DateRangePickerItem, DateRangePickerValue } from "@tremor/react";
 import API from '../API';
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FormDialog } from "./form/Form";
-import { MultiSelect, MultiSelectItem } from '@tremor/react';
-import { DashboardMap, PreviewMap } from "./map/Map";
+import { DashboardMap } from "./map/Map";
 import { KxDocument } from "../model";
+import List from "./list/List";
+import { Toaster } from "./toast/Toaster";
+import { toast } from "../utils/toaster";
 
 
 export default function Console() {
-
-    const today = new Date(Date.now());
-    const [groupKey, setGroupKey] = useState("1");
-    const [selectedView, setSelectedView] = useState(0);
-    const [selectedDocuments, setselectedDocuments] = useState<string[]>(['doc1']);
     const [documents, setDocuments] = useState<KxDocument[]>([]);
+    const [selectedView, setSelectedView] = useState(0);
+    const [refreshNeeded, setRefreshNeeded] = useState(true);
     const [entireMunicipalityDocuments, setEntireMunicipalityDocuments] = useState<KxDocument[]>([]);
-    const [newDocumentCreated, setNewDocumentCreated] = useState(true);
-
+    const [pointOrAreaDocuments, setPointOrAreaDocuments] = useState<KxDocument[]>([]);
     useEffect(() => {
-        const fetchDocuments = async () => {
+          const fetchDocuments = async () => {
             try {
-                const response = await API.getAllKxDocuments();
-                
-                const entireMunicipalityDocs = response.filter(doc => doc.doc_coordinates?.type === "EntireMunicipality");
-                const otherDocs = response.filter(doc => doc.doc_coordinates?.type !== "EntireMunicipality");
+              const docs = await API.getAllKxDocuments();
+              const entireMunicipalityDocs = docs.filter(doc => doc.doc_coordinates?.type === "EntireMunicipality");
+              const otherDocs = docs.filter(doc => doc.doc_coordinates?.type !== "EntireMunicipality");
 
-                setEntireMunicipalityDocuments(entireMunicipalityDocs);
-                setDocuments(otherDocs);
+              setEntireMunicipalityDocuments(entireMunicipalityDocs);
+              setPointOrAreaDocuments(otherDocs);
+              setDocuments(docs);
             } catch (error) {
-                console.error('Error fetching documents:', error);
+              toast({
+                title: "Error",
+                description: "Failed to retrieve documents",
+                variant: "error",
+                duration: 3000,
+              })
             }
-        };
-    
-        if (newDocumentCreated) {
-            fetchDocuments();
-            setNewDocumentCreated(false); 
-        }
-    }, [newDocumentCreated]);
+          };
+          if (refreshNeeded) {
+              fetchDocuments();
+              setRefreshNeeded(false);
+          }
+      }, [selectedView, refreshNeeded]);
 
     const drawing = {
         type: 'FeatureCollection',
-        features: documents.map(doc => ({
+        features: pointOrAreaDocuments.map(doc => ({
             type: 'Feature',
             geometry: doc.doc_coordinates,
             properties: {
@@ -79,7 +81,7 @@ export default function Console() {
 
                 <Col numColSpanLg={1}>
                     <div className="space-y-6">
-                        <FormDialog setNewDocumentCreated={setNewDocumentCreated}/>
+                        <FormDialog documents={documents} refresh={()=>setRefreshNeeded(true)} />
 
                         {/* <Card>
                             <Text>Select</Text>
@@ -123,6 +125,7 @@ export default function Console() {
                         <div>Diagram Coming soon...</div>
                 </div>
             </Card>
+            <Toaster/>
         </main >
     );
     function renderCurrentSelection(selectedView: number = 0) {
@@ -141,7 +144,7 @@ export default function Console() {
                 return (
                     <>
                         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                            <div>Coming soon...</div>
+                           <List documents={documents} />
                         </div>
                     </>
                 );
