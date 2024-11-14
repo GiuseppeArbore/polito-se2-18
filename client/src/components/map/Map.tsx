@@ -170,13 +170,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       mapRef.current.addControl(DashboardMapDraw, "bottom-right");
 
       mapRef.current.on("load", function () {
-        DashboardMapDraw.changeMode("select_feature", {
-          /// you can override the highlight color for this operation:
-          selectHighlightColor: "white",
-          onSelect(selectedFeatureID:any) {
-            alert(`Selected Feature ID: ${selectedFeatureID}`);
-          },
-        });
+        DashboardMapDraw.changeMode("select_feature");
       });
 
       if (props.drawing) {
