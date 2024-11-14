@@ -173,7 +173,7 @@ function List(props: ListProps) {
                         toast({
                             title: "Success",
                             description:
-                                "The document has been delete successfully",
+                                "The document has been deleted successfully",
                             variant: "success",
                             duration: 3000,
                         })
