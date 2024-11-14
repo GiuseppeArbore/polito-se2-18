@@ -18,6 +18,7 @@ import {
   DropdownMenuTrigger,
 } from "./DropDownMenu"
 import "../../index.css"
+import "../../css/map.css"
 
 mapboxgl.accessToken = "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 

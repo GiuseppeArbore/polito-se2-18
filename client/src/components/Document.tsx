@@ -12,6 +12,7 @@ import { DocumentPageMap, PreviewMap } from './map/Map';
 import API from '../API';
 import { KxDocument, PageRange } from '../model';
 import { mongoose } from '@typegoose/typegoose';
+import "../css/document.css";
 
 
 
@@ -183,17 +184,7 @@ export default function Document() {
                         </Card>
                     ) : (
                         <div className="flex justify-left items-start pt-10">
-                            <div className='w-full sm:w-2/3 md:w-1/2 lg:w-1/3'
-                                style={{
-                                    backgroundColor: 'white',
-                                    color: '#4A4A4A',
-                                    border: '1px solid #ccc',
-                                    padding: '16px 24px',
-                                    fontSize: '14px',
-                                    borderRadius: '8px',
-                                    boxShadow: '0 4px 8px rgba(0, 0, 0, 0.1)',
-                                }}
-                            >
+                            <div className=' document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
                                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                                     <span>
                                         The document covers the entire municipality
