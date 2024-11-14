@@ -50,13 +50,6 @@ export default function Console() {
           return true;
         });
 
-        // Find the document which assigned to a point
-        const documentsAssignedToPoints = response.filter((doc) => {
-          if (doc.doc_coordinates?.type === "Point") return false;
-
-          return true;
-        });
-
         setEntireMunicipalityCount(count);
         setDocuments(filteredDocuments);
       } catch (error) {

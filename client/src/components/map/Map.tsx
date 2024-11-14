@@ -156,6 +156,15 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         DashboardMapDraw.set(props.drawing);
       }
 
+      // filtering the list of docs for having just the points and draw the pins
+      const pointsAssignedToDocs: GeoJSON.FeatureCollection = {
+        type: "FeatureCollection",
+        features:
+          (props.drawing as any).features?.filter(
+            (feature: any) => feature.geometry?.type === "Point"
+          ) || [],
+      };
+
       // Load custom icon for points
       mapRef.current.on("load", () => {
         mapRef.current?.loadImage(
@@ -166,21 +175,25 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
               mapRef.current?.addImage("pin-icon", image);
             }
 
-            // Add points to map from props.drawing
-            mapRef.current?.addSource("documents", {
-              type: "geojson",
-              data: props.drawing,
-            });
+            // if there is any points, then we can add the source and layer
+            if (pointsAssignedToDocs) {
+              //Add points to map from pointsAssignedToDocs
+              mapRef.current?.addSource("documents", {
+                type: "geojson",
+                data: pointsAssignedToDocs,
+              });
 
-            mapRef.current?.addLayer({
-              id: "document-points",
-              type: "symbol",
-              source: "documents",
-              layout: {
-                "icon-image": "pin-icon",
-                "icon-size": 1,
-              },
-            });
+              mapRef.current?.addLayer({
+                id: "document-points",
+                type: "symbol",
+                source: "documents",
+                layout: {
+                  "icon-image": "pin-icon",
+                  "icon-size": 1,
+                },
+                
+              });
+            }
           }
         );
 
@@ -192,7 +205,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           new mapboxgl.Popup()
             .setLngLat(coordinates)
             .setHTML(
-              `<strong><a href="/documents/${id}" > ${title}</a></strong><p>${description}</p>`
+              `<strong><a href="/documents/${id}" > ${title}</a></strong>`
             )
             .addTo(mapRef.current as any);
         });
@@ -412,42 +425,6 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
 export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-
-  const loadImage = () => {
-    mapRef.current?.loadImage(
-      "../../../public/location-pin.png",
-      (error, image) => {
-        if (error) throw error;
-        if (mapRef.current && image) {
-          var map = mapRef.current;
-
-          // Add the image to the map's style
-          map.addImage("custom-icon", image as HTMLImageElement);
-
-          mapRef.current.addSource("custom-icon-layer", {
-            type: "geojson",
-            data: {
-              type: "FeatureCollection",
-              features: props.drawing?.features || [],
-            },
-          });
-
-          mapRef.current.addLayer({
-            id: "custom-icons",
-            type: "symbol",
-            source: "custom-icon-layer",
-            layout: {
-              "icon-image": "custom-icon",
-              "icon-size": 1,
-            },
-            paint: {
-              "icon-opacity": 1,
-            },
-          });
-        }
-      }
-    );
-  };
 
   useEffect(() => {
     if (mapRef.current) return;
