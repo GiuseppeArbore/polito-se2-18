@@ -3,10 +3,7 @@ import FreehandMode from 'mapbox-gl-draw-freehand-mode'
 import CutPolygonMode, { drawStyles as cutPolygonDrawStyles } from "mapbox-gl-draw-cut-polygon-mode";
 import { passing_draw_polygon } from "mapbox-gl-draw-passing-mode";
 import StaticMode from '@mapbox/mapbox-gl-draw-static-mode';
-import customDrawStyles from '../../utils/drawStyles';
-import SelectFeatureMode, {
-  drawStyles as selectFeatureDrawStyles,
-} from "mapbox-gl-draw-select-mode";
+import customDrawStyles from './drawStyles';
 
 
 
@@ -25,24 +22,6 @@ var PreviewMapDraw = new MapboxDraw({
     uncombine_features: false,
 },
 });
-
-var DashboardMapDraw = new MapboxDraw({
-  modes: {
-    ...SelectFeatureMode(MapboxDraw.modes),
-  },
-  displayControlsDefault: false,
-  controls: {
-    polygon: false,
-    trash: false,
-    line_string: false,
-    point: false,
-    combine_features: false,
-    uncombine_features: false,
-  },
-  styles: [...selectFeatureDrawStyles(customDrawStyles)],
-  userProperties: true,
-  selectHighlightColor: "white",
-} as MapboxDrawOptions);
 
 
 var DocumentMapDraw = new MapboxDraw({
@@ -64,4 +43,4 @@ var DocumentMapDraw = new MapboxDraw({
   styles: customDrawStyles
 });
 
-export { PreviewMapDraw,DashboardMapDraw,DocumentMapDraw }; 
+export { PreviewMapDraw,DocumentMapDraw }; 

@@ -1,6 +1,10 @@
 
 import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import * as turf from "@turf/turf";
+import { featureCollection,area } from "@turf/turf";
+import  { documentColorMapping } from "./documentcolors";
+
 import {
   Button,
   Card,
@@ -24,9 +28,9 @@ import {
   RiShapeLine,
   RiArrowDownSLine,
 } from "@remixicon/react";
-import { DashboardMapDraw, PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
+import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { Feature, FeatureCollection, Position } from "geojson";
+import { Feature, FeatureCollection, Position, Polygon } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
 import { coordDistance } from "../../utils";
 import { RiFileLine } from "@remixicon/react";
@@ -42,6 +46,7 @@ import {
 } from "./DropDownMenu";
 import "../../index.css";
 import "../../css/map.css";
+
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
@@ -133,15 +138,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
     mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
-    mapRef.current.addControl(DashboardMapDraw, "bottom-right");
-
-    mapRef.current.on("load", function () {
-      DashboardMapDraw.changeMode("select_feature");
-    });
-
-    if (props.drawing) {
-      DashboardMapDraw.set(props.drawing);
-    }
   }, [mapContainerRef.current]);
 
   useEffect(() => {
@@ -167,15 +163,66 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         new mapboxgl.FullscreenControl(),
         "bottom-right"
       );
-      mapRef.current.addControl(DashboardMapDraw, "bottom-right");
 
+      const sortedDrawing = featureCollection(
+        props.drawing.features.sort((a, b) => {
+          const areaA = area(a);
+          const areaB = area(b);
+          return areaB - areaA; // Sort in descending order
+        })
+      );
       mapRef.current.on("load", function () {
-        DashboardMapDraw.changeMode("select_feature");
+        
+         // Aggiungi la sorgente per la feature collection
+         mapRef.current?.addSource('drawings', {
+          type: 'geojson',
+          data: sortedDrawing,
+        });
+
+        
+      //AREA--------------------------------------------------------
+        mapRef.current?.addLayer({
+          id: 'drawings-layer',
+          type: 'fill',
+          source: 'drawings',
+          layout: {},
+          paint: {
+            'fill-color': documentColorMapping,
+            'fill-opacity': 0.3,
+          },
+        });
+        
+       
+        mapRef.current?.addLayer({
+          id: 'drawings-borders',
+          type: 'line',
+          source: 'drawings',
+          layout: {},
+          paint: {
+            'line-color':documentColorMapping,
+            'line-width': 2,
+            'line-opacity': 0.3,
+          },
+        });
+
+        
+        mapRef.current?.addLayer({
+          id: 'highlight-area',
+          type: 'fill',
+          source: 'drawings',
+          paint: {
+            'fill-color': documentColorMapping,
+            'fill-opacity': 0.5
+          },
+          filter: ['==', 'highlight', 'false'] // Inizialmente non evidenziato
+        });
+
+
+      
+
       });
 
-      if (props.drawing) {
-        DashboardMapDraw.set(props.drawing);
-      }
+      
     }
   }, [props.drawing]);
 
@@ -261,9 +308,7 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
     mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
     mapRef.current.addControl(DocumentMapDraw, "bottom-right");
 
-    mapRef.current.on("load", function () {
-      DocumentMapDraw.changeMode("static");
-    });
+    
 
     if (props.drawing) {
       DocumentMapDraw.set(props.drawing);

@@ -1,4 +1,3 @@
-const highlightPropertyName = `user_select_feature_highlight`;
 const customDrawStyles = [
   {
     'id': 'gl-draw-polygon-fill-informative',
@@ -175,64 +174,6 @@ const customDrawStyles = [
       'line-color': '#ef8354',
       'line-width': 2
     }
-  },
-  {
-    id: `user_select_feature_highlight-fill`,
-    type: "fill",
-    filter: [
-      "all",
-      ["==", "$type", "Polygon"],
-      ["has", highlightPropertyName],
-    ],
-    paint: {
-      "fill-color": ["get", highlightPropertyName],
-      "fill-outline-color": ["get", highlightPropertyName],
-      "fill-opacity": 0.2,
-    },
-  },
-  {
-    id: `user_select_feature_highlight-stroke`,
-    type: "line",
-    filter: [
-      "all",
-      ["==", "$type", "Polygon"],
-      ["has", highlightPropertyName],
-    ],
-    layout: {
-      "line-cap": "round",
-      "line-join": "round",
-    },
-    paint: {
-      "line-color": ["get", highlightPropertyName],
-      "line-width": 2,
-    },
-  },
-  {
-    id: `user_select_feature_highlight-line`,
-    type: "line",
-    filter: [
-      "all",
-      ["==", "$type", "LineString"],
-      ["has", highlightPropertyName],
-    ],
-    layout: {
-      "line-cap": "round",
-      "line-join": "round",
-    },
-    paint: {
-      "line-color": ["get", highlightPropertyName],
-      "line-dasharray": [0.2, 2],
-      "line-width": 2,
-    },
-  },
-  {
-    id: `user_select_feature_highlight-point`,
-    type: "circle",
-    filter: ["all", ["==", "$type", "Point"], ["has", highlightPropertyName]],
-    paint: {
-      "circle-color": ["get", highlightPropertyName],
-      "circle-radius": 3,
-    },
   }
 ];
   
