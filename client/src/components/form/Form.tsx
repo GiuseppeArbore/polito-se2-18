@@ -18,6 +18,7 @@ import {
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
+import { FeatureCollection } from "geojson"
 import API from "../../API";
 import { AreaType, KxDocumentType, Scale, Stakeholders } from "../../enum";
 import { DocCoords, KxDocument } from "../../model";
@@ -40,17 +41,14 @@ import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
 
-export class Link {
-  connectionType: string = "";
-  documents: string[] = [];
+interface FormDialogProps {
+  documents: KxDocument[];
+  refresh: () => void;
 }
 
-export function FormDialog({
-  setNewDocumentCreated
-} : {
-  setNewDocumentCreated: (_: boolean) => void
-}) {
-  const [drawing, setDrawing] = useState<any>(undefined);
+
+export function FormDialog(props: FormDialogProps) {
+  const [drawing, setDrawing] = useState<FeatureCollection | undefined>(undefined);
   const [isOpen, setIsOpen] = useState(false);
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState(false);
@@ -80,7 +78,6 @@ export function FormDialog({
 
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
 
-  const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
   const [documentsForCollateral, setDocumentsForCollateral] = useState<
     string[]
@@ -105,7 +102,7 @@ export function FormDialog({
         type: AreaType.POINT,
         coordinates: drawing.features[0].geometry.coordinates,
       };
-    } else if (!hideMap && drawing && drawing.features.length >= 1) {
+    } else if (!hideMap && (drawing && drawing.features.length >= 1) && drawing.features[0].geometry.type === "Polygon") {
       //TODO: add support for multiple polygons
       let cord =
         drawing.features.map((f: any) => f.geometry.coordinates).length === 1
@@ -113,7 +110,7 @@ export function FormDialog({
           : setDocCoordinatesError(true);
       draw = {
         type: AreaType.AREA,
-        coordinates: cord,
+        coordinates: cord as number[][][],
       };
     } else {
       draw = {
@@ -166,7 +163,7 @@ export function FormDialog({
     try {
       const createdDocument = await API.createKxDocument(newDocument);
       if (createdDocument) {
-        setDocuments([...documents, createdDocument]);
+        props.refresh();
         toast({
           title: "Success",
           description: "The document has been created successfully",
@@ -201,7 +198,6 @@ export function FormDialog({
       });
     }
     clearForm();
-    setNewDocumentCreated(true);
   };
 
   function clearForm() {
@@ -231,20 +227,7 @@ export function FormDialog({
     setDrawing(undefined);
   }
 
-  useEffect(() => {
-    if (isOpen) {
-      const fetchDocuments = async () => {
-        try {
-          const docs = await API.getAllKxDocuments();
-          setDocuments(docs);
-        } catch (error) {
-          setError("Failed to fetch documents");
-        }
-      };
-
-      fetchDocuments();
-    }
-  }, [isOpen]);
+  
 
   return (
     <>
@@ -619,7 +602,7 @@ export function FormDialog({
                     onValueChange={(values) => setDocumentsForDirect(values)}
                     className="mt-2"
                   >
-                    {documents.map((doc) => (
+                    {props.documents.map((doc) => (
                       <MultiSelectItem
                         key={doc._id?.toString()}
                         value={doc._id ? doc._id.toString() : ""}
@@ -662,7 +645,7 @@ export function FormDialog({
                     }
                     className="mt-2"
                   >
-                    {documents.map((doc) => (
+                    {props.documents.map((doc) => (
                       <MultiSelectItem
                         key={doc._id?.toString()}
                         value={doc._id ? doc._id.toString() : ""}
@@ -705,7 +688,7 @@ export function FormDialog({
                     }
                     className="mt-2"
                   >
-                    {documents.map((doc) => (
+                    {props.documents.map((doc) => (
                       <MultiSelectItem
                         key={doc._id?.toString()}
                         value={doc._id ? doc._id.toString() : ""}
@@ -746,7 +729,7 @@ export function FormDialog({
                     onValueChange={(values) => setDocumentsForUpdate(values)}
                     className="mt-2"
                   >
-                    {documents.map((doc) => (
+                    {props.documents.map((doc) => (
                       <MultiSelectItem
                         key={doc._id?.toString()}
                         value={doc._id ? doc._id.toString() : ""}

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-    padding: 2%;
+    padding: 2% !important;
 }
 
 .no-click {
@@ -22,3 +22,5 @@ body {
     color:  #003d8e;
     background-color: white;
 }
+
+

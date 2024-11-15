@@ -71,6 +71,26 @@ const getKxDocumentById = async (id: mongoose.Types.ObjectId): Promise<KxDocumen
         }
     }
 };
+const deleteKxDocument = async (id: mongoose.Types.ObjectId): Promise<void> => {
+    try {
+        const response = await fetch(`${API_URL}/documents/${id}`, {
+            method: 'DELETE',
+        });
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById };
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to delete document: ${error.message}`);
+        } else {
+            throw new Error('Failed to delete document: Unknown error');
+
+
+
+        }
+    }
+};
+
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument };
 export default API;

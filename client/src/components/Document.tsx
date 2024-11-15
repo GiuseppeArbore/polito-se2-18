@@ -8,10 +8,11 @@ import {
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { KxDocumentType, Stakeholders } from "../enum";
-import { PreviewMap } from './map/Map';
+import { DocumentPageMap, PreviewMap } from './map/Map';
 import API from '../API';
 import { KxDocument, PageRange } from '../model';
 import { mongoose } from '@typegoose/typegoose';
+import "../css/document.css";
 
 
 
@@ -20,7 +21,7 @@ export default function Document() {
     const { id } = useParams();
     const [doc, setDoc] = useState<KxDocument | null>(null);
     const [share, setShare] = useState(false);
-
+    const [drawings, setDrawings] = useState<any>("")
     const [title, setTitle] = useState("");
     const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
     const [scale, setScale] = useState("");
@@ -29,6 +30,7 @@ export default function Document() {
     const [language, setLanguage] = useState<string | undefined>("");
     const [pages, setPages] = useState<PageRange[] | "">("");
     const [description, setDescription] = useState<string | undefined>("");
+    const [entireMunicipality, setEntireMunicipality] = useState(false);
 
     useEffect(() => {
         const fetchDocument = async () => {
@@ -43,6 +45,27 @@ export default function Document() {
             setLanguage(document.language || "");
             setPages(document.pages || "");
             setDescription(document.description || "");
+            if(document.doc_coordinates.type !=="EntireMunicipality"){
+            const geoJSON = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        geometry: document.doc_coordinates,
+                        properties: {
+                            title: document.title,
+                            description: document.description,
+                            id: document._id
+                        }
+                    }
+                ]
+            };
+            setDrawings(geoJSON);
+        }else{
+            setEntireMunicipality(true);
+        }
+    
+        
             } catch (error) {
             console.error("Failed to fetch document:", error);
             navigate("/404");
@@ -50,10 +73,11 @@ export default function Document() {
         };
 
         fetchDocument();
-    });
+    },[]);
 
 
     const [showCheck, setShowCheck] = useState(false);
+    
 
     return (
         <div>
@@ -148,15 +172,27 @@ export default function Document() {
                     </AccordionBody>
                 </Accordion>
 
-                <Card
-                    className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
-                >
-                    <PreviewMap
-                        drawing={undefined}
-                        style={{ minHeight: "300px", width: "100%" }}
-                    />
-                </Card>
-
+             
+                    {!entireMunicipality ? (
+                        <Card
+                        className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
+                        >
+                            <DocumentPageMap
+                                drawing={drawings}
+                                style={{ minHeight: "300px", width: "100%" }}
+                            />
+                        </Card>
+                    ) : (
+                        <div className="flex justify-left items-start pt-10">
+                            <div className=' document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                    <span>
+                                        The document covers the entire municipality
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
             </Card>
 
 
