@@ -136,7 +136,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
     mapRef.current.addControl(DashboardMapDraw, "bottom-right");
 
     mapRef.current.on("load", function () {
-      DashboardMapDraw.changeMode("static");
+      DashboardMapDraw.changeMode("select_feature");
     });
 
     if (props.drawing) {
