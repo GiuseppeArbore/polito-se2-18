@@ -641,13 +641,13 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     mapRef.current.on("move", (e) => {
       setMapBounds(e.target.getBounds());
     });
-    mapRef.current.on("draw.create", (e: MapboxDraw.DrawCreateEvent) => {
+    mapRef.current.on("draw.create", (e: DrawCreateEvent) => {
       setTmpDrawing({ type: "FeatureCollection", features: e.features });
     });
     mapRef.current.on("draw.delete", () => {
       setTmpDrawing(undefined);
     });
-    mapRef.current.on("draw.update", (e: MapboxDraw.DrawUpdateEvent) => {
+    mapRef.current.on("draw.update", (e: DrawUpdateEvent) => {
       setTmpDrawing({ type: "FeatureCollection", features: e.features });
     });
 
