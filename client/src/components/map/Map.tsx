@@ -30,7 +30,7 @@ import {
 } from "@remixicon/react";
 import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { Feature, FeatureCollection, Position } from "geojson";
+import { Feature, FeatureCollection, Position, Geometry } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
 import { coordDistance } from "../../utils";
 import { RiFileLine } from "@remixicon/react";
@@ -174,9 +174,9 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           features: props.drawing?.features.flatMap(feature => {
             const features = [feature];
             if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-              let centroid = turf.pointOnFeature(feature);
+              let centroid = turf.pointOnFeature(feature as turf.AllGeoJSON);
               centroid.properties = { ...feature.properties };
-              features.push(centroid);
+              features.push(centroid as Feature<Geometry>);
             }
             return features;
           })
@@ -185,7 +185,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         
         mapRef.current?.addSource('pointsAndCentroids', {
           type: 'geojson',
-          data: pointsAndCentroids as any,
+          data: pointsAndCentroids as FeatureCollection ,
           cluster: true,
           clusterMaxZoom: 14,
           clusterRadius: 20 
@@ -220,7 +220,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             mapRef.current.getCanvas().style.cursor = 'pointer';
           }
           if (!e.features || e.features.length === 0) return;
-          const coordinates = (e.features[0].geometry as any).coordinates.slice();
+          const coordinates = (e.features[0].geometry as GeoJSON.Point).coordinates.slice();
           const title = e.features[0].properties?.title;
         
           // Ensure that if the map is zoomed out such that multiple
@@ -231,7 +231,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           }
         
           new mapboxgl.Popup({ closeButton: false })
-            .setLngLat(coordinates)
+            .setLngLat(coordinates as [number, number])
             .setHTML(`<h3>Document Title:</h3><p>${title}</p>`)
             .addTo(mapRef.current!);
         
@@ -259,8 +259,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           if (popup) popup.remove();
       
           // Reset color of the point on mouse leave
-
-          mapRef.current?.setFilter('highlight-area', ['==', 'highlight', 'false']);
           mapRef.current?.setFilter('highlight-point', ['==', 'highlight', 'false']);
         });
       
@@ -458,11 +456,12 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
     mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
     mapRef.current.addControl(DocumentMapDraw, "bottom-right");
-    
-    mapRef.current.on("load", function () {
-      DocumentMapDraw.changeMode("static");
-    })
 
+    
+
+    if (props.drawing) {
+      DocumentMapDraw.set(props.drawing);
+    }
   }, [mapContainerRef.current]);
 
   useEffect(() => {
@@ -492,10 +491,36 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
 
       mapRef.current.on("load", function () {
         DocumentMapDraw.changeMode("static");
-      })
+
+        const points = {
+          type: 'FeatureCollection',
+          features: props.drawing?.features.filter(feature => feature.geometry.type === 'Point')
+        };
+
+        
+        mapRef.current?.addSource('points', {
+          type: 'geojson',
+          data: points as any,
+          cluster: true,
+          clusterMaxZoom: 14,
+          clusterRadius: 20 
+        });
+
+      
+        //POINTS-----------------------------------------------------------------
+        mapRef.current?.addLayer({
+          id: 'points',
+          type: 'circle',
+          source: 'points',
+          filter: ['!', ['has', 'point_count']],
+          paint: {
+            'circle-radius': 10,
+            'circle-color': '#ffffff'
+          }
+        });
+      });
 
       if (props.drawing) {
-
         DocumentMapDraw.set(props.drawing);
       }
     }
