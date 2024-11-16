@@ -21,7 +21,6 @@
     "@typegoose/typegoose": "^12.9.0",
     "ag-grid-enterprise": "^32.3.2",
     "ag-grid-react": "^32.3.2",
-    "deck.gl": "^9.0.35",
     "mapbox-gl": "^3.7.0",
     "mapbox-gl-draw-cut-polygon-mode": "github:lbordino/mapbox-gl-draw-cut-polygon-mode",
     "mapbox-gl-draw-freehand-mode": "github:lbordino/mapbox-gl-draw-freehand-mode",

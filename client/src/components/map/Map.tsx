@@ -1,8 +1,7 @@
 
 import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import * as turf from "@turf/turf";
-import { featureCollection,area } from "@turf/turf";
+import { AllGeoJSON, featureCollection,area } from "@turf/turf";
 import  { documentColorMapping } from "./documentcolors";
 
 import {
@@ -166,17 +165,17 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
 
       const sortedDrawing = featureCollection(
         props.drawing.features.sort((a, b) => {
-          const areaA = area(a as turf.AllGeoJSON);
-          const areaB = area(b as turf.AllGeoJSON);
+          const areaA = area(a as AllGeoJSON);
+          const areaB = area(b as AllGeoJSON);
           return areaB - areaA; // Sort in descending order
         })
       );
       mapRef.current.on("load", function () {
         
-         // Aggiungi la sorgente per la feature collection
+         // Adding source for feature collection
          mapRef.current?.addSource('drawings', {
           type: 'geojson',
-          data: sortedDrawing,
+          data: sortedDrawing as FeatureCollection,
         });
 
         
@@ -214,7 +213,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             'fill-color': documentColorMapping,
             'fill-opacity': 0.5
           },
-          filter: ['==', 'highlight', 'false'] // Inizialmente non evidenziato
+          filter: ['==', 'highlight', 'false'] // not highlighted at start
         });
 
 
