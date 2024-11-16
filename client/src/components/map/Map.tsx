@@ -166,8 +166,8 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
 
       const sortedDrawing = featureCollection(
         props.drawing.features.sort((a, b) => {
-          const areaA = area(a);
-          const areaB = area(b);
+          const areaA = area(a as turf.AllGeoJSON);
+          const areaB = area(b as turf.AllGeoJSON);
           return areaB - areaA; // Sort in descending order
         })
       );
