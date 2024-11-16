@@ -163,59 +163,9 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         "bottom-right"
       );
 
-      const sortedDrawing = featureCollection(
-        props.drawing.features.sort((a, b) => {
-          const areaA = area(a);
-          const areaB = area(b);
-          return areaB - areaA; // Sort in descending order
-        })
-      );
+     
       mapRef.current.on("load", function () {
         
-         // Aggiungi la sorgente per la feature collection
-         mapRef.current?.addSource('drawings', {
-          type: 'geojson',
-          data: sortedDrawing,
-        });
-
-        
-      //AREA--------------------------------------------------------
-        mapRef.current?.addLayer({
-          id: 'drawings-layer',
-          type: 'fill',
-          source: 'drawings',
-          layout: {},
-          paint: {
-            'fill-color': documentColorMapping,
-            'fill-opacity': 0.3,
-          },
-        });
-        
-       
-        mapRef.current?.addLayer({
-          id: 'drawings-borders',
-          type: 'line',
-          source: 'drawings',
-          layout: {},
-          paint: {
-            'line-color':documentColorMapping,
-            'line-width': 2,
-            'line-opacity': 0.3,
-          },
-        });
-
-        
-        mapRef.current?.addLayer({
-          id: 'highlight-area',
-          type: 'fill',
-          source: 'drawings',
-          paint: {
-            'fill-color': documentColorMapping,
-            'fill-opacity': 0.5
-          },
-          filter: ['==', 'highlight', 'false'] // Inizialmente non evidenziato
-        });
-
 
       
         //SOURCES------------------------------------------------------------
@@ -282,7 +232,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         
           new mapboxgl.Popup({ closeButton: false })
             .setLngLat(coordinates)
-            .setHTML(`<h3>${title}</h3>`)
+            .setHTML(`<h3>Document Title:</h3><p>${title}</p>`)
             .addTo(mapRef.current!);
         
           // Change color of the point on hover
@@ -295,8 +245,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
     // Cambia il colore del punto quando il mouse è sopra
     if (id) {
     
-
-      mapRef.current?.setFilter('highlight-area', ['==', 'id', id]);
       mapRef.current?.setFilter('highlight-point', ['==', 'id', id]);
 
      
@@ -409,7 +357,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       
                 new mapboxgl.Popup({ closeButton: false })
                   .setLngLat(coordinates)
-                  .setHTML(`<h3>Cluster Titles:</h3><p>${titles}</p>`)
+                  .setHTML(`<h3>Documents Titles:</h3><p>${titles}</p>`)
                   .addTo(mapRef.current!);
               }
             );
@@ -510,12 +458,11 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
     mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
     mapRef.current.addControl(DocumentMapDraw, "bottom-right");
-
     
+    mapRef.current.on("load", function () {
+      DocumentMapDraw.changeMode("static");
+    })
 
-    if (props.drawing) {
-      DocumentMapDraw.set(props.drawing);
-    }
   }, [mapContainerRef.current]);
 
   useEffect(() => {
@@ -545,9 +492,10 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
 
       mapRef.current.on("load", function () {
         DocumentMapDraw.changeMode("static");
-      });
+      })
 
       if (props.drawing) {
+
         DocumentMapDraw.set(props.drawing);
       }
     }
