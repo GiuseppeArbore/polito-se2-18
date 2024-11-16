@@ -1,31 +1,62 @@
-import mapboxgl, { LngLatLike } from "mapbox-gl";
+
+import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { Button, Card, TabGroup, TabList, Tab, Divider } from "@tremor/react";
+import * as turf from "@turf/turf";
+import { featureCollection,area } from "@turf/turf";
+import  { documentColorMapping } from "./documentcolors";
+
+import {
+  Button,
+  Card,
+  TabGroup,
+  TabList,
+  Tab,
+  Divider,
+  TextInput,
+  Icon,
+} from "@tremor/react";
 import {
   RiCheckFill,
   RiCloseLine,
+  RiCrosshair2Fill,
   RiDeleteBinFill,
   RiHand,
+  RiInfoI,
+  RiInformation2Line,
   RiMapPinLine,
   RiScissorsCutFill,
   RiShapeLine,
+  RiArrowDownSLine,
 } from "@remixicon/react";
-import { DashboardMapDraw, PreviewMapDraw } from "./DrawBar";
+import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import StaticMode from "@mapbox/mapbox-gl-draw-static-mode";
-import MapboxDraw from "@mapbox/mapbox-gl-draw";
+import { Feature, FeatureCollection, Position, Polygon } from "geojson";
+import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
+import { coordDistance } from "../../utils";
 import { RiFileLine } from "@remixicon/react";
-import { Feature, Geometry } from "geojson";
+import { KxDocument } from "../../model";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "./DropDownMenu";
+import "../../index.css";
+import "../../css/map.css";
+
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
 export interface SatMapProps {
-  drawing: any;
+  drawing: FeatureCollection | undefined;
   zoom?: number;
   style?: React.CSSProperties;
   className?: string;
-  entireMunicipalityCount?: number;
+  entireMunicipalityDocuments?: KxDocument[];
 }
 
 const defaultZoom = 12;
@@ -40,6 +71,7 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
 
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
+      //style: "mapbox://styles/mapbox/satellite-streets-v12",
       style: "mapbox://styles/mapbox/light-v11",
       center: center,
       zoom: props.zoom || defaultZoom,
@@ -94,9 +126,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
   useEffect(() => {
     if (mapRef.current) return;
 
-    const modes = MapboxDraw.modes;
-    modes.static = StaticMode;
-
     mapRef.current = new mapboxgl.Map({
       container: mapContainerRef.current,
       style: "mapbox://styles/mapbox/satellite-streets-v12",
@@ -109,24 +138,12 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
     mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
-    mapRef.current.addControl(DashboardMapDraw, "bottom-right");
-
-    mapRef.current.on("load", function () {
-      DashboardMapDraw.changeMode("static");
-    });
-
-    if (props.drawing) {
-      DashboardMapDraw.set(props.drawing);
-    }
   }, [mapContainerRef.current]);
 
   useEffect(() => {
     if (props.drawing) {
       mapRef.current?.remove();
       mapRef.current = null;
-
-      const modes = MapboxDraw.modes;
-      modes.static = StaticMode;
 
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
@@ -146,101 +163,270 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         new mapboxgl.FullscreenControl(),
         "bottom-right"
       );
-      mapRef.current.addControl(DashboardMapDraw, "bottom-right");
 
+      const sortedDrawing = featureCollection(
+        props.drawing.features.sort((a, b) => {
+          const areaA = area(a);
+          const areaB = area(b);
+          return areaB - areaA; // Sort in descending order
+        })
+      );
       mapRef.current.on("load", function () {
-        DashboardMapDraw.changeMode("static");
-      });
+        
+         // Aggiungi la sorgente per la feature collection
+         mapRef.current?.addSource('drawings', {
+          type: 'geojson',
+          data: sortedDrawing,
+        });
 
-      if (props.drawing) {
-        DashboardMapDraw.set(props.drawing);
-      }
+        
+      //AREA--------------------------------------------------------
+        mapRef.current?.addLayer({
+          id: 'drawings-layer',
+          type: 'fill',
+          source: 'drawings',
+          layout: {},
+          paint: {
+            'fill-color': documentColorMapping,
+            'fill-opacity': 0.3,
+          },
+        });
+        
+       
+        mapRef.current?.addLayer({
+          id: 'drawings-borders',
+          type: 'line',
+          source: 'drawings',
+          layout: {},
+          paint: {
+            'line-color':documentColorMapping,
+            'line-width': 2,
+            'line-opacity': 0.3,
+          },
+        });
 
-      // filtering the list of docs for having just the points and draw the pins
-      const pointsAssignedToDocs: GeoJSON.FeatureCollection = {
-        type: "FeatureCollection",
-        features:
-          (props.drawing as any).features?.filter(
-            (feature: any) => feature.geometry?.type === "Point"
-          ) || [],
-      };
+        
+        mapRef.current?.addLayer({
+          id: 'highlight-area',
+          type: 'fill',
+          source: 'drawings',
+          paint: {
+            'fill-color': documentColorMapping,
+            'fill-opacity': 0.5
+          },
+          filter: ['==', 'highlight', 'false'] // Inizialmente non evidenziato
+        });
 
-      // Load custom icon for points
-      mapRef.current.on("load", () => {
-        mapRef.current?.loadImage(
-          `${window.location.origin}/pin.png`,
-          (error, image: any) => {
-            if (error) throw error;
-            if (!mapRef.current?.hasImage("pin-icon")) {
-              mapRef.current?.addImage("pin-icon", image);
+
+      
+        //SOURCES------------------------------------------------------------
+        const pointsAndCentroids = {
+          type: 'FeatureCollection',
+          features: props.drawing?.features.flatMap(feature => {
+            const features = [feature];
+            if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
+              let centroid = turf.pointOnFeature(feature);
+              centroid.properties = { ...feature.properties };
+              features.push(centroid);
             }
+            return features;
+          })
+        };
 
-            // if there is any points, then we can add the source and layer
-            if (pointsAssignedToDocs) {
-              function addJitterToPoints(geojsonData: any) {
-                const jitterAmount = 0.0009; // Adjust this value for more or less jitter
-                geojsonData.features.forEach((feature: any) => {
-                  if (feature.geometry.type === "Point") {
-                    // Add a random offset to each coordinate
-                    feature.geometry.coordinates[0] +=
-                      (Math.random() - 0.5) * jitterAmount;
-                    feature.geometry.coordinates[1] +=
-                      (Math.random() - 0.5) * jitterAmount;
-                  }
-                });
-                return geojsonData;
-              }
+        
+        mapRef.current?.addSource('pointsAndCentroids', {
+          type: 'geojson',
+          data: pointsAndCentroids as any,
+          cluster: true,
+          clusterMaxZoom: 14,
+          clusterRadius: 20 
+        });
 
-              // Apply jitter to your data and add it as a source
-              const jitteredGeoJSON = addJitterToPoints(pointsAssignedToDocs);
-              //Add points to map from pointsAssignedToDocs
-              mapRef.current?.addSource("documents", {
-                type: "geojson",
-                data: jitteredGeoJSON,
-                cluster: false, // disable clustering
-              });
-
-              mapRef.current?.addLayer({
-                id: "document-points",
-                type: "symbol",
-                source: "documents",
-                layout: {
-                  "icon-image": "pin-icon",
-                  "icon-size": 1,
-                },
-              });
-            }
+      
+        //POINTS-----------------------------------------------------------------
+        mapRef.current?.addLayer({
+          id: 'points',
+          type: 'circle',
+          source: 'pointsAndCentroids',
+          filter: ['!', ['has', 'point_count']],
+          paint: {
+            'circle-radius': 10,
+            'circle-color': '#ffffff'
           }
-        );
-
-        // Click event to show popup with document title
-        mapRef.current?.on("click", "document-points", (e: any) => {
-          const coordinates = e.features[0].geometry.coordinates.slice();
-          const { id, title, description } = e.features[0].properties;
-
-          new mapboxgl.Popup()
+        });
+        mapRef.current?.addLayer({
+          id: 'highlight-point',
+          type: 'circle',
+          source: 'pointsAndCentroids',
+          paint: {
+            'circle-radius': 10,
+            'circle-color':documentColorMapping,
+            'circle-opacity': 1
+          },
+          filter: ['==', 'highlight', 'false'] // Initially not highlighted
+        });
+        
+        mapRef.current?.on('mouseenter', 'points', function (e) {
+          if (mapRef.current) {
+            mapRef.current.getCanvas().style.cursor = 'pointer';
+          }
+          if (!e.features || e.features.length === 0) return;
+          const coordinates = (e.features[0].geometry as any).coordinates.slice();
+          const title = e.features[0].properties?.title;
+        
+          // Ensure that if the map is zoomed out such that multiple
+          // copies of the feature are visible, the popup appears
+          // over the copy being pointed to.
+          while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+            coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+          }
+        
+          new mapboxgl.Popup({ closeButton: false })
             .setLngLat(coordinates)
-            .setHTML(
-              `<strong><a href="/documents/${id}" > ${title}</a></strong>`
-            )
-            .addTo(mapRef.current as any);
-        });
+            .setHTML(`<h3>${title}</h3>`)
+            .addTo(mapRef.current!);
+        
+          // Change color of the point on hover
 
-        // Change the cursor to pointer when hovering over a point
-        mapRef.current?.on("mouseenter", "document-points", () => {
-          const canvas = mapRef.current?.getCanvas();
-          if (canvas) {
-            canvas.style.cursor = "pointer";
+    // Cambia il colore del punto al passaggio del cursore
+    const id = e.features[0].properties?.id;
+    const type = e.features[0].properties?.type;
+  
+
+    // Cambia il colore del punto quando il mouse è sopra
+    if (id) {
+    
+
+      mapRef.current?.setFilter('highlight-area', ['==', 'id', id]);
+      mapRef.current?.setFilter('highlight-point', ['==', 'id', id]);
+
+     
+    }
+        });
+      
+        mapRef.current?.on('mouseleave', 'points', function () {
+          if (mapRef.current) {
+            mapRef.current.getCanvas().style.cursor = '';
+          }
+          const popup = document.querySelector('.mapboxgl-popup');
+          if (popup) popup.remove();
+      
+          // Reset color of the point on mouse leave
+
+          mapRef.current?.setFilter('highlight-area', ['==', 'highlight', 'false']);
+          mapRef.current?.setFilter('highlight-point', ['==', 'highlight', 'false']);
+        });
+      
+        // Add click interaction
+        mapRef.current?.on('click', 'points', function (e) {
+          if (!e.features || e.features.length === 0) return;
+          const id = e.features[0].properties?.id;
+          if (id) {
+            window.location.href = `/documents/${id}`;
           }
         });
 
-        mapRef.current?.on("mouseleave", "document-points", () => {
-          const canvas = mapRef.current?.getCanvas();
-          if (canvas) {
-            canvas.style.cursor = "";
+        //CLUSTERS--------------------------------------------------------------
+        mapRef.current?.addLayer({
+          id: 'clusters',
+          type: 'circle',
+          source: 'pointsAndCentroids',
+          filter: ['has', 'point_count'],
+          paint: {
+            'circle-color': '#51bbd6',
+            'circle-radius': [
+              'step',
+              ['get', 'point_count'],
+              20,
+              100,
+              30,
+              750,
+              40
+            ]
           }
+        });
+      
+        mapRef.current?.addLayer({
+          id: 'cluster-count',
+          type: 'symbol',
+          source: 'pointsAndCentroids',
+          filter: ['has', 'point_count'],
+          layout: {
+            'text-field': '{point_count_abbreviated}',
+            'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+            'text-size': 12
+          }
+        });
+      
+        // Zoom into cluster on click
+        mapRef.current?.on('click', 'clusters', function (e) {
+          const features = mapRef.current?.queryRenderedFeatures(e.point, {
+            layers: ['clusters']
+          });
+          if (features && features.length > 0) {
+            const clusterId = features[0]?.properties?.cluster_id;
+            const source = mapRef.current?.getSource('pointsAndCentroids');
+            if (source && 'getClusterExpansionZoom' in source) {
+              (source as any).getClusterExpansionZoom(
+                clusterId,
+                function (err: any, zoom: any) {
+                  if (err) return;
+      
+                  mapRef.current?.easeTo({
+                    center: (features[0].geometry as GeoJSON.Point).coordinates as [number, number],
+                    zoom: zoom
+                  });
+                }
+              );
+            }
+          }
+        });
+      
+        // Show titles of documents in cluster on hover
+        mapRef.current?.on('mouseenter', 'clusters', function (e) {
+          if (mapRef.current) {
+            mapRef.current.getCanvas().style.cursor = 'pointer';
+          }
+          if (!e.features || e.features.length === 0) return;
+          const clusterId = e.features[0]?.properties?.cluster_id;
+          const source = mapRef.current?.getSource('pointsAndCentroids');
+          if (source && 'getClusterLeaves' in source) {
+            (source as any).getClusterLeaves(
+              clusterId,
+              Infinity,
+              0,
+              function (err: any, leaves: any) {
+                if (err) return;
+      
+                const titles = leaves.map((leaf: any) => leaf.properties.title).join('<br>');
+                const coordinates = (e.features?.[0].geometry as any).coordinates.slice();
+      
+                // Ensure that if the map is zoomed out such that multiple
+                // copies of the feature are visible, the popup appears
+                // over the copy being pointed to.
+                while (Math.abs(e.lngLat.lng - coordinates[0]) > 180) {
+                  coordinates[0] += e.lngLat.lng > coordinates[0] ? 360 : -360;
+                }
+      
+                new mapboxgl.Popup({ closeButton: false })
+                  .setLngLat(coordinates)
+                  .setHTML(`<h3>Cluster Titles:</h3><p>${titles}</p>`)
+                  .addTo(mapRef.current!);
+              }
+            );
+          }
+        });
+      
+        mapRef.current?.on('mouseleave', 'clusters', function () {
+          if (mapRef.current) {
+            mapRef.current.getCanvas().style.cursor = '';
+          }
+          const popup = document.querySelector('.mapboxgl-popup');
+          if (popup) popup.remove();
         });
       });
+
+      
     }
   }, [props.drawing]);
 
@@ -263,50 +449,196 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           touchAction: "auto",
         }}
       />
+      <DropdownMenu modal={false}>
+        <DropdownMenuTrigger asChild>
+          <Button className="button-whole-Kiruna" variant="primary">
+            <div style={{ display: "flex", alignItems: "center" }}>
+              Whole Kiruna: {props.entireMunicipalityDocuments?.length}
+              <RiFileLine
+                style={{
+                  fontSize: "1rem",
+                  color: "#4A4A4A",
+                  transform: "scale(0.80)",
+                }}
+              />
+              <RiArrowDownSLine
+                style={{
+                  fontSize: "1rem",
+                  color: "#4A4A4A",
+                  marginLeft: "0.25rem",
+                }}
+              />
+            </div>
+          </Button>
+        </DropdownMenuTrigger>
+
+        <DropdownMenuContent>
+          <DropdownMenuLabel>Documents</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuGroup>
+            {props.entireMunicipalityDocuments?.map((doc, index) => (
+              <DropdownMenuItem
+                key={index}
+                onClick={() => (window.location.href = `/documents/${doc._id}`)}
+              >
+                {doc.title}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  );
+};
+
+export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
+  const mapContainerRef = useRef<any>(null);
+  const mapRef = useRef<mapboxgl.Map | null>(null);
+
+  useEffect(() => {
+    if (mapRef.current) return;
+
+    mapRef.current = new mapboxgl.Map({
+      container: mapContainerRef.current,
+      style: "mapbox://styles/mapbox/satellite-streets-v12",
+      center: center,
+      zoom: props.zoom || defaultZoom,
+      pitch: 40,
+      interactive: true,
+    });
+
+    mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
+    mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
+    mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
+    mapRef.current.addControl(DocumentMapDraw, "bottom-right");
+
+    
+
+    if (props.drawing) {
+      DocumentMapDraw.set(props.drawing);
+    }
+  }, [mapContainerRef.current]);
+
+  useEffect(() => {
+    if (props.drawing) {
+      mapRef.current?.remove();
+      mapRef.current = null;
+
+      mapRef.current = new mapboxgl.Map({
+        container: mapContainerRef.current,
+        style: "mapbox://styles/mapbox/satellite-streets-v12",
+        center: center,
+        zoom: props.zoom || defaultZoom,
+        pitch: 40,
+        interactive: true,
+      });
+
+      mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
+      mapRef.current.addControl(
+        new mapboxgl.NavigationControl(),
+        "bottom-right"
+      );
+      mapRef.current.addControl(
+        new mapboxgl.FullscreenControl(),
+        "bottom-right"
+      );
+      mapRef.current.addControl(DocumentMapDraw, "bottom-right");
+
+      mapRef.current.on("load", function () {
+        DocumentMapDraw.changeMode("static");
+      });
+
+      if (props.drawing) {
+        DocumentMapDraw.set(props.drawing);
+      }
+    }
+  }, [props.drawing]);
+
+  useEffect(() => {
+    if (!mapRef.current) return;
+
+    const map = mapRef.current;
+    map.setZoom(props.zoom || defaultZoom);
+  }, [props.zoom]);
+
+  return (
+    <>
       <div
-        className="primary text-sm font-bold"
+        className={props.className}
+        ref={mapContainerRef}
+        id="map"
         style={{
-          position: "absolute",
-          top: "10px",
-          left: "10px",
-          zIndex: 1,
-          padding: "10px",
-          backgroundColor: "white",
-          color: "#4A4A4A",
-          border: "1px solid #ccc",
-          borderRadius: "8px",
-          boxShadow: "0 4px 8px rgba(0, 0, 0, 0.1)",
-          fontWeight: "bold",
-          fontFamily: "inherit",
-          fontSize: "0.80rem",
+          ...props.style,
+          pointerEvents: "auto",
+          touchAction: "auto",
         }}
-      >
-        {" "}
-        <div className="flex items-center">
-          Documents covering the entire municipality:{" "}
-          {props.entireMunicipalityCount}
-          <RiFileLine
-            style={{
-              marginLeft: "-2px",
-              fontSize: "16px",
-              color: "#4A4A4A",
-              transform: "scale(0.80)",
-            }}
-          />
-        </div>
-      </div>
+      />
     </>
   );
 };
 
 interface MapControlsProps {
-  onDone: (path: any) => void;
+  // path type is temporary
+  onDone: (path: FeatureCollection) => void;
   onCancel: () => void;
-  drawing: any;
+  drawing: FeatureCollection | undefined;
 }
 
-const MapControls: React.FC<MapControlsProps> = (props) => {
+const MapControls: React.FC<
+  MapControlsProps & {
+    bounds: LngLatBounds | null;
+    flyTo: (coords: LngLatLike) => void;
+    setFeature: (_: Feature) => void;
+  }
+> = (props) => {
   const [index, setIndex] = useState(0);
+  const [pointCoords, setPointCoords] = useState<[string, string]>(["", ""]);
+  const [coordsError, setCoordsError] = useState(false);
+  function str2pos(str: [string, string]): Position {
+    return [Number(str[0]), Number(str[1])];
+  }
+  function pos2str(pos: Position): [string, string] {
+    return [pos[0].toString(), pos[1].toString()];
+  }
+
+  const emptyPointFeature: Feature = {
+    type: "Feature",
+    properties: {},
+    geometry: { type: "Point", coordinates: [] },
+  };
+  // structuredClone is necessary to avoid modifying the prop's original value.
+  const feature = structuredClone(props?.drawing?.features?.at?.(0));
+  const geometry = feature?.geometry;
+  const pos = geometry?.type === "Point" ? geometry.coordinates : [NaN, NaN];
+
+  useEffect(() => {
+    if (geometry?.type === "Point") {
+      setIndex(1);
+      setPointCoords(pos2str(pos));
+    } else if (geometry?.type === "Polygon") {
+      setIndex(2);
+    }
+  }, [geometry?.type, pos?.[0], pos?.[1]]);
+
+  useEffect(() => {
+    const dist = coordDistance(
+      center.toReversed() as [number, number],
+      str2pos(pointCoords).toReversed() as [number, number]
+    );
+    if (dist <= 100 || pointCoords.find((c) => c === "") !== undefined) {
+      setCoordsError(false);
+    } else {
+      setCoordsError(true);
+    }
+    if (
+      index === 1 &&
+      PreviewMapDraw.getMode() === "simple_select" &&
+      pointCoords.every((c) => c === "")
+    ) {
+      PreviewMapDraw.deleteAll();
+      PreviewMapDraw.changeMode("draw_point");
+    }
+  }, [pointCoords[0], pointCoords[1]]);
 
   // Note:
   // React's useEffect() are run starting from the children. This means that we cannot change
@@ -346,13 +678,104 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
           </Tab>
         </TabList>
       </TabGroup>
-      <div className="mt-4 px-2 space-x-2">
+      <div className="mt-4 px-2">
         {index === 0 ? (
           <></>
         ) : index === 1 ? (
           <>
-            <p className="text-sm italic mx-2">Click to add a Point</p>
-            <div className="mt-2 flex justify-center space-x-2">
+            <p className="text-sm italic mx-2">
+              Click on the map or type the coordinates to add a Point
+            </p>
+            <div className="mt-2">
+              <TextInput
+                value={pointCoords[0]}
+                onValueChange={(longitude) => {
+                  const tmp = Number(longitude);
+                  if (tmp < 0 || tmp > 180) return;
+                  const newCoords: [string, string] = [
+                    isNaN(tmp) ? pointCoords[0] : longitude,
+                    pointCoords[1],
+                  ];
+                  setPointCoords(newCoords);
+                  if (newCoords.every((c) => !isNaN(Number(c)) && c !== "")) {
+                    let tmp =
+                      feature?.geometry.type === "Point"
+                        ? feature
+                        : emptyPointFeature;
+                    tmp.geometry = {
+                      ...tmp.geometry,
+                      type: "Point",
+                      coordinates: str2pos(newCoords),
+                    };
+                    PreviewMapDraw.changeMode("simple_select");
+                    PreviewMapDraw.set({
+                      type: "FeatureCollection",
+                      features: [tmp],
+                    });
+                  }
+                }}
+                error={coordsError}
+                icon={() => (
+                  <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
+                    Longitude
+                  </p>
+                )}
+                className="mt-1 pl-9 rounded-b-none"
+              />
+              <TextInput
+                value={pointCoords[1]}
+                onValueChange={(latitude) => {
+                  const tmp = Number(latitude);
+                  if (tmp < -90 || tmp > 90) return;
+                  const newCoords: [string, string] = [
+                    pointCoords[0],
+                    isNaN(tmp) ? pointCoords[1] : latitude,
+                  ];
+                  setPointCoords(newCoords);
+                  if (newCoords.every((c) => !isNaN(Number(c)) && c !== "")) {
+                    let tmp =
+                      feature?.geometry.type === "Point"
+                        ? feature
+                        : emptyPointFeature;
+                    tmp.geometry = {
+                      ...tmp.geometry,
+                      type: "Point",
+                      coordinates: str2pos(newCoords),
+                    };
+                    PreviewMapDraw.changeMode("simple_select");
+                    PreviewMapDraw.set({
+                      type: "FeatureCollection",
+                      features: [tmp],
+                    });
+                  }
+                }}
+                error={coordsError}
+                errorMessage="All points must be within 100Km of Kiruna"
+                icon={() => (
+                  <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
+                    Latitude
+                  </p>
+                )}
+                className="pl-9 border-t-0 rounded-t-none"
+              />
+              {!coordsError &&
+              pointCoords.every((c) => c !== "") &&
+              !props.bounds?.contains(str2pos(pointCoords) as LngLatLike) ? (
+                <div className="flex justify-center mt-2">
+                  <Button
+                    icon={RiCrosshair2Fill}
+                    size="xs"
+                    variant="light"
+                    onClick={() => {
+                      props.flyTo(str2pos(pointCoords) as LngLatLike);
+                    }}
+                  >
+                    Navigate to point
+                  </Button>
+                </div>
+              ) : null}
+            </div>
+            <div className="mt-2 flex justify-center ">
               <Button
                 size="xs"
                 variant="secondary"
@@ -360,6 +783,7 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
                 color="red"
                 className="flex-1"
                 onClick={() => {
+                  setPointCoords(["", ""]);
                   PreviewMapDraw.deleteAll();
                   PreviewMapDraw.changeMode("draw_point");
                 }}
@@ -423,10 +847,13 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
           Cancel
         </Button>
         <Button
+          disabled={coordsError}
           size="xs"
           variant="primary"
           icon={RiCheckFill}
           onClick={() => {
+            // This changeMode is necessary, otherwise the MapDraw might contain malformed data
+            PreviewMapDraw.changeMode("simple_select");
             props.onDone(PreviewMapDraw.getAll());
           }}
           className="flex-1"
@@ -441,6 +868,10 @@ const MapControls: React.FC<MapControlsProps> = (props) => {
 export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const [tmpDrawing, setTmpDrawing] = useState<FeatureCollection | undefined>(
+    props.drawing
+  );
+  const [mapBounds, setMapBounds] = useState<LngLatBounds | null>(null);
 
   useEffect(() => {
     if (mapRef.current) return;
@@ -456,7 +887,22 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
     mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
-    if (props.drawing) PreviewMapDraw.set(props.drawing);
+    mapRef.current.on("move", (e) => {
+      setMapBounds(e.target.getBounds());
+    });
+    mapRef.current.on("draw.create", (e: DrawCreateEvent) => {
+      setTmpDrawing({ type: "FeatureCollection", features: e.features });
+    });
+    mapRef.current.on("draw.delete", () => {
+      setTmpDrawing(undefined);
+    });
+    mapRef.current.on("draw.update", (e: DrawUpdateEvent) => {
+      setTmpDrawing({ type: "FeatureCollection", features: e.features });
+    });
+
+    if (props.drawing) {
+      PreviewMapDraw.set(props.drawing);
+    }
   }, []);
 
   useEffect(() => {
@@ -478,8 +924,18 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
       <MapControls
         onCancel={props.onCancel}
         onDone={props.onDone}
-        drawing={props.drawing}
-      ></MapControls>
+        setFeature={(f) => {
+          PreviewMapDraw.set({ type: "FeatureCollection", features: [f] });
+        }}
+        drawing={tmpDrawing}
+        bounds={mapBounds}
+        flyTo={(coords: LngLatLike) => {
+          mapRef.current?.flyTo({
+            center: coords,
+            zoom: props.zoom || defaultZoom,
+          });
+        }}
+      />
     </>
   );
 };
