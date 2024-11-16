@@ -4,36 +4,74 @@ import {
   Text,
   Grid,
   Col,
-  DateRangePicker,
   Metric,
   Subtitle,
-  Bold,
-  Italic,
-  Select,
-  SelectItem,
   TabGroup,
   TabList,
   Tab,
-  DateRangePickerItem,
-  DateRangePickerValue,
 } from "@tremor/react";
 import API from "../API";
-import { useState, useMemo, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { FormDialog } from "./form/Form";
-import { DashboardMap, PreviewMap } from "./map/Map";
-import { KxDocument } from "../model";
+import { DashboardMap } from "./map/Map";
+import { Area, KxDocument, Point } from "../model";
+import List from "./list/List";
+import { Toaster } from "./toast/Toaster";
+import { toast } from "../utils/toaster";
+import { FeatureCollection } from "geojson";
 
 export default function Console() {
-  const today = new Date(Date.now());
-  const [groupKey, setGroupKey] = useState("1");
-  const [selectedView, setSelectedView] = useState(0);
-
   const [documents, setDocuments] = useState<KxDocument[]>([]);
-  const [entireMunicipalityCount, setEntireMunicipalityCount] = useState(0);
-  const [newDocumentCreated, setNewDocumentCreated] = useState(true);
-  const [documentsAssignedToAPoint, setDocumentsAssignedToAPoint] = useState<
-    any[]
+  const [selectedView, setSelectedView] = useState(0);
+  const [refreshNeeded, setRefreshNeeded] = useState(true);
+  const [entireMunicipalityDocuments, setEntireMunicipalityDocuments] =
+    useState<KxDocument[]>([]);
+  const [pointOrAreaDocuments, setPointOrAreaDocuments] = useState<
+    KxDocument[]
   >([]);
+  const [newDocumentCreated, setNewDocumentCreated] = useState(true);
+
+  const drawing: FeatureCollection = {
+    type: "FeatureCollection",
+    features: pointOrAreaDocuments.map((doc) => ({
+      type: "Feature",
+      geometry: doc.doc_coordinates as Area | Point,
+      properties: {
+        title: doc.title,
+        description: doc.description,
+        id: doc._id,
+      },
+    })),
+  };
+
+  useEffect(() => {
+    const fetchDocuments = async () => {
+      try {
+        const docs = await API.getAllKxDocuments();
+        const entireMunicipalityDocs = docs.filter(
+          (doc) => doc.doc_coordinates?.type === "EntireMunicipality"
+        );
+        const otherDocs = docs.filter(
+          (doc) => doc.doc_coordinates?.type !== "EntireMunicipality"
+        );
+
+        setEntireMunicipalityDocuments(entireMunicipalityDocs);
+        setPointOrAreaDocuments(otherDocs);
+        setDocuments(docs);
+      } catch (error) {
+        toast({
+          title: "Error",
+          description: "Failed to retrieve documents",
+          variant: "error",
+          duration: 3000,
+        });
+      }
+    };
+    if (refreshNeeded) {
+      fetchDocuments();
+      setRefreshNeeded(false);
+    }
+  }, [selectedView, refreshNeeded]);
 
   useEffect(() => {
     const fetchDocuments = async () => {
@@ -50,7 +88,6 @@ export default function Console() {
           return true;
         });
 
-        setEntireMunicipalityCount(count);
         setDocuments(filteredDocuments);
       } catch (error) {
         console.error("Error fetching documents:", error);
@@ -62,19 +99,6 @@ export default function Console() {
       setNewDocumentCreated(false);
     }
   }, [newDocumentCreated]);
-
-  const drawing = {
-    type: "FeatureCollection",
-    features: documents.map((doc) => ({
-      type: "Feature",
-      geometry: doc.doc_coordinates,
-      properties: {
-        id: doc._id,
-        title: doc.title,
-        description: doc.description,
-      },
-    })),
-  };
 
   return (
     <main>
@@ -103,7 +127,11 @@ export default function Console() {
 
         <Col numColSpanLg={1}>
           <div className="space-y-6">
-            <FormDialog setNewDocumentCreated={setNewDocumentCreated} />
+            <FormDialog
+              documents={documents}
+              refresh={() => setRefreshNeeded(true)}
+            />
+
             <Card>
               <Metric>KIRUNA</Metric>
               <Title>How to move a city</Title>
@@ -135,8 +163,10 @@ export default function Console() {
           <div>Diagram Coming soon...</div>
         </div>
       </Card>
+      <Toaster />
     </main>
   );
+
   function renderCurrentSelection(selectedView: number = 0) {
     switch (selectedView) {
       case 0:
@@ -151,7 +181,7 @@ export default function Console() {
                 borderRadius: 8,
               }}
               drawing={drawing}
-              entireMunicipalityCount={entireMunicipalityCount}
+              entireMunicipalityDocuments={entireMunicipalityDocuments}
             ></DashboardMap>
           </>
         );
@@ -166,7 +196,7 @@ export default function Console() {
                 height: "100%",
               }}
             >
-              <div>Coming soon...</div>
+              <List documents={documents} />
             </div>
           </>
         );

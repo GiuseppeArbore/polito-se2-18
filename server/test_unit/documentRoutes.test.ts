@@ -12,6 +12,7 @@ jest.mock('../src/controller', () => ({
     createKxDocument: jest.fn(),
     getAllKxDocuments: jest.fn(),
     getKxDocumentById: jest.fn(),
+	deleteKxDocument: jest.fn()
 }));
 
 

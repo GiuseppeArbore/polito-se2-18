@@ -30,7 +30,7 @@ import {
 } from "@remixicon/react";
 import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { Feature, FeatureCollection, Position, Polygon } from "geojson";
+import { Feature, FeatureCollection, Position } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
 import { coordDistance } from "../../utils";
 import { RiFileLine } from "@remixicon/react";
@@ -46,7 +46,6 @@ import {
 } from "./DropDownMenu";
 import "../../index.css";
 import "../../css/map.css";
-
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
