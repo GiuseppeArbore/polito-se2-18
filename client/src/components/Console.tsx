@@ -40,6 +40,7 @@ export default function Console() {
         title: doc.title,
         description: doc.description,
         id: doc._id,
+        type: doc.type
       },
     })),
   };

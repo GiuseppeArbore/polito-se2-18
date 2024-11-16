@@ -312,7 +312,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             const clusterId = features[0]?.properties?.cluster_id;
             const source = mapRef.current?.getSource('pointsAndCentroids');
             if (source && 'getClusterExpansionZoom' in source) {
-              (source as any).getClusterExpansionZoom(
+              (source).getClusterExpansionZoom(
                 clusterId,
                 function (err: any, zoom: any) {
                   if (err) return;
@@ -336,7 +336,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           const clusterId = e.features[0]?.properties?.cluster_id;
           const source = mapRef.current?.getSource('pointsAndCentroids');
           if (source && 'getClusterLeaves' in source) {
-            (source as any).getClusterLeaves(
+            (source).getClusterLeaves(
               clusterId,
               Infinity,
               0,
@@ -344,7 +344,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                 if (err) return;
       
                 const titles = leaves.map((leaf: any) => leaf.properties.title).join('<br>');
-                const coordinates = (e.features?.[0].geometry as any).coordinates.slice();
+                const coordinates = (e.features?.[0].geometry as GeoJSON.Point).coordinates.slice();
       
                 // Ensure that if the map is zoomed out such that multiple
                 // copies of the feature are visible, the popup appears
@@ -354,7 +354,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                 }
       
                 new mapboxgl.Popup({ closeButton: false })
-                  .setLngLat(coordinates)
+                  .setLngLat(coordinates as [number, number])
                   .setHTML(`<h3>Documents Titles:</h3><p>${titles}</p>`)
                   .addTo(mapRef.current!);
               }
@@ -500,7 +500,7 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
         
         mapRef.current?.addSource('points', {
           type: 'geojson',
-          data: points as any,
+          data: points as FeatureCollection,
           cluster: true,
           clusterMaxZoom: 14,
           clusterRadius: 20 
