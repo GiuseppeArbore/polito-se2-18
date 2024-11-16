@@ -1,4 +1,5 @@
-import { S3Client, ListObjectsCommand } from "@aws-sdk/client-s3";
+import { S3Client, ListObjectsCommand, GetObjectCommand } from "@aws-sdk/client-s3";
+import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { mongoose } from "@typegoose/typegoose";
 
 export const BUCKET_NAME = "kiruna-explorer";
@@ -22,4 +23,9 @@ export namespace KxObjectStorageCommands {
     export function listObjectsForDocument(docId: mongoose.Types.ObjectId) {
         return new ListObjectsCommand({ Bucket: BUCKET_NAME, Prefix: `${docId.toString()}/` });
     }
+}
+
+export async function getPresignedUrl(docId: mongoose.Types.ObjectId, fileName: string): Promise<string> {
+    const command = new GetObjectCommand({ Bucket: BUCKET_NAME, Key: `${docId.toString()}/${fileName}` })
+    return getSignedUrl(kxObjectStorageClient, command, { expiresIn: 120 });
 }

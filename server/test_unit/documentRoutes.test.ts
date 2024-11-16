@@ -2,19 +2,18 @@ import request from 'supertest';
 import { Request, Response } from 'express';
 import { createKxDocument } from '../src/controller';
 import {app} from "../index";
+import { db } from '../src/db/dao'
 import { AreaType, KxDocumentType, Scale, Stakeholders } from '../src/models/enum';
 import { KIRUNA_COORDS } from '../src/utils';
 import { connections } from 'mongoose';
 import {get} from 'http';
 
 
-jest.mock('../src/controller', () => ({
-    createKxDocument: jest.fn(),
-    getAllKxDocuments: jest.fn(),
-    getKxDocumentById: jest.fn(),
-	deleteKxDocument: jest.fn()
-}));
+jest.mock('../src/controller');
 
+afterAll(async () => {
+    await db.disconnectFromDB();
+});
 
 describe('Document Routes', () => {
     beforeEach(() => {
