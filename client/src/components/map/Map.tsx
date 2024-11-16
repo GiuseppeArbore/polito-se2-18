@@ -1,8 +1,7 @@
 
 import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import * as turf from "@turf/turf";
-import { featureCollection,area } from "@turf/turf";
+import { AllGeoJSON, featureCollection, area, pointOnFeature } from "@turf/turf";
 import  { documentColorMapping } from "./documentcolors";
 
 import {
@@ -174,7 +173,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           features: props.drawing?.features.flatMap(feature => {
             const features = [feature];
             if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-              let centroid = turf.pointOnFeature(feature as turf.AllGeoJSON);
+              let centroid = pointOnFeature(feature as AllGeoJSON);
               centroid.properties = { ...feature.properties };
               features.push(centroid as Feature<Geometry>);
             }
@@ -237,12 +236,9 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         
           // Change color of the point on hover
 
-    // Cambia il colore del punto al passaggio del cursore
+    // change point color on hover
     const id = e.features[0].properties?.id;
-    const type = e.features[0].properties?.type;
   
-
-    // Cambia il colore del punto quando il mouse è sopra
     if (id) {
     
       mapRef.current?.setFilter('highlight-point', ['==', 'id', id]);
