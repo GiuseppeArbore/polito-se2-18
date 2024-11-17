@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCompass } from "@fortawesome/free-solid-svg-icons";
 import { Text } from "@tremor/react";
 import { Link } from "react-router-dom";
+import { Badge } from "@tremor/react";
 
 const HeroSection: React.FC = () => {
   return (
@@ -13,7 +14,12 @@ const HeroSection: React.FC = () => {
       <Text className="text-xl mt-4 animate__animated animate__fadeIn animate__delay-2s">
         Discover the journey of Sweden's moving city
       </Text>
-      <div className="cta-icon animate__animated animate__fadeIn animate__delay-3s cursor-pointer">
+      <h6>
+        <Badge color="white" size="lg">
+          Start Exploring
+        </Badge>
+      </h6>
+      <div className="cta-icon animate__animated animate__fadeIn animate__delay-3s cursor-pointer mb-4">
         <Link to="/dashboard">
           {" "}
           <FontAwesomeIcon
