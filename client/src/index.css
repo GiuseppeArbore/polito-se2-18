@@ -23,4 +23,111 @@ body {
     background-color: white;
 }
 
+/* Styles for Landing page */
+
+.hero-section {
+  padding: 60px 20px 20px 20px;
+  width: 100%;
+  align-items: center;
+}
+
+.hero-section h1 {
+  font-size: 3rem;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-weight: bold;
+  color: #ffffff;
+  margin-bottom: 10px;
+  opacity: 0;
+  animation: fadeIn 1.5s ease forwards;
+}
+
+.hero-section p {
+  font-size: 1.2rem;
+  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  color: #dcdcdc;
+  margin-bottom: 30px;
+  opacity: 0;
+  animation: fadeIn 1.5s ease 0.5s forwards;
+}
+
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cta-button {
+  padding: 12px 24px;
+  font-size: 1rem;
+  color: #003d8e;
+  background-color: #ffffff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+  opacity: 0;
+  animation: fadeIn 1.5s ease 1s forwards;
+}
+
+.cta-button:hover {
+  background-color: #dcdcdc;
+}
+
+.features-section {
+  padding: 40px 20px;
+  width: 100%;
+  background-color: #002e70;
+}
+
+.features-section h2 {
+  font-size: 2rem;
+  font-family:'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  color: #ffffff;
+  margin-bottom: 15px;
+  text-align: center;
+}
+
+.feature-list {
+  display: flex;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.feature-card {
+  width: 200px;
+  padding: 20px;
+  background: #004ca8;
+  border-radius: 8px;
+  text-align: center;
+  color: #ffffff;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease;
+  animation: fadeIn 1.2s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+}
+
+.feature-icon {
+  font-size: 2rem;
+  margin-bottom: 10px;
+}
+
+.footer {
+  padding: 20px;
+  background-color: #001a4d;
+  color: #ffffff;
+  font-size: 0.9rem;
+  text-align: center;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+  /* Styles for Landing page - End */
+  
 
