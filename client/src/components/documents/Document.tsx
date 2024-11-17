@@ -1,4 +1,4 @@
-import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line } from '@remixicon/react';
+import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiFilePdf2Fill, RiCamera2Fill, RiCameraFill } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import {
     Accordion,
@@ -7,12 +7,13 @@ import {
 } from '@tremor/react';
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { KxDocumentType, Stakeholders } from "../enum";
-import { DocumentPageMap, PreviewMap } from './map/Map';
-import API from '../API';
-import { KxDocument, PageRange } from '../model';
+import { KxDocumentType, Stakeholders } from "../../enum";
+import { DocumentPageMap, PreviewMap } from '../map/Map';
+import API from '../../API';
+import { KxDocument, PageRange } from '../../model';
 import { mongoose } from '@typegoose/typegoose';
-import "../css/document.css";
+import "../../css/document.css";
+import PreviewDoc from './Preview';
 
 
 
@@ -31,53 +32,54 @@ export default function Document() {
     const [pages, setPages] = useState<PageRange[] | "">("");
     const [description, setDescription] = useState<string | undefined>("");
     const [entireMunicipality, setEntireMunicipality] = useState(false);
+    const [showPdfPreview, setShowPdfPreview] = useState(false);
 
     useEffect(() => {
         const fetchDocument = async () => {
             try {
-            const document = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
-            setDoc(document);
-            setTitle(document.title);
-            setStakeholders(document.stakeholders);
-            setScale(document.scale.toString());
-            setIssuanceDate(document.issuance_date);
-            setType(document.type);
-            setLanguage(document.language || "");
-            setPages(document.pages || "");
-            setDescription(document.description || "");
-            if(document.doc_coordinates.type !=="EntireMunicipality"){
-            const geoJSON = {
-                type: 'FeatureCollection',
-                features: [
-                    {
-                        type: 'Feature',
-                        geometry: document.doc_coordinates,
-                        properties: {
-                            title: document.title,
-                            description: document.description,
-                            id: document._id
-                        }
-                    }
-                ]
-            };
-            setDrawings(geoJSON);
-        }else{
-            setEntireMunicipality(true);
-        }
-    
-        
+                const document = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
+                setDoc(document);
+                setTitle(document.title);
+                setStakeholders(document.stakeholders);
+                setScale(document.scale.toString());
+                setIssuanceDate(document.issuance_date);
+                setType(document.type);
+                setLanguage(document.language || "");
+                setPages(document.pages || "");
+                setDescription(document.description || "");
+                if (document.doc_coordinates.type !== "EntireMunicipality") {
+                    const geoJSON = {
+                        type: 'FeatureCollection',
+                        features: [
+                            {
+                                type: 'Feature',
+                                geometry: document.doc_coordinates,
+                                properties: {
+                                    title: document.title,
+                                    description: document.description,
+                                    id: document._id
+                                }
+                            }
+                        ]
+                    };
+                    setDrawings(geoJSON);
+                } else {
+                    setEntireMunicipality(true);
+                }
+
+
             } catch (error) {
-            console.error("Failed to fetch document:", error);
-            navigate("/404");
+                console.error("Failed to fetch document:", error);
+                navigate("/404");
             }
         };
 
         fetchDocument();
-    },[]);
+    }, []);
 
 
     const [showCheck, setShowCheck] = useState(false);
-    
+
 
     return (
         <div>
@@ -125,6 +127,14 @@ export default function Document() {
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Pages:</i>
                             <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != "" ? pages : "Unknown"} </i>
                         </div>
+                        <div className="flex items-center justify-between mb-2 space-x-2">
+                            <div className="flex space-x-2">
+                                <Button size="xs" className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong" icon={RiCameraFill} onClick={() => console.log("Download Image")}></Button>
+                                <Button size="xs" className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong" icon={RiFilePdf2Fill} onClick={() => setShowPdfPreview(true)}></Button>
+                            </div>
+                        </div>
+
+
 
                     </div>
                     <div className='hidden lg:flex flex-col items-start col space-y-2 w-1/2'>
@@ -172,27 +182,30 @@ export default function Document() {
                     </AccordionBody>
                 </Accordion>
 
-             
-                    {!entireMunicipality ? (
-                        <Card
+
+                {!entireMunicipality ? (
+                    <Card
                         className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
-                        >
-                            <DocumentPageMap
-                                drawing={drawings}
-                                style={{ minHeight: "300px", width: "100%" }}
-                            />
-                        </Card>
-                    ) : (
-                        <div className="flex justify-left items-start pt-10">
-                            <div className=' document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
-                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                    <span>
-                                        The document covers the entire municipality
-                                    </span>
-                                </div>
+                    >
+                        <DocumentPageMap
+                            drawing={drawings}
+                            style={{ minHeight: "300px", width: "100%" }}
+                        />
+                    </Card>
+                ) : (
+                    <div className="flex justify-left items-start pt-10">
+                        <div className=' document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
+                            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                <span>
+                                    The document covers the entire municipality
+                                </span>
                             </div>
                         </div>
-                    )}
+                    </div>
+                )}
+                {
+                    PreviewDoc(showPdfPreview,() => setShowPdfPreview(false))
+                }
             </Card>
 
 
