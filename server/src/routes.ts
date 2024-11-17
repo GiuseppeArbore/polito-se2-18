@@ -1,8 +1,8 @@
 
-import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument} from './controller';
+import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment} from './controller';
 import { validateRequest } from './errorHandlers';
 import e, { Application } from 'express';
-import { body } from 'express-validator';
+import { body, param } from 'express-validator';
 import { AreaType, KxDocumentType, Stakeholders } from './models/enum';
 import { coordDistance, isDocCoords, KIRUNA_COORDS } from './utils';
 
@@ -65,8 +65,39 @@ export function initRoutes(app: Application) {
 
     app.get('/api/documents', getAllKxDocuments);
 
-    app.get('/api/documents/:id', getKxDocumentById);
-	app.delete('/api/documents/:id', deleteKxDocument);
+    app.get('/api/documents/:id',
+        [
+            param("id").notEmpty().withMessage("id is required"),
+        ],
+        validateRequest,
+        getKxDocumentById,
+    );
+
+    app.get('/api/documents/:id/presignedUrl/:fileName',
+        [
+            param("id").notEmpty().withMessage("id is required"),
+            param("fileName").notEmpty().withMessage("fileName is required").custom((f) => {
+                if (typeof f !== "string") return false;
+                const codepoints = [...f];
+                if (codepoints.length > 1024 ||
+                    // Only allow characters accepted by Backblaze https://www.backblaze.com/docs/cloud-storage-files#file-names
+                    codepoints.find((c) => {
+                        const charCode = c.charCodeAt(0);
+                        return charCode < 32 ||
+                            charCode === 127 ||
+                            c === "/" ||
+                            c === "\\";
+                    })
+                ) return false;
+
+                return true;
+            })
+        ],
+        validateRequest,
+        getPresignedUrlForAttachment
+    );
+
+    app.delete('/api/documents/:id', deleteKxDocument);
 }
 
 export default initRoutes;
