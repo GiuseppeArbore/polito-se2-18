@@ -32,7 +32,10 @@ import { Toaster } from "./toast/Toaster";
 export default function Document() {
 
   const navigate = useNavigate();
-  const { id } = useParams();
+  const { id } = useParams<string>();
+  if (!id) {
+    navigate("/404");
+  }
   const [doc, setDoc] = useState<KxDocument | null>(null);
   const [share, setShare] = useState(false);
   const [drawings, setDrawings] = useState<any>("")
@@ -41,10 +44,16 @@ export default function Document() {
   const [scale, setScale] = useState(10000);
   const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(undefined);
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
-  const [language, setLanguage] = useState<string | undefined>("");
-  const [pages, setPages] = useState<PageRange[] | "">("");
-  const [description, setDescription] = useState<string | undefined>("");
+  const [language, setLanguage] = useState<string | undefined>(undefined);
+  const [pages, setPages] = useState<PageRange[]| undefined>(undefined);
+  const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(undefined);
+  const [description, setDescription] = useState<string | undefined>(undefined);
   const [entireMunicipality, setEntireMunicipality] = useState(false);
+  const [documents, setDocuments] = useState<KxDocument[]>([]);
+  const [documentsForDirect, setDocumentsForDirect] = useState<KxDocument[]>([]);
+  const [documentsForCollateral, setDocumentsForCollateral] = useState<KxDocument[]>([]);
+  const [documentsForProjection, setDocumentsForProjection] = useState<KxDocument[]>([]);
+  const [documentsForUpdate, setDocumentsForUpdate] = useState<KxDocument[]>([]);
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -56,9 +65,14 @@ export default function Document() {
         setScale(document.scale);
         setIssuanceDate(document.issuance_date);
         setType(document.type);
-        setLanguage(document.language || "");
-        setPages(document.pages || "");
-        setDescription(document.description || "");
+        setLanguage(document.language || undefined);
+        setPages(document.pages || undefined);
+        setDescription(document.description || undefined);
+        setDocumentsForDirect(document.connections.direct);
+        setDocumentsForCollateral(document.connections.collateral);
+        setDocumentsForProjection(document.connections.projection);
+        setDocumentsForUpdate(document.connections.update);
+        
         if (document.doc_coordinates.type !== "EntireMunicipality") {
           const geoJSON = {
             type: 'FeatureCollection',
@@ -137,7 +151,7 @@ export default function Document() {
 
             <div className="flex items-center justify-between mb-2 space-x-2">
               <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Pages:</i>
-              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != "" ? pages : "Unknown"} </i>
+              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != undefined ? pages : "Unknown"} </i>
             </div>
 
             <FormInfoDialog
@@ -162,7 +176,7 @@ export default function Document() {
               documents={documents}
               setDocuments={setDocuments}
               draw={undefined}
-              setDrawing={setDrawing}
+              setDrawing={setDrawings}
               documentsForDirect={documentsForDirect}
               documentsForCollateral={documentsForCollateral}
               documentsForProjection={documentsForProjection}
@@ -220,7 +234,7 @@ export default function Document() {
           <FormDescriptionDialog
             description={description}
             setDescription={setDescription}
-            id={id}
+            id={id!}
           />
         </div>
         <Dialog open={share} onClose={() => setShare(false)} static={true}>
@@ -264,7 +278,7 @@ export default function Document() {
             <FormDescriptionDialog
               description={description}
               setDescription={setDescription}
-              id={id}
+              id={id!}
             />
           </AccordionBody>
         </Accordion>
@@ -344,14 +358,14 @@ export function FormInfoDialog(
     language: string | undefined;
     setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
     pages: PageRange[] | undefined;
-    setPages: React.Dispatch<React.SetStateAction<PageRange | undefined>>;
+    setPages: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
     pageRanges: PageRange[] | undefined;
     setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
     description: string | undefined;
     setDescription: React.Dispatch<React.SetStateAction<string | undefined>>;
     documents: KxDocument[];
     setDocuments: React.Dispatch<React.SetStateAction<KxDocument[]>>;
-    draw: DocCoordsBase | undefined;
+    draw: DocCoords | undefined;
     setDrawing: React.Dispatch<React.SetStateAction<DocCoords | undefined>>;
     documentsForDirect: KxDocument[];
     documentsForCollateral: KxDocument[];
@@ -393,11 +407,11 @@ export function FormInfoDialog(
       scale_info: Scale.TEXT,
       scale,
       doc_coordinates: draw,
-      issuance_date: issuanceDate,
+      issuance_date: issuanceDate !,
       type: type,
       language,
-      description,
-      pages: validatePageRangeString(pages),
+      description: description !,
+      pages: validatePageRangeString(pages?.toString() || ""),
       connections: {
         direct: documentsForDirect,
         collateral: documentsForCollateral,

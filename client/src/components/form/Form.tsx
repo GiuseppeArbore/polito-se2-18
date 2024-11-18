@@ -60,7 +60,7 @@ export function FormDialog(props: FormDialogProps) {
   const [typeError, setTypeError] = useState(false);
   const [scale, setScale] = useState(10000);
   const [language, setLanguage] = useState<string | undefined>(undefined);
-  const [pages, setPages] = useState<number | undefined>(undefined);
+  const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
 
 
@@ -138,11 +138,11 @@ export function FormDialog(props: FormDialogProps) {
       //scale_info: Scale.TEXT,
       scale,
       doc_coordinates: draw,
-      issuance_date: issuanceDate,
+      issuance_date: issuanceDate!,
       type: type,
       language,
       description,
-      pages: validatePageRangeString(pages),
+      pages: validatePageRangeString(pages?.toString() || ""),
       connections: {
         direct: documentsForDirect.map(d => new mongoose.Types.ObjectId(d)),
         collateral: documentsForCollateral.map(d => new mongoose.Types.ObjectId(d)),
@@ -508,8 +508,8 @@ export function FormDialog(props: FormDialogProps) {
                   <TextInput
                     id="pages"
                     name="pages"
-                    onValueChange={(v: PageRange) => {
-                      setPages(v);
+                    onValueChange={(v: string) => {
+                      setPages(validatePageRangeString(v));
                     }}
                     error={!pageRanges ? true : false}
                     errorMessage='Invalid page range. Examples of valid ranges: "10" or "1-5" or "1-5,6"'
@@ -852,8 +852,8 @@ export function FormDocumentInformation({
   setScale: React.Dispatch<React.SetStateAction<number>>;
   language: string | undefined;
   setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
-  pages:PageRange | undefined;
-  setPages: React.Dispatch<React.SetStateAction<PageRange | undefined>>;
+  pages:PageRange[] | undefined;
+  setPages: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
   pageRanges: PageRange[] | undefined;
   setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
 }) {
@@ -1030,8 +1030,8 @@ export function FormDocumentInformation({
         <TextInput
           id="pages"
           name="pages"
-          onValueChange={(v: PageRange) => {
-            setPages(v);
+          onValueChange={(v: string) => {
+            setPages(validatePageRangeString(v));
           }}
           error={!pageRanges ? true : false}
           errorMessage='Invalid page range. Examples of valid ranges: "10" or "1-5" or "1-5,6"'
