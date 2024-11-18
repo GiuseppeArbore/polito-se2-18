@@ -54,7 +54,7 @@ const getAllKxDocuments = async (): Promise<KxDocument[]> => {
 // function to update title, stakeholders, type, scale, language, pages
 const updateKxDocumentInformation = async (documentId: string, title: string, stakeholders: string[], type: string, scale: number, language: string|undefined, pages: PageRange[] |undefined): Promise<KxDocument | null> => {
     try {
-        const response = await fetch(API_URL + `/documents/${documentId}`, {
+        const response = await fetch(API_URL + `/documents/${documentId}/info`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
@@ -79,7 +79,7 @@ const updateKxDocumentInformation = async (documentId: string, title: string, st
 
 const updateKxDocumentDescription = async (documentId: string, description: string): Promise<KxDocument | null> => {
     try {
-        const response = await fetch(API_URL + `/documents/${documentId}`, {
+        const response = await fetch(API_URL + `/documents/${documentId}/description`, {
             method: 'PATCH',
             headers: {
                 'Content-Type': 'application/json',
