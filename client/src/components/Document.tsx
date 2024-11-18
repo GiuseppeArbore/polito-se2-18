@@ -33,9 +33,7 @@ export default function Document() {
 
   const navigate = useNavigate();
   const { id } = useParams<string>();
-  if (!id) {
-    navigate("/404");
-  }
+ 
   const [doc, setDoc] = useState<KxDocument | null>(null);
   const [share, setShare] = useState(false);
   const [drawings, setDrawings] = useState<any>("")
@@ -50,10 +48,10 @@ export default function Document() {
   const [description, setDescription] = useState<string | undefined>(undefined);
   const [entireMunicipality, setEntireMunicipality] = useState(false);
   const [documents, setDocuments] = useState<KxDocument[]>([]);
-  const [documentsForDirect, setDocumentsForDirect] = useState<KxDocument[]>([]);
-  const [documentsForCollateral, setDocumentsForCollateral] = useState<KxDocument[]>([]);
-  const [documentsForProjection, setDocumentsForProjection] = useState<KxDocument[]>([]);
-  const [documentsForUpdate, setDocumentsForUpdate] = useState<KxDocument[]>([]);
+  const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
+  const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
+  const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
+  const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
 
   useEffect(() => {
     const fetchDocument = async () => {
@@ -68,10 +66,10 @@ export default function Document() {
         setLanguage(document.language || undefined);
         setPages(document.pages || undefined);
         setDescription(document.description || undefined);
-        setDocumentsForDirect(document.connections.direct);
-        setDocumentsForCollateral(document.connections.collateral);
-        setDocumentsForProjection(document.connections.projection);
-        setDocumentsForUpdate(document.connections.update);
+        setDocumentsForDirect(document.connections.direct.map((doc) => doc._id?.toString()));
+        setDocumentsForCollateral(document.connections.collateral.map((doc) => doc._id?.toString()));
+        setDocumentsForProjection(document.connections.projection.map((doc) => doc._id?.toString()));
+        setDocumentsForUpdate(document.connections.update.map((doc) => doc._id?.toString()));
         
         if (document.doc_coordinates.type !== "EntireMunicipality") {
           const geoJSON = {
@@ -367,10 +365,10 @@ export function FormInfoDialog(
     setDocuments: React.Dispatch<React.SetStateAction<KxDocument[]>>;
     draw: DocCoords | undefined;
     setDrawing: React.Dispatch<React.SetStateAction<DocCoords | undefined>>;
-    documentsForDirect: KxDocument[];
-    documentsForCollateral: KxDocument[];
-    documentsForProjection: KxDocument[];
-    documentsForUpdate: KxDocument[];
+    documentsForDirect: string[];
+    documentsForCollateral: string[];
+    documentsForProjection: string[];
+    documentsForUpdate: string[];
   }
 ) {
   const [titleError, setTitleError] = useState(false);
@@ -404,19 +402,19 @@ export function FormInfoDialog(
     const newDocument: KxDocument = {
       title,
       stakeholders,
-      scale_info: Scale.TEXT,
+      //scale_info: Scale.TEXT,
       scale,
-      doc_coordinates: draw,
+      doc_coordinates: draw !,
       issuance_date: issuanceDate !,
       type: type,
       language,
       description: description !,
       pages: validatePageRangeString(pages?.toString() || ""),
       connections: {
-        direct: documentsForDirect,
-        collateral: documentsForCollateral,
-        projection: documentsForProjection,
-        update: documentsForUpdate,
+        direct: documentsForDirect.map(d => new mongoose.Types.ObjectId(d)),
+        collateral: documentsForCollateral.map(d => new mongoose.Types.ObjectId(d)),
+        projection: documentsForProjection.map(d => new mongoose.Types.ObjectId(d)),
+        update: documentsForUpdate.map(d => new mongoose.Types.ObjectId(d)),
       },
     };
 

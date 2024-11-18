@@ -276,7 +276,7 @@ export function FormDialog(props: FormDialogProps) {
         <Divider />
 
         <FormDocumentConnections
-          documents={documents}
+          documents={props.documents}
           documentsForDirect={documentsForDirect}
           setDocumentsForDirect={setDocumentsForDirect}
           documentsForCollateral={documentsForCollateral}
