@@ -77,7 +77,12 @@ export default function Console() {
       <Title>
         <Link to="/" className="flex items-center">
           {" "}
-          <RiHome2Fill className="text-white animate-pulse hover:scale-110 hover:shadow-lg transition-transform duration-300 pr-3" />
+          <span title="Return to Home">
+            <RiHome2Fill
+              className="text-white animate-pulse hover:scale-110 hover:shadow-lg transition-transform duration-300 pr-3 "
+              size="32"
+            />
+          </span>
         </Link>
         Dashboard
       </Title>

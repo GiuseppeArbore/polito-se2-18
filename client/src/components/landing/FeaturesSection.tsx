@@ -26,11 +26,11 @@ const FeaturesSection: React.FC = () => {
   ];
 
   return (
-    <section className="features-section">
+    <section className="features-section text-white">
       <h2>Features</h2>
       <div className="feature-list">
         {features.map((feature, index) => (
-          <div key={index} className="feature-card">
+          <div key={index} className="feature-card bg-blue-600 text-white">
             <div
               className="text-white flex items-center justify-center hover:scale-110 hover:shadow-lg transition-transform duration-300 text-2xl"
               title="Explore"
