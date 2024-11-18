@@ -53,14 +53,14 @@ export function FormDialog(props: FormDialogProps) {
   const [titleError, setTitleError] = useState(false);
   const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
   const [shError, setShError] = useState(false);
-  const [issuanceDate, setIssuanceDate] = useState<Date>(
+  const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(
     new Date()
   );
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
   const [typeError, setTypeError] = useState(false);
   const [scale, setScale] = useState(10000);
   const [language, setLanguage] = useState<string | undefined>(undefined);
-  const [pages, setPages] = useState("");
+  const [pages, setPages] = useState<number | undefined>(undefined);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
 
 
@@ -167,8 +167,8 @@ export function FormDialog(props: FormDialogProps) {
         setIssuanceDate(new Date());
         setType(undefined);
         setLanguage(undefined);
-        setDescription("");
-        setPages("");
+        setDescription(undefined);
+        setPages(undefined);
         setDrawing(undefined);
         setPageRanges([]);
       } else {
@@ -201,7 +201,7 @@ export function FormDialog(props: FormDialogProps) {
     setTypeError(false);
     setScale(10000);
     setLanguage(undefined);
-    setPages("");
+    setPages(undefined);
     setPageRanges([]);
     setHideMap(false);
     setDescription(undefined);
@@ -508,7 +508,7 @@ export function FormDialog(props: FormDialogProps) {
                   <TextInput
                     id="pages"
                     name="pages"
-                    onValueChange={(v: string) => {
+                    onValueChange={(v: PageRange) => {
                       setPages(v);
                     }}
                     error={!pageRanges ? true : false}
@@ -852,8 +852,8 @@ export function FormDocumentInformation({
   setScale: React.Dispatch<React.SetStateAction<number>>;
   language: string | undefined;
   setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
-  pages: string;
-  setPages: React.Dispatch<React.SetStateAction<string>>;
+  pages:PageRange | undefined;
+  setPages: React.Dispatch<React.SetStateAction<PageRange | undefined>>;
   pageRanges: PageRange[] | undefined;
   setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
 }) {
@@ -1030,7 +1030,7 @@ export function FormDocumentInformation({
         <TextInput
           id="pages"
           name="pages"
-          onValueChange={(v: string) => {
+          onValueChange={(v: PageRange) => {
             setPages(v);
           }}
           error={!pageRanges ? true : false}

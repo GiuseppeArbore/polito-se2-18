@@ -118,5 +118,5 @@ const deleteKxDocument = async (id: mongoose.Types.ObjectId): Promise<void> => {
     }
 };
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument };
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription };
 export default API;
