@@ -40,6 +40,7 @@ import "../../index.css";
 import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
+import { Form } from "react-router-dom";
 
 interface FormDialogProps {
   documents: KxDocument[];
@@ -218,7 +219,7 @@ export function FormDialog(props: FormDialogProps) {
     setDrawing(undefined);
   }
 
-  
+
 
   function myform() {
     return (
@@ -249,19 +250,26 @@ export function FormDialog(props: FormDialogProps) {
           setPageRanges={setPageRanges}
         />
 
+        <FormDocumentDatePicker
+          issuanceDate={issuanceDate}
+          setIssuanceDate={setIssuanceDate}
+        />
+
+
+
         <Divider />
 
         <FormDocumentGeolocalization
-        isMapOpen={isMapOpen}
-        setIsMapOpen={setIsMapOpen}
-        showGeoInfo={showGeoInfo}
-        setShowGeoInfo={setShowGeoInfo}
-        docCoordinatesError={docCoordinatesError}
-        setDocCoordinatesError={setDocCoordinatesError}
-        drawing={drawing}
-        setDrawing={setDrawing}
-        hideMap={hideMap}
-        setHideMap={setHideMap}
+          isMapOpen={isMapOpen}
+          setIsMapOpen={setIsMapOpen}
+          showGeoInfo={showGeoInfo}
+          setShowGeoInfo={setShowGeoInfo}
+          docCoordinatesError={docCoordinatesError}
+          setDocCoordinatesError={setDocCoordinatesError}
+          drawing={drawing}
+          setDrawing={setDrawing}
+          hideMap={hideMap}
+          setHideMap={setHideMap}
         />
 
         <Divider />
@@ -286,7 +294,7 @@ export function FormDialog(props: FormDialogProps) {
           documentsForUpdate={documentsForUpdate}
           setDocumentsForUpdate={setDocumentsForUpdate}
           showConnectionsInfo={showConnectionsInfo}
-          setShowConnectionsInfo={setShowConnectionsInfo}        
+          setShowConnectionsInfo={setShowConnectionsInfo}
         />
 
         <Divider />
@@ -386,7 +394,7 @@ export function FormDocumentInformation({
   setScale: React.Dispatch<React.SetStateAction<number>>;
   language: string | undefined;
   setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
-  pages:PageRange[] | undefined;
+  pages: PageRange[] | undefined;
   setPages: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
   pageRanges: PageRange[] | undefined;
   setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
@@ -428,6 +436,7 @@ export function FormDocumentInformation({
           id="stakeholders"
           name="stakeholders"
           className="mt-2"
+          value={stakeholders.map(sh => Object.keys(Stakeholders).find(key => Stakeholders[key as keyof typeof Stakeholders] === sh)).filter((sh): sh is string => sh !== undefined)}
           onValueChange={s => setStakeholders(s.map(sh => Stakeholders[sh as keyof typeof Stakeholders]))}
           error={shError}
           errorMessage="You must select at least one stakeholder."
@@ -444,24 +453,6 @@ export function FormDocumentInformation({
           }
         </MultiSelect>
       </div>
-      <div className="col-span-full">
-        <label
-          htmlFor="issuance-date"
-          className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
-        >
-          Issuance date
-          <span className="text-red-500">*</span>
-        </label>
-        <DatePicker
-          id="issuance-date"
-          className="mt-2"
-          value={issuanceDate}
-          onValueChange={d => setIssuanceDate(d)}
-          enableYearNavigation={true}
-          weekStartsOn={1}
-          enableClear={false}
-        />
-      </div>
 
       <div className="col-span-full sm:col-span-3">
         <label
@@ -475,6 +466,7 @@ export function FormDocumentInformation({
           id="doc_type"
           name="doc_type"
           className="mt-2"
+          value={Object.keys(KxDocumentType).find(key => KxDocumentType[key as keyof typeof KxDocumentType] === type)}
           onValueChange={t => setType(KxDocumentType[t as keyof typeof KxDocumentType])}
           error={typeError}
           errorMessage="The type is mandatory"
@@ -564,6 +556,7 @@ export function FormDocumentInformation({
         <TextInput
           id="pages"
           name="pages"
+          value={pages?.toString() || ""}
           onValueChange={(v: string) => {
             setPages(validatePageRangeString(v));
           }}
@@ -589,7 +582,7 @@ export function FormDocumentGeolocalization({
   setDrawing,
   hideMap,
   setHideMap
-} : {
+}: {
   isMapOpen: boolean,
   setIsMapOpen: React.Dispatch<React.SetStateAction<boolean>>,
   showGeoInfo: boolean,
@@ -677,12 +670,12 @@ export function FormDocumentGeolocalization({
   )
 }
 
-export function FormDocumentDescription( {
+export function FormDocumentDescription({
   description,
   setDescription,
   descriptionError,
   setDescriptionError,
-} : {
+}: {
   description: string | undefined,
   setDescription: React.Dispatch<React.SetStateAction<string | undefined>>,
   descriptionError: boolean,
@@ -727,7 +720,7 @@ export function FormDocumentConnections(
     setDocumentsForUpdate,
     showConnectionsInfo,
     setShowConnectionsInfo
-  } : {
+  }: {
     documents: KxDocument[],
     documentsForDirect: string[],
     setDocumentsForDirect: React.Dispatch<React.SetStateAction<string[]>>,
@@ -904,4 +897,37 @@ export function FormDocumentConnections(
 
     </>
   )
+}
+
+
+export function FormDocumentDatePicker({
+  issuanceDate,
+  setIssuanceDate
+}: {
+  issuanceDate: Date | undefined,
+  setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>
+}) {
+  return (
+
+    <div className="col-span-full mt-4">
+      <label
+        htmlFor="issuance-date"
+        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+      >
+        Issuance date
+        <span className="text-red-500">*</span>
+      </label>
+      <DatePicker
+        id="issuance-date"
+        className="mt-2"
+        value={issuanceDate}
+        onValueChange={d => setIssuanceDate(d)}
+        enableYearNavigation={true}
+        weekStartsOn={1}
+        enableClear={false}
+      />
+    </div>
+  )
+
+
 }

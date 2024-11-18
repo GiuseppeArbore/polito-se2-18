@@ -27,6 +27,7 @@ import {
 
 import { toast } from "./../utils/toaster";
 import { Toaster } from "./toast/Toaster";
+import exp from 'constants';
 
 
 export default function Document() {
@@ -155,8 +156,12 @@ export default function Document() {
             <FormInfoDialog
               title={title}
               setTitle={setTitle}
+              titleError={false}
+              setTitleError={() => {}}
               stakeholders={stakeholders}
               setStakeholders={setStakeholders}
+              shError={false}
+              setShError={() => {}}
               issuanceDate={issuanceDate}
               setIssuanceDate={setIssuanceDate}
               type={type}
@@ -169,16 +174,7 @@ export default function Document() {
               setPages={setPages}
               pageRanges={pageRanges}
               setPageRanges={setPageRanges}
-              description={description}
-              setDescription={setDescription}
-              documents={documents}
-              setDocuments={setDocuments}
-              draw={undefined}
-              setDrawing={setDrawings}
-              documentsForDirect={documentsForDirect}
-              documentsForCollateral={documentsForCollateral}
-              documentsForProjection={documentsForProjection}
-              documentsForUpdate={documentsForUpdate} />
+            />
 
 
           </div>
@@ -309,261 +305,124 @@ export default function Document() {
   );
 }
 
+export function FormInfoDialog({
+  title,
+  setTitle,
+  titleError,
+  setTitleError,
+  stakeholders,
+  setStakeholders,
+  shError,
+  setShError,
+  issuanceDate,
+  setIssuanceDate,
+  type,
+  setType,
+  scale,
+  setScale,
+  language,
+  setLanguage,
+  pages,
+  setPages,
+  pageRanges,
+  setPageRanges
+}: {
+  title: string;
+  setTitle: React.Dispatch<React.SetStateAction<string>>;
+  titleError: boolean;
+  setTitleError: React.Dispatch<React.SetStateAction<boolean>>;
+  stakeholders: Stakeholders[];
+  setStakeholders: React.Dispatch<React.SetStateAction<Stakeholders[]>>;
+  shError: boolean;
+  setShError: React.Dispatch<React.SetStateAction<boolean>>;
+  issuanceDate: Date | undefined;
+  setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+  type: KxDocumentType | undefined;
+  setType: React.Dispatch<React.SetStateAction<KxDocumentType | undefined>>;
+  scale: number;
+  setScale: React.Dispatch<React.SetStateAction<number>>;
+  language: string | undefined;
+  setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
+  pages:PageRange[] | undefined;
+  setPages: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
+  pageRanges: PageRange[] | undefined;
+  setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
+}){
 
-
-
-export function FormInfoDialog(
-  {
-    title,
-    setTitle,
-    stakeholders,
-    setStakeholders,
-    issuanceDate,
-    setIssuanceDate,
-    type,
-    setType,
-    scale,
-    setScale,
-    language,
-    setLanguage,
-    pages,
-    setPages,
-    pageRanges,
-    setPageRanges,
-    description,
-    setDescription,
-    documents,
-    setDocuments,
-    draw,
-    setDrawing,
-    documentsForDirect,
-    documentsForCollateral,
-    documentsForProjection,
-    documentsForUpdate
-  }: {
-    title: string;
-    setTitle: React.Dispatch<React.SetStateAction<string>>;
-    stakeholders: Stakeholders[];
-    setStakeholders: React.Dispatch<React.SetStateAction<Stakeholders[]>>;
-    issuanceDate: Date | undefined;
-    setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
-    type: KxDocumentType | undefined;
-    setType: React.Dispatch<React.SetStateAction<KxDocumentType | undefined>>;
-    scale: number;
-    setScale: React.Dispatch<React.SetStateAction<number>>;
-    language: string | undefined;
-    setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
-    pages: PageRange[] | undefined;
-    setPages: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
-    pageRanges: PageRange[] | undefined;
-    setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
-    description: string | undefined;
-    setDescription: React.Dispatch<React.SetStateAction<string | undefined>>;
-    documents: KxDocument[];
-    setDocuments: React.Dispatch<React.SetStateAction<KxDocument[]>>;
-    draw: DocCoords | undefined;
-    setDrawing: React.Dispatch<React.SetStateAction<DocCoords | undefined>>;
-    documentsForDirect: string[];
-    documentsForCollateral: string[];
-    documentsForProjection: string[];
-    documentsForUpdate: string[];
-  }
-) {
-  const [titleError, setTitleError] = useState(false);
-  const [shError, setShError] = useState(false);
-  const [typeError, setTypeError] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
+  const [typeError, setTypeError] = useState(false);
 
-
+  
   const handleInfoSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    const tmpTitleError = title.length === 0;
-    const tmpShError = stakeholders.length === 0;
-    if (tmpTitleError || tmpShError || !type) {
-      setTitleError(tmpTitleError);
-      setShError(tmpShError);
-      setTypeError(!type);
-      setError("Please fill all the required fields");
-      toast({
-        title: "Error",
-        description: "Please fill all the required fields",
-        variant: "error",
-        duration: 3000,
-      })
-
-      return;
-    }
-
-
-    const newDocument: KxDocument = {
-      title,
-      stakeholders,
-      //scale_info: Scale.TEXT,
-      scale,
-      doc_coordinates: draw!,
-      issuance_date: issuanceDate!,
-      type: type,
-      language,
-      description: description!,
-      pages: validatePageRangeString(pages?.toString() || ""),
-      connections: {
-        direct: documentsForDirect.map(d => new mongoose.Types.ObjectId(d)),
-        collateral: documentsForCollateral.map(d => new mongoose.Types.ObjectId(d)),
-        projection: documentsForProjection.map(d => new mongoose.Types.ObjectId(d)),
-        update: documentsForUpdate.map(d => new mongoose.Types.ObjectId(d)),
-      },
-    };
-
-    try {
-      const createdDocument = await API.createKxDocument(newDocument);
-      if (createdDocument) {
-        setDocuments([...documents, createdDocument]);
-        toast({
-          title: "Success",
-          description:
-            "The document has been created successfully",
-          variant: "success",
-          duration: 3000,
-        })
-
-        setTitle("");
-        setScale(0);
-        setIssuanceDate(new Date());
-        setType(undefined);
-        setLanguage(undefined);
-        setDescription("");
-        setPages(undefined);
-        setDrawing(undefined);
-        setPageRanges([]);
-      } else {
-        toast({
-          title: "Error",
-          description: "Failed to create document",
-          variant: "error",
-          duration: 3000,
-        })
-      }
-      setIsOpen(false);
-    } catch (error: any) {
-      toast({
-        title: "Error",
-        description: "Failed to create document",
-        variant: "error",
-        duration: 3000,
-      })
-    }
-    clearForm();
   };
-
-  function clearForm() {
-    setTitle("");
-    setTitleError(false);
-    setStakeholders([]);
-    setShError(false);
-    setIssuanceDate(new Date());
-    setType(undefined);
-    setTypeError(false);
-    setScale(10000);
-    setLanguage(undefined);
-    setPages(undefined);
-    setPageRanges([]);
-
-    setError("");
-
-  }
-
-  useEffect(() => {
-    if (isOpen) {
-      const fetchDocuments = async () => {
-        try {
-          const docs = await API.getAllKxDocuments();
-          setDocuments(docs);
-        } catch (error) {
-          setError('Failed to fetch documents');
-        }
-      };
-
-      fetchDocuments();
-    }
-  }, [isOpen]);
-
-  function infoform() {
-    return (
-      <form action="" method="patch" className="mt-8">
-
-        <FormDocumentInformation
-          title={title}
-          setTitle={setTitle}
-          titleError={titleError}
-          setTitleError={setTitleError}
-          stakeholders={stakeholders}
-          setStakeholders={setStakeholders}
-          shError={shError}
-          setShError={setShError}
-          issuanceDate={issuanceDate}
-          setIssuanceDate={setIssuanceDate}
-          type={type}
-          setType={setType}
-          typeError={typeError}
-          setTypeError={setTypeError}
-          scale={scale}
-          setScale={setScale}
-          language={language}
-          setLanguage={setLanguage}
-          pages={pages}
-          setPages={setPages}
-          pageRanges={pageRanges}
-          setPageRanges={setPageRanges}
-        />
-
-
-        <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
-          <Button
-            className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
-            variant="light"
-            onClick={() => setIsOpen(false)}
-          >
-            Cancel
-          </Button>
-          <Button
-            className="w-full sm:w-auto primary"
-            onClick={e => handleInfoSubmit(e)}
-          >
-            Submit
-          </Button>
-        </div>
-
-      </form>
-    )
-  }
-
   return (
     <>
-      <i className="ml-auto self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-6" /></i>
-      <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
-        <DialogPanel
-          className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
-          style={{ maxWidth: "80vw" }}
-        >
-          <div className="sm:mx-auto sm:max-w-2xl">
-            <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-              Update document
-            </h3>
-            <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-              Update the informations about the document
-            </p>
-            {infoform()}
-
-
-          </div>
-        </DialogPanel>
-      </Dialog>
-      <Toaster />
+    <i className="ml-auto self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-6" /></i>
+    <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
+      <DialogPanel
+        className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
+        style={{ maxWidth: "80vw" }}
+      >
+        <div className="sm:mx-auto sm:max-w-2xl">
+          <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+            Update document
+          </h3>
+          <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+            Update the informations about the document
+          </p>
+          <form action="" method="patch" className="mt-8">
+          <FormDocumentInformation
+              title={title}
+              setTitle={setTitle}
+              titleError={titleError}
+              setTitleError={setTitleError}
+              stakeholders={stakeholders}
+              setStakeholders={setStakeholders}
+              shError={shError}
+              setShError={setShError}
+              issuanceDate={issuanceDate}
+              setIssuanceDate={setIssuanceDate}
+              type={type}
+              setType={setType}
+              typeError={typeError}
+              setTypeError={setTypeError}
+              scale={scale}
+              setScale={setScale}
+              language={language}
+              setLanguage={setLanguage}
+              pages={pages}
+              setPages={setPages}
+              pageRanges={pageRanges}
+              setPageRanges={setPageRanges}
+            />
+            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+              <Button
+                className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                variant="light"
+                onClick={() => setIsOpen(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                className="w-full sm:w-auto primary"
+                onClick={e => handleInfoSubmit(e)}
+              >
+                Submit
+              </Button>
+            </div>
+          </form>
+        </div>
+      </DialogPanel>
+    </Dialog>
     </>
-  );
+  )
+
+
 }
+
+
+
 
 export function FormDescriptionDialog(
   {
