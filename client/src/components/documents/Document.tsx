@@ -14,6 +14,8 @@ import { KxDocument, PageRange } from '../../model';
 import { mongoose } from '@typegoose/typegoose';
 import "../../css/document.css";
 import PreviewDoc from './Preview';
+import { Toast } from '@radix-ui/react-toast';
+import { Toaster } from '../toast/Toaster';
 
 
 
@@ -129,8 +131,12 @@ export default function Document() {
                         </div>
                         <div className="flex items-center justify-between mb-2 space-x-2">
                             <div className="flex space-x-2">
-                                <Button size="xs" className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong" icon={RiCameraFill} onClick={() => console.log("Download Image")}></Button>
-                                <Button size="xs" className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong" icon={RiFilePdf2Fill} onClick={() => setShowPdfPreview(true)}></Button>
+                                <Button onClick={() => console.log("Download Image")} className="bg-tremor-background hover:bg-gray-100">
+                                    <RiCamera2Fill color='#003d8e' className='active:bg-white ' />
+                                </Button>
+                                <Button className="bg-tremor-background hover:bg-gray-100"  onClick={() => setShowPdfPreview(true)}>
+                                    <RiFilePdf2Fill  color="#003d8e" className='tremor-Button-text' />
+                                </Button>
                             </div>
                         </div>
 
@@ -204,8 +210,9 @@ export default function Document() {
                     </div>
                 )}
                 {
-                    PreviewDoc(showPdfPreview,() => setShowPdfPreview(false))
+                    PreviewDoc(showPdfPreview,() => setShowPdfPreview(false), doc!)
                 }
+                <Toaster />
             </Card>
 
 
