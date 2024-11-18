@@ -1,4 +1,5 @@
-import { RiShareLine, RiEditBoxLine } from '@remixicon/react';
+
+import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "./form/Form";
 import API from '../API';
@@ -8,10 +9,16 @@ import {
   Accordion,
   AccordionBody,
   AccordionHeader,
-  AccordionList,
+  AccordionList
 } from '@tremor/react';
-import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { KxDocumentType, Stakeholders } from "../enum";
+import { DocumentPageMap, PreviewMap } from './map/Map';
+import API from '../API';
+import { KxDocument, PageRange } from '../model';
+import { mongoose } from '@typegoose/typegoose';
+import "../css/document.css";
 
 import { AreaType, DocCoords, KxDocumentType, Scale, Stakeholders } from "./../enum";
 import { KxDocument } from "./../model";
@@ -27,84 +34,117 @@ import { Toaster } from "./toast/Toaster";
 
 
 export default function Document() {
-  const { id } = useParams<string>();
-  if (!id) {
-    return <div>Document not found</div>;
-  }
-  const [share, setShare] = useState(false);
-  const [showEditDocument, setShowEditDocument] = useState(false);
-  const [showEditDescription, setShowEditDescription] = useState(false);
 
-  const [title, setTitle] = useState("Adjusted development plan for Kiruna");
-  const [stakeholders, setStakeholders] = useState<Stakeholders[]>([Stakeholders.RESIDENT, Stakeholders.URBAN_DEVELOPER]);
-  const [scale, setScale] = useState(7500);
-  const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(
-    new Date(2021, 5, 1)
-  );
-  const [type, setType] = useState<KxDocumentType | undefined>(KxDocumentType.DESIGN);
-  const [language, setLanguage] = useState<string | undefined>("Swedish");
-  const [pages, setPages] = useState("1");
-  const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
+    const navigate = useNavigate();
+    const { id } = useParams();
+    const [doc, setDoc] = useState<KxDocument | null>(null);
+    const [share, setShare] = useState(false);
+    const [drawings, setDrawings] = useState<any>("")
+    const [title, setTitle] = useState("");
+    const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
+    const [scale, setScale] = useState("");
+    const [issuanceDate, setIssuanceDate] = useState<Date | undefined | string>("");
+    const [type, setType] = useState<KxDocumentType | undefined>(undefined);
+    const [language, setLanguage] = useState<string | undefined>("");
+    const [pages, setPages] = useState<PageRange[] | "">("");
+    const [description, setDescription] = useState<string | undefined>("");
+    const [entireMunicipality, setEntireMunicipality] = useState(false);
+
+    useEffect(() => {
+        const fetchDocument = async () => {
+            try {
+            const document = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
+            setDoc(document);
+            setTitle(document.title);
+            setStakeholders(document.stakeholders);
+            setScale(document.scale.toString());
+            setIssuanceDate(document.issuance_date);
+            setType(document.type);
+            setLanguage(document.language || "");
+            setPages(document.pages || "");
+            setDescription(document.description || "");
+            if(document.doc_coordinates.type !=="EntireMunicipality"){
+            const geoJSON = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        geometry: document.doc_coordinates,
+                        properties: {
+                            title: document.title,
+                            description: document.description,
+                            id: document._id
+                        }
+                    }
+                ]
+            };
+            setDrawings(geoJSON);
+        }else{
+            setEntireMunicipality(true);
+        }
+    
+        
+            } catch (error) {
+            console.error("Failed to fetch document:", error);
+            navigate("/404");
+            }
+        };
+
+        fetchDocument();
+    },[]);
 
 
-  const [description, setDescription] = useState<string | undefined>(`This document is the update of the Development Plan, one year after its creation, modifications are made to the general master plan, which is published under the name 'Adjusted Development Plan91,' and still represents the version used today after 10 years.
-Certainly, there are no drastic differences compared to the previous plan, but upon careful comparison, several modified elements stand out. 
-For example, the central square now takes its final shape, as well as the large school complex just north of it, which appears for the first time`);
+    const [showCheck, setShowCheck] = useState(false);
+    
+
+    return (
+        <div>
+            <div className='flex flex-row mb-2'>
+                <i onClick={() => navigate("/")}><RiHome3Line className="mt-1 text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                <h1 className="text-2xl font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Document Page</h1>
 
 
-
-  const [documents, setDocuments] = useState<KxDocument[]>([]);
-  const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
-  const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
-  const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
-  const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
-  const [showConnectionsInfo, setShowConnectionsInfo] = useState(false);
-
-
-  const [drawing, setDrawing] = useState<any>(undefined);
-
-
-  return (
-    <div>
-      <Card>
-        <div className='flex flex-row '>
-
-          <div className="flex flex-col items-start justify-between lg:w-1/2 lg:border-r lg:border-gray-300 w-full max-w-full lg:max-w-none">
-            <div className="flex items-center justify-between mb-2 space-x-2">
-              <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Title:</i>
-              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {title} ({id}) </i>
             </div>
+            <Card>
+                <div className='flex flex-row '>
 
-            <div className="flex items-center justify-between mb-2 space-x-2">
-              <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Stakeholders:</i>
-              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{stakeholders.join("/ ")}</i>
-            </div>
+                    <div className="flex flex-col items-start justify-between lg:w-1/2 lg:border-r lg:border-gray-300 me-6">
+                        <div className="flex items-center justify-between mb-2 space-x-2">
+                            <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Title:</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {title} ({id}) </i>
+                        </div>
 
-            <div className="flex items-center justify-between mb-2 space-x-2">
-              <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Scale:</i>
-              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>1: {scale}</i>
-            </div>
+                        <div className="flex items-center justify-between mb-2 space-x-2">
+                            <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Stakeholders:</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{stakeholders.join("/ ")}</i>
+                        </div>
 
-            <div className="flex items-center justify-between mb-2 space-x-2">
-              <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Issuance Date:</i>
-              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {issuanceDate?.toString()}</i>
-            </div>
+                        <div className="flex items-center justify-between mb-2 space-x-2">
+                            <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Scale:</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>1: {scale}</i>
+                        </div>
 
-            <div className="flex items-center justify-between mb-2 space-x-2">
-              <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Type:</i>
-              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{type} </i>
-            </div>
+                        <div className="flex items-center justify-between mb-2 space-x-2">
+                            <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Issuance Date:</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {issuanceDate?.toString()}</i>
+                        </div>
 
-            <div className="flex items-center justify-between mb-2 space-x-2">
-              <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Language:</i>
-              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{language}</i>
-            </div>
+                        <div className="flex items-center justify-between mb-2 space-x-2">
+                            <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Type:</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{type} </i>
+                        </div>
 
-            <div className="flex items-center justify-between mb-2 space-x-2">
-              <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Pages:</i>
-              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages} </i>
-            </div>
-            <FormInfoDialog
+                        <div className="flex items-center justify-between mb-2 space-x-2">
+                            <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Language:</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{language != "" ? language : "Unknown"}</i>
+                        </div>
+
+                        <div className="flex items-center justify-between mb-2 space-x-2">
+                            <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Pages:</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != "" ? pages : "Unknown"} </i>
+                        </div>
+                      
+                                  <FormInfoDialog
               title={title}
               setTitle={setTitle}
               stakeholders={stakeholders}
@@ -134,11 +174,53 @@ For example, the central square now takes its final shape, as well as the large 
 
 
           </div>
-          <div className='hidden lg:flex flex-col items-start col space-y-2 w-1/2 h-300 ms-6'>
-            <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Description:</i>
-            <i className='text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong'> {description}  </i>
-          </div>
-          <div className='hidden lg:flex flex-col space-y-2 h-300 justify-between'>
+
+                    </div>
+                    <div className='hidden lg:flex flex-col items-start col space-y-2 w-1/2'>
+                        <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Description:</i>
+                        <i className='text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong'> {description}  </i>
+                    </div>
+                    <i onClick={() => setShare(true)}><RiShareLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                    <Dialog open={share} onClose={() => setShare(false)} static={true}>
+                        <DialogPanel>
+                            <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Share "{title}"</h3>
+                            <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                                Share the link of the document.
+                            </p>
+                            <div className="flex flex-row justify-between">
+                                <div className="mt-4 w-full  me-2">
+                                    <input
+                                        type="text"
+                                        className="w-full p-2 border border-tremor-border rounded-md"
+                                        value={window.location.href}
+                                        readOnly
+                                    />
+                                </div>
+
+                                <Button
+                                    className="mt-4 w-1/6 flex flex-col items-center justify-between"
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(window.location.href);
+                                        setShowCheck(true);
+                                        setTimeout(() => setShowCheck(false), 1500);
+                                    }}
+                                >
+                                    {showCheck ? <RiCheckDoubleLine className="mr-2" /> : <RiFileCopyLine className="mr-2" />}
+                                </Button>
+                            </div>
+                            <Button className="mt-8 w-full secondary" onClick={() => setShare(false)}>
+                                Close
+                            </Button>
+                        </DialogPanel>
+                    </Dialog>
+                </div>
+                <Accordion className='lg:hidden'>
+                    <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Description</AccordionHeader>
+                    <AccordionBody className="leading-6">
+                        {description}
+                    </AccordionBody>
+                </Accordion>
+                   <div className='hidden lg:flex flex-col space-y-2 h-300 justify-between'>
             <i onClick={() => setShare(true)} className="self-start"><RiShareLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
             <FormDescriptionDialog
               description={description}
@@ -181,7 +263,7 @@ For example, the central square now takes its final shape, as well as the large 
           </Dialog>
 
         </div>
-        <Accordion className='lg:hidden'>
+                  <Accordion className='lg:hidden'>
           <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Description</AccordionHeader>
           <AccordionBody className="leading-6 flex flex-col">
             {description}
@@ -193,18 +275,28 @@ For example, the central square now takes its final shape, as well as the large 
           </AccordionBody>
         </Accordion>
 
-        <Card
-          className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
-        >
-          <PreviewMap
-            drawing={undefined}
-            style={{ minHeight: "300px", width: "100%" }}
-          />
-        </Card>
-
-      </Card>
-
-      
+             
+                    {!entireMunicipality ? (
+                        <Card
+                        className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
+                        >
+                            <DocumentPageMap
+                                drawing={drawings}
+                                style={{ minHeight: "300px", width: "100%" }}
+                            />
+                        </Card>
+                    ) : (
+                        <div className="flex justify-left items-start pt-10">
+                            <div className=' document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                    <span>
+                                        The document covers the entire municipality
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+            </Card>
 
     </div>
   );

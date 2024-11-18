@@ -1,6 +1,6 @@
 import { KxDocument } from "../models/model";
-import { Document } from "./schema";
-import mongoose from 'mongoose';
+import { KxDocumentModel } from "../models/model";
+import { mongoose } from "@typegoose/typegoose";
 import dotenv from 'dotenv'; 
 
 
@@ -42,22 +42,22 @@ class DAO {
     }
     Document = require('../models/model');
 
-    async getKxDocumentById(id: string): Promise<KxDocument | null> {
-        const result = await Document.find().where("_id").equals(id).exec();
+    async getKxDocumentById(id: mongoose.Types.ObjectId): Promise<KxDocument | null> {
+        const result = await KxDocumentModel.find().where("_id").equals(id).exec();
         if (result) {
             return this.fromResultToKxDocument(result[0]);
         }
         return null;
     }
     async getKxDocumentByTitle(title: string): Promise<KxDocument | null> {
-        const result = await Document.find().where("title").equals(title).exec();
+        const result = await KxDocumentModel.find().where("title").equals(title).exec();
         if (result) {
             return this.fromResultToKxDocument(result[0]);
         }
         return null;
     }
     async getAlldocuments(): Promise<KxDocument[]> {
-    const result = await Document.find().sort({ title: 1 }).exec(); 
+    const result = await KxDocumentModel.find().sort({ title: 1 }).exec(); 
     if (result) {
         const list = result.map((doc: any) => {
             return this.fromResultToKxDocument(doc);
@@ -67,18 +67,18 @@ class DAO {
     return [];
 }
     async createKxDocument(document: KxDocument): Promise<KxDocument | null> {
-        const newDocument = new Document(document);
+        const newDocument = new KxDocumentModel(document);
         const result = await newDocument.save();
         if (result) {
             return this.fromResultToKxDocument(result);
         }
         return null;
     }
-    async deleteKxDocument(id: string): Promise<Boolean> {
-        const result = await Document.deleteOne({
+    async deleteKxDocument(id: mongoose.Types.ObjectId): Promise<Boolean> {
+        const result = await KxDocumentModel.deleteOne({
             _id: id
         }).exec();
-        if (result) {
+        if (result.deletedCount === 1) {
             return true;
 
         }
