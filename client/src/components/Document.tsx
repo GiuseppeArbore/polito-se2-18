@@ -149,7 +149,7 @@ export default function Document() {
 
             <div className="flex items-center justify-between mb-2 space-x-2">
               <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Pages:</i>
-              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != undefined ? pages : "Unknown"} </i>
+              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != undefined && pages.toString()!="" ? pages : "Unknown"} </i>
             </div>
 
             <FormInfoDialog
@@ -239,14 +239,14 @@ export default function Document() {
           <DialogPanel>
             <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Share "{title}"</h3>
             <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-              Share the link of the document with your friends and colleagues.
+              Share the link of the document.
             </p>
             <div className="flex flex-row justify-between">
               <div className="mt-4 w-full  me-2">
                 <input
                   type="text"
                   className="w-full p-2 border border-tremor-border rounded-md"
-                  value={`http://localhost:1420/documents/${id}`}
+                  value={window.location.href}
                   readOnly
                 />
               </div>
@@ -254,7 +254,7 @@ export default function Document() {
               <Button
                 className="mt-4 w-1/6 flex flex-col items-center justify-between"
                 onClick={() => {
-                  navigator.clipboard.writeText(`http://localhost:1420/documents/${id}`);
+                  navigator.clipboard.writeText(window.location.href);
                   alert("Link copied to clipboard!");
                   setShare(false);
                 }}
