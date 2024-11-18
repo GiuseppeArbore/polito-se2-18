@@ -14,20 +14,11 @@ const HeroSection: React.FC = () => {
       <Text className="text-xl mt-4 animate__animated animate__fadeIn animate__delay-2s">
         Discover the journey of Sweden's moving city
       </Text>
-      <h6>
-        <Badge color="white" size="lg">
-          Start Exploring
-        </Badge>
-      </h6>
-      <div className="cta-icon animate__animated animate__fadeIn animate__delay-3s cursor-pointer mb-4">
+      <div className="animate__animated animate__fadeIn animate__delay-2s mb-4 custom-blink">
         <Link to="/dashboard">
-          {" "}
-          <FontAwesomeIcon
-            icon={faCompass}
-            size="3x"
-            className="text-white animate-pulse hover:scale-110 hover:shadow-lg transition-transform duration-300"
-            title="Explore"
-          />
+          <Badge color="white" size="lg" className="cursor-pointer ">
+            Start Exploring
+          </Badge>
         </Link>
       </div>
     </section>
