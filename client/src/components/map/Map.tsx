@@ -2,7 +2,7 @@
 import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AllGeoJSON, featureCollection,area } from "@turf/turf";
-import  { documentColorMapping } from "./documentcolors";
+import  { documentAreaColorMapping,documentBorderColorMapping } from "./documentcolors";
 
 import {
   Button,
@@ -179,43 +179,70 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         });
 
         
-      //AREA--------------------------------------------------------
-        mapRef.current?.addLayer({
-          id: 'drawings-layer',
-          type: 'fill',
-          source: 'drawings',
-          layout: {},
-          paint: {
-            'fill-color': documentColorMapping,
-            'fill-opacity': 0.3,
-          },
-        });
+      //AREA-------------------------------------------------------
+        props.drawing?.features.forEach((feature, index) => {
+          const layerId = `drawings-layer-${index}`;
+          const borderLayerId = `drawings-border-layer-${index}`;
+          const highlightLayerId = `drawings-highlight-layer-${index}`;
         
-       
-        mapRef.current?.addLayer({
-          id: 'drawings-borders',
-          type: 'line',
-          source: 'drawings',
-          layout: {},
-          paint: {
-            'line-color':documentColorMapping,
-            'line-width': 2,
-            'line-opacity': 0.3,
-          },
-        });
-
+          // Add the main fill layer
+          mapRef.current?.addLayer({
+            id: layerId,
+            type: 'fill',
+            source: {
+              type: 'geojson',
+              data: feature,
+            },
+            layout: {},
+            paint: {
+              'fill-color': documentAreaColorMapping, // Assuming documentColorMapping is an object mapping feature IDs to colors
+              'fill-opacity': 0.3,
+            },
+          });
         
-        mapRef.current?.addLayer({
-          id: 'highlight-area',
-          type: 'fill',
-          source: 'drawings',
-          paint: {
-            'fill-color': documentColorMapping,
-            'fill-opacity': 0.5
-          },
-          filter: ['==', 'highlight', 'false'] // not highlighted at start
+          // Add the border layer
+          mapRef.current?.addLayer({
+            id: borderLayerId,
+            type: 'line',
+            source: {
+              type: 'geojson',
+              data: feature,
+            },
+            layout: {},
+            paint: {
+              'line-color': documentBorderColorMapping, // Border color
+              'line-width': 3,
+            },
+          });
+        
+          // Add the highlight layer
+          mapRef.current?.addLayer({
+            id: highlightLayerId,
+            type: 'line',
+            source: {
+              type: 'geojson',
+              data: feature,
+            },
+            layout: {},
+            paint: {
+              'line-color': documentBorderColorMapping,
+              'line-width': 3,
+              'line-opacity': 0, // Initially hidden
+            },
+          });
+        
+          // Add mouse enter and leave events
+          mapRef.current?.on('mouseenter', layerId, () => {
+            console.log(`Mouse entered area with ID: ${feature.properties?.type}`);
+            mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.6);
+            mapRef.current?.setPaintProperty(highlightLayerId, 'line-opacity', 1);
+          });
+        
+          mapRef.current?.on('mouseleave', layerId, () => {
+            mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.3);
+            mapRef.current?.setPaintProperty(highlightLayerId, 'line-opacity', 0);
+          });
         });
-
 
       
 
