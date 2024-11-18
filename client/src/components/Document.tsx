@@ -33,7 +33,7 @@ export default function Document() {
 
   const navigate = useNavigate();
   const { id } = useParams<string>();
- 
+
   const [doc, setDoc] = useState<KxDocument | null>(null);
   const [share, setShare] = useState(false);
   const [drawings, setDrawings] = useState<any>("")
@@ -43,7 +43,7 @@ export default function Document() {
   const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(undefined);
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
   const [language, setLanguage] = useState<string | undefined>(undefined);
-  const [pages, setPages] = useState<PageRange[]| undefined>(undefined);
+  const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(undefined);
   const [description, setDescription] = useState<string | undefined>(undefined);
   const [entireMunicipality, setEntireMunicipality] = useState(false);
@@ -70,7 +70,7 @@ export default function Document() {
         setDocumentsForCollateral(document.connections.collateral.map((doc) => doc._id?.toString()));
         setDocumentsForProjection(document.connections.projection.map((doc) => doc._id?.toString()));
         setDocumentsForUpdate(document.connections.update.map((doc) => doc._id?.toString()));
-        
+
         if (document.doc_coordinates.type !== "EntireMunicipality") {
           const geoJSON = {
             type: 'FeatureCollection',
@@ -116,7 +116,7 @@ export default function Document() {
       <Card>
         <div className='flex flex-row '>
 
-          <div className="flex flex-col items-start justify-between lg:w-1/2 lg:border-r lg:border-gray-300 me-6">
+          <div className="flex flex-col items-start justify-between w-full lg:w-1/2 lg:border-r lg:border-gray-300 lg:me-6">
             <div className="flex items-center justify-between mb-2 space-x-2">
               <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Title:</i>
               <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {title} ({id}) </i>
@@ -149,7 +149,7 @@ export default function Document() {
 
             <div className="flex items-center justify-between mb-2 space-x-2">
               <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Pages:</i>
-              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != undefined && pages.toString()!="" ? pages : "Unknown"} </i>
+              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != undefined && pages.toString() != "" ? pages : "Unknown"} </i>
             </div>
 
             <FormInfoDialog
@@ -186,55 +186,53 @@ export default function Document() {
           <div className='hidden lg:flex flex-col items-start col space-y-2 w-1/2'>
             <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Description:</i>
             <i className='text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong'> {description}  </i>
-          </div>
-          <i onClick={() => setShare(true)}><RiShareLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
-          <Dialog open={share} onClose={() => setShare(false)} static={true}>
-            <DialogPanel>
-              <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Share "{title}"</h3>
-              <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-                Share the link of the document.
-              </p>
-              <div className="flex flex-row justify-between">
-                <div className="mt-4 w-full  me-2">
-                  <input
-                    type="text"
-                    className="w-full p-2 border border-tremor-border rounded-md"
-                    value={window.location.href}
-                    readOnly
-                  />
-                </div>
-
-                <Button
-                  className="mt-4 w-1/6 flex flex-col items-center justify-between"
-                  onClick={() => {
-                    navigator.clipboard.writeText(window.location.href);
-                    setShowCheck(true);
-                    setTimeout(() => setShowCheck(false), 1500);
-                  }}
-                >
-                  {showCheck ? <RiCheckDoubleLine className="mr-2" /> : <RiFileCopyLine className="mr-2" />}
-                </Button>
-              </div>
-              <Button className="mt-8 w-full secondary" onClick={() => setShare(false)}>
-                Close
-              </Button>
-            </DialogPanel>
-          </Dialog>
-        </div>
-        <Accordion className='lg:hidden'>
-          <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Description</AccordionHeader>
-          <AccordionBody className="leading-6">
-            {description}
-          </AccordionBody>
-        </Accordion>
-        <div className='hidden lg:flex flex-col space-y-2 h-300 justify-between'>
-          <i onClick={() => setShare(true)} className="self-start"><RiShareLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+            
+        <div className='hidden lg:flex flex-end space-y-2 h-full justify-around'>
           <FormDescriptionDialog
             description={description}
             setDescription={setDescription}
             id={id!}
           />
         </div>
+          </div>
+          <div className="flex justify-end w-full absolute right-4">
+            <i onClick={() => setShare(true)}><RiShareLine className="self-end text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+            <Dialog open={share} onClose={() => setShare(false)} static={true}>
+              <DialogPanel>
+                <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Share "{title}"</h3>
+                <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                  Share the link of the document.
+                </p>
+                <div className="flex flex-row justify-between">
+                  <div className="mt-4 w-full  me-2">
+                    <input
+                      type="text"
+                      className="w-full p-2 border border-tremor-border rounded-md"
+                      value={window.location.href}
+                      readOnly
+                    />
+                  </div>
+
+                  <Button
+                    className="mt-4 w-1/6 flex flex-col items-center justify-between"
+                    onClick={() => {
+                      navigator.clipboard.writeText(window.location.href);
+                      setShowCheck(true);
+                      setTimeout(() => setShowCheck(false), 1500);
+                    }}
+                  >
+                    {showCheck ? <RiCheckDoubleLine className="mr-2" /> : <RiFileCopyLine className="mr-2" />}
+                  </Button>
+                </div>
+                <Button className="mt-8 w-full secondary" onClick={() => setShare(false)}>
+                  Close
+                </Button>
+              </DialogPanel>
+            </Dialog>
+          </div>
+
+        </div>
+
         <Dialog open={share} onClose={() => setShare(false)} static={true}>
           <DialogPanel>
             <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Share "{title}"</h3>
@@ -260,7 +258,7 @@ export default function Document() {
                 }}
               >
 
-                <RiShareLine className="mr-2" />
+                <RiFileCopyLine className="mr-2" />
               </Button>
             </div>
             <Button className="mt-8 w-full secondary" onClick={() => setShare(false)}>
@@ -404,11 +402,11 @@ export function FormInfoDialog(
       stakeholders,
       //scale_info: Scale.TEXT,
       scale,
-      doc_coordinates: draw !,
-      issuance_date: issuanceDate !,
+      doc_coordinates: draw!,
+      issuance_date: issuanceDate!,
       type: type,
       language,
-      description: description !,
+      description: description!,
       pages: validatePageRangeString(pages?.toString() || ""),
       connections: {
         direct: documentsForDirect.map(d => new mongoose.Types.ObjectId(d)),
@@ -619,7 +617,7 @@ export function FormDescriptionDialog(
 
   return (
     <>
-      <i className="self-start" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+      <i className="self-end" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
         <DialogPanel
           className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
