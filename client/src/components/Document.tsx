@@ -174,6 +174,7 @@ export default function Document() {
               setPages={setPages}
               pageRanges={pageRanges}
               setPageRanges={setPageRanges}
+              id={id!}
             />
 
 
@@ -325,7 +326,8 @@ export function FormInfoDialog({
   pages,
   setPages,
   pageRanges,
-  setPageRanges
+  setPageRanges,
+  id
 }: {
   title: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
@@ -347,6 +349,7 @@ export function FormInfoDialog({
   setPages: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
   pageRanges: PageRange[] | undefined;
   setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
+  id: string;
 }){
 
   const [isOpen, setIsOpen] = useState(false);
@@ -355,7 +358,42 @@ export function FormInfoDialog({
 
   
   const handleInfoSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (title === "" || stakeholders.length === 0 || type === undefined || scale === 0 ) {
+      setError("Please fill all the fields");
+      return;
+    }
+    //API call to update document
+    try {
+      const updatedDocument = await API.updateKxDocumentInformation(id, title, stakeholders, type, scale, language, pages);
+      if (updatedDocument) {
+        toast({
+          title: "Success",
+          description:
+            "The document has been updated successfully",
+          variant: "success",
+          duration: 3000,
+        })
+      } else {
+        toast({
+          title: "Error",
+          description: "Failed to update document",
+          variant: "error",
+          duration: 3000,
+        })
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to update document",
+        variant: "error",
+        duration: 3000,
+      })
+    }
+    setIsOpen(false);
+
   };
+
   return (
     <>
     <i className="ml-auto self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-6" /></i>
@@ -420,8 +458,6 @@ export function FormInfoDialog({
 
 
 }
-
-
 
 
 export function FormDescriptionDialog(
