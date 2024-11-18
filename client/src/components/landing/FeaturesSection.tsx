@@ -8,7 +8,8 @@ const FeaturesSection: React.FC = () => {
   const features = [
     {
       title: "",
-      description: "Enhanced interaction with MapGL for seamless navigation",
+      description:
+        "Enhanced interaction with Mapbox GL for seamless navigation",
       icon: <RiMapPinLine />,
     },
     {
