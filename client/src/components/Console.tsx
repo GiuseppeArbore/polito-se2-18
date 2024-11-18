@@ -4,18 +4,11 @@ import {
   Text,
   Grid,
   Col,
-  DateRangePicker,
   Metric,
   Subtitle,
-  Bold,
-  Italic,
-  Select,
-  SelectItem,
   TabGroup,
   TabList,
   Tab,
-  DateRangePickerItem,
-  DateRangePickerValue,
 } from "@tremor/react";
 import API from "../API";
 import { useState, useEffect } from "react";
@@ -26,10 +19,8 @@ import List from "./list/List";
 import { Toaster } from "./toast/Toaster";
 import { toast } from "../utils/toaster";
 import { FeatureCollection } from "geojson";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faHome } from "@fortawesome/free-solid-svg-icons";
 import { Link } from "react-router-dom";
-
+import { RiHome2Fill } from "@remixicon/react";
 export default function Console() {
   const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [selectedView, setSelectedView] = useState(0);
@@ -84,14 +75,9 @@ export default function Console() {
   return (
     <main>
       <Title>
-        <Link to="/">
+        <Link to="/" className="flex items-center">
           {" "}
-          <FontAwesomeIcon
-            icon={faHome}
-            size="1x"
-            className="text-white animate-pulse hover:scale-110 hover:shadow-lg transition-transform duration-300 pr-3"
-            title="Explore"
-          />
+          <RiHome2Fill className="text-white animate-pulse hover:scale-110 hover:shadow-lg transition-transform duration-300 pr-3" />
         </Link>
         Dashboard
       </Title>
@@ -124,28 +110,6 @@ export default function Console() {
               refresh={() => setRefreshNeeded(true)}
             />
 
-            {/* <Card>
-                            <Text>Select</Text>
-                            <Select
-                                className="mt-2" value={groupKey} onValueChange={setGroupKey}
-                            >
-                                <SelectItem value="1">
-                                    1
-                                </SelectItem>
-                                <SelectItem value="2">
-                                    2
-                                </SelectItem>
-                                <SelectItem value="3">
-                                    3
-                                </SelectItem>
-                                <SelectItem value="4">
-                                    4
-                                </SelectItem>
-                                <SelectItem value="5">
-                                    5
-                                </SelectItem>
-                            </Select>
-                        </Card> */}
             <Card>
               <Metric>KIRUNA</Metric>
               <Title>How to move a city</Title>
