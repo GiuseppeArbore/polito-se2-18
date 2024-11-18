@@ -1,7 +1,7 @@
 
 import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment} from './controller';
 import { validateRequest } from './errorHandlers';
-import e, { Application } from 'express';
+import e, { Application, Request, Response } from 'express';
 import { body, param } from 'express-validator';
 import { AreaType, KxDocumentType, Stakeholders } from './models/enum';
 import { coordDistance, isDocCoords, KIRUNA_COORDS } from './utils';
@@ -63,6 +63,8 @@ export function initRoutes(app: Application) {
         createKxDocument
     );
 
+    
+
     app.get('/api/documents', getAllKxDocuments);
 
     app.get('/api/documents/:id',
@@ -98,6 +100,35 @@ export function initRoutes(app: Application) {
     );
 
     app.delete('/api/documents/:id', deleteKxDocument);
+
+    app.patch('/api/documents/:id/description',
+        [
+            param("id").notEmpty().withMessage("id is required"),
+            body("description").notEmpty().withMessage("description is required"),
+        ],
+        validateRequest,
+        async (_req: Request, res: Response) => {
+            res.status(501).json({ error: "Not implemented" });
+        }
+    );
+
+    app.patch('api/documents/:id/info',
+        [
+            param("id").notEmpty().withMessage("id is required"),
+            body("title").optional(),
+            body("stakeholders").optional(),
+            body("scale").optional(),
+            body("type").optional(),
+            body("language").optional(),
+            body("pages").optional(),
+        ],
+        validateRequest,
+        async (_req: Request, res: Response) => {
+            res.status(501).json({ error: "Not implemented" });
+        }
+    );
+
+
 }
 
 export default initRoutes;

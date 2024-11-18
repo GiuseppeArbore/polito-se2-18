@@ -68,3 +68,20 @@ export const getPresignedUrlForAttachment = async (req: Request, res: Response, 
         next(error);
     }
 }
+
+export const updateKxDocumentDescription = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const id = new mongoose.Types.ObjectId(req.params.id);
+        const description = req.body.description;
+        /*
+        const updatedDocument = await db.updateKxDocumentDescription(id, description);
+        if (updatedDocument) {
+            res.status(200).json(updatedDocument);
+        } else {
+            res.status(404).json("Document not found");
+        }
+            */  //ADD THIS FUNCTION TO DAO
+    } catch (error) {
+        next(error);
+    }
+}
