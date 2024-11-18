@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import API from "../../API";
 import { toast } from "../../utils/toaster";
 import { mongoose } from "@typegoose/typegoose";
+import '@react-pdf-viewer/core/lib/styles/index.css';
 
 export default function PreviewDoc(open: boolean, setOpen: (bool: boolean) => void, doc: KxDocument) {
 
