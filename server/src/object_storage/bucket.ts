@@ -28,8 +28,8 @@ export namespace KxObjectStorageCommands {
     export function uploadAttachmentForDocument(docId: mongoose.Types.ObjectId, fileName: string) {
         return new PutObjectCommand({
             Bucket: BUCKET_NAME,
-            Key: `${docId.toString()}/`,
-            Body: createReadStream(fileName)
+            Key: `${docId.toString()}/${fileName}`,
+            Body: createReadStream(`tmp/${docId.toString()}/${fileName}`)
         });
     }
 }
