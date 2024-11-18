@@ -175,6 +175,9 @@ function List(props: ListProps) {
       ],
     },
     autoGroupColumnDef: autoGroupColumnDef,
+    rowSelection: {
+      mode: "multiRow",
+    },
   };
 
   function onGridReady() {
