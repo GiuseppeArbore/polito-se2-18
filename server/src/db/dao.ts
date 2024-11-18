@@ -40,7 +40,6 @@ class DAO {
             console.error('Error disconnecting from the database', error);
         }
     }
-    Document = require('../models/model');
 
     async getKxDocumentById(id: mongoose.Types.ObjectId): Promise<KxDocument | null> {
         const result = await KxDocumentModel.find().where("_id").equals(id).exec();

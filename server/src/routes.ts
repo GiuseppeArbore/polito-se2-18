@@ -1,12 +1,12 @@
-
-import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment} from './controller';
+import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment } from './controller';
 import { validateRequest } from './errorHandlers';
-import e, { Application } from 'express';
+import e, { Application, Request, Response, NextFunction } from 'express';
 import { body, param } from 'express-validator';
 import { AreaType, KxDocumentType, Stakeholders } from './models/enum';
 import { coordDistance, isDocCoords, KIRUNA_COORDS } from './utils';
-
-
+import multer from 'multer';
+import { randomBytes } from 'crypto';
+import { mkdir } from 'fs/promises';
 
 export function initRoutes(app: Application) {
 
@@ -52,6 +52,17 @@ export function initRoutes(app: Application) {
         }).withMessage('Invalid connections'),
     ];
 
+    const storage = multer.diskStorage({
+        destination: async (req, _file, cb) => {
+            const dir = `tmp/${req.params.id}`;
+            await mkdir(dir, { recursive: true });
+            cb(null, dir);
+        }
+    })
+    const upload = multer({
+        storage
+    })
+
     app.get("/doc", async (_, res) => {
         res.status(200).json({ ok: "ok" });
     });
@@ -61,6 +72,19 @@ export function initRoutes(app: Application) {
         kxDocumentValidationChain,
         validateRequest,
         createKxDocument
+    );
+
+    app.post(
+        '/api/documents/:id/attachments',
+        [
+            param("id").notEmpty().withMessage("Missing id").isString().isHexadecimal().withMessage("Invalid id")
+        ],
+        validateRequest,
+        upload.array("attributes", 10),
+        (req: Request, res: Response, next: NextFunction) => {
+            console.log(req.files);
+            res.status(201).send();
+        }
     );
 
     app.get('/api/documents', getAllKxDocuments);
