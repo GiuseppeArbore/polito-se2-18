@@ -49,7 +49,8 @@ export default function Console() {
             properties: {
                 title: doc.title,
                 description: doc.description,
-                id: doc._id
+                id: doc._id,
+                type: doc.type
             }
         }))
     };

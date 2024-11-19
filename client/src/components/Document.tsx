@@ -55,7 +55,8 @@ export default function Document() {
                         properties: {
                             title: document.title,
                             description: document.description,
-                            id: document._id
+                            id: document._id,
+                            type: document.type
                         }
                     }
                 ]
