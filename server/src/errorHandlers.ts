@@ -12,7 +12,7 @@ export const validateRequest = (req: Request, res: Response, next: NextFunction)
 
 export function registerErrorHandler(app: Application) {
     app.use((err: any, req: any, res: any, next: any) => {
-        console.log(err);
+        // TODO: add logging functionality
         return res.status(err.customCode || 500).json({
             error: err.customMessage || "Internal Server Error",
             status: err.customCode || 500
