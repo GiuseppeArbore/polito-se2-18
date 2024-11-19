@@ -2,6 +2,7 @@ import { Request, Response, NextFunction } from 'express';
 import { db } from './db/dao';
 import { KxDocumentModel, KxDocument } from './models/model';
 import { mongoose } from '@typegoose/typegoose';
+import { getPresignedUrl } from './object_storage/bucket';
 
 export const createKxDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -55,3 +56,15 @@ export const deleteKxDocument = async (req: Request, res: Response, next: NextFu
     }
 }
 
+export const getPresignedUrlForAttachment = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const id = new mongoose.Types.ObjectId(req.params.id);
+        const fileName = req.params.fileName;
+        const url = await getPresignedUrl(id, fileName);
+
+        res.status(201).json({presignedUrl: url});
+        
+    } catch (error) {
+        next(error);
+    }
+}

@@ -17,6 +17,7 @@
     "@remixicon/react": "^4.5.0",
     "@tailwindcss/forms": "^0.5.9",
     "@tremor/react": "^3.3.0",
+    "@turf/turf": "^7.1.0",
     "@typegoose/typegoose": "^12.9.0",
     "ag-grid-enterprise": "^32.3.2",
     "ag-grid-react": "^32.3.2",
@@ -24,10 +25,12 @@
     "mapbox-gl-draw-cut-polygon-mode": "github:lbordino/mapbox-gl-draw-cut-polygon-mode",
     "mapbox-gl-draw-freehand-mode": "github:lbordino/mapbox-gl-draw-freehand-mode",
     "mapbox-gl-draw-passing-mode": "github:lbordino/mapbox-gl-draw-passing-mode",
+    "mapbox-gl-draw-select-mode": "^1.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-router-dom": "^6.11.2",
-    "react-dropzone": "^11.4.2"
+    "react-dropzone": "^11.4.2",
+    "react-map-gl": "^7.1.7",
+    "react-router-dom": "^6.11.2"
   },
   "devDependencies": {
     "@tremor/react": "^3.3.0",

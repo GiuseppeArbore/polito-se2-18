@@ -79,7 +79,6 @@ export default function Console() {
       try {
         const response = await API.getAllKxDocuments();
         setDocuments(response);
-
         let count = 0;
         const filteredDocuments = response.filter((doc) => {
           if (doc.doc_coordinates?.type === "EntireMunicipality") {
@@ -88,11 +87,24 @@ export default function Console() {
           }
           return true;
         });
-
         setDocuments(filteredDocuments);
       } catch (error) {
         console.error("Error fetching documents:", error);
       }
+
+    const drawing: FeatureCollection = {
+        type: 'FeatureCollection',
+        features: pointOrAreaDocuments.map(doc => ({
+            type: 'Feature',
+            geometry: doc.doc_coordinates as Area | Point,
+            properties: {
+                title: doc.title,
+                description: doc.description,
+                id: doc._id,
+                type: doc.type
+            }
+        }))
+
     };
 
     if (newDocumentCreated) {
