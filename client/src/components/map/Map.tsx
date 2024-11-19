@@ -28,7 +28,7 @@ import {
 } from "@remixicon/react";
 import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { Feature, FeatureCollection, Position, Polygon, Geometry, Point } from "geojson";
+import { Feature, FeatureCollection, Position, Polygon, Geometry, Point, GeoJsonProperties } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
 import { coordDistance } from "../../utils";
 import { RiFileLine } from "@remixicon/react";
@@ -261,14 +261,14 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       //CLUSTERS---------------------------------------------------------
         const pointsAndCentroids = {
           type: 'FeatureCollection',
-          features: props.drawing?.features.flatMap(feature => {
+          features: props.drawing?.features.flatMap<Feature<Geometry, GeoJsonProperties>>(feature => {
             if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-              let centroid = pointOnFeature(feature);
+              let centroid = pointOnFeature(feature as AllGeoJSON);
               centroid.properties = { ...feature.properties };
-              return [centroid];
+              return [centroid as Feature<Geometry, GeoJsonProperties>];
             }
             return [feature];
-          })
+          }) || []
         };
   
         

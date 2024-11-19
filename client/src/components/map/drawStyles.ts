@@ -17,7 +17,7 @@ const customDrawStyles = [
       'line-join': 'round'
     },
     'paint': {
-      'line-color': '#abc4ab', 
+      'line-color': '#8a9b8a', 
       'line-width': 2
     }
   },
@@ -26,7 +26,7 @@ const customDrawStyles = [
     'type': 'fill',
     'filter': ['all', ['==', '$type', 'Polygon'], ['==', 'user_type', 'Prescriptive Document']],
     'paint': {
-      'fill-color': '#a39171', 
+      'fill-color': '#2b9eb3', 
       'fill-opacity': 0.5
     }
   },
@@ -39,7 +39,7 @@ const customDrawStyles = [
       'line-join': 'round'
     },
     'paint': {
-      'line-color': '#a39171', 
+      'line-color': '#217a8a', 
       'line-width': 2
     }
   },
@@ -48,7 +48,7 @@ const customDrawStyles = [
     'type': 'fill',
     'filter': ['all', ['==', '$type', 'Polygon'], ['==', 'user_type', 'Design Document']],
     'paint': {
-      'fill-color': '#dcc9b6', 
+      'fill-color': '#fffd82', 
       'fill-opacity': 0.5
     }
   },
@@ -61,7 +61,7 @@ const customDrawStyles = [
       'line-join': 'round'
     },
     'paint': {
-      'line-color': '#dcc9b6', 
+      'line-color': '#ccc96a', 
       'line-width': 2
     }
   },
@@ -70,7 +70,7 @@ const customDrawStyles = [
     'type': 'fill',
     'filter': ['all', ['==', '$type', 'Polygon'], ['==', 'user_type', 'Technical Document']],
     'paint': {
-      'fill-color': '#727d71', 
+      'fill-color': '#a63446', 
       'fill-opacity': 0.5
     }
   },
@@ -83,7 +83,7 @@ const customDrawStyles = [
       'line-join': 'round'
     },
     'paint': {
-      'line-color': '#727d71', 
+      'line-color': '#832b36', 
       'line-width': 2
     }
   },
@@ -105,7 +105,7 @@ const customDrawStyles = [
       'line-join': 'round'
     },
     'paint': {
-      'line-color': '#6d4c3d', 
+      'line-color': '#55382d', 
       'line-width': 2
     }
   },
@@ -127,7 +127,7 @@ const customDrawStyles = [
       'line-join': 'round'
     },
     'paint': {
-      'line-color': '#4fb477', 
+      'line-color': '#3a8d5e', 
       'line-width': 2
     }
   },
@@ -149,7 +149,7 @@ const customDrawStyles = [
       'line-join': 'round'
     },
     'paint': {
-      'line-color': '#474973', 
+      'line-color': '#373a5a', 
       'line-width': 2
     }
   },
@@ -171,7 +171,7 @@ const customDrawStyles = [
       'line-join': 'round'
     },
     'paint': {
-      'line-color': '#ef8354',
+      'line-color': '#c66a43',
       'line-width': 2
     }
   }
