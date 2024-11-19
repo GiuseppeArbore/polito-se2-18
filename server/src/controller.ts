@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from './db/dao';
-import { KxDocumentModel, KxDocument } from './models/model';
+import { KxDocumentModel, KxDocument, DocInfo } from './models/model';
 import { mongoose } from '@typegoose/typegoose';
 import { getPresignedUrl } from './object_storage/bucket';
 
@@ -73,14 +73,27 @@ export const updateKxDocumentDescription = async (req: Request, res: Response, n
     try {
         const id = new mongoose.Types.ObjectId(req.params.id);
         const description = req.body.description;
-        /*
         const updatedDocument = await db.updateKxDocumentDescription(id, description);
         if (updatedDocument) {
             res.status(200).json(updatedDocument);
         } else {
             res.status(404).json("Document not found");
         }
-            */  //ADD THIS FUNCTION TO DAO
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const updateKxDocumentInfo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const id = new mongoose.Types.ObjectId(req.params.id);
+        const info = req.body as DocInfo;
+        const updatedDocument = await db.updateKxDocumentInfo(id, info);
+        if (updatedDocument) {
+            res.status(200).json(updatedDocument);
+        } else {
+            res.status(404).json("Document not found");
+        }
     } catch (error) {
         next(error);
     }

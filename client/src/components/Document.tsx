@@ -363,8 +363,8 @@ export function FormInfoDialog({
       setError("Please fill all the fields");
       return;
     }
-    //API call to update document
     try {
+      console.log(title);
       const updatedDocument = await API.updateKxDocumentInformation(id, title, stakeholders, type, scale, language, pages);
       if (updatedDocument) {
         toast({
@@ -409,7 +409,6 @@ export function FormInfoDialog({
           <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
             Update the informations about the document
           </p>
-          <form action="" method="patch" className="mt-8">
           <FormDocumentInformation
               title={title}
               setTitle={setTitle}
@@ -449,7 +448,6 @@ export function FormInfoDialog({
                 Submit
               </Button>
             </div>
-          </form>
         </div>
       </DialogPanel>
     </Dialog>

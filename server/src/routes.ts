@@ -1,5 +1,5 @@
 
-import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment} from './controller';
+import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription} from './controller';
 import { validateRequest } from './errorHandlers';
 import e, { Application, Request, Response } from 'express';
 import { body, param } from 'express-validator';
@@ -101,18 +101,16 @@ export function initRoutes(app: Application) {
 
     app.delete('/api/documents/:id', deleteKxDocument);
 
-    app.patch('/api/documents/:id/description',
+    app.put('/api/documents/:id/description',
         [
             param("id").notEmpty().withMessage("id is required"),
             body("description").notEmpty().withMessage("description is required"),
         ],
         validateRequest,
-        async (_req: Request, res: Response) => {
-            res.status(501).json({ error: "Not implemented" });
-        }
+        updateKxDocumentDescription
     );
 
-    app.patch('api/documents/:id/info',
+    app.put('/api/documents/:id/info',
         [
             param("id").notEmpty().withMessage("id is required"),
             body("title").optional(),
@@ -123,10 +121,8 @@ export function initRoutes(app: Application) {
             body("pages").optional(),
         ],
         validateRequest,
-        async (_req: Request, res: Response) => {
-            res.status(501).json({ error: "Not implemented" });
-        }
-    );
+        updateKxDocumentInfo
+    )
 
 
 }

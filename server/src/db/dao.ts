@@ -1,4 +1,4 @@
-import { KxDocument } from "../models/model";
+import { DocInfo, KxDocument } from "../models/model";
 import { KxDocumentModel } from "../models/model";
 import { mongoose } from "@typegoose/typegoose";
 import dotenv from 'dotenv'; 
@@ -83,6 +83,34 @@ class DAO {
 
         }
         return false;
+    }
+    async updateKxDocumentDescription(id: mongoose.Types.ObjectId, description: string): Promise<KxDocument | null> {
+        const result = await KxDocumentModel.updateOne(
+            {_id: id._id},
+            {
+                $set: {
+                    description: description
+                }
+            }
+        ).exec();
+
+        if (result.modifiedCount === 0)
+            return null;
+
+        return await this.getKxDocumentById(id);
+    }
+    async updateKxDocumentInfo(id: mongoose.Types.ObjectId, info: DocInfo): Promise<KxDocument | null> {
+        const result = await KxDocumentModel.updateOne(
+            {_id: id._id},
+            {
+                $set: info
+            }
+        ).exec();
+
+        if (result.modifiedCount === 0)
+            return null;
+
+        return await this.getKxDocumentById(id);
     }
     private fromResultToKxDocument(result: any): KxDocument {
         return {
