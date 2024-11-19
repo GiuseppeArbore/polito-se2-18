@@ -79,7 +79,7 @@ export default function Console() {
           {" "}
           <span title="Return to Home">
             <RiHome2Fill
-              className="text-white animate-pulse hover:scale-110 hover:shadow-lg transition-transform duration-300 pr-3 "
+              className="text-black dark:text-white animate-pulse hover:scale-110 hover:shadow-lg transition-transform duration-300 pr-3"
               size="32"
             />
           </span>
