@@ -192,7 +192,7 @@ export default function Document() {
           />
         </div>
           </div>
-          <div className="flex justify-end w-full absolute right-4">
+          <div className="flex justify-end w-full absolute right-3">
             <i onClick={() => setShare(true)}><RiShareLine className="self-end text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
             <Dialog open={share} onClose={() => setShare(false)} static={true}>
               <DialogPanel>
@@ -230,39 +230,7 @@ export default function Document() {
 
         </div>
 
-        <Dialog open={share} onClose={() => setShare(false)} static={true}>
-          <DialogPanel>
-            <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Share "{title}"</h3>
-            <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-              Share the link of the document.
-            </p>
-            <div className="flex flex-row justify-between">
-              <div className="mt-4 w-full  me-2">
-                <input
-                  type="text"
-                  className="w-full p-2 border border-tremor-border rounded-md"
-                  value={window.location.href}
-                  readOnly
-                />
-              </div>
-
-              <Button
-                className="mt-4 w-1/6 flex flex-col items-center justify-between"
-                onClick={() => {
-                  navigator.clipboard.writeText(window.location.href);
-                  alert("Link copied to clipboard!");
-                  setShare(false);
-                }}
-              >
-
-                <RiFileCopyLine className="mr-2" />
-              </Button>
-            </div>
-            <Button className="mt-8 w-full secondary" onClick={() => setShare(false)}>
-              Close
-            </Button>
-          </DialogPanel>
-        </Dialog>
+ 
 
         <Accordion className='lg:hidden'>
           <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Description</AccordionHeader>
