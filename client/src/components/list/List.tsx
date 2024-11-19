@@ -5,10 +5,9 @@ import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
 import { useCallback, useMemo, useRef, useState } from "react";
 import { KxDocument } from "../../model";
-
 import { Badge, Button, Flex, Card, Text } from "@tremor/react";
 import { useNavigate } from "react-router-dom";
-import { RiDeleteBinLine, RiEditLine, RiInfoI } from "@remixicon/react";
+import { RiDeleteBinLine, RiInfoI } from "@remixicon/react";
 import { toast } from "../../utils/toaster";
 import locales from "../../locales.json";
 import API from "../../API";
@@ -196,7 +195,7 @@ function List(props: ListProps) {
 
   return (
     <Card className="p-4">
-      <Text className="mb-4 text-center">Document List</Text>
+      <Text className="mb-4 text-center">Document</Text>
       <div
         className={"ag-theme-quartz-auto-dark"}
         style={{ width: "100%", height: "70vh", overflow: "auto" }}
