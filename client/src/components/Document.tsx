@@ -190,6 +190,7 @@ export default function Document() {
             
         <div className='hidden lg:flex flex-end space-y-2 h-full justify-around'>
           <FormDescriptionDialog
+            document={doc!}
             description={description}
             setDescription={setDescription}
             id={id!}
@@ -241,6 +242,7 @@ export default function Document() {
           <AccordionBody className="leading-6 flex flex-col">
             {description}
             <FormDescriptionDialog
+              document={doc!}
               description={description}
               setDescription={setDescription}
               id={id!}
@@ -447,10 +449,12 @@ export function FormInfoDialog({
 
 export function FormDescriptionDialog(
   {
+    document,
     description,
     setDescription,
     id
   }: {
+    document: KxDocument;
     description: string | undefined;
     setDescription: React.Dispatch<React.SetStateAction<string | undefined>>;
     id: string;
@@ -495,6 +499,12 @@ export function FormDescriptionDialog(
     setIsOpen(false);
   };
 
+  const handleDescriptionCancel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setDescription(document.description);
+    setIsOpen(false);
+  }
+
   return (
     <>
       <i className="self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
@@ -520,7 +530,7 @@ export function FormDescriptionDialog(
                 <Button
                   className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
                   variant="light"
-                  onClick={() => setIsOpen(false)}
+                  onClick={(e) => handleDescriptionCancel(e)}
                 >
                   Cancel
                 </Button>
