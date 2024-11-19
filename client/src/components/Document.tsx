@@ -54,6 +54,7 @@ export default function Document() {
   const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
   const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
 
+
   useEffect(() => {
     const fetchDocument = async () => {
       try {
@@ -71,6 +72,8 @@ export default function Document() {
         setDocumentsForCollateral(document.connections.collateral.map((doc) => doc._id?.toString()));
         setDocumentsForProjection(document.connections.projection.map((doc) => doc._id?.toString()));
         setDocumentsForUpdate(document.connections.update.map((doc) => doc._id?.toString()));
+        setPageRanges([]);
+
 
         if (document.doc_coordinates.type !== "EntireMunicipality") {
           const geoJSON = {
