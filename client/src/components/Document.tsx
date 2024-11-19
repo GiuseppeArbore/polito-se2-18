@@ -154,6 +154,7 @@ export default function Document() {
             </div>
 
             <FormInfoDialog
+              document={doc!}
               title={title}
               setTitle={setTitle}
               titleError={false}
@@ -275,6 +276,7 @@ export default function Document() {
 }
 
 export function FormInfoDialog({
+  document,
   title,
   setTitle,
   titleError,
@@ -297,6 +299,7 @@ export function FormInfoDialog({
   setPageRanges,
   id
 }: {
+  document: KxDocument;
   title: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   titleError: boolean;
@@ -362,6 +365,19 @@ export function FormInfoDialog({
 
   };
 
+  const handleCancelSubmit = async (e: React.FormEvent) => {  
+    e.preventDefault();
+    setTitle(document.title);
+    setStakeholders(document.stakeholders);
+    setScale(document.scale);
+    setType(document.type);
+    setLanguage(document.language || undefined);
+    setPages(document.pages || undefined);
+    setIsOpen(false);
+  }
+
+
+
   return (
     <>
     <i className="ml-auto self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-6" /></i>
@@ -405,13 +421,13 @@ export function FormInfoDialog({
               <Button
                 className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
                 variant="light"
-                onClick={() => setIsOpen(false)}
+                onClick={(e) => handleCancelSubmit(e)}
               >
                 Cancel
               </Button>
               <Button
                 className="w-full sm:w-auto primary"
-                onClick={e => handleInfoSubmit(e)}
+                onClick={(e) => handleInfoSubmit(e)}
               >
                 Submit
               </Button>
