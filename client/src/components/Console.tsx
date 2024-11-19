@@ -74,8 +74,8 @@ export default function Console() {
 
   return (
     <main>
-      <Title>
-        <Link to="/" className="flex items-center">
+      <Title className="flex items-center">
+        <Link to="/">
           {" "}
           <span title="Return to Home">
             <RiHome2Fill
