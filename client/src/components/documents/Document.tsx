@@ -39,37 +39,38 @@ export default function Document() {
     useEffect(() => {
         const fetchDocument = async () => {
             try {
-                const document = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
-                setDoc(document);
-                setTitle(document.title);
-                setStakeholders(document.stakeholders);
-                setScale(document.scale.toString());
-                setIssuanceDate(document.issuance_date);
-                setType(document.type);
-                setLanguage(document.language || "");
-                setPages(document.pages || "");
-                setDescription(document.description || "");
-                if (document.doc_coordinates.type !== "EntireMunicipality") {
-                    const geoJSON = {
-                        type: 'FeatureCollection',
-                        features: [
-                            {
-                                type: 'Feature',
-                                geometry: document.doc_coordinates,
-                                properties: {
-                                    title: document.title,
-                                    description: document.description,
-                                    id: document._id
-                                }
-                            }
-                        ]
-                    };
-                    setDrawings(geoJSON);
-                } else {
-                    setEntireMunicipality(true);
-                }
-
-
+            const document = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
+            setDoc(document);
+            setTitle(document.title);
+            setStakeholders(document.stakeholders);
+            setScale(document.scale.toString());
+            setIssuanceDate(document.issuance_date);
+            setType(document.type);
+            setLanguage(document.language || "");
+            setPages(document.pages || "");
+            setDescription(document.description || "");
+            if(document.doc_coordinates.type !=="EntireMunicipality"){
+            const geoJSON = {
+                type: 'FeatureCollection',
+                features: [
+                    {
+                        type: 'Feature',
+                        geometry: document.doc_coordinates,
+                        properties: {
+                            title: document.title,
+                            description: document.description,
+                            id: document._id,
+                            type: document.type
+                        }
+                    }
+                ]
+            };
+            setDrawings(geoJSON);
+        }else{
+            setEntireMunicipality(true);
+        }
+    
+        
             } catch (error) {
                 console.error("Failed to fetch document:", error);
                 navigate("/404");

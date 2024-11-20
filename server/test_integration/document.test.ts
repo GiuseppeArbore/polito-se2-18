@@ -7,13 +7,14 @@ import {db} from "../src/db/dao";
 import { KIRUNA_COORDS } from "../src/utils";
 import { mongoose } from "@typegoose/typegoose";
 
-
+const TEST_ID = "6738b18f8da44b335177509e";
+const TEST_FILENAME = "filename";
 
 const date = new Date();
 let documentIds: mongoose.Types.ObjectId[] = [];
 
 describe("Integration Tests for Document API", () => {
-    
+
     afterAll(async () => {
 
         for (const id of documentIds) {
@@ -297,5 +298,13 @@ describe("Integration Tests for Document API", () => {
         expect(getResponse.body.pages).toEqual([]);
     });
 
+    test("Test 11 - Add attachments to non existing document", async () => {
+        const file = Buffer.from("test data");
+        const response = await request(app)
+            .post(`/api/documents/${TEST_ID}/attachments`)
+            .attach("attachments", file, TEST_FILENAME);
+            
+        expect(response.status).toBe(404);
+    });
 });
 

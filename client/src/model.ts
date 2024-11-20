@@ -102,4 +102,7 @@ export class KxDocument {
 
     @prop({required: true, type: Connections})
     connections!: Connections;
+
+    @prop({type: String})
+    attachments?: string[];
 }
