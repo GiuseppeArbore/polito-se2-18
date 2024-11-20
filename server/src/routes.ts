@@ -150,6 +150,7 @@ export function initRoutes(app: Application) {
             body("type").optional(),
             body("language").optional(),
             body("pages").optional(),
+            body("docCoordinates").optional(),
         ],
         validateRequest,
         updateKxDocumentInfo

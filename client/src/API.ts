@@ -52,14 +52,32 @@ const getAllKxDocuments = async (): Promise<KxDocument[]> => {
 };
 
 // function to update title, stakeholders, type, scale, language, pages
-const updateKxDocumentInformation = async (documentId: string, title: string, stakeholders: string[], type: string, scale: number, language: string|undefined, pages: PageRange[] |undefined): Promise<KxDocument | null> => {
+const updateKxDocumentInformation = async (
+    documentId: string,
+    title?: string,
+    stakeholders?: string[],
+    type?: string,
+    scale?: number,
+    language?: string,
+    pages?: PageRange[],
+    doc_coordinates?: any
+): Promise<KxDocument | null> => {
     try {
+        const body: any = {};
+        if (title !== undefined) body.title = title;
+        if (stakeholders !== undefined) body.stakeholders = stakeholders;
+        if (type !== undefined) body.type = type;
+        if (scale !== undefined) body.scale = scale;
+        if (language !== undefined) body.language = language;
+        if (pages !== undefined) body.pages = pages;
+        if (doc_coordinates !== undefined) body.doc_coordinates = doc_coordinates;
+
         const response = await fetch(API_URL + `/documents/${documentId}/info`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({ title, stakeholders,  type, scale, language, pages }),
+            body: JSON.stringify(body),
         });
 
         if (!response.ok) {
@@ -75,7 +93,7 @@ const updateKxDocumentInformation = async (documentId: string, title: string, st
             throw new Error('Failed to update document: Unknown error');
         }
     }
-}
+};
 
 const updateKxDocumentDescription = async (documentId: string, description: string): Promise<KxDocument | null> => {
     try {
