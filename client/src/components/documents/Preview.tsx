@@ -1,6 +1,6 @@
 import { Dialog, DialogPanel, Button } from "@tremor/react";
 import { Viewer, Worker, ViewMode } from '@react-pdf-viewer/core';
-import { RiCloseLargeFill, RiCloseLargeLine, RiExternalLinkLine, RiFileCloseFill } from "@remixicon/react";
+import { RiCloseLargeFill, RiCloseLargeLine, RiDownload2Line, RiExternalLinkLine, RiFileCloseFill } from "@remixicon/react";
 import { KxDocument } from "../../model";
 import { useEffect, useState } from "react";
 import API from "../../API";
@@ -40,7 +40,7 @@ export default function PreviewDoc(open: boolean, setOpen: (bool: boolean) => vo
                     <h2 className="text-xl font-semibold">Document Preview</h2>
                     <div className="flex justify-end">
                         <a href={fileUrl} target="_blank" rel="noopener noreferrer" >
-                            <Button icon={RiExternalLinkLine} className="mx-2"></Button>
+                            <Button icon={RiDownload2Line} className="mx-2"></Button>
                         </a>
                         <Button onClick={() => setOpen(false)} icon={RiCloseLargeFill} className="mr-2"></Button>
 

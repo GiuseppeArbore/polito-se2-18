@@ -4,7 +4,7 @@ import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
 import API from '../../API';
 //import { FileUpload } from './DragDrop';
-
+import mime from 'mime';
 import {
     Accordion,
     AccordionBody,
@@ -166,7 +166,7 @@ export default function Document() {
                                     <AccordionList style={{ boxShadow: 'none' }}>
                                         {doc !== undefined && doc?.attachments && doc?.attachments.length >= 1 ? doc?.attachments?.map((title) => (
                                             <div key={title + doc._id} className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{title}</i>
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{mime.getType(title)?.split("/")[1] === "pdf" ? "PDF file" : mime.getType(title)?.split("/")[0] === "image" ? "Image file" : "File  ".concat("(."+ title.split(".")[1] +")") }</i>
                                                 <Button
                                                     className="ml-2"
                                                     onClick={() => {
