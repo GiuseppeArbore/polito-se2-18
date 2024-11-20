@@ -8,15 +8,15 @@ import { toast } from "../../utils/toaster";
 import { mongoose } from "@typegoose/typegoose";
 import '@react-pdf-viewer/core/lib/styles/index.css';
 
-export default function PreviewDoc(open: boolean, setOpen: (bool: boolean) => void, doc: KxDocument) {
+export default function PreviewDoc(open: boolean, setOpen: (bool: boolean) => void, docId: mongoose.Types.ObjectId | undefined, title: string | undefined) {
 
     const [fileUrl, setFileUrl] = useState<string | undefined>(undefined);
 
     useEffect(() => {
         const fetchDocuments = async () => {
             try {
-                if (doc && doc._id) {
-                    const url = await API.getKxFileByID(new mongoose.Types.ObjectId("6730daada436c299749f589e"), "doc_63_info.pdf");
+                if (docId && title) {
+                    const url = await API.getKxFileByID(docId, title);
                     setFileUrl(url.presignedUrl);
                 }
             } catch (error) {
@@ -30,7 +30,7 @@ export default function PreviewDoc(open: boolean, setOpen: (bool: boolean) => vo
             }
         };
         fetchDocuments();
-    }, [doc]);
+    }, [docId, title]);
 
     return (
         <Dialog open={open} onClose={() => setOpen(false)} static={true}>
