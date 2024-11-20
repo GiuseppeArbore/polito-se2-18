@@ -163,12 +163,10 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         "bottom-right"
       );
 
-     
-      mapRef.current.on("load", function () {
-        
-
-
-
+      
+      mapRef.current?.on("load", function () {
+        if(mapRef.current){
+        loadIcons(mapRef.current).then(() => {
         //AREA-------------------------------------------------------
         const sortedDrawing = props.drawing
         ? featureCollection(
@@ -486,7 +484,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
        
         //POINTS--------------------------------------------------------
         if (mapRef.current) {
-          loadIcons(mapRef.current).then(() => {
+          
             pointsAndCentroids.features?.forEach((feature, index) => {
               const id = feature.properties?.id;
               const pointId = `point-${id}`;
@@ -568,20 +566,17 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                 window.location.href = `/documents/${id}`;
               });
             });
-          }).catch(error => {
-            console.error('Errore nel caricamento delle icone:', error);
-          });
-        }
+          
+        };
      
 
-        
+      }).catch(error => {
+        console.error('Errore nel caricamento delle icone:', error);
+      });
+    };
       
-
-      
-
-
-      
-    });
+    }); 
+   
       
     }
   }, [props.drawing]);
