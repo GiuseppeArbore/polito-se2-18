@@ -40,7 +40,6 @@ import "../../index.css";
 import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
-import { Form } from "react-router-dom";
 
 interface FormDialogProps {
   documents: KxDocument[];
@@ -57,6 +56,7 @@ export function FormDialog(props: FormDialogProps) {
   const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(
     new Date()
   );
+  const [files, setFiles] = useState<File[]>([]);
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
   const [typeError, setTypeError] = useState(false);
   const [scale, setScale] = useState(10000);
@@ -151,9 +151,9 @@ export function FormDialog(props: FormDialogProps) {
         update: documentsForUpdate.map(d => new mongoose.Types.ObjectId(d)),
       },
     };
-
+    let createdDocument: KxDocument | null = null;
     try {
-      const createdDocument = await API.createKxDocument(newDocument);
+      createdDocument = await API.createKxDocument(newDocument);
       if (createdDocument) {
         props.refresh();
         toast({
@@ -180,7 +180,6 @@ export function FormDialog(props: FormDialogProps) {
           duration: 3000,
         })
       }
-      setIsOpen(false);
     } catch (error: any) {
       toast({
         title: "Error",
@@ -189,6 +188,29 @@ export function FormDialog(props: FormDialogProps) {
         duration: 3000,
       })
     }
+    try {
+      if (createdDocument && createdDocument._id) {
+        if (files.length > 0) {
+          const FileUpload = await API.addAttachmentToDocument(createdDocument._id, files);
+          if (!FileUpload) {
+            toast({
+              title: "Error",
+              description: "Failed to upload files",
+              variant: "error",
+              duration: 3000,
+            })
+          }
+        }
+      }
+    } catch (error: any) {
+      toast({
+        title: "Error",
+        description: "Failed to upload files",
+        variant: "error",
+        duration: 3000,
+      })
+    }
+    setIsOpen(false);
     clearForm();
   };
 
@@ -299,7 +321,7 @@ export function FormDialog(props: FormDialogProps) {
 
         <Divider />
 
-        <FileUpload />
+        <FileUpload saveFile={(list) => setFiles(list)} />
 
         <Divider />
 
