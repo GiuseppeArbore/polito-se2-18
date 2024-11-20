@@ -164,5 +164,27 @@ const deleteKxDocument = async (id: mongoose.Types.ObjectId): Promise<void> => {
     }
 };
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID };
+const addAttachmentToDocument = async (id: mongoose.Types.ObjectId, files: File[]): Promise<Boolean> => {
+    try {
+        const formData = new FormData();
+        files.forEach(file => formData.append('attachments', file, file.name));
+        const response = await fetch(`${API_URL}/documents/${id}/attachments`, {
+            method: 'POST',
+            body: formData,
+        });
+        
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+        return true;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to add attachment: ${error.message}`);
+        } else {
+            throw new Error('Failed to add attachment: Unknown error');
+        }
+    }
+};
+
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument };
 export default API;

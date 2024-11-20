@@ -4,7 +4,7 @@ import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
 import API from '../../API';
 //import { FileUpload } from './DragDrop';
-
+import mime from 'mime';
 import {
     Accordion,
     AccordionBody,
@@ -35,6 +35,7 @@ export default function Document() {
 
     const navigate = useNavigate();
     const { id } = useParams<string>();
+    const [fileTitle, setFileTitle] = useState<string | undefined>(undefined);
     const [showPdfPreview, setShowPdfPreview] = useState(false);
     const [doc, setDoc] = useState<KxDocument | null>(null);
     const [share, setShare] = useState(false);
@@ -157,16 +158,34 @@ export default function Document() {
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Pages:</i>
                             <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != undefined && pages.toString() != "" ? pages : "Unknown"} </i>
                         </div>
-                        
-                        <div className="flex items-center justify-between mb-2 space-x-2">
-                            <div className="flex space-x-2">
-                                <Button onClick={() => console.log("Download Image")} className="bg-tremor-background hover:bg-gray-100">
-                                    <RiCamera2Fill color='#003d8e' className='active:bg-white ' />
-                                </Button>
-                                <Button className="bg-tremor-background hover:bg-gray-100" onClick={() => setShowPdfPreview(true)}>
-                                    <RiFilePdf2Fill color="#003d8e" className='tremor-Button-text' />
-                                </Button>
-                            </div>
+
+                        <div className="flex w-full items-center justify-between mb-2">
+                            <Accordion className="w-full mr-6 mb-6">
+                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Original Resources</AccordionHeader>
+                                <AccordionBody className="leading-6 flex flex-col">
+                                    <AccordionList style={{ boxShadow: 'none' }}>
+                                        {doc !== undefined && doc?.attachments && doc?.attachments.length >= 1 ? doc?.attachments?.map((title) => (
+                                            <div key={title + doc._id} className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{mime.getType(title)?.split("/")[1] === "pdf" ? "PDF file" : mime.getType(title)?.split("/")[0] === "image" ? "Image file" : "File  ".concat("(."+ title.split(".")[1] +")") }</i>
+                                                <Button
+                                                    className="ml-2"
+                                                    onClick={() => {
+                                                        setFileTitle(title)
+                                                        setShowPdfPreview(true)
+                                                    }}
+                                                >
+                                                    Preview File
+                                                </Button>
+                                            </div>
+                                        )) : <>
+                                            <div className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No original resources added</i>
+                                            </div>
+                                        </>}
+
+                                    </AccordionList>
+                                </AccordionBody>
+                            </Accordion>
                         </div>
 
 
@@ -288,8 +307,8 @@ export default function Document() {
                     )
                 }
                 {
-                    PreviewDoc(showPdfPreview,() => setShowPdfPreview(false), doc!)
-                    
+                    PreviewDoc(showPdfPreview, () => setShowPdfPreview(false), doc?._id, fileTitle)
+
                 }
                 <Toaster />
 
