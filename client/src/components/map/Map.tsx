@@ -245,9 +245,9 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           mapRef.current?.on('mouseenter', layerId, () => {
             mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.6);
             mapRef.current?.setPaintProperty(highlightLayerId, 'line-opacity', 1);
-            mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
+           // mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
             mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 2);
-            mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 30);
+            mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 25);
 
 
           });
@@ -255,7 +255,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           mapRef.current?.on('mouseleave', layerId, () => {
             mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.3);
             mapRef.current?.setPaintProperty(highlightLayerId, 'line-opacity', 0);
-            mapRef.current?.setLayoutProperty(pointId, 'icon-size', 1);
+          //mapRef.current?.setLayoutProperty(pointId, 'icon-size', 1);
             mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 1);
             mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 15);
 
@@ -535,9 +535,9 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                   mapRef.current.getCanvas().style.cursor = 'pointer';
                 }
                 popup.addTo(mapRef.current!);
-                mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
+               // mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
                 mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 2);
-                mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 30);
+                mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 25);
               });
         
               mapRef.current?.on('mouseleave', pointId, () => {
@@ -545,7 +545,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                   mapRef.current.getCanvas().style.cursor = '';
                 }
                 popup.remove();
-                mapRef.current?.setLayoutProperty(pointId, 'icon-size', 1);
+                //mapRef.current?.setLayoutProperty(pointId, 'icon-size', 1);
                 mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 1);
                 mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 15);
               });
@@ -554,8 +554,8 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                 const features = mapRef.current?.queryRenderedFeatures(e.point, { layers: [layerId] });
                 const hasFeatures = features && features.length > 0;
                 if (hasFeatures) {
-                  mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
-                  mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 30);
+                 // mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
+                  mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 25);
                 }
               });
         
