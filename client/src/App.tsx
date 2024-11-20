@@ -6,6 +6,7 @@ import Console from "./components/Console";
 
 export default function App() {
   return (
+    
     <Routes>
       <Route path="/" element={<Home />} />
       <Route path="/dashboard" element={<Console />} />

@@ -7,21 +7,21 @@ import {
 const FeaturesSection: React.FC = () => {
   const features = [
     {
-      title: "",
+      title: "FIRST COLONIZATION",
       description:
-        "Enhanced interaction with Mapbox GL for seamless navigation",
+        "Add something here and change icons to something related to the first colonization",
       icon: <RiMapPinLine />,
     },
     {
-      title: "",
+      title: "SECOND COLONIZATION",
       description:
-        "Clear, concise information presented in an easily digestible format",
+        "Add something here and change icons to something related to the THINK WE'RE SPEAKING ABOUT",
       icon: <RiNavigationLine />,
     },
     {
-      title: "",
+      title: "BHO",
       description:
-        "Optimized document storage for superior performance and efficiency.",
+        "Add something here and change icons to something related to the THING WE'RE SPEAKING ABOUT",
       icon: <RiMapPin2Line />,
     },
   ];

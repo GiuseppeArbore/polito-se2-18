@@ -4,13 +4,10 @@ import Footer from "./Footer";
 
 export default function Home() {
   return (
-    <>
-      <div className="App">
+      <div className="App " >
         <HeroSection />
         <FeaturesSection />
         <Footer />
       </div>
-      ;
-    </>
   );
 }

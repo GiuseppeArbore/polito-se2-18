@@ -7,7 +7,6 @@ import { PutObjectCommandOutput, S3ServiceException } from '@aws-sdk/client-s3';
 import { rm } from 'fs/promises';
 import { setTimeout } from 'timers/promises';
 
-//add comment
 export const createKxDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const document = await KxDocumentModel.create(req.body);

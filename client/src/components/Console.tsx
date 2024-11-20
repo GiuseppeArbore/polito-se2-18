@@ -118,11 +118,16 @@ export default function Console() {
 
             <Card>
               <Metric>KIRUNA</Metric>
-              <Title>How to move a city</Title>
-              <Subtitle>Mapping the process of Kiruna relocation.</Subtitle>
+              <Title>Quick facts</Title>
               <Text>
-                Kiruna, a Swedish city, is being relocated in phases since 2010
-                to prevent damage from mining activities.
+                <ul className="list-disc list-inside">
+                <li>20,000 inhabitants</li>
+                <li>Located 140 km north of the Arctic Circle</li>
+                <li>Lowest recorded temperature -42 °C</li>
+                <li>45 days of Midnight Sun each year</li>
+                <li>21 days of Polar Night</li>
+                <li>Covered in snow for 8 months each year</li>
+                </ul>
               </Text>
             </Card>
             <Card className="hidden lg:block w-full h-40">
