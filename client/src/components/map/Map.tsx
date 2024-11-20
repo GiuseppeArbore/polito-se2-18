@@ -259,17 +259,38 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         });
 
       //CLUSTERS---------------------------------------------------------
-        const pointsAndCentroids = {
-          type: 'FeatureCollection',
-          features: props.drawing?.features.flatMap<Feature<Geometry, GeoJsonProperties>>(feature => {
-            if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-              let centroid = pointOnFeature(feature as AllGeoJSON);
-              centroid.properties = { ...feature.properties };
-              return [centroid as Feature<Geometry, GeoJsonProperties>];
-            }
-            return [feature];
-          }) || []
-        };
+      const offsetDistance = 0.0001; // Distanza di offset
+
+      const pointsAndCentroids: FeatureCollection<Geometry, GeoJsonProperties> = {
+        type: 'FeatureCollection',
+        features: props.drawing?.features.flatMap<Feature<Geometry, GeoJsonProperties>>(feature => {
+          let updatedFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
+      
+          if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
+            let centroid = pointOnFeature(feature as AllGeoJSON);
+            centroid.properties = { ...feature.properties };
+      
+            if (!centroid.geometry) return [];
+            const centroidCoordinates = centroid.geometry.coordinates as [number, number];
+            const centroidOffsetX = (Math.random() - 0.5) * offsetDistance;
+            const centroidOffsetY = (Math.random() - 0.5) * offsetDistance;
+            centroid.geometry.coordinates = [centroidCoordinates[0] + centroidOffsetX, centroidCoordinates[1] + centroidOffsetY];
+      
+            updatedFeatures.push(centroid as Feature<Geometry, GeoJsonProperties>);
+          }
+      
+          if (feature.geometry.type === 'Point') {
+            const pointCoordinates = feature.geometry.coordinates as [number, number];
+            const pointOffsetX = (Math.random() - 0.5) * offsetDistance;
+            const pointOffsetY = (Math.random() - 0.5) * offsetDistance;
+            feature.geometry.coordinates = [pointCoordinates[0] + pointOffsetX, pointCoordinates[1] + pointOffsetY];
+          }
+      
+          updatedFeatures.push(feature);
+      
+          return updatedFeatures;
+        }) || []
+      };
   
         
         mapRef.current?.addSource('pointsAndCentroids', {
