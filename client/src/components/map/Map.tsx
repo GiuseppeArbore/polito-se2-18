@@ -438,8 +438,8 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           
           const description = `Document Title:<br> <b>${feature.properties?.title}</b>`;
           const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
-            .setLngLat(coordinates)
-            .setHTML(description);
+          .setLngLat(coordinates)
+          .setHTML(`<div class="popup-content">${description}</div>`);
 
 
             mapRef.current?.on('mouseenter', pointId, () => {
