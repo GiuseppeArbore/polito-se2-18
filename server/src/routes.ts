@@ -1,12 +1,14 @@
 
-import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription} from './controller';
+import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription, handleFileUpload} from './controller';
 import { validateRequest } from './errorHandlers';
-import e, { Application, Request, Response } from 'express';
+import e, { Application, NextFunction, Request, Response } from 'express';
 import { body, param } from 'express-validator';
 import { AreaType, KxDocumentType, Stakeholders } from './models/enum';
 import { coordDistance, isDocCoords, KIRUNA_COORDS } from './utils';
-
-
+import multer from 'multer';
+import * as mime from 'mime-types';
+import { randomBytes } from 'crypto';
+import { mkdir } from 'fs/promises';
 
 export function initRoutes(app: Application) {
 
@@ -52,6 +54,27 @@ export function initRoutes(app: Application) {
         }).withMessage('Invalid connections'),
     ];
 
+    const storage = multer.diskStorage({
+        destination: async (req, _file, cb) => {
+            const dir = `tmp/${req.params.id}`;
+            await mkdir(dir, { recursive: true });
+            cb(null, dir);
+        },
+        filename: async (_req, file, cb) => {
+            const ext = file.mimetype ? mime.extension(file.mimetype) : file.originalname.split(".").pop() || false;
+            const hexBytes = randomBytes(16).toString("hex");
+            const fileName = `${hexBytes}.${ext || "bin"}`;
+            cb(null, fileName);
+        }
+    });
+
+    const upload = multer({
+        storage,
+        limits: {
+            fileSize: 10 * 1024 * 1024 // 10MiB
+        }
+    });
+
     app.get("/doc", async (_, res) => {
         res.status(200).json({ ok: "ok" });
     });
@@ -63,7 +86,15 @@ export function initRoutes(app: Application) {
         createKxDocument
     );
 
-    
+    app.post(
+        '/api/documents/:id/attachments',
+        [
+            param("id").notEmpty().withMessage("Missing id").isString().isHexadecimal().withMessage("Invalid id")
+        ],
+        validateRequest,
+        upload.array("attachments", 10),
+        handleFileUpload
+    );
 
     app.get('/api/documents', getAllKxDocuments);
 
