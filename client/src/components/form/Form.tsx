@@ -13,7 +13,7 @@ import {
   Textarea,
   Badge,
   Callout,
-  Switch
+  Switch,
 } from "@tremor/react";
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
@@ -28,7 +28,7 @@ import {
   RiLinksLine,
   RiLoopLeftLine,
   RiProjector2Line,
-  RiInformation2Line
+  RiInformation2Line,
 } from "@remixicon/react";
 
 import {
@@ -63,27 +63,22 @@ export function FormDialog(props: FormDialogProps) {
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
-
-
   const [isMapOpen, setIsMapOpen] = useState(false);
   const [showGeoInfo, setShowGeoInfo] = useState(false);
   const [docCoordinatesError, setDocCoordinatesError] = useState(false);
   const [drawing, setDrawing] = useState<any>(undefined);
   const [hideMap, setHideMap] = useState<boolean>(false);
-
-
   const [description, setDescription] = useState<string | undefined>(undefined);
   const [descriptionError, setDescriptionError] = useState(false);
-
-
   const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
-  const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
-  const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
+  const [documentsForCollateral, setDocumentsForCollateral] = useState<
+    string[]
+  >([]);
+  const [documentsForProjection, setDocumentsForProjection] = useState<
+    string[]
+  >([]);
   const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
   const [showConnectionsInfo, setShowConnectionsInfo] = useState(false);
-
-
-
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState("");
   const [message, setMessage] = useState("");
@@ -92,29 +87,37 @@ export function FormDialog(props: FormDialogProps) {
   // Example usage
   //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
 
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const tmpTitleError = title.length === 0;
     const tmpShError = stakeholders.length === 0;
     let draw: DocCoords | undefined;
-    if (!hideMap && (drawing && drawing.features.length === 1 && drawing.features[0].geometry.type === "Point")) {
+    if (
+      !hideMap &&
+      drawing &&
+      drawing.features.length === 1 &&
+      drawing.features[0].geometry.type === "Point"
+    ) {
       draw = {
         type: AreaType.POINT,
         coordinates: drawing.features[0].geometry.coordinates,
       };
     } else if (!hideMap && (drawing && drawing.features.length >= 1) && drawing.features[0].geometry.type === "Polygon") {
       //TODO: add support for multiple polygons
-      let cord = drawing.features.map((f: any) => f.geometry.coordinates).length === 1 ? drawing.features[0].geometry.coordinates : setDocCoordinatesError(true);
+      let cord =
+        drawing.features.map((f: any) => f.geometry.coordinates).length === 1
+          ? drawing.features[0].geometry.coordinates
+          : setDocCoordinatesError(true);
       draw = {
         type: AreaType.AREA,
         coordinates: cord as number[][][],
       };
     } else {
       draw = {
-        type: AreaType.ENTIRE_MUNICIPALITY
+        type: AreaType.ENTIRE_MUNICIPALITY,
       };
     }
+
     if (tmpTitleError || tmpShError || !type || !description || !draw || (drawing === undefined && !hideMap)) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
@@ -128,10 +131,8 @@ export function FormDialog(props: FormDialogProps) {
         variant: "error",
         duration: 3000,
       })
-
       return;
     }
-
 
     const newDocument: KxDocument = {
       title,
@@ -158,11 +159,11 @@ export function FormDialog(props: FormDialogProps) {
         props.refresh();
         toast({
           title: "Success",
-          description:
-            "The document has been created successfully",
+          description: "The document has been created successfully",
           variant: "success",
           duration: 3000,
-        })
+        });
+
         setTitle("");
         setScale(0);
         setIssuanceDate(new Date());
@@ -178,7 +179,7 @@ export function FormDialog(props: FormDialogProps) {
           description: "Failed to create document",
           variant: "error",
           duration: 3000,
-        })
+        });
       }
       setIsOpen(false);
     } catch (error: any) {
@@ -187,7 +188,7 @@ export function FormDialog(props: FormDialogProps) {
         description: "Failed to create document",
         variant: "error",
         duration: 3000,
-      })
+      });
     }
     clearForm();
   };
@@ -340,9 +341,7 @@ export function FormDialog(props: FormDialogProps) {
             <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
               Add all the information about the document
             </p>
-
             {myform()}
-
           </div>
         </DialogPanel>
       </Dialog>
