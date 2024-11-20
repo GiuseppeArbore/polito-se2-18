@@ -1,5 +1,5 @@
 import Home from "./components/landing/Home";
-import Document from "./components/Document";
+import Document from "./components/documents/Document";
 import { NotFound } from "./components/NotFound";
 import { Route, Routes } from "react-router-dom";
 import Console from "./components/Console";

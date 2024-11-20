@@ -1,5 +1,9 @@
+
 import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
+import { AllGeoJSON, featureCollection,area } from "@turf/turf";
+import  { documentAreaColorMapping,documentBorderColorMapping } from "./documentcolors";
+
 import {
   Button,
   Card,
@@ -22,13 +26,13 @@ import {
   RiScissorsCutFill,
   RiShapeLine,
   RiArrowDownSLine,
+  RiFileLine
 } from "@remixicon/react";
-import { DashboardMapDraw, PreviewMapDraw } from "./DrawBar";
+import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { Feature, FeatureCollection, Position } from "geojson";
+import { Feature, FeatureCollection, Position, Polygon } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
 import { coordDistance } from "../../utils";
-import { RiFileLine } from "@remixicon/react";
 import { KxDocument } from "../../model";
 import {
   DropdownMenu,
@@ -41,6 +45,7 @@ import {
 } from "./DropDownMenu";
 import "../../index.css";
 import "../../css/map.css";
+
 
 mapboxgl.accessToken =
   "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
@@ -132,15 +137,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
     mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
-    mapRef.current.addControl(DashboardMapDraw, "bottom-right");
-
-    mapRef.current.on("load", function () {
-      DashboardMapDraw.changeMode("static");
-    });
-
-    if (props.drawing) {
-      DashboardMapDraw.set(props.drawing);
-    }
   }, [mapContainerRef.current]);
 
   useEffect(() => {
@@ -166,15 +162,93 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
         new mapboxgl.FullscreenControl(),
         "bottom-right"
       );
-      mapRef.current.addControl(DashboardMapDraw, "bottom-right");
 
+      const sortedDrawing = featureCollection(
+        props.drawing.features.sort((a, b) => {
+          const areaA = area(a as AllGeoJSON);
+          const areaB = area(b as AllGeoJSON);
+          return areaB - areaA; // Sort in descending order
+        })
+      );
       mapRef.current.on("load", function () {
-        DashboardMapDraw.changeMode("static");
+        
+         // Adding source for feature collection
+         mapRef.current?.addSource('drawings', {
+          type: 'geojson',
+          data: sortedDrawing as FeatureCollection,
+        });
+
+        
+      //AREA-------------------------------------------------------
+        props.drawing?.features.forEach((feature, index) => {
+          const layerId = `drawings-layer-${index}`;
+          const borderLayerId = `drawings-border-layer-${index}`;
+          const highlightLayerId = `drawings-highlight-layer-${index}`;
+        
+          // Add the main fill layer
+          mapRef.current?.addLayer({
+            id: layerId,
+            type: 'fill',
+            source: {
+              type: 'geojson',
+              data: feature,
+            },
+            layout: {},
+            paint: {
+              'fill-color': documentAreaColorMapping, // Assuming documentColorMapping is an object mapping feature IDs to colors
+              'fill-opacity': 0.3,
+            },
+          });
+        
+          // Add the border layer
+          mapRef.current?.addLayer({
+            id: borderLayerId,
+            type: 'line',
+            source: {
+              type: 'geojson',
+              data: feature,
+            },
+            layout: {},
+            paint: {
+              'line-color': documentBorderColorMapping, // Border color
+              'line-width': 3,
+            },
+          });
+        
+          // Add the highlight layer
+          mapRef.current?.addLayer({
+            id: highlightLayerId,
+            type: 'line',
+            source: {
+              type: 'geojson',
+              data: feature,
+            },
+            layout: {},
+            paint: {
+              'line-color': documentBorderColorMapping,
+              'line-width': 3,
+              'line-opacity': 0, // Initially hidden
+            },
+          });
+        
+          // Add mouse enter and leave events
+          mapRef.current?.on('mouseenter', layerId, () => {
+            console.log(`Mouse entered area with ID: ${feature.properties?.type}`);
+            mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.6);
+            mapRef.current?.setPaintProperty(highlightLayerId, 'line-opacity', 1);
+          });
+        
+          mapRef.current?.on('mouseleave', layerId, () => {
+            mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.3);
+            mapRef.current?.setPaintProperty(highlightLayerId, 'line-opacity', 0);
+          });
+        });
+
+      
+
       });
 
-      if (props.drawing) {
-        DashboardMapDraw.set(props.drawing);
-      }
+      
     }
   }, [props.drawing]);
 
@@ -258,14 +332,12 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
     mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
     mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
-    mapRef.current.addControl(DashboardMapDraw, "bottom-right");
+    mapRef.current.addControl(DocumentMapDraw, "bottom-right");
 
-    mapRef.current.on("load", function () {
-      DashboardMapDraw.changeMode("static");
-    });
+    
 
     if (props.drawing) {
-      DashboardMapDraw.set(props.drawing);
+      DocumentMapDraw.set(props.drawing);
     }
   }, [mapContainerRef.current]);
 
@@ -292,14 +364,14 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
         new mapboxgl.FullscreenControl(),
         "bottom-right"
       );
-      mapRef.current.addControl(DashboardMapDraw, "bottom-right");
+      mapRef.current.addControl(DocumentMapDraw, "bottom-right");
 
       mapRef.current.on("load", function () {
-        DashboardMapDraw.changeMode("static");
+        DocumentMapDraw.changeMode("static");
       });
 
       if (props.drawing) {
-        DashboardMapDraw.set(props.drawing);
+        DocumentMapDraw.set(props.drawing);
       }
     }
   }, [props.drawing]);
@@ -360,6 +432,7 @@ const MapControls: React.FC<
   const feature = structuredClone(props?.drawing?.features?.at?.(0));
   const geometry = feature?.geometry;
   const pos = geometry?.type === "Point" ? geometry.coordinates : [NaN, NaN];
+
 
   useEffect(() => {
     if (geometry?.type === "Point") {

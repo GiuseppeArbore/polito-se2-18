@@ -3,6 +3,16 @@ import { mongoose, prop, modelOptions, getModelForClass, Ref, Severity } from "@
 
 export type PageRange = [number, number] | number;
 
+export interface DocInfo {
+    _id: mongoose.Types.ObjectId;
+    title: string;
+    stakeholders: Stakeholders[];
+    scale: number;
+    type: KxDocumentType;
+    language?: string;
+    pages?: PageRange;
+}
+
 @modelOptions({
     schemaOptions: {
         _id: false,
@@ -103,6 +113,9 @@ export class KxDocument {
 
     @prop({required: true, type: Connections})
     connections!: Connections;
+
+    @prop({type: String})
+    attachments?: string[];
 }
 
 export const KxDocumentModel = getModelForClass(KxDocument);

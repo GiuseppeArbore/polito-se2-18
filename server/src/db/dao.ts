@@ -1,4 +1,4 @@
-import { KxDocument } from "../models/model";
+import { DocInfo, KxDocument } from "../models/model";
 import { KxDocumentModel } from "../models/model";
 import { mongoose } from "@typegoose/typegoose";
 import dotenv from 'dotenv'; 
@@ -40,32 +40,32 @@ class DAO {
             console.error('Error disconnecting from the database', error);
         }
     }
-    Document = require('../models/model');
 
     async getKxDocumentById(id: mongoose.Types.ObjectId): Promise<KxDocument | null> {
         const result = await KxDocumentModel.find().where("_id").equals(id).exec();
-        if (result) {
+        if (result.length > 0) {
             return this.fromResultToKxDocument(result[0]);
         }
         return null;
     }
     async getKxDocumentByTitle(title: string): Promise<KxDocument | null> {
         const result = await KxDocumentModel.find().where("title").equals(title).exec();
-        if (result) {
+        if (result.length > 0) {
             return this.fromResultToKxDocument(result[0]);
         }
         return null;
     }
+
     async getAlldocuments(): Promise<KxDocument[]> {
-    const result = await KxDocumentModel.find().sort({ title: 1 }).exec(); 
-    if (result) {
-        const list = result.map((doc: any) => {
-            return this.fromResultToKxDocument(doc);
-        });
-        return list;
+        const result = await KxDocumentModel.find().sort({ title: 1 }).exec();
+        if (result.length > 0) {
+            const list = result.map((doc: any) => {
+                return this.fromResultToKxDocument(doc);
+            });
+            return list;
+        }
+        return [];
     }
-    return [];
-}
     async createKxDocument(document: KxDocument): Promise<KxDocument | null> {
         const newDocument = new KxDocumentModel(document);
         const result = await newDocument.save();
@@ -84,6 +84,50 @@ class DAO {
         }
         return false;
     }
+    async addKxDocumentAttachments(id: mongoose.Types.ObjectId, fileNames: string[]): Promise<boolean> {
+        const result = await KxDocumentModel.updateOne(
+            {_id: id._id},
+            {
+                $push: {
+                    attachments: {
+                        $each: fileNames
+                    }
+                }
+            }
+        ).exec();
+
+        if (result.modifiedCount === 0)
+            return false;
+        return true;
+    }
+    async updateKxDocumentDescription(id: mongoose.Types.ObjectId, description: string): Promise<KxDocument | null> {
+        const result = await KxDocumentModel.updateOne(
+            {_id: id._id},
+            {
+                $set: {
+                    description: description
+                }
+            }
+        ).exec();
+
+        if (result.modifiedCount === 0)
+            return null;
+
+        return await this.getKxDocumentById(id);
+    }
+    async updateKxDocumentInfo(id: mongoose.Types.ObjectId, info: DocInfo): Promise<KxDocument | null> {
+        const result = await KxDocumentModel.updateOne(
+            {_id: id._id},
+            {
+                $set: info
+            }
+        ).exec();
+
+        if (result.modifiedCount === 0)
+            return null;
+
+        return await this.getKxDocumentById(id);
+    }
     private fromResultToKxDocument(result: any): KxDocument {
         return {
             title: result.title,
@@ -98,6 +142,7 @@ class DAO {
             doc_coordinates: result.doc_coordinates,
             description: result.description,
             language: result.language,
+            attachments: result.attachments
         } as KxDocument;
     }
 }

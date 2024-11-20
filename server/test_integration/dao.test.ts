@@ -4,6 +4,7 @@ import { AreaType, KxDocumentType, Scale, Stakeholders } from "../src/models/enu
 import { Area, KxDocument, Point } from "../src/models/model";
 import { mongoose } from "@typegoose/typegoose";
 import { KIRUNA_COORDS } from "../src/utils";
+import { read } from "fs";
 
 const list: mongoose.Types.ObjectId[] = [];
 const date = new Date();
@@ -188,6 +189,35 @@ describe("Test DAO", () => {
             const res2 = await db.deleteKxDocument(res._id);
             expect(res2).toBeTruthy();
         }
+    });
+
+    test("Test adding attachments to existing document", async () => {
+        const id = new mongoose.Types.ObjectId();
+        const tmpDoc = {
+            _id: id,
+            title: "test",
+            stakeholders: [],
+            scale: 0,
+            issuance_date: date,
+            type: KxDocumentType.INFORMATIVE,
+            language: "Italian",
+            doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] } as Area,
+            description: "Test",
+            connections: {
+                direct: [], collateral: [], projection: [], update: []
+            },
+        } as KxDocument;
+
+        await db.createKxDocument(tmpDoc);
+        await db.addKxDocumentAttachments(id, ["test1", "test2"]);
+        const addRes = await db.getKxDocumentById(id);
+        expect(addRes).toMatchObject({
+            ...tmpDoc,
+            attachments: ["test1", "test2"]
+        } as KxDocument);
+
+        const res2 = await db.deleteKxDocument(id);
+        expect(res2).toBeTruthy();
     });
 });
 
