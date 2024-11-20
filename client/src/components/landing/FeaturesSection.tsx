@@ -1,34 +1,34 @@
 import React from "react";
 import {
-  RiMapPinLine,
-  RiNavigationLine,
-  RiMapPin2Line,
+  RiMapPinUserLine,
+  RiAlarmWarningLine,
+  RiCompass3Line,
 } from "@remixicon/react";
 const FeaturesSection: React.FC = () => {
   const features = [
     {
-      title: "FIRST COLONIZATION",
+      title: "Sweden's northernmost city",
       description:
-        "Add something here and change icons to something related to the first colonization",
-      icon: <RiMapPinLine />,
+        "Home to 20,000 people and Europe's biggest iron mine",
+      icon: <RiCompass3Line />,
     },
     {
-      title: "SECOND COLONIZATION",
+      title: "Mining caused structural problems...",
       description:
-        "Add something here and change icons to something related to the THINK WE'RE SPEAKING ABOUT",
-      icon: <RiNavigationLine />,
+        "...that endangered people and the city's heritage",
+      icon: <RiAlarmWarningLine />,
     },
     {
-      title: "BHO",
+      title: "Relocation project",
       description:
-        "Add something here and change icons to something related to the THING WE'RE SPEAKING ABOUT",
-      icon: <RiMapPin2Line />,
+        "An ambitious plan to move citzens to safety and preserve historically significant buildings",
+      icon: <RiMapPinUserLine />,
     },
   ];
 
   return (
     <section className="features-section text-white">
-      <h2>Features</h2>
+      <h2>Quick facts</h2>
       <div className="feature-list">
         {features.map((feature, index) => (
           <div key={index} className="feature-card bg-blue-600 text-white">
@@ -38,7 +38,7 @@ const FeaturesSection: React.FC = () => {
             >
               {feature.icon}
             </div>
-            <h3>{feature.title}</h3>
+            <h3><b>{feature.title}</b></h3>
             <p>{feature.description}</p>
           </div>
         ))}
