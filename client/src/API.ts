@@ -1,5 +1,5 @@
 import { mongoose } from '@typegoose/typegoose';
-import { KxDocument } from './model';
+import { KxDocument, PageRange } from './model';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -51,10 +51,61 @@ const getAllKxDocuments = async (): Promise<KxDocument[]> => {
     }
 };
 
+// function to update title, stakeholders, type, scale, language, pages
+const updateKxDocumentInformation = async (documentId: string, title: string, stakeholders: string[], type: string, scale: number, language: string|undefined, pages: PageRange[] |undefined): Promise<KxDocument | null> => {
+    try {
+        const response = await fetch(API_URL + `/documents/${documentId}/info`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ title, stakeholders,  type, scale, language, pages }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+
+        const data: KxDocument = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to update document: ${error.message}`);
+        } else {
+            throw new Error('Failed to update document: Unknown error');
+        }
+    }
+}
+
+const updateKxDocumentDescription = async (documentId: string, description: string): Promise<KxDocument | null> => {
+    try {
+        const response = await fetch(API_URL + `/documents/${documentId}/description`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ description }),
+                  });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+
+        const data: KxDocument = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to update document: ${error.message}`);
+        } else {
+            throw new Error('Failed to update document: Unknown error');
+        }
+    }
+};
 const getKxFileByID = async (id: mongoose.Types.ObjectId, fileName:string): Promise<{presignedUrl: string}> => {
     try {
         const response = await fetch(API_URL + `/documents/${id}/presignedUrl/${fileName}`, {
             method: 'GET',
+
         });
 
         if (!response.ok) {
@@ -70,6 +121,7 @@ const getKxFileByID = async (id: mongoose.Types.ObjectId, fileName:string): Prom
         }
     }
 };
+
 const getKxDocumentById = async (id: mongoose.Types.ObjectId): Promise<KxDocument> => {
     try {
         const response = await fetch(API_URL + `/documents/${id}`, {
@@ -90,6 +142,7 @@ const getKxDocumentById = async (id: mongoose.Types.ObjectId): Promise<KxDocumen
         }
     }
 };
+
 const deleteKxDocument = async (id: mongoose.Types.ObjectId): Promise<void> => {
     try {
         const response = await fetch(`${API_URL}/documents/${id}`, {
@@ -111,5 +164,5 @@ const deleteKxDocument = async (id: mongoose.Types.ObjectId): Promise<void> => {
     }
 };
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getKxFileByID };
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID };
 export default API;

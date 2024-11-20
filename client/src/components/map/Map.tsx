@@ -26,13 +26,13 @@ import {
   RiScissorsCutFill,
   RiShapeLine,
   RiArrowDownSLine,
+  RiFileLine
 } from "@remixicon/react";
 import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { Feature, FeatureCollection, Position, Polygon } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
 import { coordDistance } from "../../utils";
-import { RiFileLine } from "@remixicon/react";
 import { KxDocument } from "../../model";
 import {
   DropdownMenu,
@@ -432,6 +432,7 @@ const MapControls: React.FC<
   const feature = structuredClone(props?.drawing?.features?.at?.(0));
   const geometry = feature?.geometry;
   const pos = geometry?.type === "Point" ? geometry.coordinates : [NaN, NaN];
+
 
   useEffect(() => {
     if (geometry?.type === "Point") {
