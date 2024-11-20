@@ -171,9 +171,6 @@ const addAttachmentToDocument = async (id: mongoose.Types.ObjectId, files: File[
         const response = await fetch(`${API_URL}/documents/${id}/attachments`, {
             method: 'POST',
             body: formData,
-            // headers: {
-            //     'Content-Type': 'multipart/form-data',
-            // },
         });
         
         if (!response.ok) {
