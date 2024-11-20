@@ -77,6 +77,29 @@ export default function Document() {
 
 
                 if (document.doc_coordinates.type !== "EntireMunicipality") {
+                    function getIconForType(type: string): string {
+                        switch (type) {
+                          case 'Informative Document':
+                            return 'icon-InformativeDocument';
+                          case 'Prescriptive Document':
+                            return 'icon-PrescriptiveDocument';
+                          case 'Design Document':
+                            return 'icon-DesignDocument';
+                          case 'Technical Document':
+                            return 'icon-TechnicalDocument';
+                          case 'Strategy':
+                            return 'icon-Strategy';
+                          case 'Agreement':
+                            return 'icon-Agreement';
+                          case 'Conflict Resolution':
+                            return 'icon-ConflictResolution';
+                          case 'Consultation':
+                            return 'icon-Consultation';
+                          default:
+                            return 'default-icon';
+                        }
+                      }
+
                     const geoJSON = {
                         type: 'FeatureCollection',
                         features: [
@@ -87,7 +110,8 @@ export default function Document() {
                                     title: document.title,
                                     description: document.description,
                                     id: document._id,
-                                    type: document.type
+                                    type: document.type,
+                                    icon: getIconForType(document.type)
                                 }
                             }
                         ]
