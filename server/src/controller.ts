@@ -1,8 +1,11 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from './db/dao';
-import { KxDocumentModel, KxDocument } from './models/model';
+import { KxDocumentModel, KxDocument, DocInfo } from './models/model';
 import { mongoose } from '@typegoose/typegoose';
-import { getPresignedUrl } from './object_storage/bucket';
+import { getPresignedUrl, kxObjectStorageClient, KxObjectStorageCommands } from './object_storage/bucket';
+import { PutObjectCommandOutput, S3ServiceException } from '@aws-sdk/client-s3';
+import { rm } from 'fs/promises';
+import { setTimeout } from 'timers/promises';
 
 export const createKxDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -64,6 +67,96 @@ export const getPresignedUrlForAttachment = async (req: Request, res: Response, 
 
         res.status(201).json({presignedUrl: url});
         
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const handleFileUpload = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    interface JobResult {
+        fileName: string,
+        S3Output: PutObjectCommandOutput
+    }
+
+    const docId = new mongoose.Types.ObjectId(req.params.id); 
+    if (!req.files) {
+        res.status(409).send();
+        return;
+    }
+    if (!await db.getKxDocumentById(docId)) {
+        res.status(404).send();
+        return;
+    }
+
+    // Immediately send a response to avoid blocking the client
+    res.status(201).send();
+    const allFiles = Array.isArray(req.files) ? req.files : Object.values(req.files).flat();
+    let toUpload = allFiles.map(f => f.filename);
+
+    let retryDelayMs = 10_000;
+    const maxDelayBeforeFailure = 1000 * 60 * 60 * 24;
+    while (toUpload.length !== 0) {
+        const uploadJobs = toUpload.map(async (fn) => {
+            const out = await kxObjectStorageClient.send(KxObjectStorageCommands.uploadAttachmentForDocument(
+                docId,
+                fn
+            ));
+            return {
+                fileName: fn,
+                S3Output: out
+            } as JobResult;
+        });
+
+        const uploadResult = await Promise.allSettled(uploadJobs);
+        const failed = uploadResult.filter(r => r.status === "rejected");
+        const succeded = uploadResult.filter(r => r.status === "fulfilled").map(r => r.value.fileName);
+        toUpload = toUpload.filter(f => !succeded.includes(f));
+
+        const dbUpdate = await db.addKxDocumentAttachments(docId, succeded);
+        if (!dbUpdate)
+            throw Error("Cannot write to db");
+
+        const fileRemoveJobs = succeded.map(f => rm(`tmp/${req.params.id}/${f}`));
+        await Promise.allSettled(fileRemoveJobs);
+
+        if (toUpload.length !== 0) {
+            console.log(failed);
+            if (retryDelayMs > maxDelayBeforeFailure) {
+                console.error(`Document ${req.params.id}: Failed to upload some files to object storage (${toUpload.join(", ")})`);
+                break;
+            }
+            console.log(`Retrying upload in ${retryDelayMs / 1000}s`);
+            await setTimeout(retryDelayMs);
+            retryDelayMs *= 2;
+        }
+    }
+}
+
+export const updateKxDocumentDescription = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const id = new mongoose.Types.ObjectId(req.params.id);
+        const description = req.body.description;
+        const updatedDocument = await db.updateKxDocumentDescription(id, description);
+        if (updatedDocument) {
+            res.status(200).json(updatedDocument);
+        } else {
+            res.status(404).json("Document not found");
+        }
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const updateKxDocumentInfo = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const id = new mongoose.Types.ObjectId(req.params.id);
+        const info = req.body as DocInfo;
+        const updatedDocument = await db.updateKxDocumentInfo(id, info);
+        if (updatedDocument) {
+            res.status(200).json(updatedDocument);
+        } else {
+            res.status(404).json("Document not found");
+        }
     } catch (error) {
         next(error);
     }
