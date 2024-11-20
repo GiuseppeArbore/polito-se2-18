@@ -27,6 +27,7 @@ import {
 
 import { toast } from "./../utils/toaster";
 import { Toaster } from "./toast/Toaster";
+import locales from "../locales.json"
 import exp from 'constants';
 
 
@@ -149,7 +150,7 @@ export default function Document() {
 
             <div className="flex items-center justify-between mb-2 space-x-2">
               <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Language:</i>
-              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{language != "" ? language : "Unknown"}</i>
+              <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{locales.find((l) => l.code === language)?.name || "Unknown"}</i>
             </div>
 
             <div className="flex items-center justify-between mb-2 space-x-2">
