@@ -1,4 +1,3 @@
-import { RiShareLine } from "@remixicon/react";
 import { Dialog, DialogPanel, Button } from "@tremor/react";
 
 export default function DeleteDialog(open: boolean, setOpen: (bool: boolean) => void, deleteFn: () => void, title: string) {
