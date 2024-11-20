@@ -11,7 +11,7 @@ import {
     AccordionHeader,
     AccordionList
 } from '@tremor/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DocumentPageMap, PreviewMap } from '../map/Map';
 import { KxDocument, DocCoords } from "../../model";
@@ -39,7 +39,7 @@ export default function Document() {
     const [showPdfPreview, setShowPdfPreview] = useState(false);
     const [doc, setDoc] = useState<KxDocument | null>(null);
     const [share, setShare] = useState(false);
-    const [drawings, setDrawings] = useState<any>("")
+    const [drawings, setDrawings] = useState<any>();
     const [title, setTitle] = useState("");
     const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
     const [scale, setScale] = useState(10000);
@@ -50,12 +50,13 @@ export default function Document() {
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(undefined);
     const [description, setDescription] = useState<string | undefined>(undefined);
     const [entireMunicipality, setEntireMunicipality] = useState(false);
+    const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
     const [documents, setDocuments] = useState<KxDocument[]>([]);
     const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
     const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
     const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
     const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
-
+    const [saveDrawing, setSaveDrawing] = useState(false);
 
     useEffect(() => {
         const fetchDocument = async () => {
@@ -108,6 +109,57 @@ export default function Document() {
         fetchDocument();
     }, []);
 
+    useMemo(async () => {
+       if(drawings && saveDrawing){
+        let draw: DocCoords;
+        if (
+            drawings &&
+            drawings.features.length === 1 &&
+            drawings.features[0].geometry.type === "Point"
+          ) {
+            draw = {
+              type: AreaType.POINT,
+              coordinates: drawings.features[0].geometry.coordinates,
+            };
+          } else if ((drawings && drawings.features.length >= 1) && drawings.features[0].geometry.type === "Polygon") {
+            let cord =
+              drawings.features.map((f: any) => f.geometry.coordinates).length === 1
+                ? drawings.features[0].geometry.coordinates
+                : [];
+               
+            draw = {
+              type: AreaType.AREA,
+              coordinates: cord as number[][][],
+            };
+          } else {
+            draw = {
+              type: AreaType.ENTIRE_MUNICIPALITY,
+            };
+          }
+          try{
+            const res = await API.updateKxDocumentInformation(id!, undefined, undefined, undefined, undefined, undefined, undefined, draw);
+            if (res) {
+                toast({
+                    title: "Success",
+                    description:
+                        "The document has been updated successfully",
+                    variant: "success",
+                    duration: 3000,
+                })
+            } else {
+                toast({
+                    title: "Error",
+                    description: "Failed to update document",
+                    variant: "error",
+                    duration: 3000,
+                })
+            }
+          } catch (error) {
+          
+          }
+          setSaveDrawing(false);
+       }
+    },[saveDrawing]);
 
     const [showCheck, setShowCheck] = useState(false);
 
@@ -290,6 +342,7 @@ export default function Document() {
                             className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
                         >
                             <DocumentPageMap
+                                setDrawing={(d) => {setDrawings(d); setSaveDrawing(true)}}
                                 drawing={drawings}
                                 style={{ minHeight: "300px", width: "100%" }}
                             />
@@ -378,7 +431,6 @@ export function FormInfoDialog({
             return;
         }
         try {
-            console.log(title);
             const updatedDocument = await API.updateKxDocumentInformation(id, title, stakeholders, type, scale, language, pages);
             if (updatedDocument) {
                 toast({
@@ -459,6 +511,7 @@ export function FormInfoDialog({
                             setPages={setPages}
                             pageRanges={pageRanges}
                             setPageRanges={setPageRanges}
+                            
                         />
                         <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
                             <Button
