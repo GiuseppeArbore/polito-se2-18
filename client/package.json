@@ -25,6 +25,7 @@
     "mapbox-gl-draw-cut-polygon-mode": "github:lbordino/mapbox-gl-draw-cut-polygon-mode",
     "mapbox-gl-draw-freehand-mode": "github:lbordino/mapbox-gl-draw-freehand-mode",
     "mapbox-gl-draw-passing-mode": "github:lbordino/mapbox-gl-draw-passing-mode",
+    "mime": "^4.0.4",
     "pdfjs-dist": "^3.4.120",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
