@@ -181,7 +181,7 @@ function List(props: ListProps) {
 
   function onGridReady() {
     const allColumnIds: string[] = [];
-    gridRef.current!.api!.getColumns()!.forEach((column) => {
+    gridRef.current!.api!.getAllGridColumns()!.forEach((column) => {
       allColumnIds.push(column.getId());
     });
     gridRef.current!.api!.autoSizeColumns(allColumnIds, false);
@@ -201,6 +201,7 @@ function List(props: ListProps) {
         style={{ width: "100%", height: "70vh", overflow: "auto" }}
       >
         <AgGridReact
+          onGridColumnsChanged={onGridReady}
           rowData={rowData}
           onFirstDataRendered={onFirstDataRendered}
           gridOptions={gridOptions}
