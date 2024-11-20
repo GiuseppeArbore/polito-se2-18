@@ -1,4 +1,5 @@
-import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, handleFileUpload} from './controller';
+
+import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription, handleFileUpload} from './controller';
 import { validateRequest } from './errorHandlers';
 import e, { Application, NextFunction, Request, Response } from 'express';
 import { body, param } from 'express-validator';
@@ -130,6 +131,31 @@ export function initRoutes(app: Application) {
     );
 
     app.delete('/api/documents/:id', deleteKxDocument);
+
+    app.put('/api/documents/:id/description',
+        [
+            param("id").notEmpty().withMessage("id is required"),
+            body("description").notEmpty().withMessage("description is required"),
+        ],
+        validateRequest,
+        updateKxDocumentDescription
+    );
+
+    app.put('/api/documents/:id/info',
+        [
+            param("id").notEmpty().withMessage("id is required"),
+            body("title").optional(),
+            body("stakeholders").optional(),
+            body("scale").optional(),
+            body("type").optional(),
+            body("language").optional(),
+            body("pages").optional(),
+        ],
+        validateRequest,
+        updateKxDocumentInfo
+    )
+
+
 }
 
 export default initRoutes;
