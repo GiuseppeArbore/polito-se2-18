@@ -272,14 +272,14 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       
           if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
             let centroid = pointOnFeature(feature as AllGeoJSON);
-            centroid.properties = { ...feature.properties };
-      
+            centroid.properties = { ...feature.properties, isCentroid: true }; // Add isCentroid property
+          
             if (!centroid.geometry) return [];
             const centroidCoordinates = centroid.geometry.coordinates as [number, number];
             const centroidOffsetX = (Math.random() - 0.5) * offsetDistance;
             const centroidOffsetY = (Math.random() - 0.5) * offsetDistance;
             centroid.geometry.coordinates = [centroidCoordinates[0] + centroidOffsetX, centroidCoordinates[1] + centroidOffsetY];
-      
+          
             updatedFeatures.push(centroid as Feature<Geometry, GeoJsonProperties>);
           }
       
@@ -494,14 +494,19 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
               const circleLayerId = `drawings-circle-layer-${id}`;
         
               if (!mapRef.current?.getLayer(pointId)) {
-
+                
                 mapRef.current?.addLayer({
                   id: circleLayerId,
                   type: 'circle',
                   source: 'pointsAndCentroids',
                   paint: {
                     'circle-radius': 15,
-                    'circle-color': '#ffffff',
+                    'circle-color': [
+                      'case',
+                      ['==', ['get', 'isCentroid'], true], // Check if the feature is a centroid
+                      '#ffffff',
+                      '#7499E8'  
+                    ],
                   },
                   filter: ['==', ['get', 'id'], feature.properties?.id]
                 });
@@ -717,14 +722,14 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
       
           //POINTS-----------------------------------------------------------------
           mapRef.current?.addLayer({
-            id: 'circle',
-            type: 'circle',
-            source: 'points',
-            paint: {
-              'circle-radius': 15,
-              'circle-color': '#ffffff',
-            },
-          });
+                  id: 'points',
+                  type: 'circle',
+                  source: 'points',
+                  paint: {
+                    'circle-radius': 15,
+                    'circle-color': '#7499E8' ,
+                  }
+                });
           
           mapRef.current?.addLayer({
             id: 'icon',
