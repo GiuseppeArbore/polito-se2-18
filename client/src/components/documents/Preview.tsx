@@ -7,7 +7,7 @@ import API from "../../API";
 import { toast } from "../../utils/toaster";
 import { mongoose } from "@typegoose/typegoose";
 import '@react-pdf-viewer/core/lib/styles/index.css';
-
+import mime from 'mime';
 export default function PreviewDoc(open: boolean, setOpen: (bool: boolean) => void, docId: mongoose.Types.ObjectId | undefined, title: string | undefined) {
 
     const [fileUrl, setFileUrl] = useState<string | undefined>(undefined);
@@ -18,6 +18,7 @@ export default function PreviewDoc(open: boolean, setOpen: (bool: boolean) => vo
                 if (docId && title) {
                     const url = await API.getKxFileByID(docId, title);
                     setFileUrl(url.presignedUrl);
+                    console.log(url.presignedUrl);
                 }
             } catch (error) {
                 console.error(error);
@@ -45,11 +46,18 @@ export default function PreviewDoc(open: boolean, setOpen: (bool: boolean) => vo
 
                     </div>
                 </div>
-                <div className="flex justify-center items-center ml-8">
-                    <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.worker.min.js">
-                        {fileUrl && <Viewer fileUrl={fileUrl} viewMode={ViewMode.SinglePage} />}
-                    </Worker>
-                </div>
+                {title && title && mime.getType(title)?.split("/")[0] === "image" ? (
+                    <div className="flex justify-center items-center">
+                        <img src={fileUrl} alt="Document Preview" className="max-w-full max-h-full" />
+                    </div>
+                ) : title && mime.getType(title)?.split("/")[1] === "pdf" ?
+                 <div className="flex justify-center items-center mx-3" style={{ height: '70vh' }}>
+                   <embed src={fileUrl} type="application/pdf" width="100%" height="100%" />
+                </div> : <div className="flex justify-center items-center">
+                    <p>Preview not available</p>
+                </div>}
+
+
             </DialogPanel>
         </Dialog>
     );
