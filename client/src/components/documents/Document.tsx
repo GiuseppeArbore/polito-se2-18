@@ -4,14 +4,14 @@ import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
 import API from '../../API';
 //import { FileUpload } from './DragDrop';
-
+import mime from 'mime';
 import {
     Accordion,
     AccordionBody,
     AccordionHeader,
     AccordionList
 } from '@tremor/react';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DocumentPageMap, PreviewMap } from '../map/Map';
 import { KxDocument, DocCoords } from "../../model";
@@ -35,10 +35,11 @@ export default function Document() {
 
     const navigate = useNavigate();
     const { id } = useParams<string>();
+    const [fileTitle, setFileTitle] = useState<string | undefined>(undefined);
     const [showPdfPreview, setShowPdfPreview] = useState(false);
     const [doc, setDoc] = useState<KxDocument | null>(null);
     const [share, setShare] = useState(false);
-    const [drawings, setDrawings] = useState<any>("")
+    const [drawings, setDrawings] = useState<any>();
     const [title, setTitle] = useState("");
     const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
     const [scale, setScale] = useState(10000);
@@ -49,12 +50,13 @@ export default function Document() {
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(undefined);
     const [description, setDescription] = useState<string | undefined>(undefined);
     const [entireMunicipality, setEntireMunicipality] = useState(false);
+    const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
     const [documents, setDocuments] = useState<KxDocument[]>([]);
     const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
     const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
     const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
     const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
-
+    const [saveDrawing, setSaveDrawing] = useState(false);
 
     useEffect(() => {
         const fetchDocument = async () => {
@@ -107,6 +109,57 @@ export default function Document() {
         fetchDocument();
     }, []);
 
+    useMemo(async () => {
+       if(drawings && saveDrawing){
+        let draw: DocCoords;
+        if (
+            drawings &&
+            drawings.features.length === 1 &&
+            drawings.features[0].geometry.type === "Point"
+          ) {
+            draw = {
+              type: AreaType.POINT,
+              coordinates: drawings.features[0].geometry.coordinates,
+            };
+          } else if ((drawings && drawings.features.length >= 1) && drawings.features[0].geometry.type === "Polygon") {
+            let cord =
+              drawings.features.map((f: any) => f.geometry.coordinates).length === 1
+                ? drawings.features[0].geometry.coordinates
+                : [];
+               
+            draw = {
+              type: AreaType.AREA,
+              coordinates: cord as number[][][],
+            };
+          } else {
+            draw = {
+              type: AreaType.ENTIRE_MUNICIPALITY,
+            };
+          }
+          try{
+            const res = await API.updateKxDocumentInformation(id!, undefined, undefined, undefined, undefined, undefined, undefined, draw);
+            if (res) {
+                toast({
+                    title: "Success",
+                    description:
+                        "The document has been updated successfully",
+                    variant: "success",
+                    duration: 3000,
+                })
+            } else {
+                toast({
+                    title: "Error",
+                    description: "Failed to update document",
+                    variant: "error",
+                    duration: 3000,
+                })
+            }
+          } catch (error) {
+          
+          }
+          setSaveDrawing(false);
+       }
+    },[saveDrawing]);
 
     const [showCheck, setShowCheck] = useState(false);
 
@@ -157,16 +210,34 @@ export default function Document() {
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Pages:</i>
                             <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != undefined && pages.toString() != "" ? pages : "Unknown"} </i>
                         </div>
-                        
-                        <div className="flex items-center justify-between mb-2 space-x-2">
-                            <div className="flex space-x-2">
-                                <Button onClick={() => console.log("Download Image")} className="bg-tremor-background hover:bg-gray-100">
-                                    <RiCamera2Fill color='#003d8e' className='active:bg-white ' />
-                                </Button>
-                                <Button className="bg-tremor-background hover:bg-gray-100" onClick={() => setShowPdfPreview(true)}>
-                                    <RiFilePdf2Fill color="#003d8e" className='tremor-Button-text' />
-                                </Button>
-                            </div>
+
+                        <div className="flex w-full items-center justify-between mb-2">
+                            <Accordion className="w-full mr-6 mb-6">
+                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Original Resources</AccordionHeader>
+                                <AccordionBody className="leading-6 flex flex-col">
+                                    <AccordionList style={{ boxShadow: 'none' }}>
+                                        {doc !== undefined && doc?.attachments && doc?.attachments.length >= 1 ? doc?.attachments?.map((title) => (
+                                            <div key={title + doc._id} className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{mime.getType(title)?.split("/")[1] === "pdf" ? "PDF file" : mime.getType(title)?.split("/")[0] === "image" ? "Image file" : "File  ".concat("(."+ title.split(".")[1] +")") }</i>
+                                                <Button
+                                                    className="ml-2"
+                                                    onClick={() => {
+                                                        setFileTitle(title)
+                                                        setShowPdfPreview(true)
+                                                    }}
+                                                >
+                                                    Preview File
+                                                </Button>
+                                            </div>
+                                        )) : <>
+                                            <div className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No original resources added</i>
+                                            </div>
+                                        </>}
+
+                                    </AccordionList>
+                                </AccordionBody>
+                            </Accordion>
                         </div>
 
 
@@ -271,6 +342,7 @@ export default function Document() {
                             className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
                         >
                             <DocumentPageMap
+                                setDrawing={(d) => {setDrawings(d); setSaveDrawing(true)}}
                                 drawing={drawings}
                                 style={{ minHeight: "300px", width: "100%" }}
                             />
@@ -288,8 +360,8 @@ export default function Document() {
                     )
                 }
                 {
-                    PreviewDoc(showPdfPreview,() => setShowPdfPreview(false), doc!)
-                    
+                    PreviewDoc(showPdfPreview, () => setShowPdfPreview(false), doc?._id, fileTitle)
+
                 }
                 <Toaster />
 
@@ -359,7 +431,6 @@ export function FormInfoDialog({
             return;
         }
         try {
-            console.log(title);
             const updatedDocument = await API.updateKxDocumentInformation(id, title, stakeholders, type, scale, language, pages);
             if (updatedDocument) {
                 toast({
@@ -440,6 +511,7 @@ export function FormInfoDialog({
                             setPages={setPages}
                             pageRanges={pageRanges}
                             setPageRanges={setPageRanges}
+                            
                         />
                         <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
                             <Button

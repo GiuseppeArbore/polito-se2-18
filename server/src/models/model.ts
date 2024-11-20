@@ -11,6 +11,7 @@ export interface DocInfo {
     type: KxDocumentType;
     language?: string;
     pages?: PageRange;
+    doc_coordinates?: DocCoords;
 }
 
 @modelOptions({

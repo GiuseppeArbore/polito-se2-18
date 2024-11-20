@@ -30,6 +30,22 @@ export default function Console() {
   const [pointOrAreaDocuments, setPointOrAreaDocuments] = useState<
     KxDocument[]
   >([]);
+
+
+  const drawing: FeatureCollection = {
+    type: "FeatureCollection",
+    features: pointOrAreaDocuments.map((doc) => ({
+      type: "Feature",
+      geometry: doc.doc_coordinates as Area | Point,
+      properties: {
+        title: doc.title,
+        description: doc.description,
+        id: doc._id,
+        type: doc.type
+      },
+    })),
+  };
+
   useEffect(() => {
     const fetchDocuments = async () => {
       try {
@@ -58,20 +74,6 @@ export default function Console() {
       setRefreshNeeded(false);
     }
   }, [selectedView, refreshNeeded]);
-
-  const drawing: FeatureCollection = {
-    type: "FeatureCollection",
-    features: pointOrAreaDocuments.map((doc) => ({
-      type: "Feature",
-      geometry: doc.doc_coordinates as Area | Point,
-      properties: {
-        title: doc.title,
-        description: doc.description,
-        id: doc._id,
-        type: doc.type,
-      },
-    })),
-  };
 
   return (
     <main>
@@ -204,3 +206,4 @@ export default function Console() {
     }
   }
 }
+

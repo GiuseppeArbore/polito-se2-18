@@ -1,4 +1,5 @@
 import { ExpressionSpecification } from 'mapbox-gl';
+
 const documentAreaColorMapping : ExpressionSpecification = [
     'case',
     ['==', ['get', 'type'], 'Informative Document'], '#abc4ab',
@@ -26,3 +27,4 @@ const documentAreaColorMapping : ExpressionSpecification = [
 ];
 
   export {documentAreaColorMapping,documentBorderColorMapping};
+
