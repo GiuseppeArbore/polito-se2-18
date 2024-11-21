@@ -13,6 +13,8 @@ import {
   Divider,
   TextInput,
   Icon,
+  Dialog,
+  DialogPanel,
 } from "@tremor/react";
 import {
   RiCheckFill,
@@ -26,7 +28,8 @@ import {
   RiScissorsCutFill,
   RiShapeLine,
   RiArrowDownSLine,
-  RiFileLine
+  RiFileLine,
+  RiEditBoxLine
 } from "@remixicon/react";
 import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
@@ -94,6 +97,7 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
         interactive: false,
       });
       mapRef.current.addControl(PreviewMapDraw, "bottom-right");
+     
       if (props.drawing) PreviewMapDraw.set(props.drawing);
     }
   }, [props.drawing]);
@@ -642,9 +646,15 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
   );
 };
 
-export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
+export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: FeatureCollection<Geometry, GeoJsonProperties> | undefined) => void}> = (props) => {
+  const [isOpen, setIsOpen] = useState(false);
+  const [drawing, setDrawing] = useState(props.drawing);
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+
+  useMemo(() => {
+    setDrawing(props.drawing);
+  }, [props.drawing]);
 
   useEffect(() => {
     if (mapRef.current) return;
@@ -657,95 +667,25 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
       pitch: 40,
       interactive: true,
     });
-
-    mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
-    mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
-    mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
-    mapRef.current.addControl(DocumentMapDraw, "bottom-right");
-
-    
-
-    if (props.drawing) {
-      DocumentMapDraw.set(props.drawing);
-    }
+    mapRef.current.addControl(PreviewMapDraw, "bottom-right");
+    if (props.drawing) PreviewMapDraw.set(props.drawing);
   }, [mapContainerRef.current]);
 
-  useEffect(() => {
+  useMemo(() => {
     if (props.drawing) {
       mapRef.current?.remove();
       mapRef.current = null;
-
       mapRef.current = new mapboxgl.Map({
         container: mapContainerRef.current,
         style: "mapbox://styles/mapbox/satellite-streets-v12",
         center: center,
         zoom: props.zoom || defaultZoom,
         pitch: 40,
-        interactive: true,
+        interactive: false,
       });
 
-      mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
-      mapRef.current.addControl(
-        new mapboxgl.NavigationControl(),
-        "bottom-right"
-      );
-      mapRef.current.addControl(
-        new mapboxgl.FullscreenControl(),
-        "bottom-right"
-      );
-      mapRef.current.addControl(DocumentMapDraw, "bottom-right");
-
-      mapRef.current.on("load", function () {
-        DocumentMapDraw.changeMode("static");
-
-        const points = {
-          type: 'FeatureCollection',
-          features: props.drawing?.features.filter(feature => feature.geometry.type === 'Point')
-        };
-
-        
-        mapRef.current?.addSource('points', {
-          type: 'geojson',
-          data: points as FeatureCollection,
-          cluster: true,
-          clusterMaxZoom: 14,
-          clusterRadius: 20 
-        });
-
-        if(mapRef.current){
-        loadIcons(mapRef.current).then(() => {
-      
-          //POINTS-----------------------------------------------------------------
-          mapRef.current?.addLayer({
-                  id: 'points',
-                  type: 'circle',
-                  source: 'points',
-                  paint: {
-                    'circle-radius': 15,
-                    'circle-color': '#7499E8' ,
-                  }
-                });
-          
-          mapRef.current?.addLayer({
-            id: 'icon',
-            type: 'symbol',
-            source: 'points',
-            layout: {
-              'icon-image': ['get', 'icon'], 
-              'icon-size': 1,
-              'icon-padding': 1
-            }
-          });
-        }).catch(error => {
-                console.error('Errore nel caricamento delle icone:', error);
-        });
-      };
-
-      });
-
-      if (props.drawing) {
-        DocumentMapDraw.set(props.drawing);
-      }
+      mapRef.current.addControl(PreviewMapDraw, "bottom-right");
+      if (props.drawing) PreviewMapDraw.set(props.drawing);
     }
   }, [props.drawing]);
 
@@ -758,6 +698,36 @@ export const DocumentPageMap: React.FC<SatMapProps> = (props) => {
 
   return (
     <>
+      <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }} >
+        <Button
+          style={{
+            backgroundColor: "white",
+            color: "black",
+            borderColor: "transparent",
+          }}
+          className="ring-0"
+          icon={RiEditBoxLine}
+          onClick={() => setIsOpen(true)}
+        >
+        </Button>
+        <Dialog
+        open={isOpen}
+        onClose={(val) => setIsOpen(val)}
+        static={true}
+      >
+        <DialogPanel
+          className="p-0 overflow-hidden"
+          style={{ maxWidth: "100%" }}
+        >
+          <SatMap
+            drawing={drawing}
+            onCancel={() => setIsOpen(false)}
+            onDone={(v) => {props.setDrawing(v); setIsOpen(false); }}
+            style={{ minHeight: "95vh", width: "100%" }}
+          ></SatMap>
+        </DialogPanel>
+      </Dialog>
+      </div>
       <div
         className={props.className}
         ref={mapContainerRef}

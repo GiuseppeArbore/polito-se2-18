@@ -19,7 +19,8 @@ import List from "./list/List";
 import { Toaster } from "./toast/Toaster";
 import { toast } from "../utils/toaster";
 import { FeatureCollection } from "geojson";
-
+import { Link } from "react-router-dom";
+import { RiHome2Fill } from "@remixicon/react";
 export default function Console() {
   const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [selectedView, setSelectedView] = useState(0);
@@ -96,10 +97,20 @@ export default function Console() {
     }
   }, [selectedView, refreshNeeded]);
 
-
   return (
     <main>
-      <Title>Dashboard</Title>
+      <Title className="flex items-center">
+        <Link to="/">
+          {" "}
+          <span title="Return to Home">
+            <RiHome2Fill
+              className="text-black dark:text-white animate-pulse hover:scale-110 hover:shadow-lg transition-transform duration-300 pr-3"
+              size="32"
+            />
+          </span>
+        </Link>
+        Dashboard
+      </Title>
       <Text>Explore Kiruna</Text>
       <div className="flex items-stretch mt-6">
         <TabGroup
@@ -131,11 +142,16 @@ export default function Console() {
 
             <Card>
               <Metric>KIRUNA</Metric>
-              <Title>How to move a city</Title>
-              <Subtitle>Mapping the process of Kiruna relocation.</Subtitle>
+              <Title>Quick facts</Title>
               <Text>
-                Kiruna, a Swedish city, is being relocated in phases since 2010
-                to prevent damage from mining activities.
+                <ul className="list-disc list-inside">
+                <li>20,000 inhabitants</li>
+                <li>Located 140 km north of the Arctic Circle</li>
+                <li>Lowest recorded temperature -42 °C</li>
+                <li>45 days of Midnight Sun each year</li>
+                <li>21 days of Polar Night</li>
+                <li>Covered in snow for 8 months each year</li>
+                </ul>
               </Text>
             </Card>
             <Card className="hidden lg:block w-full h-40">
@@ -163,7 +179,6 @@ export default function Console() {
       <Toaster />
     </main>
   );
-
   function renderCurrentSelection(selectedView: number = 0) {
     switch (selectedView) {
       case 0:
@@ -213,3 +228,4 @@ export default function Console() {
     }
   }
 }
+
