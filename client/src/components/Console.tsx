@@ -31,7 +31,28 @@ export default function Console() {
     KxDocument[]
   >([]);
 
-
+  function getIconForType(type: string): string {
+    switch (type) {
+      case 'Informative Document':
+        return 'icon-InformativeDocument';
+      case 'Prescriptive Document':
+        return 'icon-PrescriptiveDocument';
+      case 'Design Document':
+        return 'icon-DesignDocument';
+      case 'Technical Document':
+        return 'icon-TechnicalDocument';
+      case 'Strategy':
+        return 'icon-Strategy';
+      case 'Agreement':
+        return 'icon-Agreement';
+      case 'Conflict Resolution':
+        return 'icon-ConflictResolution';
+      case 'Consultation':
+        return 'icon-Consultation';
+      default:
+        return 'default-icon';
+    }
+  }
   const drawing: FeatureCollection = {
     type: "FeatureCollection",
     features: pointOrAreaDocuments.map((doc) => ({
@@ -41,7 +62,8 @@ export default function Console() {
         title: doc.title,
         description: doc.description,
         id: doc._id,
-        type: doc.type
+        type: doc.type,
+        icon: getIconForType(doc.type)
       },
     })),
   };
