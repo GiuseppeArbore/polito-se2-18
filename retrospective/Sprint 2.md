@@ -12,7 +12,7 @@ Index:
 
 **Process Measures**
 
-For this sprint, the team selected **4 stories** to complete, with a total of **21 story points** planned and committed to by the end. The initial estimation made during the planning meeting was **78 hours 15 min**, while the actual time spent was **80 hours and 58 minutes**, completing the sprint slightly above the planned estimate.
+For this sprint, the team selected **4 stories** to complete, with a total of **21 story points** planned and committed to by the end. The initial estimation made during the planning meeting was **80 hours 15 min**, while the actual time spent was **80 hours and 58 minutes**, completing the sprint slightly above the planned estimate.
   
 **Sum-up**
 
