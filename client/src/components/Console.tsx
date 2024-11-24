@@ -5,11 +5,9 @@ import {
   Grid,
   Col,
   Metric,
-  Subtitle,
   TabGroup,
   TabList,
   Tab,
-  Button,
 } from "@tremor/react";
 import "../css/dashboard.css"
 import API from "../API";
@@ -22,7 +20,7 @@ import { Toaster } from "./toast/Toaster";
 import { toast } from "../utils/toaster";
 import { FeatureCollection } from "geojson";
 import { Link } from "react-router-dom";
-import { RiHome2Fill, RiEyeOffFill, RiLineFill, RiArrowRightSLine, RiArrowLeftSLine } from "@remixicon/react";
+import { RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine } from "@remixicon/react";
 export default function Console() {
   const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [selectedView, setSelectedView] = useState(0);
