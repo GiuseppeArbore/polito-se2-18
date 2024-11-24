@@ -145,7 +145,7 @@ export default function Console() {
             </Col>
             {!showSideBar &&
               <Col className="hider ml-2 hide-on-small">
-                <i className="h-full" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full"></RiArrowLeftSLine></i>
+                <i className="h-full" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full" role="Button"></RiArrowLeftSLine></i>
               </Col>
             }
           </div>
@@ -155,7 +155,7 @@ export default function Console() {
           <div className="flex flex-row ">
             {showSideBar &&
               <Col className="hider mr-1 hide-on-small">
-                <i className="h-full" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full"></RiArrowRightSLine></i>
+                <i className="h-full" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full" role="Button"></RiArrowRightSLine></i>
               </Col>
             }
             {(showSideBar || windowWidth <= 1024) &&
