@@ -9,6 +9,7 @@ import {
   TabGroup,
   TabList,
   Tab,
+  Button,
 } from "@tremor/react";
 import API from "../API";
 import { useState, useEffect } from "react";
@@ -20,7 +21,7 @@ import { Toaster } from "./toast/Toaster";
 import { toast } from "../utils/toaster";
 import { FeatureCollection } from "geojson";
 import { Link } from "react-router-dom";
-import { RiHome2Fill } from "@remixicon/react";
+import { RiHome2Fill, RiEyeOffFill, Ri } from "@remixicon/react";
 export default function Console() {
   const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [selectedView, setSelectedView] = useState(0);
@@ -97,6 +98,8 @@ export default function Console() {
     }
   }, [selectedView, refreshNeeded]);
 
+  const [showSideBar, setShowSideBar] = useState(true);
+
   return (
     <main>
       <Title className="flex items-center">
@@ -126,44 +129,56 @@ export default function Console() {
           </TabList>
         </TabGroup>
       </div>
+      {!showSideBar && <Button onClick={() => setShowSideBar(true)}>Show Sidebar</Button>}
+
+
+
       <Grid numItemsLg={6} className="gap-6 mt-6">
-        <Col numColSpanLg={5}>
-          <Card className="h-full p-0 m-0" style={{ margin: 0, padding: 0 }}>
+        <Col numColSpanLg={showSideBar ? 5 : 6}>
+
+            <Card className="h-full p-0 m-0" style={{ margin: 0, padding: 0, minHeight: "500px" }}>
             {renderCurrentSelection(selectedView)}
           </Card>
         </Col>
+        {showSideBar &&
+          <Col numColSpanLg={1}>
+            <Button onClick={() => setShowSideBar(false)}>Hide Sidebar</Button>
 
-        <Col numColSpanLg={1}>
-          <div className="space-y-6">
-            <FormDialog
-              documents={documents}
-              refresh={() => setRefreshNeeded(true)}
-            />
-
-            <Card>
-              <Metric>KIRUNA</Metric>
-              <Title>Quick facts</Title>
-              <Text>
-                <ul className="list-disc list-inside">
-                <li>20,000 inhabitants</li>
-                <li>Located 140 km north of the Arctic Circle</li>
-                <li>Lowest recorded temperature -42 °C</li>
-                <li>45 days of Midnight Sun each year</li>
-                <li>21 days of Polar Night</li>
-                <li>Covered in snow for 8 months each year</li>
-                </ul>
-              </Text>
-            </Card>
-            <Card className="hidden lg:block w-full h-40">
-              <img
-                src="/kiruna.png"
-                alt="Kiruna"
-                className="w-full h-full object-contain"
+            <div className="space-y-6">
+              <FormDialog
+                documents={documents}
+                refresh={() => setRefreshNeeded(true)}
               />
-            </Card>
-          </div>
-        </Col>
+
+              <Card>
+                <Metric>KIRUNA</Metric>
+                <Title>Quick facts</Title>
+                <Text>
+                  <ul className="list-disc list-inside">
+                    <li>20,000 inhabitants</li>
+                    <li>Located 140 km north of the Arctic Circle</li>
+                    <li>Lowest recorded temperature -42 °C</li>
+                    <li>45 days of Midnight Sun each year</li>
+                    <li>21 days of Polar Night</li>
+                    <li>Covered in snow for 8 months each year</li>
+                  </ul>
+                </Text>
+              </Card>
+              <Card className="hidden lg:block w-full h-40">
+                <img
+                  src="/kiruna.png"
+                  alt="Kiruna"
+                  className="w-full h-full object-contain"
+                />
+              </Card>
+            </div>
+          </Col>
+        }
+
       </Grid>
+
+
+
       <Card className="mt-6">
         <div
           style={{
