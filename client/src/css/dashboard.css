@@ -1,0 +1,16 @@
+.hider {
+    /*
+     * i need to change the color
+     */
+    background-color: lightblue; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+}
+
+@media (max-width: 1024px) {
+    .hide-on-small {
+      display: none;
+    }
+  }
