@@ -156,6 +156,7 @@ export default function Console() {
             {showSideBar &&
               <Col className="hider mr-1 hide-on-small" role="Button">
                 <i className="h-full" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full" ></RiArrowRightSLine></i>
+
               </Col>
             }
             {(showSideBar || windowWidth <= 1024) &&
