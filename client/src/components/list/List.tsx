@@ -148,6 +148,7 @@ function List(props: ListProps) {
     rowGroupPanelShow: "always",
     animateRows: true,
     pagination: false,
+    enableAdvancedFilter: true,
     defaultColDef: {
       filter: true,
       flex: 1,
