@@ -1,0 +1,14 @@
+.document-whole-municipality-style {
+    background-color: white;
+    color: #4A4A4A;
+    border: 1px solid #ccc;
+    padding: 1rem 1.5rem;
+    font-size: 0.875rem; 
+    border-radius: 0.5rem; 
+    box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.1);
+}
+.react-pdf__Page__canvas rpv-core__page-layer rpv-core__page-layer--single {
+    margin: 0 auto;
+    width: 100% !important;
+    height: 100% !important;
+}

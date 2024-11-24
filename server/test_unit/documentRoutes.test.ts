@@ -1,17 +1,25 @@
 import request from 'supertest';
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
 import { createKxDocument } from '../src/controller';
+import * as cnt from "../src/controller";
 import {app} from "../index";
+import { db } from '../src/db/dao'
 import { AreaType, KxDocumentType, Scale, Stakeholders } from '../src/models/enum';
 import { KIRUNA_COORDS } from '../src/utils';
 import { connections } from 'mongoose';
+import {get} from 'http';
+import { randomBytes } from 'crypto';
 
+const TEST_ID = "6738b18f8da44b335177509e";
+const TEST_FILENAME = "filename";
 
-jest.mock('../src/controller', () => ({
-    createKxDocument: jest.fn(),
-    getAllKxDocuments: jest.fn()
-}));
+jest.mock('../src/controller');
+jest.mock("@aws-sdk/client-s3");
+jest.mock("@aws-sdk/s3-request-presigner");
 
+afterAll(async () => {
+    await db.disconnectFromDB();
+});
 
 describe('Document Routes', () => {
     beforeEach(() => {
@@ -67,8 +75,6 @@ describe('Document Routes', () => {
         expect(response.body).toHaveProperty('_id', '12345');
         expect(response.body.title).toBe('Unit Test Document');
     });
-
-   
 
     test('Test 2 - POST /api/documents - should return error 400 (missing title)', async () => {
 
@@ -168,5 +174,53 @@ describe('Document Routes', () => {
         expect(response.status).toBe(400);
         expect(response.body.errors[0].msg).toBe('Invalid connections');}
     );
+
+    test('Test 7 - POST /api/documents/:id/attachments - nominal case', async () => {
+        jest.spyOn(cnt, "handleFileUpload").mockImplementation(
+            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+                res.status(201).send();
+                return;
+            })
+        );
+        const file = Buffer.from("test data");
+        const response = await request(app)
+            .post(`/api/documents/${TEST_ID}/attachments`)
+            .attach("attachments", file, TEST_FILENAME);
+
+        expect(response.status).toBe(201);
+        expect(cnt.handleFileUpload).toHaveBeenCalledTimes(1);
+    });
+
+    test('Test 8 - POST /api/documents/:id/attachments - invalid id', async () => {
+        jest.spyOn(cnt, "handleFileUpload").mockImplementation(
+            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+                res.status(201).send();
+                return;
+            })
+        );
+        const file = Buffer.from("test data");
+        const response = await request(app)
+            .post(`/api/documents/nonvalidid/attachments`)
+            .attach("attachments", file, TEST_FILENAME);
+
+        expect(response.status).toBe(400);
+        expect(cnt.handleFileUpload).toHaveBeenCalledTimes(0);
+    });
+
+    test('Test 9 - POST /api/documents/:id/attachments - file too big', async () => {
+        jest.spyOn(cnt, "handleFileUpload").mockImplementation(
+            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+                res.status(201).send();
+                return;
+            })
+        );
+        const file = randomBytes(11 * 1024 * 1024);
+        const response = await request(app)
+            .post(`/api/documents/${TEST_ID}/attachments`)
+            .attach("attachments", file, TEST_FILENAME);
+
+        expect(response.status).toBe(500);
+        expect(cnt.handleFileUpload).toHaveBeenCalledTimes(0);
+    });
 
 });

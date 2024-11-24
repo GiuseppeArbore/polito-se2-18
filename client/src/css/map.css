@@ -1,0 +1,27 @@
+.button-whole-Kiruna {
+    background-color: white;
+    color: #4A4A4A;
+    border: 1px solid #ccc;
+    position: absolute;
+    top: 0.625rem;
+    left: 0.625rem;
+    z-index: 1;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.button-whole-Kiruna:hover {
+    background-color: #f0f0f0;
+    border-color: #b0b0b0; 
+}
+
+.popup-content {
+    display: inline-block;
+    padding: 10px;
+    min-width: 100px;
+    max-width: 100%;
+    word-wrap: break-word;
+  }
