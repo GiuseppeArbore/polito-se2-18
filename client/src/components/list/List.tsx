@@ -1,5 +1,5 @@
 import "ag-grid-enterprise";
-import { ColDef, GridOptions } from "ag-grid-enterprise";
+import { AdvancedFilterModel, ColDef, GridOptions } from "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -13,9 +13,13 @@ import locales from "../../locales.json";
 import API from "../../API";
 import DeleteDialog from "./DeleteDialog";
 import { Stakeholders } from "../../enum";
+import { prop } from "@typegoose/typegoose";
 
 interface ListProps {
   documents: KxDocument[];
+  updateDocuments: (documents: KxDocument[]) => void;
+  updateFilterModel: (filterModel: AdvancedFilterModel | undefined) => void;
+  filterModel: AdvancedFilterModel | undefined;
 }
 
 function List(props: ListProps) {
@@ -155,6 +159,7 @@ function List(props: ListProps) {
       resizable: true,
       sortable: true,
       enableRowGroup: true,
+      filterParams: {newRowsAction: 'keep'}
     },
     sideBar: {
       toolPanels: [
@@ -192,8 +197,22 @@ function List(props: ListProps) {
     return props.documents;
   }, [props.documents]);
 
-  const defaultColDef: ColDef = {};
+  function onFilterChanged() {
+    let rowData: (KxDocument | undefined)[] = [];
+    gridRef.current?.api?.forEachNodeAfterFilter((node) => {
+      rowData.push(node.data)
+    });
+    props.updateDocuments(rowData.filter((doc): doc is KxDocument => doc !== undefined));
+    props.updateFilterModel(gridRef.current?.api?.getAdvancedFilterModel() || undefined);
+  }
+  function addFilterModel() {
+    if(props.filterModel) {
+      gridRef.current?.api?.setAdvancedFilterModel(props.filterModel);
+    } else {
+     props.updateFilterModel(undefined);
+    }
 
+  }
   return (
     <Card className="p-4">
       <Text className="mb-4 text-center">Document</Text>
@@ -202,6 +221,7 @@ function List(props: ListProps) {
         style={{ width: "100%", height: "70vh", overflow: "auto" }}
       >
         <AgGridReact
+          onViewportChanged={addFilterModel}
           onGridColumnsChanged={onGridReady}
           rowData={rowData}
           onFirstDataRendered={onFirstDataRendered}
@@ -209,6 +229,7 @@ function List(props: ListProps) {
           onGridReady={onGridReady}
           ref={gridRef}
           animateRows={true}
+          onFilterChanged={onFilterChanged}
         />
       </div>
 
