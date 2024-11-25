@@ -207,6 +207,7 @@ export default function Console() {
         return (
           <>
             <div
+              className="ring-0 shadow-none"
               style={{
                 display: "flex",
                 justifyContent: "center",

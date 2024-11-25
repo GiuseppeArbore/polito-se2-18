@@ -214,10 +214,9 @@ function List(props: ListProps) {
 
   }
   return (
-    <Card className="p-4">
-      <Text className="mb-4 text-center">Document</Text>
+    <>
       <div
-        className={"ag-theme-quartz-auto-dark"}
+        className={"ag-theme-quartz-auto-dark right-0 left-0 ring-0"}
         style={{ width: "100%", height: "70vh", overflow: "auto" }}
       >
         <AgGridReact
@@ -259,7 +258,7 @@ function List(props: ListProps) {
         },
         rowNode.current?.title
       )}
-    </Card>
+    </>
   );
 }
 
