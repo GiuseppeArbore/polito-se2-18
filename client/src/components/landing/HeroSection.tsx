@@ -34,14 +34,6 @@ const HeroSection: React.FC = () => {
             <div>
               <TextInput placeholder="Type password here" type="password" />
             </div>
-            <div className="mb-4 text-center font-mono text-sm text-slate-500">
-              Select your role
-            </div>
-            <Select defaultValue="1">
-              <SelectItem value="1">Urban Planner</SelectItem>
-              <SelectItem value="2">Resident</SelectItem>
-              <SelectItem value="3">Visitor</SelectItem>  // I don't know if we really need this
-            </Select>
           </div>
 
           <div className="mt-8 flex items-center justify-end space-x-2">
