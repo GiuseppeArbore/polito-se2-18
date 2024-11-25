@@ -6,9 +6,8 @@ import {app} from "../index";
 import { db } from '../src/db/dao'
 import { AreaType, KxDocumentType, Scale, Stakeholders } from '../src/models/enum';
 import { KIRUNA_COORDS } from '../src/utils';
-import { connections } from 'mongoose';
-import {get} from 'http';
 import { randomBytes } from 'crypto';
+import { isUrbanPlanner } from '../src/auth';
 
 const TEST_ID = "6738b18f8da44b335177509e";
 const TEST_FILENAME = "filename";
@@ -16,6 +15,12 @@ const TEST_FILENAME = "filename";
 jest.mock('../src/controller');
 jest.mock("@aws-sdk/client-s3");
 jest.mock("@aws-sdk/s3-request-presigner");
+jest.mock("../src/auth", () => ({
+    ...jest.requireActual("../src/auth"),
+    isUrbanPlanner: jest.fn((_req, _res, next) => {
+        next();
+    })
+}))
 
 afterAll(async () => {
     await db.disconnectFromDB();

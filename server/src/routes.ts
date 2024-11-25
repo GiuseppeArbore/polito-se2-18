@@ -9,6 +9,7 @@ import multer from 'multer';
 import * as mime from 'mime-types';
 import { randomBytes } from 'crypto';
 import { mkdir } from 'fs/promises';
+import { isUrbanPlanner } from './auth';
 
 export function initRoutes(app: Application) {
 
@@ -81,6 +82,7 @@ export function initRoutes(app: Application) {
 
     app.post(
         '/api/documents',
+        isUrbanPlanner,
         kxDocumentValidationChain,
         validateRequest,
         createKxDocument
@@ -88,6 +90,7 @@ export function initRoutes(app: Application) {
 
     app.post(
         '/api/documents/:id/attachments',
+        isUrbanPlanner,
         [
             param("id").notEmpty().withMessage("Missing id").isString().isHexadecimal().withMessage("Invalid id")
         ],
@@ -130,9 +133,13 @@ export function initRoutes(app: Application) {
         getPresignedUrlForAttachment
     );
 
-    app.delete('/api/documents/:id', deleteKxDocument);
+    app.delete('/api/documents/:id',
+        isUrbanPlanner,
+        deleteKxDocument
+    );
 
     app.put('/api/documents/:id/description',
+        isUrbanPlanner,
         [
             param("id").notEmpty().withMessage("id is required"),
             body("description").notEmpty().withMessage("description is required"),
@@ -142,6 +149,7 @@ export function initRoutes(app: Application) {
     );
 
     app.put('/api/documents/:id/info',
+        isUrbanPlanner,
         [
             param("id").notEmpty().withMessage("id is required"),
             body("title").optional(),
@@ -155,8 +163,6 @@ export function initRoutes(app: Application) {
         validateRequest,
         updateKxDocumentInfo
     )
-
-
 }
 
 export default initRoutes;

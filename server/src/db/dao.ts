@@ -2,6 +2,7 @@ import { DocInfo, KxDocument } from "../models/model";
 import { KxDocumentModel } from "../models/model";
 import { mongoose } from "@typegoose/typegoose";
 import dotenv from 'dotenv'; 
+import { User, UserModel } from "../models/user";
 
 
 class DAO {
@@ -40,7 +41,17 @@ class DAO {
             console.error('Error disconnecting from the database', error);
         }
     }
-
+    async getUserByEmail(email: string): Promise<User | null> {
+        const res = await UserModel.findOne().where("email").equals(email).exec();
+        return this.fromResultToUser(res);
+    }
+    async deleteUser(id: mongoose.Types.ObjectId): Promise<boolean> {
+        const result = await UserModel.deleteOne({_id: id}).exec();
+        if (result.deletedCount === 1) {
+            return true;
+        }
+        return false;
+    }
     async getKxDocumentById(id: mongoose.Types.ObjectId): Promise<KxDocument | null> {
         const result = await KxDocumentModel.find().where("_id").equals(id).exec();
         if (result.length > 0) {
@@ -127,6 +138,15 @@ class DAO {
             return null;
 
         return await this.getKxDocumentById(id);
+    }
+    private fromResultToUser(result: any | null): User | null {
+        return result && {
+            _id: result._id,
+            email: result.email,
+            password: result.password,
+            salt: result.salt,
+            role: result.role
+        }
     }
     private fromResultToKxDocument(result: any): KxDocument {
         return {
