@@ -1,5 +1,5 @@
 
-import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription, handleFileUpload} from './controller';
+import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription, handleFileUpload, removeAttachmentFromDocument} from './controller';
 import { validateRequest } from './errorHandlers';
 import e, { Application, NextFunction, Request, Response } from 'express';
 import { body, param } from 'express-validator';
@@ -97,6 +97,17 @@ export function initRoutes(app: Application) {
         validateRequest,
         upload.array("attachments", 10),
         handleFileUpload
+    );
+
+    app.delete(
+        '/api/documents/:id/attachments/:fileName',
+        isUrbanPlanner,
+        [
+            param("id").notEmpty().withMessage("Missing id").isString().isHexadecimal().withMessage("Invalid id"),
+            param("fileName").notEmpty().withMessage("Missing file name").isString().withMessage("Invalid file name")
+        ],
+        validateRequest,
+        removeAttachmentFromDocument
     );
 
     app.get('/api/documents', getAllKxDocuments);
