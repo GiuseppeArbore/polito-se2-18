@@ -12,7 +12,11 @@ import { isUrbanPlanner } from '../src/auth';
 const TEST_ID = "6738b18f8da44b335177509e";
 const TEST_FILENAME = "filename";
 
-jest.mock('../src/controller');
+jest.mock('../src/controller', () => ({
+    ...jest.requireActual("../src/controller"),
+    createKxDocument: jest.fn(),
+    handleFileUpload: jest.fn()
+}));
 jest.mock("@aws-sdk/client-s3");
 jest.mock("@aws-sdk/s3-request-presigner");
 jest.mock("../src/auth", () => ({
@@ -20,13 +24,13 @@ jest.mock("../src/auth", () => ({
     isUrbanPlanner: jest.fn((_req, _res, next) => {
         next();
     })
-}))
-
-afterAll(async () => {
-    await db.disconnectFromDB();
-});
+}));
 
 describe('Document Routes', () => {
+    afterAll(async () => {
+        await db.disconnectFromDB();
+    });
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
