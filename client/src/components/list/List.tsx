@@ -1,5 +1,5 @@
 import "ag-grid-enterprise";
-import { AdvancedFilterModel, ColDef, GridOptions } from "ag-grid-enterprise";
+import { AdvancedFilterModel, ColDef, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -95,6 +95,9 @@ function List(props: ListProps) {
     {
       headerName: "Issuance Date",
       field: "issuance_date",
+      filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
+        return params.data && new Date(params.data.issuance_date).toLocaleDateString() || "";
+      },
       valueFormatter: (params: { value: string | number }) => {
         return params.value !== undefined
           ? new Date(params.value).toLocaleDateString()
@@ -124,6 +127,9 @@ function List(props: ListProps) {
       field: "language",
       enableRowGroup: true,
       filter: true,
+      filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
+        return locales.find((l) => params.data && l.code === params.data.language)?.name;
+      },
       valueFormatter: (params: { value: string | number }) => {
         return locales.find((l) => l.code === params.value)?.name || "";
       },
@@ -140,6 +146,7 @@ function List(props: ListProps) {
       minWidth: 30,
       enableRowGroup: false,
       cellRenderer: (params: any) => infoButton(params),
+      filter: false,
     },
   ];
 
