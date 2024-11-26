@@ -186,7 +186,6 @@ function List(props: ListProps) {
   function onGridReady() {
     const allColumnIds: string[] = [];
     gridRef.current!.api!.getAllGridColumns()!.forEach((column) => {
-      console.log("col: ", column);
       allColumnIds.push(column.getId());
     });
     gridRef.current!.api!.autoSizeColumns(allColumnIds, false);
