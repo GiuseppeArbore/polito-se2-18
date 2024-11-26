@@ -194,7 +194,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           const pointId = `point-${id}`;
           const layerId = `drawings-layer-${id}`;
           const borderLayerId = `drawings-border-layer-${id}`;
-          const highlightLayerId = `drawings-highlight-layer-${id}`;
           const circleLayerId = `drawings-circle-layer-${id}`;
         
           // Add the main fill layer
@@ -208,7 +207,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             layout: {},
             paint: {
               'fill-color': documentAreaColorMapping, // Assuming documentColorMapping is an object mapping feature IDs to colors
-              'fill-opacity': 0.3,
+              'fill-opacity': 0,
             },
           });
         
@@ -223,49 +222,15 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             layout: {},
             paint: {
               'line-color': documentBorderColorMapping, // Border color
-              'line-width': 3,
+              'line-width': 0,
             },
           });
-        
-          // Add the highlight layer
-          mapRef.current?.addLayer({
-            id: highlightLayerId,
-            type: 'line',
-            source: {
-              type: 'geojson',
-              data: feature,
-            },
-            layout: {},
-            paint: {
-              'line-color': documentBorderColorMapping,
-              'line-width': 3,
-              'line-opacity': 0, // Initially hidden
-            },
-          });
-          
-          // Add mouse enter and leave events
-          mapRef.current?.on('mouseenter', layerId, () => {
-            mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.6);
-            mapRef.current?.setPaintProperty(highlightLayerId, 'line-opacity', 1);
-           // mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
-            mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 2);
-            mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 25);
 
-
-          });
-        
-          mapRef.current?.on('mouseleave', layerId, () => {
-            mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.3);
-            mapRef.current?.setPaintProperty(highlightLayerId, 'line-opacity', 0);
-          //mapRef.current?.setLayoutProperty(pointId, 'icon-size', 1);
-            mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 1);
-            mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 15);
-
-          });
+         
         });
 
       //CLUSTERS---------------------------------------------------------
-      const offsetDistance = 0.0001; // Distanza di offset
+      const offsetDistance = 0.0001; // offsetDistance
 
       const pointsAndCentroids: FeatureCollection<Geometry, GeoJsonProperties> = {
         type: 'FeatureCollection',
@@ -494,6 +459,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
               const pointId = `point-${id}`;
               const layerId = `drawings-layer-${id}`;
               const circleLayerId = `drawings-circle-layer-${id}`;
+              const borderLayerId = `drawings-border-layer-${id}`;
         
               if (!mapRef.current?.getLayer(pointId)) {
                 
@@ -542,9 +508,10 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                   mapRef.current.getCanvas().style.cursor = 'pointer';
                 }
                 popup.addTo(mapRef.current!);
-               // mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
                 mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 2);
                 mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 25);
+                mapRef.current?.setPaintProperty(borderLayerId, 'line-width', 3);
+                mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.5);
               });
         
               mapRef.current?.on('mouseleave', pointId, () => {
@@ -552,19 +519,13 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                   mapRef.current.getCanvas().style.cursor = '';
                 }
                 popup.remove();
-                //mapRef.current?.setLayoutProperty(pointId, 'icon-size', 1);
                 mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 1);
                 mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 15);
+                mapRef.current?.setPaintProperty(borderLayerId, 'line-width', 0);
+                mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0);
               });
         
-              mapRef.current?.on('mousemove', (e: any) => {
-                const features = mapRef.current?.queryRenderedFeatures(e.point, { layers: [layerId] });
-                const hasFeatures = features && features.length > 0;
-                if (hasFeatures) {
-                 // mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
-                  mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 25);
-                }
-              });
+             
         
               mapRef.current?.on('click', pointId, () => {
                 window.location.href = `/documents/${id}`;
