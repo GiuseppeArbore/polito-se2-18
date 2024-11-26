@@ -87,6 +87,7 @@ function List(props: ListProps) {
           ? "1:" + params.value.toLocaleString()
           : "";
       },
+      hide: true,
     },
     {
       headerName: "Issuance Date",
@@ -96,6 +97,7 @@ function List(props: ListProps) {
           ? new Date(params.value).toLocaleDateString()
           : "";
       },
+      hide: true,
     },
     {
       headerName: "Area Type",
@@ -123,12 +125,14 @@ function List(props: ListProps) {
       valueFormatter: (params: { value: string | number }) => {
         return locales.find((l) => l.code === params.value)?.name || "";
       },
+      hide: true,
     },
     {
       headerName: "Pages",
       field: "pages",
       enableRowGroup: false,
       filter: true,
+      hide: true,
     },
     {
       headerName: "Controls",
@@ -182,6 +186,7 @@ function List(props: ListProps) {
   function onGridReady() {
     const allColumnIds: string[] = [];
     gridRef.current!.api!.getAllGridColumns()!.forEach((column) => {
+      console.log("col: ", column);
       allColumnIds.push(column.getId());
     });
     gridRef.current!.api!.autoSizeColumns(allColumnIds, false);
