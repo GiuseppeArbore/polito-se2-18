@@ -4,6 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AllGeoJSON, featureCollection, area, pointOnFeature,centroid } from "@turf/turf";
 import  { documentAreaColorMapping,documentBorderColorMapping } from "./documentcolors";
 import {loadIcons} from "./imagesLoader";
+import {Kiruna} from "./KirunaMunicipality"
 import {
   Button,
   Card,
@@ -61,6 +62,7 @@ export interface SatMapProps {
   entireMunicipalityDocuments?: KxDocument[];
 }
 
+
 const defaultZoom = 12;
 const center: LngLatLike = [20.26, 67.845];
 
@@ -97,7 +99,8 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
         interactive: false,
       });
       mapRef.current.addControl(PreviewMapDraw, "bottom-right");
-     
+
+      
       if (props.drawing) PreviewMapDraw.set(props.drawing);
     }
   }, [props.drawing]);
@@ -125,6 +128,15 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
 export const DashboardMap: React.FC<SatMapProps> = (props) => {
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const [isKirunaVisible, setIsKirunaVisible] = useState(true);
+
+    const toggleKirunaVisibility = () => {
+    if (mapRef.current) {
+      const visibility = isKirunaVisible ? 'none' : 'visible';
+      mapRef.current.setLayoutProperty('Kiruna-fill', 'visibility', visibility);
+      setIsKirunaVisible(!isKirunaVisible);
+    }
+  };
 
   useEffect(() => {
     if (mapRef.current) return;
@@ -171,7 +183,35 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       mapRef.current?.on("load", function () {
         if(mapRef.current){
         loadIcons(mapRef.current).then(() => {
+        //KIRUNA-----------------------------------------------------
+        mapRef.current?.addSource('Kiruna', {
+          type: 'geojson',
+          data: Kiruna as FeatureCollection,
+        });
+        
+        // Aggiungi un layer per visualizzare l'area
+        mapRef.current?.addLayer({
+          id: "Kiruna-fill",
+          type: 'fill',
+          source: "Kiruna",
+          paint: {
+            'fill-color': '#745296',
+            'fill-opacity': 0.5,
+          },
+        });
+        
+        // Aggiungi un layer per visualizzare il bordo
+        mapRef.current?.addLayer({
+          id: "Kiruna-line",
+          type: 'line',
+          source: "Kiruna",
+          paint: {
+            'line-color': '#745296',
+            'line-width': 2,
+          },
+        });
         //AREA-------------------------------------------------------
+        
         const sortedDrawing = props.drawing
         ? featureCollection(
             props.drawing.features.sort((a, b) => {
@@ -604,6 +644,13 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           touchAction: "auto",
         }}
       />
+    
+     
+      <Button className = "Kiruna-area-button"onClick={toggleKirunaVisibility}>
+        {isKirunaVisible ? 'Hide Kiruna Area' : 'Show Kiruna Area'}
+      </Button>
+      
+
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button className="button-whole-Kiruna" variant="primary">
@@ -698,7 +745,7 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
 
   return (
     <>
-      <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }} >
+        <div>
         <Button
           style={{
             backgroundColor: "white",
@@ -1066,6 +1113,34 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
       setTmpDrawing({ type: "FeatureCollection", features: e.features });
     });
 
+    mapRef.current?.on("load", function () {
+      //KIRUNA-----------------------------------------------------
+      mapRef.current?.addSource('Kiruna', {
+        type: 'geojson',
+        data: Kiruna as FeatureCollection,
+      });
+
+      // Aggiungi un layer per visualizzare l'area
+      mapRef.current?.addLayer({
+        id: "Kiruna-fill",
+        type: 'fill',
+        source: "Kiruna",
+        paint: {
+          'fill-color': '#745296',
+          'fill-opacity': 0.2,
+        },
+      });
+
+      mapRef.current?.addLayer({
+        id: "Kiruna-line",
+        type: 'line',
+        source: "Kiruna",
+        paint: {
+          'line-color': '#745296',
+          'line-width': 4,
+        },
+      });
+    });
     if (props.drawing) {
       PreviewMapDraw.set(props.drawing);
     }
