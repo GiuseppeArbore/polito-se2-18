@@ -1,0 +1,39 @@
+
+.process-carousel {
+    width: 100%;
+    max-width: 800px; 
+    margin: auto;
+  }
+  
+  .swiper-container {
+    padding: 20px 0;
+  }
+  
+  .swiper-slide {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+  }
+  
+  .swiper-slide h3 {
+    font-size: 1.5em;
+    margin-bottom: 10px;
+  }
+  
+  .swiper-slide p {
+    font-size: 1em;
+    color: #666;
+  }
+  
+  .swiper-pagination {
+    margin-top: 10px;
+  }
+  
+  .swiper-button-next,
+  .swiper-button-prev {
+    color: #726e6e; 
+  }
+
+  

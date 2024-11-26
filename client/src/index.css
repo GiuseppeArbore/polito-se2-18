@@ -81,6 +81,17 @@ body {
   font-size: 2rem;
   margin-bottom: 10px;
 }
+.phases-section {
+  padding: 40px 20px;
+  width: 100%;
+  background-color: #023883;
+}
+
+.phases-section h2 {
+  font-size: 2rem;
+  margin-bottom: 15px;
+  text-align: center;
+}
 
 .footer {
   padding: 20px;
@@ -106,7 +117,6 @@ body {
 .custom-blink {
   animation: blink 1s infinite ease-in-out;
 }
-
   /* Styles for Landing page - End */
   
 
