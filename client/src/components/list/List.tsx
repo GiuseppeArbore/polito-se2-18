@@ -168,6 +168,15 @@ function List(props: ListProps) {
       enableRowGroup: true,
       filterParams: {newRowsAction: 'keep'}
     },
+    statusBar: {
+      statusPanels: [
+          { statusPanel: 'agTotalAndFilteredRowCountComponent' },
+          { statusPanel: 'agTotalRowCountComponent' },
+          { statusPanel: 'agFilteredRowCountComponent' },
+          { statusPanel: 'agSelectedRowCountComponent' },
+          { statusPanel: 'agAggregationComponent' }
+      ]
+  },
     sideBar: {
       toolPanels: [
         {
