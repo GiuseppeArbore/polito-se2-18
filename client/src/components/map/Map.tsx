@@ -255,9 +255,10 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             const pointOffsetX = (Math.random() - 0.5) * offsetDistance;
             const pointOffsetY = (Math.random() - 0.5) * offsetDistance;
             feature.geometry.coordinates = [pointCoordinates[0] + pointOffsetX, pointCoordinates[1] + pointOffsetY];
+            updatedFeatures.push(feature);
           }
       
-          updatedFeatures.push(feature);
+          
       
           return updatedFeatures;
         }) || []
@@ -629,10 +630,9 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
       interactive: true,
     });
     mapRef.current.addControl(PreviewMapDraw, "bottom-right");
-    if (props.drawing) PreviewMapDraw.set(props.drawing);
   }, [mapContainerRef.current]);
 
-  useMemo(() => {
+  useEffect(() => {
     if (props.drawing) {
       mapRef.current?.remove();
       mapRef.current = null;
@@ -645,8 +645,140 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
         interactive: false,
       });
 
-      mapRef.current.addControl(PreviewMapDraw, "bottom-right");
-      if (props.drawing) PreviewMapDraw.set(props.drawing);
+      mapRef.current?.on("load", function () {
+        if (mapRef.current) {
+          mapRef.current.addControl(PreviewMapDraw, "bottom-right");
+          loadIcons(mapRef.current).then(() => {
+
+            const offsetDistance = 0.0001; // offsetDistance
+            const pointsAndCentroids: FeatureCollection<Geometry, GeoJsonProperties> = {
+              type: 'FeatureCollection',
+              features: props.drawing?.features.flatMap<Feature<Geometry, GeoJsonProperties>>(feature => {
+                let updatedFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
+
+                if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
+                  let centroid = pointOnFeature(feature as AllGeoJSON);
+                  centroid.properties = { ...feature.properties, isCentroid: true }; // Add isCentroid property
+
+                  if (!centroid.geometry) return [];
+                  const centroidCoordinates = centroid.geometry.coordinates as [number, number];
+                  const centroidOffsetX = (Math.random() - 0.5) * offsetDistance;
+                  const centroidOffsetY = (Math.random() - 0.5) * offsetDistance;
+                  centroid.geometry.coordinates = [centroidCoordinates[0] + centroidOffsetX, centroidCoordinates[1] + centroidOffsetY];
+
+                  updatedFeatures.push(centroid as Feature<Geometry, GeoJsonProperties>);
+                }
+
+                if (feature.geometry.type === 'Point') {
+                  const pointCoordinates = feature.geometry.coordinates as [number, number];
+                  const pointOffsetX = (Math.random() - 0.5) * offsetDistance;
+                  const pointOffsetY = (Math.random() - 0.5) * offsetDistance;
+                  feature.geometry.coordinates = [pointCoordinates[0] + pointOffsetX, pointCoordinates[1] + pointOffsetY];
+                  updatedFeatures.push(feature);
+                }
+
+                
+
+                return updatedFeatures;
+              }) || []
+            };
+//AREA----------------------------------------------------------------
+            mapRef.current?.addSource('drawings', {
+              type: 'geojson',
+              data: props.drawing as FeatureCollection,
+            });
+    
+            props.drawing?.features.forEach((feature, index) => {
+              const id = feature.properties?.id;  
+              const pointId = `point-${id}`;
+              const layerId = `drawings-layer-${id}`;
+              const borderLayerId = `drawings-border-layer-${id}`;
+              const circleLayerId = `drawings-circle-layer-${id}`;
+            
+              // Add the main fill layer
+              mapRef.current?.addLayer({
+                id: layerId,
+                type: 'fill',
+                source: {
+                  type: 'geojson',
+                  data: feature,
+                },
+                layout: {},
+                paint: {
+                  'fill-color': documentAreaColorMapping, // Assuming documentColorMapping is an object mapping feature IDs to colors
+                  'fill-opacity': 0.5,
+                },
+              });
+            
+              // Add the border layer
+              mapRef.current?.addLayer({
+                id: borderLayerId,
+                type: 'line',
+                source: {
+                  type: 'geojson',
+                  data: feature,
+                },
+                layout: {},
+                paint: {
+                  'line-color': documentBorderColorMapping, // Border color
+                  'line-width': 3,
+                },
+              });
+    
+             
+            });
+//PUNTI--------------------------------------------------------
+            mapRef.current?.addSource('pointsAndCentroids', {
+              type: 'geojson',
+              data: pointsAndCentroids as FeatureCollection,
+            });
+            pointsAndCentroids.features?.forEach((feature, index) => {
+              const id = feature.properties?.id;
+              const pointId = `point-${id}`;
+              const layerId = `drawings-layer-${id}`;
+              const circleLayerId = `drawings-circle-layer-${id}`;
+              const borderLayerId = `drawings-border-layer-${id}`;
+        
+              if (!mapRef.current?.getLayer(pointId)) {
+                
+                mapRef.current?.addLayer({
+                  id: circleLayerId,
+                  type: 'circle',
+                  source: 'pointsAndCentroids',
+                  paint: {
+                    'circle-radius': 15,
+                    'circle-color': [
+                      'case',
+                      ['==', ['get', 'isCentroid'], true], // Check if the feature is a centroid
+                      '#ffffff',
+                      '#7499E8'  
+                    ],
+                  },
+                  filter: ['==', ['get', 'id'], feature.properties?.id]
+                });
+                
+                mapRef.current?.addLayer({
+                  id: pointId,
+                  type: 'symbol',
+                  source: 'pointsAndCentroids',
+                  filter: ['==', ['get', 'id'], id],
+                  layout: {
+                    'icon-image': ['get', 'icon'], // Use the 'icon' property from the dataset
+                    'icon-size': 1,
+                    'icon-padding': 1.5 // Increase the clickable area
+                  }
+                });
+                
+              }
+            });
+
+          }).catch(error => {
+            console.error('Errore nel caricamento delle icone:', error);
+          });
+        }
+      });
+
+
     }
   }, [props.drawing]);
 
