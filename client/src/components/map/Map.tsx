@@ -128,7 +128,7 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
 export const DashboardMap: React.FC<SatMapProps> = (props) => {
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
-  const [isKirunaVisible, setIsKirunaVisible] = useState(true);
+  const [isKirunaVisible, setIsKirunaVisible] = useState(false);
 
     const toggleKirunaVisibility = () => {
     if (mapRef.current) {
@@ -194,6 +194,9 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           id: "Kiruna-fill",
           type: 'fill',
           source: "Kiruna",
+          layout: {
+            'visibility': 'none'
+          },
           paint: {
             'fill-color': '#745296',
             'fill-opacity': 0.5,
