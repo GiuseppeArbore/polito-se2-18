@@ -16,6 +16,7 @@ import { Stakeholders } from "../../enum";
 
 interface ListProps {
   documents: KxDocument[];
+  quickFilter: string;
 }
 
 function List(props: ListProps) {
@@ -208,6 +209,7 @@ function List(props: ListProps) {
           onGridReady={onGridReady}
           ref={gridRef}
           animateRows={true}
+          quickFilterText={props.quickFilter}
         />
       </div>
 

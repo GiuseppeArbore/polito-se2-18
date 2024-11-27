@@ -9,6 +9,7 @@ import {
   TabGroup,
   TabList,
   Tab,
+  TextInput,
 } from "@tremor/react";
 import API from "../API";
 import { useState, useEffect } from "react";
@@ -20,8 +21,9 @@ import { Toaster } from "./toast/Toaster";
 import { toast } from "../utils/toaster";
 import { FeatureCollection } from "geojson";
 import { Link } from "react-router-dom";
-import { RiHome2Fill } from "@remixicon/react";
+import { RiHome2Fill, RiSearchLine } from "@remixicon/react";
 export default function Console() {
+  const [quickFilterText, setQuickFilterText] = useState('');
   const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [selectedView, setSelectedView] = useState(0);
   const [refreshNeeded, setRefreshNeeded] = useState(true);
@@ -139,7 +141,15 @@ export default function Console() {
               documents={documents}
               refresh={() => setRefreshNeeded(true)}
             />
-
+            
+           <TextInput
+           icon={RiSearchLine}
+           id="quickFilter"
+              placeholder="Search..."
+              className="w-full"
+              value={quickFilterText}
+              onValueChange={(e) => setQuickFilterText(e)}
+           ></TextInput>
             <Card>
               <Metric>KIRUNA</Metric>
               <Title>Quick facts</Title>
@@ -154,13 +164,7 @@ export default function Console() {
                 </ul>
               </Text>
             </Card>
-            <Card className="hidden lg:block w-full h-40">
-              <img
-                src="/kiruna.png"
-                alt="Kiruna"
-                className="w-full h-full object-contain"
-              />
-            </Card>
+            
           </div>
         </Col>
       </Grid>
@@ -184,6 +188,7 @@ export default function Console() {
       case 0:
         return (
           <>
+          
             <DashboardMap
               style={{
                 margin: 0,
@@ -208,7 +213,7 @@ export default function Console() {
                 height: "100%",
               }}
             >
-              <List documents={documents} />
+              <List documents={documents} quickFilter={quickFilterText} />
             </div>
           </>
         );
