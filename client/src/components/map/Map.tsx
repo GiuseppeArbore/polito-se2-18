@@ -36,7 +36,6 @@ import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { Feature, FeatureCollection, Position, Polygon, MultiPolygon, Geometry, Point, GeoJsonProperties } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
-import { coordDistance } from "../../utils";
 import { KxDocument } from "../../model";
 import {
   DropdownMenu,

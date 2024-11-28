@@ -9,6 +9,9 @@ import multer from 'multer';
 import * as mime from 'mime-types';
 import { randomBytes } from 'crypto';
 import { mkdir } from 'fs/promises';
+import kirunaPolygon from './KirunaMunicipality.json';
+import { booleanPointInPolygon } from '@turf/turf';
+import { Feature, Polygon, MultiPolygon} from "geojson";
 
 export function initRoutes(app: Application) {
 
@@ -28,12 +31,13 @@ export function initRoutes(app: Application) {
             .isString().withMessage('Language must be a string'),
         body('doc_coordinates').notEmpty().withMessage('Document coordinates are required').isObject()
             .custom((v) => {
+                const poly = kirunaPolygon.features[0] as Feature<Polygon | MultiPolygon>;
                 return isDocCoords(v) &&  
-                    (
-                        (v.type === AreaType.ENTIRE_MUNICIPALITY) ||
-                        (v.type === AreaType.POINT && coordDistance(v.coordinates as [number, number], KIRUNA_COORDS) < 100) ||
-                        (v.type === AreaType.AREA && v.coordinates.every(c => c.every(c => coordDistance(c as [number, number], KIRUNA_COORDS) < 100)))
-                    )
+                (
+                    (v.type === AreaType.ENTIRE_MUNICIPALITY) ||
+                    (v.type === AreaType.POINT && booleanPointInPolygon([v.coordinates[0], v.coordinates[1]], poly)) ||
+                    (v.type === AreaType.AREA && v.coordinates.every(c => c.every(c => booleanPointInPolygon([c[0], c[1]], poly))))
+                )
             }).withMessage('Invalid document coordinates'),
         body('description').notEmpty().withMessage('Description is required'),
         body('pages').optional().isArray().custom((v) => {

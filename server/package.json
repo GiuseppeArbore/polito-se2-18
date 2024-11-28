@@ -15,6 +15,7 @@
     "@aws-sdk/s3-request-presigner": "^3.693.0",
     "@radix-ui/react-dropdown-menu": "^2.1.2",
     "@remixicon/react": "^4.5.0",
+    "@turf/turf": "^7.1.0",
     "@typegoose/typegoose": "^12.9.0",
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
