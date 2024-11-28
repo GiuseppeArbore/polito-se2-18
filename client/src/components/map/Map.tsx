@@ -1,7 +1,7 @@
 
 import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { AllGeoJSON, featureCollection, area, pointOnFeature,centroid } from "@turf/turf";
+import { AllGeoJSON, featureCollection, area, pointOnFeature, centroid, booleanPointInPolygon } from "@turf/turf";
 import  { documentAreaColorMapping,documentBorderColorMapping } from "./documentcolors";
 import {loadIcons} from "./imagesLoader";
 import Kiruna from "./KirunaMunicipality.json"
@@ -34,7 +34,7 @@ import {
 } from "@remixicon/react";
 import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { Feature, FeatureCollection, Position, Polygon, Geometry, Point, GeoJsonProperties } from "geojson";
+import { Feature, FeatureCollection, Position, Polygon, MultiPolygon, Geometry, Point, GeoJsonProperties } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
 import { coordDistance } from "../../utils";
 import { KxDocument } from "../../model";
@@ -837,15 +837,33 @@ const MapControls: React.FC<
   }, [geometry?.type, pos?.[0], pos?.[1]]);
 
   useEffect(() => {
-    const dist = coordDistance(
-      center.toReversed() as [number, number],
-      str2pos(pointCoords).toReversed() as [number, number]
-    );
-    if (dist <= 100 || pointCoords.find((c) => c === "") !== undefined) {
+  
+  const poly = Kiruna.features[0] as Feature<Polygon | MultiPolygon>; // 
+
+  if (geometry?.type === "Point") {
+    if (booleanPointInPolygon({ type: 'Point', coordinates: str2pos(pointCoords) }, poly) || pointCoords.find((c) => c === "") !== undefined) {
       setCoordsError(false);
     } else {
       setCoordsError(true);
     }
+  } else if (geometry?.type === "Polygon" || geometry?.type === "MultiPolygon") {
+    const drawnPoly = {
+      type: 'Feature',
+      geometry: geometry,
+      properties: {}
+    } as Feature<Polygon | MultiPolygon>;
+
+    const allPointsInside = drawnPoly.geometry.coordinates[0].every((coord: Position | Position[]) =>
+      booleanPointInPolygon({ type: 'Point', coordinates: coord as Position }, poly)
+    );
+
+    if (allPointsInside) {
+      setCoordsError(false);
+    } else {
+      setCoordsError(true);
+    }
+  }
+  
     if (
       index === 1 &&
       PreviewMapDraw.getMode() === "simple_select" &&
@@ -854,7 +872,7 @@ const MapControls: React.FC<
       PreviewMapDraw.deleteAll();
       PreviewMapDraw.changeMode("draw_point");
     }
-  }, [pointCoords[0], pointCoords[1]]);
+  }, [pointCoords[0], pointCoords[1],geometry]);
 
   // Note:
   // React's useEffect() are run starting from the children. This means that we cannot change
@@ -966,7 +984,7 @@ const MapControls: React.FC<
                   }
                 }}
                 error={coordsError}
-                errorMessage="All points must be within 100Km of Kiruna"
+                errorMessage="All points must be inside the Kiruna area"
                 icon={() => (
                   <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
                     Latitude
