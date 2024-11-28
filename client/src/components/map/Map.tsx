@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useRef, useState } from "react";
 import { AllGeoJSON, featureCollection, area, pointOnFeature,centroid } from "@turf/turf";
 import  { documentAreaColorMapping,documentBorderColorMapping } from "./documentcolors";
 import {loadIcons} from "./imagesLoader";
-import {Kiruna} from "./KirunaMunicipality"
+import Kiruna from "./KirunaMunicipality.json"
 import {
   Button,
   Card,
