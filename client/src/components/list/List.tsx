@@ -233,7 +233,7 @@ function List(props: ListProps) {
     <>
       <div
         className={"ag-theme-quartz-auto-dark right-0 left-0 ring-0"}
-        style={{ width: "100%", height: "70vh", overflow: "auto" }}
+        style={{ width: "100%", height: "100%", minHeight: "70vh", overflow: "auto" }}
       >
         <AgGridReact
           onViewportChanged={addFilterModel}
