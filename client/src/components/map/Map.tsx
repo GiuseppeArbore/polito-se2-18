@@ -539,7 +539,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
      
 
       }).catch(error => {
-        console.error('Errore nel caricamento delle icone:', error);
+        console.error('Error loading icons:', error);
       });
     };
       
@@ -745,7 +745,7 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
             });
 
           }).catch(error => {
-            console.error('Errore nel caricamento delle icone:', error);
+            console.error('Error loading icons:', error);
           });
         }
       });
