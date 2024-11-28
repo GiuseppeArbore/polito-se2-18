@@ -748,7 +748,7 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
 
   return (
     <>
-        <div>
+        <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }} >
         <Button
           style={{
             backgroundColor: "white",
