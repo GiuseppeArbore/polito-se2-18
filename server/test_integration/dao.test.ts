@@ -8,6 +8,8 @@ import { mongoose } from "@typegoose/typegoose";
 import { KIRUNA_COORDS } from "../src/utils";
 import testUsers from "../test_users/db_export.kiruna-ex.users.json";
 
+const TEST_FILENAME = "filename";
+
 const list: mongoose.Types.ObjectId[] = [];
 const date = new Date();
 const deserializedTestUsers = EJSON.deserialize(testUsers);
@@ -244,6 +246,73 @@ describe("Test DAO", () => {
                 salt: user.salt.toString("base64")
             }
         );
+    });
+    test("Remove attachment", async () => {
+        const doc: KxDocument = {
+            title: "title 1",
+            stakeholders: [Stakeholders.RESIDENT],
+            scale: 10,
+            issuance_date: date,
+            type: KxDocumentType.INFORMATIVE,
+            language: "Swedish",
+            doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
+            description: "Test",
+            connections: {
+                direct: [], collateral: [], projection: [], update: []
+            }
+        };
+        const resCreation = await db.createKxDocument({
+            ...doc,
+            attachments: [
+                TEST_FILENAME
+            ]
+        } as KxDocument);
+        expect(resCreation).toBeTruthy();
+
+        const res = await db.removeKxDocumentAttachments(resCreation!._id!, [TEST_FILENAME]);
+        const newDoc = await db.getKxDocumentById(resCreation!._id!);
+
+        expect(res).toBeTruthy();
+        expect(newDoc).toMatchObject({
+            ...doc,
+            attachments: [],
+            _id: resCreation!._id!
+        });
+        const res2 = await db.deleteKxDocument(resCreation!._id!);
+        expect(res2).toBeTruthy();
+    });
+    test("Remove non existing attachment", async () => {
+        const doc: KxDocument = {
+            title: "title 1",
+            stakeholders: [Stakeholders.RESIDENT],
+            scale: 10,
+            issuance_date: date,
+            type: KxDocumentType.INFORMATIVE,
+            language: "Swedish",
+            doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
+            description: "Test",
+            connections: {
+                direct: [], collateral: [], projection: [], update: []
+            }
+        };
+        const resCreation = await db.createKxDocument({
+            ...doc,
+            attachments: [
+            ]
+        } as KxDocument);
+        expect(resCreation).toBeTruthy();
+
+        const res = await db.removeKxDocumentAttachments(resCreation!._id!, [TEST_FILENAME]);
+        const newDoc = await db.getKxDocumentById(resCreation!._id!);
+
+        expect(res).toBeFalsy();
+        expect(newDoc).toMatchObject({
+            ...doc,
+            attachments: [],
+            _id: resCreation!._id!
+        });
+        const res2 = await db.deleteKxDocument(resCreation!._id!);
+        expect(res2).toBeTruthy();
     });
 });
 

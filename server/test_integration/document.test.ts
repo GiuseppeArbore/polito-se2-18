@@ -340,5 +340,12 @@ describe("Integration Tests for Document API", () => {
             
         expect(response.status).toBe(404);
     });
+    test("Test 12 - Remove attachment from non existing document", async () => {
+        const response = await request(app)
+            .delete(`/api/documents/${TEST_ID}/attachments/${TEST_FILENAME}`)
+            .set("Cookie", urbanPlannerCookie);
+            
+        expect(response.status).toBe(404);
+    });
 });
 
