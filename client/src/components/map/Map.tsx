@@ -1066,6 +1066,11 @@ const MapControls: React.FC<
                 Cut in shape
               </Button>
             </div>
+            {coordsError && (
+              <p className="text-red-500 text-sm mt-4">
+                All points must be inside the Kiruna area
+              </p>
+            )}
           </>
         ) : null}
       </div>
