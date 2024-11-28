@@ -61,6 +61,38 @@ export interface SatMapProps {
   entireMunicipalityDocuments?: KxDocument[];
 }
 
+const getPointsAndCentroids = (drawing: FeatureCollection<Geometry, GeoJsonProperties> | undefined, offsetDistance: number): FeatureCollection<Geometry, GeoJsonProperties> => {
+  return {
+    type: 'FeatureCollection',
+    features: drawing?.features.flatMap<Feature<Geometry, GeoJsonProperties>>(feature => {
+      let updatedFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
+
+      if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
+        let centroid = pointOnFeature(feature as AllGeoJSON);
+        centroid.properties = { ...feature.properties, isCentroid: true }; // Add isCentroid property
+      
+        if (!centroid.geometry) return [];
+        const centroidCoordinates = centroid.geometry.coordinates as [number, number];
+        const centroidOffsetX = (Math.random() - 0.5) * offsetDistance;
+        const centroidOffsetY = (Math.random() - 0.5) * offsetDistance;
+        centroid.geometry.coordinates = [centroidCoordinates[0] + centroidOffsetX, centroidCoordinates[1] + centroidOffsetY];
+      
+        updatedFeatures.push(centroid as Feature<Geometry, GeoJsonProperties>);
+      }
+
+      if (feature.geometry.type === 'Point') {
+        const pointCoordinates = feature.geometry.coordinates as [number, number];
+        const pointOffsetX = (Math.random() - 0.5) * offsetDistance;
+        const pointOffsetY = (Math.random() - 0.5) * offsetDistance;
+        feature.geometry.coordinates = [pointCoordinates[0] + pointOffsetX, pointCoordinates[1] + pointOffsetY];
+        updatedFeatures.push(feature);
+      }
+
+      return updatedFeatures;
+    }) || []
+  };
+};
+
 const defaultZoom = 12;
 const center: LngLatLike = [20.26, 67.845];
 
@@ -232,37 +264,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       //CLUSTERS---------------------------------------------------------
       const offsetDistance = 0.0001; // offsetDistance
 
-      const pointsAndCentroids: FeatureCollection<Geometry, GeoJsonProperties> = {
-        type: 'FeatureCollection',
-        features: props.drawing?.features.flatMap<Feature<Geometry, GeoJsonProperties>>(feature => {
-          let updatedFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
-      
-          if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-            let centroid = pointOnFeature(feature as AllGeoJSON);
-            centroid.properties = { ...feature.properties, isCentroid: true }; // Add isCentroid property
-          
-            if (!centroid.geometry) return [];
-            const centroidCoordinates = centroid.geometry.coordinates as [number, number];
-            const centroidOffsetX = (Math.random() - 0.5) * offsetDistance;
-            const centroidOffsetY = (Math.random() - 0.5) * offsetDistance;
-            centroid.geometry.coordinates = [centroidCoordinates[0] + centroidOffsetX, centroidCoordinates[1] + centroidOffsetY];
-          
-            updatedFeatures.push(centroid as Feature<Geometry, GeoJsonProperties>);
-          }
-      
-          if (feature.geometry.type === 'Point') {
-            const pointCoordinates = feature.geometry.coordinates as [number, number];
-            const pointOffsetX = (Math.random() - 0.5) * offsetDistance;
-            const pointOffsetY = (Math.random() - 0.5) * offsetDistance;
-            feature.geometry.coordinates = [pointCoordinates[0] + pointOffsetX, pointCoordinates[1] + pointOffsetY];
-            updatedFeatures.push(feature);
-          }
-      
-          
-      
-          return updatedFeatures;
-        }) || []
-      };
+      const pointsAndCentroids = getPointsAndCentroids(props.drawing, offsetDistance);
   
         
         mapRef.current?.addSource('pointsAndCentroids', {
@@ -651,37 +653,7 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
           loadIcons(mapRef.current).then(() => {
 
             const offsetDistance = 0.0001; // offsetDistance
-            const pointsAndCentroids: FeatureCollection<Geometry, GeoJsonProperties> = {
-              type: 'FeatureCollection',
-              features: props.drawing?.features.flatMap<Feature<Geometry, GeoJsonProperties>>(feature => {
-                let updatedFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
-
-                if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-                  let centroid = pointOnFeature(feature as AllGeoJSON);
-                  centroid.properties = { ...feature.properties, isCentroid: true }; // Add isCentroid property
-
-                  if (!centroid.geometry) return [];
-                  const centroidCoordinates = centroid.geometry.coordinates as [number, number];
-                  const centroidOffsetX = (Math.random() - 0.5) * offsetDistance;
-                  const centroidOffsetY = (Math.random() - 0.5) * offsetDistance;
-                  centroid.geometry.coordinates = [centroidCoordinates[0] + centroidOffsetX, centroidCoordinates[1] + centroidOffsetY];
-
-                  updatedFeatures.push(centroid as Feature<Geometry, GeoJsonProperties>);
-                }
-
-                if (feature.geometry.type === 'Point') {
-                  const pointCoordinates = feature.geometry.coordinates as [number, number];
-                  const pointOffsetX = (Math.random() - 0.5) * offsetDistance;
-                  const pointOffsetY = (Math.random() - 0.5) * offsetDistance;
-                  feature.geometry.coordinates = [pointCoordinates[0] + pointOffsetX, pointCoordinates[1] + pointOffsetY];
-                  updatedFeatures.push(feature);
-                }
-
-                
-
-                return updatedFeatures;
-              }) || []
-            };
+            const pointsAndCentroids = getPointsAndCentroids(props.drawing, offsetDistance);
 //AREA----------------------------------------------------------------
             mapRef.current?.addSource('drawings', {
               type: 'geojson',
