@@ -824,7 +824,8 @@ const MapControls: React.FC<
   const feature = structuredClone(props?.drawing?.features?.at?.(0));
   const geometry = feature?.geometry;
   const pos = geometry?.type === "Point" ? geometry.coordinates : [NaN, NaN];
-
+  const area = geometry?.type === "Polygon" ? geometry.coordinates : [[[NaN, NaN]]];
+  const kirunaArea = Kiruna.features[0] as Feature<Polygon | MultiPolygon>;
 
   useEffect(() => {
     if (geometry?.type === "Point") {
@@ -836,33 +837,13 @@ const MapControls: React.FC<
   }, [geometry?.type, pos?.[0], pos?.[1]]);
 
   useEffect(() => {
-  
-  const poly = Kiruna.features[0] as Feature<Polygon | MultiPolygon>; // 
-
-  if (geometry?.type === "Point") {
-    if (booleanPointInPolygon({ type: 'Point', coordinates: str2pos(pointCoords) }, poly) || pointCoords.find((c) => c === "") !== undefined) {
+    if (geometry?.type !== "Point") return;
+    if (booleanPointInPolygon({ type: 'Point', coordinates: str2pos(pointCoords) }, kirunaArea) || pointCoords.find((c) => c === "") !== undefined) {
       setCoordsError(false);
     } else {
       setCoordsError(true);
     }
-  } else if (geometry?.type === "Polygon" || geometry?.type === "MultiPolygon") {
-    const drawnPoly = {
-      type: 'Feature',
-      geometry: geometry,
-      properties: {}
-    } as Feature<Polygon | MultiPolygon>;
 
-    const allPointsInside = drawnPoly.geometry.coordinates[0].every((coord: Position | Position[]) =>
-      booleanPointInPolygon({ type: 'Point', coordinates: coord as Position }, poly)
-    );
-
-    if (allPointsInside) {
-      setCoordsError(false);
-    } else {
-      setCoordsError(true);
-    }
-  }
-  
     if (
       index === 1 &&
       PreviewMapDraw.getMode() === "simple_select" &&
@@ -871,7 +852,20 @@ const MapControls: React.FC<
       PreviewMapDraw.deleteAll();
       PreviewMapDraw.changeMode("draw_point");
     }
-  }, [pointCoords[0], pointCoords[1],geometry]);
+  }, [pointCoords[0], pointCoords[1]]);
+  
+  useEffect(() => {
+    if (geometry?.type !== "Polygon") return;
+    const allPointsInside = area[0].every((coord) =>
+      booleanPointInPolygon({ type: 'Point', coordinates: coord }, kirunaArea)
+    );
+
+    if (allPointsInside) {
+      setCoordsError(false);
+    } else {
+      setCoordsError(true);
+    }
+  }, [area[0]]);
 
   // Note:
   // React's useEffect() are run starting from the children. This means that we cannot change
@@ -885,6 +879,8 @@ const MapControls: React.FC<
         index={index}
         onIndexChange={(i) => {
           PreviewMapDraw.deleteAll();
+          setCoordsError(false);
+          setPointCoords(["", ""]);
           switch (i) {
             default: // case 0
               PreviewMapDraw.changeMode("simple_select");
@@ -983,7 +979,7 @@ const MapControls: React.FC<
                   }
                 }}
                 error={coordsError}
-                errorMessage="All points must be inside the Kiruna area"
+                errorMessage="All points must be inside the municipality of Kiruna"
                 icon={() => (
                   <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
                     Latitude
@@ -1067,7 +1063,7 @@ const MapControls: React.FC<
             </div>
             {coordsError && (
               <p className="text-red-500 text-sm mt-4">
-                All points must be inside the Kiruna area
+                All points must be inside the municipality of Kiruna
               </p>
             )}
           </>
