@@ -1,8 +1,9 @@
 .hider {
     /*
-     * i need to change the color
+     * #3A7CA5 is the color suggested by Golnaz
+     * #e7ebf3 is the color suggested by Alberto
      */
-    background-color: lightblue; 
+    background-color: #e7ebf3 ; 
     display: flex;
     justify-content: center;
     align-items: center;

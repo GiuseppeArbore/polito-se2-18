@@ -97,6 +97,14 @@ export default function Console() {
     }
   }, [selectedView, refreshNeeded]);
 
+  useEffect(() => {
+    if(selectedView === 0) {
+      setShowSideBar(true);
+    } else {
+      setShowSideBar(false);
+    }
+  }, [selectedView]);
+
   const [showSideBar, setShowSideBar] = useState(true);
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   useEffect(() => {
@@ -104,6 +112,8 @@ export default function Console() {
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
+
+  
 
   return (
     <main>
