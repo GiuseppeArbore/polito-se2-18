@@ -21,8 +21,9 @@ interface ListProps {
 function List(props: ListProps) {
   const navigator = useNavigate();
   const gridRef = useRef<AgGridReact<KxDocument>>(null);
-  const onFirstDataRendered = useCallback(() => {
-    onGridReady();
+  const onFirstDataRendered = useCallback((params: any) => {
+    onGridReady(params);
+    params.api.sizeColumnsToFit();
   }, []);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const rowNode = useRef<any>();
@@ -183,12 +184,13 @@ function List(props: ListProps) {
     },
   };
 
-  function onGridReady() {
+  function onGridReady(params: any) {
     const allColumnIds: string[] = [];
     gridRef.current!.api!.getAllGridColumns()!.forEach((column) => {
       allColumnIds.push(column.getId());
     });
     gridRef.current!.api!.autoSizeColumns(allColumnIds, false);
+    params.api.sizeColumnsToFit();
   }
 
   const rowData = useMemo(() => {
