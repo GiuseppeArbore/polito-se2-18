@@ -2,7 +2,8 @@ export enum Stakeholders {
     URBAN_DEVELOPER = "Urban Developer",
     URBAN_PLANNER = "Urban Planner",
     RESIDENT = "Resident",
-    VISITOR = "Visitor"
+    VISITOR = "Visitor",
+    NEW = "+Add New..."
 
 }
 
@@ -21,6 +22,11 @@ export enum KxDocumentType {
     AGREEMENT = "Agreement",
     CONFLICT = "Conflict Resolution",
     CONSULTATION = "Consultation",
+    NEW = "+Add New...",
+}
+export enum KxDocumentScale {
+    DEFAULT = "1:10000",
+    NEW = "+Add New...",
 }
 
 export enum AreaType {

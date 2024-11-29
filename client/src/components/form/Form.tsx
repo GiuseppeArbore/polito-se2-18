@@ -18,9 +18,15 @@ import {
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
-import { FeatureCollection } from "geojson"
+import { FeatureCollection } from "geojson";
 import API from "../../API";
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "../../enum";
+import {
+  AreaType,
+  KxDocumentScale,
+  KxDocumentType,
+  Scale,
+  Stakeholders,
+} from "../../enum";
 import { DocCoords, KxDocument } from "../../model";
 import { mongoose } from "@typegoose/typegoose";
 import {
@@ -46,8 +52,6 @@ interface FormDialogProps {
   refresh: () => void;
 }
 
-
-
 export function FormDialog(props: FormDialogProps) {
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState(false);
@@ -59,7 +63,7 @@ export function FormDialog(props: FormDialogProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
   const [typeError, setTypeError] = useState(false);
-  const [scale, setScale] = useState(10000);
+  const [scale, setScale] = useState<KxDocumentScale | undefined>(undefined);
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -84,8 +88,6 @@ export function FormDialog(props: FormDialogProps) {
   const [message, setMessage] = useState("");
 
   const [docCoordinates, _] = useState<DocCoords | undefined>(undefined);
-  // Example usage
-  //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -102,7 +104,12 @@ export function FormDialog(props: FormDialogProps) {
         type: AreaType.POINT,
         coordinates: drawing.features[0].geometry.coordinates,
       };
-    } else if (!hideMap && (drawing && drawing.features.length >= 1) && drawing.features[0].geometry.type === "Polygon") {
+    } else if (
+      !hideMap &&
+      drawing &&
+      drawing.features.length >= 1 &&
+      drawing.features[0].geometry.type === "Polygon"
+    ) {
       //TODO: add support for multiple polygons
       let cord =
         drawing.features.map((f: any) => f.geometry.coordinates).length === 1
@@ -118,27 +125,35 @@ export function FormDialog(props: FormDialogProps) {
       };
     }
 
-    if (tmpTitleError || tmpShError || !type || !description || !draw || (drawing === undefined && !hideMap)) {
+    if (
+      tmpTitleError ||
+      tmpShError ||
+      !type ||
+      !description ||
+      !draw ||
+      (drawing === undefined && !hideMap)
+    ) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
-      hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
+      hideMap
+        ? setDocCoordinatesError(false)
+        : setDocCoordinatesError(!docCoordinates);
       setError("Please fill all the required fields");
       toast({
         title: "Error",
         description: "Please fill all the required fields",
         variant: "error",
         duration: 3000,
-      })
+      });
       return;
     }
 
     const newDocument: KxDocument = {
       title,
       stakeholders,
-      //scale_info: Scale.TEXT,
-      scale,
+      scale: scale || KxDocumentScale.DEFAULT,
       doc_coordinates: draw,
       issuance_date: issuanceDate!,
       type: type,
@@ -146,10 +161,14 @@ export function FormDialog(props: FormDialogProps) {
       description,
       pages: validatePageRangeString(pages?.toString() || ""),
       connections: {
-        direct: documentsForDirect.map(d => new mongoose.Types.ObjectId(d)),
-        collateral: documentsForCollateral.map(d => new mongoose.Types.ObjectId(d)),
-        projection: documentsForProjection.map(d => new mongoose.Types.ObjectId(d)),
-        update: documentsForUpdate.map(d => new mongoose.Types.ObjectId(d)),
+        direct: documentsForDirect.map((d) => new mongoose.Types.ObjectId(d)),
+        collateral: documentsForCollateral.map(
+          (d) => new mongoose.Types.ObjectId(d)
+        ),
+        projection: documentsForProjection.map(
+          (d) => new mongoose.Types.ObjectId(d)
+        ),
+        update: documentsForUpdate.map((d) => new mongoose.Types.ObjectId(d)),
       },
     };
     let createdDocument: KxDocument | null = null;
@@ -165,7 +184,7 @@ export function FormDialog(props: FormDialogProps) {
         });
 
         setTitle("");
-        setScale(0);
+        setScale(undefined);
         setIssuanceDate(new Date());
         setType(undefined);
         setLanguage(undefined);
@@ -192,14 +211,17 @@ export function FormDialog(props: FormDialogProps) {
     try {
       if (createdDocument && createdDocument._id) {
         if (files.length > 0) {
-          const FileUpload = await API.addAttachmentToDocument(createdDocument._id, files);
+          const FileUpload = await API.addAttachmentToDocument(
+            createdDocument._id,
+            files
+          );
           if (!FileUpload) {
             toast({
               title: "Error",
               description: "Failed to upload files",
               variant: "error",
               duration: 3000,
-            })
+            });
           }
         }
       }
@@ -209,7 +231,7 @@ export function FormDialog(props: FormDialogProps) {
         description: "Failed to upload files",
         variant: "error",
         duration: 3000,
-      })
+      });
     }
     setIsOpen(false);
     clearForm();
@@ -223,7 +245,7 @@ export function FormDialog(props: FormDialogProps) {
     setIssuanceDate(new Date());
     setType(undefined);
     setTypeError(false);
-    setScale(10000);
+    setScale(undefined);
     setLanguage(undefined);
     setPages(undefined);
     setPageRanges([]);
@@ -242,12 +264,9 @@ export function FormDialog(props: FormDialogProps) {
     setDrawing(undefined);
   }
 
-
-
   function myform() {
     return (
       <form action="#" method="post" className="mt-8">
-
         <FormDocumentInformation
           title={title}
           setTitle={setTitle}
@@ -277,8 +296,6 @@ export function FormDialog(props: FormDialogProps) {
           issuanceDate={issuanceDate}
           setIssuanceDate={setIssuanceDate}
         />
-
-
 
         <Divider />
 
@@ -336,19 +353,24 @@ export function FormDialog(props: FormDialogProps) {
           </Button>
           <Button
             className="w-full sm:w-auto primary"
-            onClick={e => handleSubmit(e)}
+            onClick={(e) => handleSubmit(e)}
           >
             Submit
           </Button>
         </div>
-
       </form>
-    )
+    );
   }
 
   return (
     <>
-      <Button className="w-full primary" onClick={() => { setIsOpen(true); clearForm() }}>
+      <Button
+        className="w-full primary"
+        onClick={() => {
+          setIsOpen(true);
+          clearForm();
+        }}
+      >
         Add new document
       </Button>
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
@@ -372,7 +394,6 @@ export function FormDialog(props: FormDialogProps) {
   );
 }
 
-
 export function FormDocumentInformation({
   title,
   setTitle,
@@ -395,7 +416,7 @@ export function FormDocumentInformation({
   pages,
   setPages,
   pageRanges,
-  setPageRanges
+  setPageRanges,
 }: {
   title: string;
   setTitle: React.Dispatch<React.SetStateAction<string>>;
@@ -411,8 +432,8 @@ export function FormDocumentInformation({
   setType: React.Dispatch<React.SetStateAction<KxDocumentType | undefined>>;
   typeError: boolean;
   setTypeError: React.Dispatch<React.SetStateAction<boolean>>;
-  scale: number;
-  setScale: React.Dispatch<React.SetStateAction<number>>;
+  scale: KxDocumentScale | undefined;
+  setScale: React.Dispatch<React.SetStateAction<KxDocumentScale | undefined>>;
   language: string | undefined;
   setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
   pages: PageRange[] | undefined;
@@ -420,6 +441,60 @@ export function FormDocumentInformation({
   pageRanges: PageRange[] | undefined;
   setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
 }) {
+  const [isNewTypeModalOpen, setIsNewTypeModalOpen] = useState(false);
+  const [newType, setNewType] = useState("");
+  const [newTypeError, setNewTypeError] = useState(false);
+
+  const [isNewScaleModalOpen, setIsNewScaleModalOpen] = useState(false);
+  const [newScale, setNewScale] = useState("");
+  const [newScaleError, setNewScaleError] = useState(false);
+
+  const [isNewStakeholderModalOpen, setisNewStakeholderModalOpen] =
+    useState(false);
+  const [newStakeholder, setnewStakeholder] = useState("");
+  const [newStakeholderError, setNewStakeholderError] = useState(false);
+  const [stakeholderOptions, setStakeholderOptions] =
+    useState<typeof Stakeholders>(Stakeholders); // Dynamic list of stakeholders
+
+  const OpenNewTypeModal = () => {
+    setIsNewTypeModalOpen(true);
+  };
+  const OpenNewScaleModal = () => {
+    setIsNewScaleModalOpen(true);
+  };
+  const OpenNewStakeholderModal = () => {
+    setisNewStakeholderModalOpen(true);
+  };
+
+  const handleNewTypeSubmit = () => {
+    if (!newType || newType == undefined) {
+      setNewTypeError(true);
+      return;
+    } else {
+      setNewTypeError(false);
+      setIsNewTypeModalOpen(false);
+    }
+  };
+
+  const handleNewScaleSubmit = () => {
+    if (!newScale || newScale == undefined) {
+      setNewScaleError(true);
+      return;
+    } else {
+      setNewScaleError(false);
+      setIsNewScaleModalOpen(false);
+    }
+  };
+
+  const handleNewStakeholderSubmit = () => {
+    if (!newStakeholder || newStakeholder == undefined) {
+      setNewStakeholderError(true);
+      return;
+    } else {
+      setNewStakeholderError(false);
+      setisNewStakeholderModalOpen(false);
+    }
+  };
 
   return (
     <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
@@ -436,7 +511,7 @@ export function FormDocumentInformation({
           id="title"
           name="title"
           value={title}
-          onValueChange={t => setTitle(t)}
+          onValueChange={(t) => setTitle(t)}
           autoComplete="title"
           placeholder="Title"
           className="mt-2"
@@ -457,22 +532,74 @@ export function FormDocumentInformation({
           id="stakeholders"
           name="stakeholders"
           className="mt-2"
-          value={stakeholders.map(sh => Object.keys(Stakeholders).find(key => Stakeholders[key as keyof typeof Stakeholders] === sh)).filter((sh): sh is string => sh !== undefined)}
-          onValueChange={s => setStakeholders(s.map(sh => Stakeholders[sh as keyof typeof Stakeholders]))}
+          value={stakeholders
+            .map((sh) =>
+              Object.keys(Stakeholders).find(
+                (key) => Stakeholders[key as keyof typeof Stakeholders] === sh
+              )
+            )
+            .filter((sh): sh is string => sh !== undefined)}
+          onValueChange={(s) => {
+            if (s.includes("NEW")) {
+              OpenNewStakeholderModal();
+              return;
+            }
+            setStakeholders(
+              s.map((sh) => Stakeholders[sh as keyof typeof Stakeholders])
+            );
+            setisNewStakeholderModalOpen(false);
+          }}
           error={shError}
           errorMessage="You must select at least one stakeholder."
           required
         >
-          {
-            Object.entries(Stakeholders).map((dt) => {
-              return (
-                <MultiSelectItem key={`sh-${dt[0]}`} value={dt[0]}>
-                  {dt[1]}
-                </MultiSelectItem>
-              );
-            })
-          }
+          {Object.entries(Stakeholders).map((dt) => {
+            return (
+              <MultiSelectItem key={`sh-${dt[0]}`} value={dt[0]}>
+                {dt[1]}
+              </MultiSelectItem>
+            );
+          })}
         </MultiSelect>
+
+        <Dialog
+          open={isNewStakeholderModalOpen}
+          onClose={(val) => setisNewStakeholderModalOpen(val)}
+          static={true}
+        >
+          <DialogPanel
+            className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
+            style={{ maxWidth: "80vw" }}
+          >
+            <div className="sm:mx-auto sm:max-w-2xl">
+              <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                Add new stakeholder
+              </h3>
+              <TextInput
+                type="text"
+                id="new_stakeholder"
+                name="new_stakeholder"
+                value={newStakeholder}
+                autoComplete="new_stakeholder"
+                placeholder="New Stakeholder"
+                onValueChange={(s) => setnewStakeholder(s)}
+                className="mt-4"
+                error={newStakeholderError}
+                errorMessage="The stakeholder is mandatory"
+                required
+              />
+            </div>
+            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+              <Button
+                className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                variant="light"
+                onClick={() => handleNewStakeholderSubmit()}
+              >
+                Add
+              </Button>
+            </div>
+          </DialogPanel>
+        </Dialog>
       </div>
 
       <div className="col-span-full sm:col-span-3">
@@ -487,22 +614,67 @@ export function FormDocumentInformation({
           id="doc_type"
           name="doc_type"
           className="mt-2"
-          value={Object.keys(KxDocumentType).find(key => KxDocumentType[key as keyof typeof KxDocumentType] === type)}
-          onValueChange={t => setType(KxDocumentType[t as keyof typeof KxDocumentType])}
+          value={Object.keys(KxDocumentType).find(
+            (key) => KxDocumentType[key as keyof typeof KxDocumentType] === type
+          )}
+          onValueChange={(t) => {
+            if (t.includes("NEW")) {
+              OpenNewTypeModal();
+              return;
+            }
+            setType(KxDocumentType[t as keyof typeof KxDocumentType]);
+            setIsNewTypeModalOpen(false);
+          }}
           error={typeError}
           errorMessage="The type is mandatory"
           required
         >
-          {
-            Object.entries(KxDocumentType).map((dt) => {
-              return (
-                <SearchSelectItem key={`type-${dt[0]}`} value={dt[0]}>
-                  {dt[1]}
-                </SearchSelectItem>
-              );
-            })
-          }
+          {Object.entries(KxDocumentType).map((dt) => {
+            return (
+              <SearchSelectItem key={`type-${dt[0]}`} value={dt[0]}>
+                {dt[1]}
+              </SearchSelectItem>
+            );
+          })}
         </SearchSelect>
+        <Dialog
+          open={isNewTypeModalOpen}
+          onClose={(val) => setIsNewTypeModalOpen(val)}
+          static={true}
+        >
+          <DialogPanel
+            className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
+            style={{ maxWidth: "80vw" }}
+          >
+            <div className="sm:mx-auto sm:max-w-2xl">
+              <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                Add new type
+              </h3>
+              <TextInput
+                type="text"
+                id="new_type"
+                name="new_type"
+                value={newType}
+                autoComplete="new_type"
+                placeholder="New Type"
+                onValueChange={(t) => setNewType(t)}
+                className="mt-4"
+                error={newTypeError}
+                errorMessage="The Type is mandatory"
+                required
+              />
+            </div>
+            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+              <Button
+                className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                variant="light"
+                onClick={() => handleNewTypeSubmit()}
+              >
+                Add
+              </Button>
+            </div>
+          </DialogPanel>
+        </Dialog>
       </div>
 
       <div className="col-span-full sm:col-span-3">
@@ -513,7 +685,7 @@ export function FormDocumentInformation({
           Scale
           <span className="text-red-500">*</span>
         </label>
-        <TextInput
+        {/* <TextInput
           id="scale"
           value={scale.toLocaleString()}
           onValueChange={(v) => {
@@ -541,7 +713,74 @@ export function FormDocumentInformation({
             </p>
           )}
           required
-        />
+        /> */}
+
+        <SearchSelect
+          id="scale"
+          name="scale"
+          className="mt-2"
+          value={Object.keys(KxDocumentScale).find(
+            (key) =>
+              KxDocumentScale[key as keyof typeof KxDocumentScale] === scale
+          )}
+          onValueChange={(t) => {
+            if (t.includes("NEW")) {
+              OpenNewScaleModal();
+              return;
+            }
+            setScale(KxDocumentScale[t as keyof typeof KxDocumentScale]);
+            setIsNewScaleModalOpen(false);
+          }}
+          error={typeError}
+          errorMessage="The scale is mandatory"
+          required
+        >
+          {Object.entries(KxDocumentScale).map((dt) => {
+            return (
+              <SearchSelectItem key={`scale-${dt[0]}`} value={dt[0]}>
+                {dt[1]}
+              </SearchSelectItem>
+            );
+          })}
+        </SearchSelect>
+        <Dialog
+          open={isNewScaleModalOpen}
+          onClose={(val) => setIsNewScaleModalOpen(val)}
+          static={true}
+        >
+          <DialogPanel
+            className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
+            style={{ maxWidth: "80vw" }}
+          >
+            <div className="sm:mx-auto sm:max-w-2xl">
+              <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                Add new scale
+              </h3>
+              <TextInput
+                type="text"
+                id="new_scale"
+                name="new_scale"
+                value={newScale}
+                autoComplete="new_scale"
+                placeholder="New Scale"
+                onValueChange={(t) => setNewScale(t)}
+                className="mt-4"
+                error={newScaleError}
+                errorMessage="The scale is mandatory"
+                required
+              />
+            </div>
+            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+              <Button
+                className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                variant="light"
+                onClick={() => handleNewScaleSubmit()}
+              >
+                Add
+              </Button>
+            </div>
+          </DialogPanel>
+        </Dialog>
       </div>
 
       <div className="col-span-full sm:col-span-3">
@@ -556,7 +795,7 @@ export function FormDocumentInformation({
           name="language"
           className="mt-2"
           value={language}
-          onValueChange={l => setLanguage(l)}
+          onValueChange={(l) => setLanguage(l)}
         >
           {locales.map((l) => {
             return (
@@ -589,7 +828,7 @@ export function FormDocumentInformation({
         />
       </div>
     </div>
-  )
+  );
 }
 
 export function FormDocumentGeolocalization({
@@ -602,18 +841,18 @@ export function FormDocumentGeolocalization({
   drawing,
   setDrawing,
   hideMap,
-  setHideMap
+  setHideMap,
 }: {
-  isMapOpen: boolean,
-  setIsMapOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  showGeoInfo: boolean,
-  setShowGeoInfo: React.Dispatch<React.SetStateAction<boolean>>,
-  docCoordinatesError: boolean,
-  setDocCoordinatesError: React.Dispatch<React.SetStateAction<boolean>>,
-  drawing: any,
-  setDrawing: React.Dispatch<React.SetStateAction<any>>,
-  hideMap: boolean,
-  setHideMap: React.Dispatch<React.SetStateAction<boolean>>
+  isMapOpen: boolean;
+  setIsMapOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  showGeoInfo: boolean;
+  setShowGeoInfo: React.Dispatch<React.SetStateAction<boolean>>;
+  docCoordinatesError: boolean;
+  setDocCoordinatesError: React.Dispatch<React.SetStateAction<boolean>>;
+  drawing: any;
+  setDrawing: React.Dispatch<React.SetStateAction<any>>;
+  hideMap: boolean;
+  setHideMap: React.Dispatch<React.SetStateAction<boolean>>;
 }) {
   return (
     <>
@@ -624,29 +863,34 @@ export function FormDocumentGeolocalization({
         >
           Geolocalization
         </label>
-        <a
-          className="ml-2"
-          onClick={() => setShowGeoInfo(!showGeoInfo)}
-        >
-          <RiInformation2Line className="text-2xl" style={{ color: "#003d8e" }} />
+        <a className="ml-2" onClick={() => setShowGeoInfo(!showGeoInfo)}>
+          <RiInformation2Line
+            className="text-2xl"
+            style={{ color: "#003d8e" }}
+          />
         </a>
       </div>
-      {showGeoInfo &&
+      {showGeoInfo && (
         <Callout
           className="mb-6"
           style={{ border: "none" }}
           title="Geolocalization guide"
           color="gray"
         >
-          To specify the Geolocalization of the document, use the
-          switch to select the entire municipality or click on the map
-          to select a specific area or point.
+          To specify the Geolocalization of the document, use the switch to
+          select the entire municipality or click on the map to select a
+          specific area or point.
         </Callout>
-      }
+      )}
       <div className="flex items-center space-x-3">
-        <label htmlFor="switch" className="text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-          Select the whole Municipality {' '}
-          <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Kiruna</span>
+        <label
+          htmlFor="switch"
+          className="text-tremor-default text-tremor-content dark:text-dark-tremor-content"
+        >
+          Select the whole Municipality{" "}
+          <span className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
+            Kiruna
+          </span>
         </label>
         <Switch
           id="switch"
@@ -659,7 +903,9 @@ export function FormDocumentGeolocalization({
       {!hideMap && (
         <>
           <Card
-            className={`my-4 p-0 overflow-hidden cursor-pointer ${docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"}`}
+            className={`my-4 p-0 overflow-hidden cursor-pointer ${
+              docCoordinatesError ? "ring-red-400" : "ring-tremor-ring"
+            }`}
             onClick={() => setIsMapOpen(true)}
           >
             <PreviewMap
@@ -669,7 +915,11 @@ export function FormDocumentGeolocalization({
           </Card>
         </>
       )}
-      {docCoordinatesError ? <p className="tremor-TextInput-errorMessage text-sm text-red-500 mt-1">Please provide document coordinates</p> : null}
+      {docCoordinatesError ? (
+        <p className="tremor-TextInput-errorMessage text-sm text-red-500 mt-1">
+          Please provide document coordinates
+        </p>
+      ) : null}
       <Dialog
         open={isMapOpen}
         onClose={(val) => setIsMapOpen(val)}
@@ -682,13 +932,16 @@ export function FormDocumentGeolocalization({
           <SatMap
             drawing={drawing}
             onCancel={() => setIsMapOpen(false)}
-            onDone={(v) => { setDrawing(v); setIsMapOpen(false); }}
+            onDone={(v) => {
+              setDrawing(v);
+              setIsMapOpen(false);
+            }}
             style={{ minHeight: "95vh", width: "100%" }}
           ></SatMap>
         </DialogPanel>
       </Dialog>
     </>
-  )
+  );
 }
 
 export function FormDocumentDescription({
@@ -697,13 +950,11 @@ export function FormDocumentDescription({
   descriptionError,
   setDescriptionError,
 }: {
-  description: string | undefined,
-  setDescription: React.Dispatch<React.SetStateAction<string | undefined>>,
-  descriptionError: boolean,
-  setDescriptionError: React.Dispatch<React.SetStateAction<boolean>>,
-}
-) {
-
+  description: string | undefined;
+  setDescription: React.Dispatch<React.SetStateAction<string | undefined>>;
+  descriptionError: boolean;
+  setDescriptionError: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   return (
     <div className="col-span-full">
       <label
@@ -721,42 +972,38 @@ export function FormDocumentDescription({
         value={description}
         error={descriptionError}
         errorMessage="The description is mandatory"
-        onValueChange={d => setDescription(d)}
+        onValueChange={(d) => setDescription(d)}
         style={{ minHeight: "200px" }}
       />
     </div>
-  )
+  );
 }
 
-export function FormDocumentConnections(
-  {
-    documents,
-    documentsForDirect,
-    setDocumentsForDirect,
-    documentsForCollateral,
-    setDocumentsForCollateral,
-    documentsForProjection,
-    setDocumentsForProjection,
-    documentsForUpdate,
-    setDocumentsForUpdate,
-    showConnectionsInfo,
-    setShowConnectionsInfo
-  }: {
-    documents: KxDocument[],
-    documentsForDirect: string[],
-    setDocumentsForDirect: React.Dispatch<React.SetStateAction<string[]>>,
-    documentsForCollateral: string[],
-    setDocumentsForCollateral: React.Dispatch<React.SetStateAction<string[]>>,
-    documentsForProjection: string[],
-    setDocumentsForProjection: React.Dispatch<React.SetStateAction<string[]>>,
-    documentsForUpdate: string[],
-    setDocumentsForUpdate: React.Dispatch<React.SetStateAction<string[]>>,
-    showConnectionsInfo: boolean,
-    setShowConnectionsInfo: React.Dispatch<React.SetStateAction<boolean>>
-  }
-) {
-
-
+export function FormDocumentConnections({
+  documents,
+  documentsForDirect,
+  setDocumentsForDirect,
+  documentsForCollateral,
+  setDocumentsForCollateral,
+  documentsForProjection,
+  setDocumentsForProjection,
+  documentsForUpdate,
+  setDocumentsForUpdate,
+  showConnectionsInfo,
+  setShowConnectionsInfo,
+}: {
+  documents: KxDocument[];
+  documentsForDirect: string[];
+  setDocumentsForDirect: React.Dispatch<React.SetStateAction<string[]>>;
+  documentsForCollateral: string[];
+  setDocumentsForCollateral: React.Dispatch<React.SetStateAction<string[]>>;
+  documentsForProjection: string[];
+  setDocumentsForProjection: React.Dispatch<React.SetStateAction<string[]>>;
+  documentsForUpdate: string[];
+  setDocumentsForUpdate: React.Dispatch<React.SetStateAction<string[]>>;
+  showConnectionsInfo: boolean;
+  setShowConnectionsInfo: React.Dispatch<React.SetStateAction<boolean>>;
+}) {
   return (
     <>
       <div className="col-span-full sm:col-span-3 flex flex-row">
@@ -770,30 +1017,36 @@ export function FormDocumentConnections(
           className="ml-2"
           onClick={() => setShowConnectionsInfo(!showConnectionsInfo)}
         >
-          <RiInformation2Line className="text-2xl" style={{ color: "#003d8e" }} />
+          <RiInformation2Line
+            className="text-2xl"
+            style={{ color: "#003d8e" }}
+          />
         </a>
       </div>
 
-      {showConnectionsInfo &&
+      {showConnectionsInfo && (
         <Callout
           className="mb-6"
           style={{ border: "none" }}
           title="Connections guide"
           color="gray"
         >
-          To specify connections in the graph, use each dropdown to select
-          the nodes you want to connect. The dropdowns correspond to
-          different types of connections. Simply click on a dropdown under
-          the relevant connection type (e.g., Direct, Collateral) and
-          choose one or more nodes to establish that specific connection.
+          To specify connections in the graph, use each dropdown to select the
+          nodes you want to connect. The dropdowns correspond to different types
+          of connections. Simply click on a dropdown under the relevant
+          connection type (e.g., Direct, Collateral) and choose one or more
+          nodes to establish that specific connection.
         </Callout>
-      }
+      )}
 
       <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2 lg:grid-cols-2">
         {/* Direct Section */}
         <div className="col-span-full sm:col-span-1">
-          <Badge icon={RiLinksLine} className="text-sm flex items-center gap-2"
-            color="gray">
+          <Badge
+            icon={RiLinksLine}
+            className="text-sm flex items-center gap-2"
+            color="gray"
+          >
             <span className="text-sm">Direct</span>
           </Badge>
           <MultiSelect
@@ -806,12 +1059,13 @@ export function FormDocumentConnections(
                 key={doc._id?.toString()}
                 value={doc._id ? doc._id.toString() : ""}
                 className={
-
-                  (doc._id && documentsForProjection.includes(doc._id.toString())) ||
-                    (doc._id && documentsForDirect.includes(doc._id.toString())) ||
-                    (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
-                    (doc._id && documentsForUpdate.includes(doc._id.toString()))
-
+                  (doc._id &&
+                    documentsForProjection.includes(doc._id.toString())) ||
+                  (doc._id &&
+                    documentsForDirect.includes(doc._id.toString())) ||
+                  (doc._id &&
+                    documentsForCollateral.includes(doc._id.toString())) ||
+                  (doc._id && documentsForUpdate.includes(doc._id.toString()))
                     ? "opacity-50 cursor-not-allowed no-click"
                     : ""
                 }
@@ -841,10 +1095,13 @@ export function FormDocumentConnections(
                 key={doc._id?.toString()}
                 value={doc._id ? doc._id.toString() : ""}
                 className={
-                  (doc._id && documentsForProjection.includes(doc._id.toString())) ||
-                    (doc._id && documentsForDirect.includes(doc._id.toString())) ||
-                    (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
-                    (doc._id && documentsForUpdate.includes(doc._id.toString()))
+                  (doc._id &&
+                    documentsForProjection.includes(doc._id.toString())) ||
+                  (doc._id &&
+                    documentsForDirect.includes(doc._id.toString())) ||
+                  (doc._id &&
+                    documentsForCollateral.includes(doc._id.toString())) ||
+                  (doc._id && documentsForUpdate.includes(doc._id.toString()))
                     ? "opacity-50 cursor-not-allowed no-click"
                     : ""
                 }
@@ -857,8 +1114,11 @@ export function FormDocumentConnections(
 
         {/* Projection Section */}
         <div className="col-span-full sm:col-span-1">
-          <Badge icon={RiProjector2Line} className="text-sm flex items-center gap-2"
-            color="gray">
+          <Badge
+            icon={RiProjector2Line}
+            className="text-sm flex items-center gap-2"
+            color="gray"
+          >
             <span className="text-sm">Projection</span>
           </Badge>
           <MultiSelect
@@ -871,10 +1131,13 @@ export function FormDocumentConnections(
                 key={doc._id?.toString()}
                 value={doc._id ? doc._id.toString() : ""}
                 className={
-                  (doc._id && documentsForProjection.includes(doc._id.toString())) ||
-                    (doc._id && documentsForDirect.includes(doc._id.toString())) ||
-                    (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
-                    (doc._id && documentsForUpdate.includes(doc._id.toString()))
+                  (doc._id &&
+                    documentsForProjection.includes(doc._id.toString())) ||
+                  (doc._id &&
+                    documentsForDirect.includes(doc._id.toString())) ||
+                  (doc._id &&
+                    documentsForCollateral.includes(doc._id.toString())) ||
+                  (doc._id && documentsForUpdate.includes(doc._id.toString()))
                     ? "opacity-50 cursor-not-allowed no-click"
                     : ""
                 }
@@ -887,8 +1150,11 @@ export function FormDocumentConnections(
 
         {/* Update Section */}
         <div className="col-span-full sm:col-span-1">
-          <Badge icon={RiLoopLeftLine} className="text-sm flex items-center gap-2"
-            color="gray">
+          <Badge
+            icon={RiLoopLeftLine}
+            className="text-sm flex items-center gap-2"
+            color="gray"
+          >
             <span className="text-sm icon-text">Update</span>
           </Badge>
           <MultiSelect
@@ -901,10 +1167,13 @@ export function FormDocumentConnections(
                 key={doc._id?.toString()}
                 value={doc._id ? doc._id.toString() : ""}
                 className={
-                  (doc._id && documentsForProjection.includes(doc._id.toString())) ||
-                    (doc._id && documentsForDirect.includes(doc._id.toString())) ||
-                    (doc._id && documentsForCollateral.includes(doc._id.toString())) ||
-                    (doc._id && documentsForUpdate.includes(doc._id.toString()))
+                  (doc._id &&
+                    documentsForProjection.includes(doc._id.toString())) ||
+                  (doc._id &&
+                    documentsForDirect.includes(doc._id.toString())) ||
+                  (doc._id &&
+                    documentsForCollateral.includes(doc._id.toString())) ||
+                  (doc._id && documentsForUpdate.includes(doc._id.toString()))
                     ? "opacity-50 cursor-not-allowed no-click"
                     : ""
                 }
@@ -915,21 +1184,18 @@ export function FormDocumentConnections(
           </MultiSelect>
         </div>
       </div>
-
     </>
-  )
+  );
 }
-
 
 export function FormDocumentDatePicker({
   issuanceDate,
-  setIssuanceDate
+  setIssuanceDate,
 }: {
-  issuanceDate: Date | undefined,
-  setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>
+  issuanceDate: Date | undefined;
+  setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
 }) {
   return (
-
     <div className="col-span-full mt-4">
       <label
         htmlFor="issuance-date"
@@ -942,13 +1208,11 @@ export function FormDocumentDatePicker({
         id="issuance-date"
         className="mt-2"
         value={issuanceDate}
-        onValueChange={d => setIssuanceDate(d)}
+        onValueChange={(d) => setIssuanceDate(d)}
         enableYearNavigation={true}
         weekStartsOn={1}
         enableClear={false}
       />
     </div>
-  )
-
-
+  );
 }
