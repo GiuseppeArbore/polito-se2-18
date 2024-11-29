@@ -11,7 +11,7 @@ import {
   Tab,
 } from "@tremor/react";
 import API from "../API";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { FormDialog } from "./form/Form";
 import { DashboardMap } from "./map/Map";
 import { Area, KxDocument, Point } from "../model";
@@ -21,10 +21,14 @@ import { toast } from "../utils/toaster";
 import { FeatureCollection } from "geojson";
 import { Link } from "react-router-dom";
 import { RiHome2Fill } from "@remixicon/react";
+import { AdvancedFilterModel } from "ag-grid-enterprise";
+
 export default function Console() {
   const [documents, setDocuments] = useState<KxDocument[]>([]);
+  const [tmpDocuments, setTmpDocuments] = useState<KxDocument[]>([]);
   const [selectedView, setSelectedView] = useState(0);
   const [refreshNeeded, setRefreshNeeded] = useState(true);
+  const [filterModel, setFilterModel] = useState<AdvancedFilterModel|undefined>(undefined);
   const [entireMunicipalityDocuments, setEntireMunicipalityDocuments] =
     useState<KxDocument[]>([]);
   const [pointOrAreaDocuments, setPointOrAreaDocuments] = useState<
@@ -72,16 +76,8 @@ export default function Console() {
     const fetchDocuments = async () => {
       try {
         const docs = await API.getAllKxDocuments();
-        const entireMunicipalityDocs = docs.filter(
-          (doc) => doc.doc_coordinates?.type === "EntireMunicipality"
-        );
-        const otherDocs = docs.filter(
-          (doc) => doc.doc_coordinates?.type !== "EntireMunicipality"
-        );
-
-        setEntireMunicipalityDocuments(entireMunicipalityDocs);
-        setPointOrAreaDocuments(otherDocs);
         setDocuments(docs);
+        setTmpDocuments(docs);
       } catch (error) {
         toast({
           title: "Error",
@@ -95,8 +91,18 @@ export default function Console() {
       fetchDocuments();
       setRefreshNeeded(false);
     }
-  }, [selectedView, refreshNeeded]);
+  }, [refreshNeeded]);
+  useMemo(() => {
+    const entireMunicipalityDocs = tmpDocuments.filter(
+      (doc) => doc.doc_coordinates?.type === "EntireMunicipality"
+    );
+    const otherDocs = tmpDocuments.filter(
+      (doc) => doc.doc_coordinates?.type !== "EntireMunicipality"
+    );
 
+    setEntireMunicipalityDocuments(entireMunicipalityDocs);
+    setPointOrAreaDocuments(otherDocs);
+  }, [tmpDocuments]);
   return (
     <main>
       <Title className="flex items-center">
@@ -201,6 +207,7 @@ export default function Console() {
         return (
           <>
             <div
+              className="ring-0 shadow-none"
               style={{
                 display: "flex",
                 justifyContent: "center",
@@ -208,7 +215,7 @@ export default function Console() {
                 height: "100%",
               }}
             >
-              <List documents={documents} />
+              <List documents={documents} updateDocuments={setTmpDocuments} updateFilterModel={setFilterModel} filterModel={filterModel} />
             </div>
           </>
         );
