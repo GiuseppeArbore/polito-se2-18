@@ -10,7 +10,7 @@ import * as mime from 'mime-types';
 import { randomBytes } from 'crypto';
 import { mkdir } from 'fs/promises';
 import kirunaPolygon from './KirunaMunicipality.json';
-import { booleanPointInPolygon } from '@turf/turf';
+import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
 import { Feature, Polygon, MultiPolygon} from "geojson";
 
 export function initRoutes(app: Application) {
