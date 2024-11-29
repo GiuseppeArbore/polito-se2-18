@@ -23,7 +23,8 @@ const HeroSection: React.FC = () => {
           </Badge>
         </Link>
       </div>
-      <Button onClick={() => setShowLogin(true)}>Login</Button>
+      {/* hide if not logged in */}
+      <Button className="login" onClick={() => setShowLogin(true)}>Login</Button>
       <Dialog open={showLogin} onClose={(val) => setShowLogin(val)} static={true}>
         <DialogPanel>
           <h2 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Login</h2>
