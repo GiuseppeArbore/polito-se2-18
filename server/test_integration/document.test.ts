@@ -200,7 +200,7 @@ describe("Integration Tests for Document API", () => {
                 issuance_date: date,
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
-                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.1)]] },
                 description: "Test document",
                 connections: {
                     direct: [], collateral: [], projection: [], update: []
