@@ -242,103 +242,6 @@ export default function Document() {
                             <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != undefined && pages.toString() != "" ? pages : "Unknown"} </i>
                         </div>
 
-                        <div className="flex w-full h-full items-center justify-between mb-2">
-                            <Accordion className="w-full mr-6 mb-6">
-                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Original Resources</AccordionHeader>
-                                <AccordionBody className="leading-6 flex flex-col">
-                                    <AccordionList style={{ boxShadow: 'none' }}>
-                                        {doc !== undefined && doc?.attachments && doc?.attachments.length >= 1 ? doc?.attachments?.map((title) => (
-                                            <div key={title + doc._id} className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{mime.getType(title)?.split("/")[1] === "pdf" ? "PDF file" : mime.getType(title)?.split("/")[0] === "image" ? "Image file" : "File  ".concat("(." + title.split(".")[1] + ")")}</i>
-                                                <div className="flex space-x-2">
-                                                    <Button
-                                                        className="ml-2"
-                                                        onClick={() => {
-                                                            setFileTitle(title)
-                                                            setShowPdfPreview(true)
-                                                        }}
-                                                    >
-                                                        Preview File
-                                                    </Button>
-                                                    <Button
-                                                        className="ml-2"
-                                                        color="red"
-                                                        onClick={async () => {
-                                                            setDeleteOriginalResourceConfirm(true);
-                                                            setSelectedResource(title);
-                                                        }}
-                                                    ><RiDeleteBinLine /></Button>
-                                                </div>
-                                            </div>
-                                        )) : <>
-                                            <div className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No original resources added</i>
-                                            </div>
-                                        </>}
-
-                                    </AccordionList>
-                                </AccordionBody>
-                            </Accordion>
-                            <i className="h-full lg:mr-6 mt-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
-
-                        </div>
-
-                        {DeleteResourceDialog(
-                            deleteOriginalResourceConfirm,
-                            setDeleteOriginalResourceConfirm,
-                            async () => {
-                                //this is a draft, we have to implement it in the kx-87, understand the logic and implement it, also the file name
-                                try {
-                                    //await API.deleteKxDocumentAttachment(id!, fileTitle!);
-                                    const updatedDocument = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
-                                    setDoc(updatedDocument);
-                                    toast({
-                                        title: "Success",
-                                        description: "The document has been deleted successfully",
-                                        variant: "success",
-                                        duration: 3000,
-                                    });
-                                } catch (error) {
-                                    toast({
-                                        title: "Error",
-                                        description: "Failed to delete documents",
-                                        variant: "error",
-                                        duration: 3000,
-                                    });
-                                }
-                            }
-                            , selectedResource!
-
-                        )}
-
-                        <Dialog open={isDragAndDropOpen} onClose={() => setIsDragAndDropOpen(false)} static={true}>
-                            <DialogPanel>
-                                <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Add Original Resources</h3>
-                                <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-                                    Add original resources about the document you are uploading.
-                                </p>
-                                <FileUpload
-                                    saveFile={(list) => setFiles(list)}
-                                />
-                                <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
-                                    <Button
-                                        className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
-                                        variant="light"
-                                        onClick={() => setIsDragAndDropOpen(false)}
-                                    >
-                                        Cancel
-                                    </Button>
-                                    <Button
-                                        className="w-full sm:w-auto primary"
-                                        //onClick={e => handleSubmit(e)}    handleSumbitDragAndDrop to do in kx-87
-                                    >
-                                        Submit
-                                    </Button>
-                                </div>
-                            </DialogPanel>
-                        </Dialog>
-
-
 
                         <FormInfoDialog
                             document={doc!}
@@ -416,6 +319,124 @@ export default function Document() {
                             </DialogPanel>
                         </Dialog>
                     </div>
+
+                </div>
+
+                <div className="flex flex-row">
+
+                    <div className="flex w-full h-full items-center justify-between mb-2">
+                        <Accordion className="w-full mr-6 mb-6">
+                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Original Resources</AccordionHeader>
+                            <AccordionBody className="leading-6 flex flex-col">
+                                <AccordionList style={{ boxShadow: 'none' }}>
+                                    {doc !== undefined && doc?.attachments && doc?.attachments.length >= 1 ? doc?.attachments?.map((title) => (
+                                        <div key={title + doc._id} className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{mime.getType(title)?.split("/")[1] === "pdf" ? "PDF file" : mime.getType(title)?.split("/")[0] === "image" ? "Image file" : "File  ".concat("(." + title.split(".")[1] + ")")}</i>
+                                            <div className="flex space-x-2">
+                                                <Button
+                                                    className="ml-2"
+                                                    onClick={() => {
+                                                        setFileTitle(title)
+                                                        setShowPdfPreview(true)
+                                                    }}
+                                                >
+                                                    Preview File
+                                                </Button>
+                                                <Button
+                                                    className="ml-2"
+                                                    color="red"
+                                                    onClick={async () => {
+                                                        setDeleteOriginalResourceConfirm(true);
+                                                        setSelectedResource(title);
+                                                    }}
+                                                ><RiDeleteBinLine /></Button>
+                                            </div>
+                                        </div>
+                                    )) : <>
+                                        <div className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No original resources added</i>
+                                        </div>
+                                    </>}
+
+                                </AccordionList>
+                            </AccordionBody>
+                        </Accordion>
+                        <i className="lg:mr-9 lg:mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+
+                    </div>
+
+                    <div className="flex w-full h-full items-center justify-between mb-2">
+                        <i className="lg:ml-3 lg:mr-5 lg:mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+
+                        <Accordion className="w-full mr-6 mb-6">
+                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">More documents [Cooming soon] </AccordionHeader>
+                            <AccordionBody className="leading-6 flex flex-col">
+                                <AccordionList style={{ boxShadow: 'none' }}>
+                                    <div className="flex items-center justify-between m-2">
+                                        <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No more documents added</i>
+                                    </div>
+
+                                </AccordionList>
+                            </AccordionBody>
+                        </Accordion>
+
+                    </div>
+
+                    {DeleteResourceDialog(
+                        deleteOriginalResourceConfirm,
+                        setDeleteOriginalResourceConfirm,
+                        async () => {
+                            //this is a draft, we have to implement it in the kx-87, understand the logic and implement it, also the file name
+                            try {
+                                //await API.deleteKxDocumentAttachment(id!, fileTitle!);
+                                const updatedDocument = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
+                                setDoc(updatedDocument);
+                                toast({
+                                    title: "Success",
+                                    description: "The document has been deleted successfully",
+                                    variant: "success",
+                                    duration: 3000,
+                                });
+                            } catch (error) {
+                                toast({
+                                    title: "Error",
+                                    description: "Failed to delete documents",
+                                    variant: "error",
+                                    duration: 3000,
+                                });
+                            }
+                        }
+                        , selectedResource!
+
+                    )}
+
+                    <Dialog open={isDragAndDropOpen} onClose={() => setIsDragAndDropOpen(false)} static={true}>
+                        <DialogPanel>
+                            <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Add Original Resources</h3>
+                            <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                                Add original resources about the document you are uploading.
+                            </p>
+                            <FileUpload
+                                saveFile={(list) => setFiles(list)}
+                            />
+                            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+                                <Button
+                                    className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                                    variant="light"
+                                    onClick={() => setIsDragAndDropOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="w-full sm:w-auto primary"
+                                //onClick={e => handleSubmit(e)}    handleSumbitDragAndDrop to do in kx-87
+                                >
+                                    Submit
+                                </Button>
+                            </div>
+                        </DialogPanel>
+                    </Dialog>
+
 
                 </div>
 
