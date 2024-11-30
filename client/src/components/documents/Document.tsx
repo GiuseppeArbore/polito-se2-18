@@ -1,7 +1,8 @@
 
-import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine } from '@remixicon/react';
+import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine, RiAddBoxLine } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
+import { FileUpload } from "../form/DragAndDrop";
 import DeleteResourceDialog from './DeleteResourcesDialog';
 import API from '../../API';
 //import { FileUpload } from './DragDrop';
@@ -58,6 +59,8 @@ export default function Document() {
     const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
     const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
+    const [files, setFiles] = useState<File[]>([]);
+
 
     useEffect(() => {
         const fetchDocument = async () => {
@@ -189,6 +192,7 @@ export default function Document() {
     const [showCheck, setShowCheck] = useState(false);
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
     const [selectedResource, setSelectedResource] = useState<string>("");
+    const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
 
 
     return (
@@ -238,7 +242,7 @@ export default function Document() {
                             <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != undefined && pages.toString() != "" ? pages : "Unknown"} </i>
                         </div>
 
-                        <div className="flex w-full items-center justify-between mb-2">
+                        <div className="flex w-full h-full items-center justify-between mb-2">
                             <Accordion className="w-full mr-6 mb-6">
                                 <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Original Resources</AccordionHeader>
                                 <AccordionBody className="leading-6 flex flex-col">
@@ -275,6 +279,8 @@ export default function Document() {
                                     </AccordionList>
                                 </AccordionBody>
                             </Accordion>
+                            <i className="h-full lg:mr-6 mt-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+
                         </div>
 
                         {DeleteResourceDialog(
@@ -304,6 +310,33 @@ export default function Document() {
                             , selectedResource!
 
                         )}
+
+                        <Dialog open={isDragAndDropOpen} onClose={() => setIsDragAndDropOpen(false)} static={true}>
+                            <DialogPanel>
+                                <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Add Original Resources</h3>
+                                <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                                    Add original resources about the document you are uploading.
+                                </p>
+                                <FileUpload
+                                    saveFile={(list) => setFiles(list)}
+                                />
+                                <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+                                    <Button
+                                        className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                                        variant="light"
+                                        onClick={() => setIsDragAndDropOpen(false)}
+                                    >
+                                        Cancel
+                                    </Button>
+                                    <Button
+                                        className="w-full sm:w-auto primary"
+                                        //onClick={e => handleSubmit(e)}    handleSumbitDragAndDrop to do in kx-87
+                                    >
+                                        Submit
+                                    </Button>
+                                </div>
+                            </DialogPanel>
+                        </Dialog>
 
 
 
