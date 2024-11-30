@@ -168,8 +168,8 @@ export default function Console() {
               </Card>
             </Col>
             {!showSideBar &&
-              <Col className="hider ml-2 hide-on-small"  role="Button">
-                <i className="h-full" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full"></RiArrowLeftSLine></i>
+              <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring"  role="Button">
+                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full"/></i>
               </Col>
             }
           </div>
@@ -178,8 +178,8 @@ export default function Console() {
         <Col numColSpanLg={1}>
           <div className="flex flex-row ">
             {showSideBar &&
-              <Col className="hider mr-1 hide-on-small" role="Button">
-                <i className="h-full" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full" ></RiArrowRightSLine></i>
+              <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring" role="Button">
+                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full"/></i>
 
               </Col>
             }
