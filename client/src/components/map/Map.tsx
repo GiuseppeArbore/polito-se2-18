@@ -219,7 +219,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           data: Kiruna as FeatureCollection,
         });
         
-        // Aggiungi un layer per visualizzare l'area
+        
         mapRef.current?.addLayer({
           id: "Kiruna-fill",
           type: 'fill',
@@ -233,7 +233,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           },
         });
         
-        // Aggiungi un layer per visualizzare il bordo
+      
         mapRef.current?.addLayer({
           id: "Kiruna-line",
           type: 'line',
@@ -1205,7 +1205,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         data: Kiruna as FeatureCollection,
       });
 
-      // Aggiungi un layer per visualizzare l'area
+      
       mapRef.current?.addLayer({
         id: "Kiruna-fill",
         type: 'fill',
