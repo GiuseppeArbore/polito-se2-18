@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Card,
   Button,
@@ -15,6 +16,7 @@ import {
   Callout,
   Switch,
 } from "@tremor/react";
+import { DateRange, DateRangePicker } from "./DatePicker"
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
@@ -273,10 +275,11 @@ export function FormDialog(props: FormDialogProps) {
           setPageRanges={setPageRanges}
         />
 
-        <FormDocumentDatePicker
+        {/* <FormDocumentDatePicker
           issuanceDate={issuanceDate}
           setIssuanceDate={setIssuanceDate}
-        />
+        /> */}
+        <DateRangePickerPresets />
 
 
 
@@ -951,4 +954,85 @@ export function FormDocumentDatePicker({
   )
 
 
+}
+
+export const DateRangePickerPresets = () => {
+  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
+    undefined,
+  )
+  const presets = [
+    {
+      label: "Today",
+      dateRange: {
+        from: new Date(),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 7 days",
+      dateRange: {
+        from: new Date(new Date().setDate(new Date().getDate() - 7)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 30 days",
+      dateRange: {
+        from: new Date(new Date().setDate(new Date().getDate() - 30)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 3 months",
+      dateRange: {
+        from: new Date(new Date().setMonth(new Date().getMonth() - 3)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 6 months",
+      dateRange: {
+        from: new Date(new Date().setMonth(new Date().getMonth() - 6)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Month to date",
+      dateRange: {
+        from: new Date(new Date().setDate(1)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Year to date",
+      dateRange: {
+        from: new Date(new Date().setFullYear(new Date().getFullYear(), 0, 1)),
+        to: new Date(),
+      },
+    },
+  ]
+  return (
+    <div className="flex flex-col items-center gap-y-2 pt-4">
+        <label
+        htmlFor="issuance-date"
+        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+      >
+        Issuance date
+        <span className="text-red-500">*</span>
+      </label>
+      <DateRangePicker
+        presets={presets}
+        value={dateRange}
+        onChange={setDateRange}
+        className="w-70"
+      />
+      <p className="flex items-center rounded-md bg-gray-100 p-2 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
+      {dateRange
+      ? dateRange.to
+        ? `Selected Range: ${dateRange.from?.toLocaleDateString()} – ${dateRange.to?.toLocaleDateString()}`
+        : `Selected Date: ${dateRange.from?.toLocaleDateString()}`
+      : "Selected Range or Date: None"}
+      </p>
+    </div>
+  )
 }
