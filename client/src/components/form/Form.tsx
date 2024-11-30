@@ -55,9 +55,8 @@ export function FormDialog(props: FormDialogProps) {
   const [titleError, setTitleError] = useState(false);
   const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
   const [shError, setShError] = useState(false);
-  const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(
-    new Date()
-  );
+  const [issuanceDate, setIssuanceDate] = React.useState<DateRange | undefined>(
+    undefined)
   const [files, setFiles] = useState<File[]>([]);
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
   const [typeError, setTypeError] = useState(false);
@@ -168,7 +167,7 @@ export function FormDialog(props: FormDialogProps) {
 
         setTitle("");
         setScale(0);
-        setIssuanceDate(new Date());
+        setIssuanceDate({ from: new Date() });
         setType(undefined);
         setLanguage(undefined);
         setDescription(undefined);
@@ -222,7 +221,7 @@ export function FormDialog(props: FormDialogProps) {
     setTitleError(false);
     setStakeholders([]);
     setShError(false);
-    setIssuanceDate(new Date());
+    setIssuanceDate({ from: new Date() });
     setType(undefined);
     setTypeError(false);
     setScale(10000);
@@ -275,11 +274,11 @@ export function FormDialog(props: FormDialogProps) {
           setPageRanges={setPageRanges}
         />
 
-        {/* <FormDocumentDatePicker
-          issuanceDate={issuanceDate}
-          setIssuanceDate={setIssuanceDate}
-        /> */}
-        <DateRangePickerPresets />
+ 
+        <DateRangePickerPresets 
+         issuanceDate={issuanceDate}
+         setIssuanceDate={setIssuanceDate} 
+         />
 
 
 
@@ -408,8 +407,8 @@ export function FormDocumentInformation({
   setStakeholders: React.Dispatch<React.SetStateAction<Stakeholders[]>>;
   shError: boolean;
   setShError: React.Dispatch<React.SetStateAction<boolean>>;
-  issuanceDate: Date | undefined;
-  setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+  issuanceDate: DateRange | undefined;
+  setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
   type: KxDocumentType | undefined;
   setType: React.Dispatch<React.SetStateAction<KxDocumentType | undefined>>;
   typeError: boolean;
@@ -956,10 +955,15 @@ export function FormDocumentDatePicker({
 
 }
 
-export const DateRangePickerPresets = () => {
-  const [dateRange, setDateRange] = React.useState<DateRange | undefined>(
-    undefined,
-  )
+interface DateRangePickerPresetsProps {
+  issuanceDate: DateRange | undefined;
+  setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+}
+
+export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
+  issuanceDate,
+  setIssuanceDate,
+}) => {
   const presets = [
     {
       label: "Today",
@@ -1010,10 +1014,11 @@ export const DateRangePickerPresets = () => {
         to: new Date(),
       },
     },
-  ]
+  ];
+
   return (
     <div className="flex flex-col items-center gap-y-2 pt-4">
-        <label
+      <label
         htmlFor="issuance-date"
         className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
       >
@@ -1021,18 +1026,19 @@ export const DateRangePickerPresets = () => {
         <span className="text-red-500">*</span>
       </label>
       <DateRangePicker
+       enableYearNavigation
         presets={presets}
-        value={dateRange}
-        onChange={setDateRange}
+        value={issuanceDate}
+        onChange={setIssuanceDate}
         className="w-70"
       />
       <p className="flex items-center rounded-md bg-gray-100 p-2 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
-      {dateRange
-      ? dateRange.to
-        ? `Selected Range: ${dateRange.from?.toLocaleDateString()} – ${dateRange.to?.toLocaleDateString()}`
-        : `Selected Date: ${dateRange.from?.toLocaleDateString()}`
-      : "Selected Range or Date: None"}
+        {issuanceDate
+          ? issuanceDate.to
+            ? `Selected Range: ${issuanceDate.from?.toLocaleDateString()} – ${issuanceDate.to?.toLocaleDateString()}`
+            : `Selected Date: ${issuanceDate.from?.toLocaleDateString()}`
+          : "Selected a range or a single date"}
       </p>
     </div>
-  )
-}
+  );
+};
