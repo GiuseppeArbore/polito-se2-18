@@ -322,7 +322,7 @@ export default function Document() {
 
                 </div>
 
-                <div className="flex flex-row">
+                <div className="flex flex-col lg:flex-row ">
 
                     <div className="flex w-full h-full items-center justify-between mb-2">
                         <Accordion className="w-full mr-6 mb-6">
@@ -361,12 +361,11 @@ export default function Document() {
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
-                        <i className="lg:mr-9 lg:mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                        <i className="h-full lg:mr-9 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
 
                     </div>
 
-                    <div className="flex w-full h-full items-center justify-between mb-2">
-                        <i className="lg:ml-3 lg:mr-5 lg:mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                    <div className="flex w-full h-full items-center justify-between mb-2 lg:flex-row-reverse">
 
                         <Accordion className="w-full mr-6 mb-6">
                             <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">More documents [Cooming soon] </AccordionHeader>
@@ -379,6 +378,8 @@ export default function Document() {
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
+                        <i className="h-full lg:ml-3 lg:mr-5 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+
 
                     </div>
 
