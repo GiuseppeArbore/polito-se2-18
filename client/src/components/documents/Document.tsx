@@ -1,7 +1,8 @@
 
-import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill } from '@remixicon/react';
+import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
+import DeleteResourceDialog from './DeleteResourcesDialog';
 import API from '../../API';
 //import { FileUpload } from './DragDrop';
 import mime from 'mime';
@@ -81,26 +82,26 @@ export default function Document() {
                 if (document.doc_coordinates.type !== "EntireMunicipality") {
                     function getIconForType(type: string): string {
                         switch (type) {
-                          case 'Informative Document':
-                            return 'icon-InformativeDocument';
-                          case 'Prescriptive Document':
-                            return 'icon-PrescriptiveDocument';
-                          case 'Design Document':
-                            return 'icon-DesignDocument';
-                          case 'Technical Document':
-                            return 'icon-TechnicalDocument';
-                          case 'Strategy':
-                            return 'icon-Strategy';
-                          case 'Agreement':
-                            return 'icon-Agreement';
-                          case 'Conflict Resolution':
-                            return 'icon-ConflictResolution';
-                          case 'Consultation':
-                            return 'icon-Consultation';
-                          default:
-                            return 'default-icon';
+                            case 'Informative Document':
+                                return 'icon-InformativeDocument';
+                            case 'Prescriptive Document':
+                                return 'icon-PrescriptiveDocument';
+                            case 'Design Document':
+                                return 'icon-DesignDocument';
+                            case 'Technical Document':
+                                return 'icon-TechnicalDocument';
+                            case 'Strategy':
+                                return 'icon-Strategy';
+                            case 'Agreement':
+                                return 'icon-Agreement';
+                            case 'Conflict Resolution':
+                                return 'icon-ConflictResolution';
+                            case 'Consultation':
+                                return 'icon-Consultation';
+                            default:
+                                return 'default-icon';
                         }
-                      }
+                    }
 
                     const geoJSON = {
                         type: 'FeatureCollection',
@@ -134,58 +135,59 @@ export default function Document() {
     }, []);
 
     useMemo(async () => {
-       if(drawings && saveDrawing){
-        let draw: DocCoords;
-        if (
-            drawings &&
-            drawings.features.length === 1 &&
-            drawings.features[0].geometry.type === "Point"
-          ) {
-            draw = {
-              type: AreaType.POINT,
-              coordinates: drawings.features[0].geometry.coordinates,
-            };
-          } else if ((drawings && drawings.features.length >= 1) && drawings.features[0].geometry.type === "Polygon") {
-            let cord =
-              drawings.features.map((f: any) => f.geometry.coordinates).length === 1
-                ? drawings.features[0].geometry.coordinates
-                : [];
-               
-            draw = {
-              type: AreaType.AREA,
-              coordinates: cord as number[][][],
-            };
-          } else {
-            draw = {
-              type: AreaType.ENTIRE_MUNICIPALITY,
-            };
-          }
-          try{
-            const res = await API.updateKxDocumentInformation(id!, undefined, undefined, undefined, undefined, undefined, undefined, draw);
-            if (res) {
-                toast({
-                    title: "Success",
-                    description:
-                        "The document has been updated successfully",
-                    variant: "success",
-                    duration: 3000,
-                })
+        if (drawings && saveDrawing) {
+            let draw: DocCoords;
+            if (
+                drawings &&
+                drawings.features.length === 1 &&
+                drawings.features[0].geometry.type === "Point"
+            ) {
+                draw = {
+                    type: AreaType.POINT,
+                    coordinates: drawings.features[0].geometry.coordinates,
+                };
+            } else if ((drawings && drawings.features.length >= 1) && drawings.features[0].geometry.type === "Polygon") {
+                let cord =
+                    drawings.features.map((f: any) => f.geometry.coordinates).length === 1
+                        ? drawings.features[0].geometry.coordinates
+                        : [];
+
+                draw = {
+                    type: AreaType.AREA,
+                    coordinates: cord as number[][][],
+                };
             } else {
-                toast({
-                    title: "Error",
-                    description: "Failed to update document",
-                    variant: "error",
-                    duration: 3000,
-                })
+                draw = {
+                    type: AreaType.ENTIRE_MUNICIPALITY,
+                };
             }
-          } catch (error) {
-          
-          }
-          setSaveDrawing(false);
-       }
-    },[saveDrawing]);
+            try {
+                const res = await API.updateKxDocumentInformation(id!, undefined, undefined, undefined, undefined, undefined, undefined, draw);
+                if (res) {
+                    toast({
+                        title: "Success",
+                        description:
+                            "The document has been updated successfully",
+                        variant: "success",
+                        duration: 3000,
+                    })
+                } else {
+                    toast({
+                        title: "Error",
+                        description: "Failed to update document",
+                        variant: "error",
+                        duration: 3000,
+                    })
+                }
+            } catch (error) {
+
+            }
+            setSaveDrawing(false);
+        }
+    }, [saveDrawing]);
 
     const [showCheck, setShowCheck] = useState(false);
+    const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
 
 
     return (
@@ -242,7 +244,7 @@ export default function Document() {
                                     <AccordionList style={{ boxShadow: 'none' }}>
                                         {doc !== undefined && doc?.attachments && doc?.attachments.length >= 1 ? doc?.attachments?.map((title) => (
                                             <div key={title + doc._id} className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{mime.getType(title)?.split("/")[1] === "pdf" ? "PDF file" : mime.getType(title)?.split("/")[0] === "image" ? "Image file" : "File  ".concat("(."+ title.split(".")[1] +")") }</i>
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{mime.getType(title)?.split("/")[1] === "pdf" ? "PDF file" : mime.getType(title)?.split("/")[0] === "image" ? "Image file" : "File  ".concat("(." + title.split(".")[1] + ")")}</i>
                                                 <Button
                                                     className="ml-2"
                                                     onClick={() => {
@@ -252,6 +254,16 @@ export default function Document() {
                                                 >
                                                     Preview File
                                                 </Button>
+                                                <Button
+                                                    style={{ backgroundColor: "red" }}
+                                                    color="red"
+                                                    size="xs"
+                                                    icon={RiDeleteBinLine}
+                                                    onClick={async () => {
+                                                        setDeleteOriginalResourceConfirm(true);
+                                                        //rowNode.current = params.data;
+                                                    }}
+                                                />
                                             </div>
                                         )) : <>
                                             <div className="flex items-center justify-between m-2">
@@ -263,6 +275,35 @@ export default function Document() {
                                 </AccordionBody>
                             </Accordion>
                         </div>
+
+                        {DeleteResourceDialog(
+                            deleteOriginalResourceConfirm,
+                            setDeleteOriginalResourceConfirm,
+                            async () => {
+                                //this is a draft, we have to implement it in the kx-87
+                                try {
+                                    //await API.deleteKxDocumentAttachment(id!, fileTitle!);
+                                    const updatedDocument = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
+                                    setDoc(updatedDocument);
+                                    toast({
+                                        title: "Success",
+                                        description: "The document has been deleted successfully",
+                                        variant: "success",
+                                        duration: 3000,
+                                    });
+                                } catch (error) {
+                                    toast({
+                                        title: "Error",
+                                        description: "Failed to delete documents",
+                                        variant: "error",
+                                        duration: 3000,
+                                    });
+                                }
+                            }
+                            , fileTitle!
+
+                        )}
+
 
 
                         <FormInfoDialog
@@ -366,7 +407,7 @@ export default function Document() {
                             className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
                         >
                             <DocumentPageMap
-                                setDrawing={(d) => {setDrawings(d); setSaveDrawing(true)}}
+                                setDrawing={(d) => { setDrawings(d); setSaveDrawing(true) }}
                                 drawing={drawings}
                                 style={{ minHeight: "300px", width: "100%" }}
                             />
@@ -535,7 +576,7 @@ export function FormInfoDialog({
                             setPages={setPages}
                             pageRanges={pageRanges}
                             setPageRanges={setPageRanges}
-                            
+
                         />
                         <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
                             <Button
@@ -584,7 +625,6 @@ export function FormDescriptionDialog(
             setError("Please fill the description field");
             return;
         }
-        //API call to update description
         try {
             const updatedDocument = await API.updateKxDocumentDescription(id, description);
             if (updatedDocument) {
