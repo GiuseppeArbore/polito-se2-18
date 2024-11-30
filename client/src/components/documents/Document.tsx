@@ -188,6 +188,7 @@ export default function Document() {
 
     const [showCheck, setShowCheck] = useState(false);
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
+    const [selectedResource, setSelectedResource] = useState<string>("");
 
 
     return (
@@ -245,25 +246,25 @@ export default function Document() {
                                         {doc !== undefined && doc?.attachments && doc?.attachments.length >= 1 ? doc?.attachments?.map((title) => (
                                             <div key={title + doc._id} className="flex items-center justify-between m-2">
                                                 <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{mime.getType(title)?.split("/")[1] === "pdf" ? "PDF file" : mime.getType(title)?.split("/")[0] === "image" ? "Image file" : "File  ".concat("(." + title.split(".")[1] + ")")}</i>
-                                                <Button
-                                                    className="ml-2"
-                                                    onClick={() => {
-                                                        setFileTitle(title)
-                                                        setShowPdfPreview(true)
-                                                    }}
-                                                >
-                                                    Preview File
-                                                </Button>
-                                                <Button
-                                                    style={{ backgroundColor: "red" }}
-                                                    color="red"
-                                                    size="xs"
-                                                    icon={RiDeleteBinLine}
-                                                    onClick={async () => {
-                                                        setDeleteOriginalResourceConfirm(true);
-                                                        //rowNode.current = params.data;
-                                                    }}
-                                                />
+                                                <div className="flex space-x-2">
+                                                    <Button
+                                                        className="ml-2"
+                                                        onClick={() => {
+                                                            setFileTitle(title)
+                                                            setShowPdfPreview(true)
+                                                        }}
+                                                    >
+                                                        Preview File
+                                                    </Button>
+                                                    <Button
+                                                        className="ml-2"
+                                                        color="red"
+                                                        onClick={async () => {
+                                                            setDeleteOriginalResourceConfirm(true);
+                                                            setSelectedResource(title);
+                                                        }}
+                                                    ><RiDeleteBinLine /></Button>
+                                                </div>
                                             </div>
                                         )) : <>
                                             <div className="flex items-center justify-between m-2">
@@ -280,7 +281,7 @@ export default function Document() {
                             deleteOriginalResourceConfirm,
                             setDeleteOriginalResourceConfirm,
                             async () => {
-                                //this is a draft, we have to implement it in the kx-87
+                                //this is a draft, we have to implement it in the kx-87, understand the logic and implement it, also the file name
                                 try {
                                     //await API.deleteKxDocumentAttachment(id!, fileTitle!);
                                     const updatedDocument = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
@@ -300,7 +301,7 @@ export default function Document() {
                                     });
                                 }
                             }
-                            , fileTitle!
+                            , selectedResource!
 
                         )}
 
