@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-    padding: 2% !important;
+    padding: 1% !important;
 }
 
 .no-click {
@@ -45,7 +45,7 @@ body {
 }
 
 .features-section {
-  padding: 40px 20px;
+  padding: 20px 20px;
   width: 100%;
   background-color: #002e70;
 }
@@ -64,7 +64,6 @@ body {
 }
 
 .feature-card {
-  width: 200px;
   padding: 20px;
   border-radius: 8px;
   text-align: center;
@@ -82,19 +81,18 @@ body {
   margin-bottom: 10px;
 }
 .phases-section {
-  padding: 40px 20px;
+  padding: 5px 20px;
   width: 100%;
   background-color: #023883;
 }
 
 .phases-section h2 {
   font-size: 2rem;
-  margin-bottom: 15px;
   text-align: center;
 }
 
 .footer {
-  padding: 20px;
+  padding: 10px;
   font-size: 0.9rem;
   text-align: center;
 }
