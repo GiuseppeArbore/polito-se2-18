@@ -1205,17 +1205,6 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         data: Kiruna as FeatureCollection,
       });
 
-      
-      mapRef.current?.addLayer({
-        id: "Kiruna-fill",
-        type: 'fill',
-        source: "Kiruna",
-        paint: {
-          'fill-color': '#745296',
-          'fill-opacity': 0.2,
-        },
-      });
-
       mapRef.current?.addLayer({
         id: "Kiruna-line",
         type: 'line',
@@ -1223,6 +1212,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         paint: {
           'line-color': '#745296',
           'line-width': 4,
+          'line-dasharray': [1, 1]
         },
       });
     });
