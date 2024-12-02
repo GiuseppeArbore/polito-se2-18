@@ -7,8 +7,8 @@ export default function Home() {
   return (
     <div className="App">
       <HeroSection />
-      <FeaturesSection />
       <Phases />
+      <FeaturesSection />
       <Footer />
     </div>
   );

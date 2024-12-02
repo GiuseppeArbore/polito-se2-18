@@ -36,7 +36,7 @@ const ProcessCarousel = () => {
   ];
 
   return (
-    <div className="process-carousel text-white">
+    <div className="process-carousel text-white max-w-screen-xl mx-auto">
       <Swiper
         modules={[Navigation, Pagination]}
         slidesPerView={1}
@@ -46,20 +46,24 @@ const ProcessCarousel = () => {
         {slides.map((slide, index) => (
           <SwiperSlide
             key={index}
-            className="flex flex-col lg:flex-row items-center justify-between gap-4 p-4"
+            className="flex flex-col lg:flex-row items-center justify-between gap-2 p-2"
           >
-            <div className="w-full lg:w-1/2 text-center lg:text-left p-8">
-              <h4 className="mb-2 text-xl font-bold">{slide.title}</h4>
+            <div className="w-full lg:w-1/2 text-center lg:text-center p-2 lg:p-4 ">
+              <h4 className="mb-1 text-lg md:text-xl lg:text-2xl font-bold">
+                {slide.title}
+              </h4>
               {slide.description && (
-                <p className="text-md">{slide.description}</p>
+                <p className="text-sm md:text-md lg:text-lg">
+                  {slide.description}
+                </p>
               )}
             </div>
 
-            <div className="w-full lg:w-1/2 mb-4">
+            <div className="w-full lg:w-1/2 flex justify-center">
               <img
                 src={slide.image}
                 alt={slide.title}
-                className="w-[20vw] h-[20vh] object-cover rounded-lg"
+                className="w-3/4 xl:w-[14vw] 2xl:w-[20vw] h-auto object-cover rounded-lg"
               />
             </div>
           </SwiperSlide>
