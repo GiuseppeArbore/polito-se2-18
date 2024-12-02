@@ -23,7 +23,11 @@ import { Link } from "react-router-dom";
 import { RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine } from "@remixicon/react";
 import { AdvancedFilterModel } from "ag-grid-enterprise";
 
-export default function Console() {
+interface ConsoleProps {
+  user: { id: string; name: string } | null;
+}
+
+const Console: React.FC<ConsoleProps> = ({ user }) => {
   const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [tmpDocuments, setTmpDocuments] = useState<KxDocument[]>([]);
   const [selectedView, setSelectedView] = useState(0);
@@ -291,3 +295,4 @@ export default function Console() {
   }
 }
 
+export default Console;

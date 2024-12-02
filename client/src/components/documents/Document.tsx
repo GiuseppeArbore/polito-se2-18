@@ -30,8 +30,11 @@ import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
 import exp from 'constants';
 
+interface DocumentProps {
+user: { id: string; name: string } | null;
+}
 
-export default function Document() {
+export default function Document({ user }: DocumentProps) {
 
     const navigate = useNavigate();
     const { id } = useParams<string>();

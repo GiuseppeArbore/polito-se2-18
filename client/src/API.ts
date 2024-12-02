@@ -204,5 +204,56 @@ const addAttachmentToDocument = async (id: mongoose.Types.ObjectId, files: File[
     }
 };
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument };
+//LOGIN
+
+interface Credentials {
+    username: string;
+    password: string;
+}
+
+const login = async (credentials: Credentials) => {
+    const response = await fetch(API_URL + '/api/sessions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(credentials),
+    });
+    if (response.ok) {
+      const user = await response.json();
+      return user;
+    } else {
+      const errDetails = await response.json();
+      throw errDetails;
+    }
+  };
+  
+  const getUserInfo = async () => {
+    const response = await fetch(API_URL + '/api/sessions/current', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      const errMessage = await response.json();
+      throw errMessage;
+    } else {
+      return response.json();
+    }
+  };
+  
+  const logout = async () => {
+    const response = await fetch(API_URL + '/api/sessions/current', {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      const errMessage = await response.json();
+      throw errMessage;
+    } else {
+      return null;
+    }
+  };
+
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument, login, getUserInfo, logout };
 export default API;
