@@ -8,11 +8,20 @@ Software Engineering 2 - main project - Kiruna eXplorer - group 18
 [Documentation](https://storage.veebor.dev/s/AJegs4BtiMGxpqZ)
 ---
 
+### Running the project without docker
+
+You can use `npm run dev` to run the project with authentication disabled.
+Running with `npm start` will leave authentication enabled.
+
+### Fake users
+You can find a collection ready to be imported in mongodb in `test_users`. The collection name should be
+`users`.
+
 ### Run the project with docker
 1. Clone the repository
 2. Run the following command in the root folder of the project:
 ```
-docker-compose up
+docker compose up
 ```
 3. Open a browser and go to the following address:
 ```
@@ -20,7 +29,7 @@ http://localhost:80/
 ```
 4. To stop the project, run the following command in the root folder of the project:
 ```
-docker-compose down
+docker compose down
 ```
 ### Run mongoDB with docker
 1. Run the following command:

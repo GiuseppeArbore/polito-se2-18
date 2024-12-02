@@ -2,14 +2,22 @@ import { describe, test } from "@jest/globals"
 import { db } from "../src/db/dao";
 import { AreaType, KxDocumentType, Scale, Stakeholders } from "../src/models/enum";
 import { Area, KxDocument, Point } from "../src/models/model";
+import { User, UserModel } from "../src/models/user";
+import { EJSON } from "bson";
 import { mongoose } from "@typegoose/typegoose";
 import { KIRUNA_COORDS } from "../src/utils";
-import { read } from "fs";
+import testUsers from "../test_users/db_export.kiruna-ex.users.json";
 
 const list: mongoose.Types.ObjectId[] = [];
 const date = new Date();
+const deserializedTestUsers = EJSON.deserialize(testUsers);
+
+let userIds: mongoose.Types.ObjectId[] = [];
 
 beforeAll(async () => {
+    const users = await UserModel.db.collection("users").insertMany(deserializedTestUsers);
+    userIds = userIds.concat(Object.values(users.insertedIds));
+
     const res = await db.createKxDocument({
         title: "title 1",
         stakeholders: [Stakeholders.RESIDENT],
@@ -219,8 +227,30 @@ describe("Test DAO", () => {
         const res2 = await db.deleteKxDocument(id);
         expect(res2).toBeTruthy();
     });
+    test("Get user by email", async () => {
+        const user = deserializedTestUsers[0]
+        const res = await db.getUserByEmail(user.email);
+
+        expect(
+            {
+                ...res,
+                password: res?.password.toString("base64"),
+                salt: res?.salt.toString("base64")
+            }
+        ).toMatchObject(
+            {
+                ...user,
+                password: user.password.toString("base64"),
+                salt: user.salt.toString("base64")
+            }
+        );
+    });
 });
 
 afterAll(async () => {
+    for (const id of userIds) {
+        await db.deleteUser(id);
+    }
+
     await db.disconnectFromDB();
 });
