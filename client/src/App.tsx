@@ -5,13 +5,14 @@ import { NotFound } from "./components/NotFound";
 import { Route, Routes, useNavigate } from "react-router-dom";
 import Console from "./components/Console";
 import API from "./API";
+import { Stakeholders } from "./enum";
 
 export default function App() {
 
   const navigate = useNavigate();
   const [loggedIn, setLoggedIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState<{ msg: string; type: string }>({ msg: '', type: '' });
-  const [user, setUser] = useState<{ id: string; name: string } | null>(null);
+  const [user, setUser] = useState<{ email: string; role: Stakeholders } | null>(null);
   const [error, setError] = useState< boolean | undefined >(false);
 
 

@@ -20,6 +20,7 @@ interface ListProps {
   updateDocuments: (documents: KxDocument[]) => void;
   updateFilterModel: (filterModel: AdvancedFilterModel | undefined) => void;
   filterModel: AdvancedFilterModel | undefined;
+  user: { email: string; role: Stakeholders } | null;
 }
 
 function List(props: ListProps) {
@@ -38,16 +39,18 @@ function List(props: ListProps) {
           icon={RiInfoI}
           onClick={() => navigator("/documents/" + params.value)}
         />
-        <Button
-          style={{ backgroundColor: "red" }}
-          color="red"
-          size="xs"
-          icon={RiDeleteBinLine}
-          onClick={async () => {
-            setDeleteConfirm(true);
-            rowNode.current = params.data;
-          }}
-        />
+        {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
+          <Button
+            style={{ backgroundColor: "red" }}
+            color="red"
+            size="xs"
+            icon={RiDeleteBinLine}
+            onClick={async () => {
+              setDeleteConfirm(true);
+              rowNode.current = params.data;
+            }}
+          />
+        )}
       </Flex>
     );
   };

@@ -2,12 +2,13 @@ import React, { useState } from "react";
 import { Button, Dialog, DialogPanel, Select, SelectItem, Text, TextInput } from "@tremor/react";
 import { Link } from "react-router-dom";
 import { Badge } from "@tremor/react";
+import { Stakeholders } from "../../enum";
 
 interface HeroSectionProps {
   login: (credentials: { username: string; password: string }) => void;
   loginErrorMessage: { msg: string; type: string }; 
   error : boolean | undefined;
-  user : { id: string; name: string } | null;
+  user: { email: string; role: Stakeholders } | null;
 }
 
 const HeroSection: React.FC<HeroSectionProps> = ({ login, loginErrorMessage, error, user}) => {

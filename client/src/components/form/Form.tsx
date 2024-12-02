@@ -41,9 +41,11 @@ import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
 
+
 interface FormDialogProps {
   documents: KxDocument[];
   refresh: () => void;
+  user: { email: string; role: Stakeholders } | null;
 }
 
 
@@ -348,9 +350,11 @@ export function FormDialog(props: FormDialogProps) {
 
   return (
     <>
-      <Button className="w-full primary" onClick={() => { setIsOpen(true); clearForm() }}>
-        Add new document
-      </Button>
+      {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
+        <Button className="w-full primary" onClick={() => { setIsOpen(true); clearForm() }}>
+          Add new document
+        </Button>
+      )}
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
         <DialogPanel
           className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"

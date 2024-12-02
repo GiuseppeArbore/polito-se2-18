@@ -22,9 +22,10 @@ import { FeatureCollection } from "geojson";
 import { Link } from "react-router-dom";
 import { RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine } from "@remixicon/react";
 import { AdvancedFilterModel } from "ag-grid-enterprise";
+import { Stakeholders } from "../enum";
 
 interface ConsoleProps {
-  user: { id: string; name: string } | null;
+  user: { email: string; role: Stakeholders } | null;
 }
 
 const Console: React.FC<ConsoleProps> = ({ user }) => {
@@ -193,6 +194,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                   <FormDialog
                     documents={documents}
                     refresh={() => setRefreshNeeded(true)}
+                    user = {user}
                   />
 
                   <Card>
@@ -274,7 +276,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                 height: "100%",
               }}
             >
-              <List documents={documents} updateDocuments={setTmpDocuments} updateFilterModel={setFilterModel} filterModel={filterModel} />
+              <List documents={documents} updateDocuments={setTmpDocuments} updateFilterModel={setFilterModel} filterModel={filterModel} user={user} />
             </div>
           </>
         );

@@ -1,12 +1,13 @@
 import HeroSection from "./HeroSection";
 import FeaturesSection from "./FeaturesSection";
 import Footer from "./Footer";
+import { Stakeholders } from "../../enum";
 
 interface HomeProps {
   login: (credentials: { username: string; password: string }) => void;
   loginErrorMessage: { msg: string; type: string };
   error : boolean|undefined;
-  user : { id: string; name: string } | null;
+  user: { email: string; role: Stakeholders } | null;
 }
 const Home: React.FC<HomeProps> = ({ login, loginErrorMessage, error, user }) => {
   return (
