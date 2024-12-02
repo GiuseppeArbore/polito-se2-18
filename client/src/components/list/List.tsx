@@ -1,5 +1,5 @@
 import "ag-grid-enterprise";
-import { AdvancedFilterModel, ColDef, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
+import { AdvancedFilterModel, ColDef, GridApi, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -14,13 +14,14 @@ import API from "../../API";
 import DeleteDialog from "./DeleteDialog";
 import { Stakeholders } from "../../enum";
 import { prop } from "@typegoose/typegoose";
+import { on } from "events";
 
 interface ListProps {
   documents: KxDocument[];
   updateDocuments: (documents: KxDocument[]) => void;
   updateFilterModel: (filterModel: AdvancedFilterModel | undefined) => void;
   filterModel: AdvancedFilterModel | undefined;
-quickFilter: string;
+  quickFilter: string;
 }
 
 function List(props: ListProps) {
@@ -221,6 +222,7 @@ function List(props: ListProps) {
     });
     props.updateDocuments(rowData.filter((doc): doc is KxDocument => doc !== undefined));
     props.updateFilterModel(gridRef.current?.api?.getAdvancedFilterModel() || undefined);
+    onGridReady();
   }
   function addFilterModel() {
     if(props.filterModel) {
@@ -247,6 +249,11 @@ function List(props: ListProps) {
           animateRows={true}
           onFilterChanged={onFilterChanged}
 		      quickFilterText={props.quickFilter}
+          onRowDataUpdated={onFilterChanged}
+          onModelUpdated={onFilterChanged}
+          
+          
+         
         />
       </div>
 
