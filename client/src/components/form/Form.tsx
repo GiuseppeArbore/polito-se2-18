@@ -42,6 +42,7 @@ import "../../index.css";
 import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
+import { se } from "date-fns/locale";
 
 interface FormDialogProps {
   documents: KxDocument[];
@@ -58,6 +59,7 @@ export function FormDialog(props: FormDialogProps) {
   const [issuanceDate, setIssuanceDate] = React.useState<DateRange | undefined>(
     undefined)
   const [files, setFiles] = useState<File[]>([]);
+  const [issuanceDateError, setIssuanceDateError] = useState(false);
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
   const [typeError, setTypeError] = useState(false);
   const [scale, setScale] = useState(10000);
@@ -119,11 +121,12 @@ export function FormDialog(props: FormDialogProps) {
       };
     }
 
-    if (tmpTitleError || tmpShError || !type || !description || !draw || (drawing === undefined && !hideMap)) {
+    if (tmpTitleError || tmpShError || !type || !description || !draw || !issuanceDate || (drawing === undefined && !hideMap)) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
+      setIssuanceDateError(!issuanceDate); 
       hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
       setError("Please fill all the required fields");
       toast({
@@ -222,6 +225,7 @@ export function FormDialog(props: FormDialogProps) {
     setStakeholders([]);
     setShError(false);
     setIssuanceDate({ from: new Date() });
+    setIssuanceDateError(false);
     setType(undefined);
     setTypeError(false);
     setScale(10000);
@@ -278,6 +282,7 @@ export function FormDialog(props: FormDialogProps) {
         <DateRangePickerPresets 
          issuanceDate={issuanceDate}
          setIssuanceDate={setIssuanceDate} 
+         hasError={issuanceDateError}
          />
 
 
@@ -958,11 +963,13 @@ export function FormDocumentDatePicker({
 interface DateRangePickerPresetsProps {
   issuanceDate: DateRange | undefined;
   setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  hasError: boolean;
 }
 
 export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
   issuanceDate,
   setIssuanceDate,
+  hasError
 }) => {
   const presets = [
     {
@@ -1026,7 +1033,8 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
         <span className="text-red-500">*</span>
       </label>
       <DateRangePicker
-       enableYearNavigation
+        enableYearNavigation
+        hasError={hasError}
         presets={presets}
         value={issuanceDate}
         onChange={setIssuanceDate}
