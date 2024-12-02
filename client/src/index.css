@@ -23,6 +23,16 @@ body {
     background-color: transparent;
 }
 
+.login {
+    background-color: white;
+    color: #003d8e;
+}
+
+.login:hover {
+    background-color: #003d8e;
+    color: white;
+}
+
 /* Styles for Landing page */
 
 .hero-section {

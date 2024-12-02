@@ -1,5 +1,5 @@
 import "ag-grid-enterprise";
-import { ColDef, GridOptions } from "ag-grid-enterprise";
+import { AdvancedFilterModel, ColDef, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -13,10 +13,14 @@ import locales from "../../locales.json";
 import API from "../../API";
 import DeleteDialog from "./DeleteDialog";
 import { Stakeholders } from "../../enum";
+import { prop } from "@typegoose/typegoose";
 
 interface ListProps {
   documents: KxDocument[];
-  quickFilter: string;
+  updateDocuments: (documents: KxDocument[]) => void;
+  updateFilterModel: (filterModel: AdvancedFilterModel | undefined) => void;
+  filterModel: AdvancedFilterModel | undefined;
+quickFilter: string;
 }
 
 function List(props: ListProps) {
@@ -92,6 +96,9 @@ function List(props: ListProps) {
     {
       headerName: "Issuance Date",
       field: "issuance_date",
+      filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
+        return params.data && new Date(params.data.issuance_date).toLocaleDateString() || "";
+      },
       valueFormatter: (params: { value: string | number }) => {
         return params.value !== undefined
           ? new Date(params.value).toLocaleDateString()
@@ -121,6 +128,9 @@ function List(props: ListProps) {
       field: "language",
       enableRowGroup: true,
       filter: true,
+      filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
+        return locales.find((l) => params.data && l.code === params.data.language)?.name;
+      },
       valueFormatter: (params: { value: string | number }) => {
         return locales.find((l) => l.code === params.value)?.name || "";
       },
@@ -137,6 +147,7 @@ function List(props: ListProps) {
       minWidth: 30,
       enableRowGroup: false,
       cellRenderer: (params: any) => infoButton(params),
+      filter: false,
     },
   ];
 
@@ -149,13 +160,24 @@ function List(props: ListProps) {
     rowGroupPanelShow: "always",
     animateRows: true,
     pagination: false,
+    enableAdvancedFilter: true,
     defaultColDef: {
       filter: true,
       flex: 1,
       resizable: true,
       sortable: true,
       enableRowGroup: true,
+      filterParams: {newRowsAction: 'keep'}
     },
+    statusBar: {
+      statusPanels: [
+          { statusPanel: 'agTotalAndFilteredRowCountComponent' },
+          { statusPanel: 'agTotalRowCountComponent' },
+          { statusPanel: 'agFilteredRowCountComponent' },
+          { statusPanel: 'agSelectedRowCountComponent' },
+          { statusPanel: 'agAggregationComponent' }
+      ]
+  },
     sideBar: {
       toolPanels: [
         {
@@ -192,16 +214,30 @@ function List(props: ListProps) {
     return props.documents;
   }, [props.documents]);
 
-  const defaultColDef: ColDef = {};
+  function onFilterChanged() {
+    let rowData: (KxDocument | undefined)[] = [];
+    gridRef.current?.api?.forEachNodeAfterFilter((node) => {
+      rowData.push(node.data)
+    });
+    props.updateDocuments(rowData.filter((doc): doc is KxDocument => doc !== undefined));
+    props.updateFilterModel(gridRef.current?.api?.getAdvancedFilterModel() || undefined);
+  }
+  function addFilterModel() {
+    if(props.filterModel) {
+      gridRef.current?.api?.setAdvancedFilterModel(props.filterModel);
+    } else {
+     props.updateFilterModel(undefined);
+    }
 
+  }
   return (
-    <Card className="p-4">
-      <Text className="mb-4 text-center">Document</Text>
+    <>
       <div
-        className={"ag-theme-quartz-auto-dark"}
-        style={{ width: "100%", height: "70vh", overflow: "auto" }}
+        className={"ag-theme-quartz-auto-dark right-0 left-0 ring-0"}
+        style={{ width: "100%", height: "100%", minHeight: "70vh", overflow: "auto" }}
       >
         <AgGridReact
+          onViewportChanged={addFilterModel}
           onGridColumnsChanged={onGridReady}
           rowData={rowData}
           onFirstDataRendered={onFirstDataRendered}
@@ -209,7 +245,8 @@ function List(props: ListProps) {
           onGridReady={onGridReady}
           ref={gridRef}
           animateRows={true}
-          quickFilterText={props.quickFilter}
+          onFilterChanged={onFilterChanged}
+		      quickFilterText={props.quickFilter}
         />
       </div>
 
@@ -239,7 +276,7 @@ function List(props: ListProps) {
         },
         rowNode.current?.title
       )}
-    </Card>
+    </>
   );
 }
 
