@@ -1,9 +1,10 @@
 
 import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { AllGeoJSON, featureCollection, area, pointOnFeature,centroid } from "@turf/turf";
+import { AllGeoJSON, featureCollection, area, pointOnFeature, centroid, booleanPointInPolygon } from "@turf/turf";
 import  { documentAreaColorMapping,documentBorderColorMapping } from "./documentcolors";
 import {loadIcons} from "./imagesLoader";
+import Kiruna from "./KirunaMunicipality.json"
 import {
   Button,
   Card,
@@ -33,9 +34,8 @@ import {
 } from "@remixicon/react";
 import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { Feature, FeatureCollection, Position, Polygon, Geometry, Point, GeoJsonProperties } from "geojson";
+import { Feature, FeatureCollection, Position, Polygon, MultiPolygon, Geometry, Point, GeoJsonProperties } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
-import { coordDistance } from "../../utils";
 import { KxDocument } from "../../model";
 import {
   DropdownMenu,
@@ -60,6 +60,38 @@ export interface SatMapProps {
   className?: string;
   entireMunicipalityDocuments?: KxDocument[];
 }
+
+const getPointsAndCentroids = (drawing: FeatureCollection<Geometry, GeoJsonProperties> | undefined, offsetDistance: number): FeatureCollection<Geometry, GeoJsonProperties> => {
+  return {
+    type: 'FeatureCollection',
+    features: drawing?.features.flatMap<Feature<Geometry, GeoJsonProperties>>(feature => {
+      let updatedFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
+
+      if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
+        let centroid = pointOnFeature(feature as AllGeoJSON);
+        centroid.properties = { ...feature.properties, isCentroid: true }; // Add isCentroid property
+      
+        if (!centroid.geometry) return [];
+        const centroidCoordinates = centroid.geometry.coordinates as [number, number];
+        const centroidOffsetX = (Math.random() - 0.5) * offsetDistance;
+        const centroidOffsetY = (Math.random() - 0.5) * offsetDistance;
+        centroid.geometry.coordinates = [centroidCoordinates[0] + centroidOffsetX, centroidCoordinates[1] + centroidOffsetY];
+      
+        updatedFeatures.push(centroid as Feature<Geometry, GeoJsonProperties>);
+      }
+
+      if (feature.geometry.type === 'Point') {
+        const pointCoordinates = feature.geometry.coordinates as [number, number];
+        const pointOffsetX = (Math.random() - 0.5) * offsetDistance;
+        const pointOffsetY = (Math.random() - 0.5) * offsetDistance;
+        feature.geometry.coordinates = [pointCoordinates[0] + pointOffsetX, pointCoordinates[1] + pointOffsetY];
+        updatedFeatures.push(feature);
+      }
+
+      return updatedFeatures;
+    }) || []
+  };
+};
 
 const defaultZoom = 12;
 const center: LngLatLike = [20.26, 67.845];
@@ -97,7 +129,8 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
         interactive: false,
       });
       mapRef.current.addControl(PreviewMapDraw, "bottom-right");
-     
+
+      
       if (props.drawing) PreviewMapDraw.set(props.drawing);
     }
   }, [props.drawing]);
@@ -125,6 +158,15 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
 export const DashboardMap: React.FC<SatMapProps> = (props) => {
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const [isKirunaVisible, setIsKirunaVisible] = useState(false);
+
+    const toggleKirunaVisibility = () => {
+    if (mapRef.current) {
+      const visibility = isKirunaVisible ? 'none' : 'visible';
+      mapRef.current.setLayoutProperty('Kiruna-fill', 'visibility', visibility);
+      setIsKirunaVisible(!isKirunaVisible);
+    }
+  };
 
   useEffect(() => {
     if (mapRef.current) return;
@@ -171,7 +213,38 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       mapRef.current?.on("load", function () {
         if(mapRef.current){
         loadIcons(mapRef.current).then(() => {
+        //KIRUNA-----------------------------------------------------
+        mapRef.current?.addSource('Kiruna', {
+          type: 'geojson',
+          data: Kiruna as FeatureCollection,
+        });
+        
+        
+        mapRef.current?.addLayer({
+          id: "Kiruna-fill",
+          type: 'fill',
+          source: "Kiruna",
+          layout: {
+            'visibility': 'none'
+          },
+          paint: {
+            'fill-color': '#745296',
+            'fill-opacity': 0.5,
+          },
+        });
+        
+      
+        mapRef.current?.addLayer({
+          id: "Kiruna-line",
+          type: 'line',
+          source: "Kiruna",
+          paint: {
+            'line-color': '#745296',
+            'line-width': 2,
+          },
+        });
         //AREA-------------------------------------------------------
+        
         const sortedDrawing = props.drawing
         ? featureCollection(
             props.drawing.features.sort((a, b) => {
@@ -194,7 +267,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           const pointId = `point-${id}`;
           const layerId = `drawings-layer-${id}`;
           const borderLayerId = `drawings-border-layer-${id}`;
-          const highlightLayerId = `drawings-highlight-layer-${id}`;
           const circleLayerId = `drawings-circle-layer-${id}`;
         
           // Add the main fill layer
@@ -208,7 +280,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             layout: {},
             paint: {
               'fill-color': documentAreaColorMapping, // Assuming documentColorMapping is an object mapping feature IDs to colors
-              'fill-opacity': 0.3,
+              'fill-opacity': 0,
             },
           });
         
@@ -223,80 +295,17 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             layout: {},
             paint: {
               'line-color': documentBorderColorMapping, // Border color
-              'line-width': 3,
+              'line-width': 0,
             },
           });
-        
-          // Add the highlight layer
-          mapRef.current?.addLayer({
-            id: highlightLayerId,
-            type: 'line',
-            source: {
-              type: 'geojson',
-              data: feature,
-            },
-            layout: {},
-            paint: {
-              'line-color': documentBorderColorMapping,
-              'line-width': 3,
-              'line-opacity': 0, // Initially hidden
-            },
-          });
-          
-          // Add mouse enter and leave events
-          mapRef.current?.on('mouseenter', layerId, () => {
-            mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.6);
-            mapRef.current?.setPaintProperty(highlightLayerId, 'line-opacity', 1);
-           // mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
-            mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 2);
-            mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 25);
 
-
-          });
-        
-          mapRef.current?.on('mouseleave', layerId, () => {
-            mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.3);
-            mapRef.current?.setPaintProperty(highlightLayerId, 'line-opacity', 0);
-          //mapRef.current?.setLayoutProperty(pointId, 'icon-size', 1);
-            mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 1);
-            mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 15);
-
-          });
+         
         });
 
       //CLUSTERS---------------------------------------------------------
-      const offsetDistance = 0.0001; // Distanza di offset
+      const offsetDistance = 0.0001; // offsetDistance
 
-      const pointsAndCentroids: FeatureCollection<Geometry, GeoJsonProperties> = {
-        type: 'FeatureCollection',
-        features: props.drawing?.features.flatMap<Feature<Geometry, GeoJsonProperties>>(feature => {
-          let updatedFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
-      
-          if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-            let centroid = pointOnFeature(feature as AllGeoJSON);
-            centroid.properties = { ...feature.properties, isCentroid: true }; // Add isCentroid property
-          
-            if (!centroid.geometry) return [];
-            const centroidCoordinates = centroid.geometry.coordinates as [number, number];
-            const centroidOffsetX = (Math.random() - 0.5) * offsetDistance;
-            const centroidOffsetY = (Math.random() - 0.5) * offsetDistance;
-            centroid.geometry.coordinates = [centroidCoordinates[0] + centroidOffsetX, centroidCoordinates[1] + centroidOffsetY];
-          
-            updatedFeatures.push(centroid as Feature<Geometry, GeoJsonProperties>);
-          }
-      
-          if (feature.geometry.type === 'Point') {
-            const pointCoordinates = feature.geometry.coordinates as [number, number];
-            const pointOffsetX = (Math.random() - 0.5) * offsetDistance;
-            const pointOffsetY = (Math.random() - 0.5) * offsetDistance;
-            feature.geometry.coordinates = [pointCoordinates[0] + pointOffsetX, pointCoordinates[1] + pointOffsetY];
-          }
-      
-          updatedFeatures.push(feature);
-      
-          return updatedFeatures;
-        }) || []
-      };
+      const pointsAndCentroids = getPointsAndCentroids(props.drawing, offsetDistance);
   
         
         mapRef.current?.addSource('pointsAndCentroids', {
@@ -494,6 +503,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
               const pointId = `point-${id}`;
               const layerId = `drawings-layer-${id}`;
               const circleLayerId = `drawings-circle-layer-${id}`;
+              const borderLayerId = `drawings-border-layer-${id}`;
         
               if (!mapRef.current?.getLayer(pointId)) {
                 
@@ -542,9 +552,10 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                   mapRef.current.getCanvas().style.cursor = 'pointer';
                 }
                 popup.addTo(mapRef.current!);
-               // mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
                 mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 2);
                 mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 25);
+                mapRef.current?.setPaintProperty(borderLayerId, 'line-width', 3);
+                mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.5);
               });
         
               mapRef.current?.on('mouseleave', pointId, () => {
@@ -552,19 +563,13 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
                   mapRef.current.getCanvas().style.cursor = '';
                 }
                 popup.remove();
-                //mapRef.current?.setLayoutProperty(pointId, 'icon-size', 1);
                 mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 1);
                 mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 15);
+                mapRef.current?.setPaintProperty(borderLayerId, 'line-width', 0);
+                mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0);
               });
         
-              mapRef.current?.on('mousemove', (e: any) => {
-                const features = mapRef.current?.queryRenderedFeatures(e.point, { layers: [layerId] });
-                const hasFeatures = features && features.length > 0;
-                if (hasFeatures) {
-                 // mapRef.current?.setLayoutProperty(pointId, 'icon-size', 2);
-                  mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 25);
-                }
-              });
+             
         
               mapRef.current?.on('click', pointId, () => {
                 window.location.href = `/documents/${id}`;
@@ -575,7 +580,7 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
      
 
       }).catch(error => {
-        console.error('Errore nel caricamento delle icone:', error);
+        console.error('Error loading icons:', error);
       });
     };
       
@@ -604,6 +609,13 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           touchAction: "auto",
         }}
       />
+    
+     
+      <Button className = "Kiruna-area-button"onClick={toggleKirunaVisibility}>
+        {isKirunaVisible ? 'Hide Kiruna Area' : 'Show Kiruna Area'}
+      </Button>
+      
+
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
           <Button className="button-whole-Kiruna" variant="primary">
@@ -668,10 +680,9 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
       interactive: true,
     });
     mapRef.current.addControl(PreviewMapDraw, "bottom-right");
-    if (props.drawing) PreviewMapDraw.set(props.drawing);
   }, [mapContainerRef.current]);
 
-  useMemo(() => {
+  useEffect(() => {
     if (props.drawing) {
       mapRef.current?.remove();
       mapRef.current = null;
@@ -684,8 +695,110 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
         interactive: false,
       });
 
-      mapRef.current.addControl(PreviewMapDraw, "bottom-right");
-      if (props.drawing) PreviewMapDraw.set(props.drawing);
+      mapRef.current?.on("load", function () {
+        if (mapRef.current) {
+          mapRef.current.addControl(PreviewMapDraw, "bottom-right");
+          loadIcons(mapRef.current).then(() => {
+
+            const offsetDistance = 0.0001; // offsetDistance
+            const pointsAndCentroids = getPointsAndCentroids(props.drawing, offsetDistance);
+//AREA----------------------------------------------------------------
+            mapRef.current?.addSource('drawings', {
+              type: 'geojson',
+              data: props.drawing as FeatureCollection,
+            });
+    
+            props.drawing?.features.forEach((feature, index) => {
+              const id = feature.properties?.id;  
+              const pointId = `point-${id}`;
+              const layerId = `drawings-layer-${id}`;
+              const borderLayerId = `drawings-border-layer-${id}`;
+              const circleLayerId = `drawings-circle-layer-${id}`;
+            
+              // Add the main fill layer
+              mapRef.current?.addLayer({
+                id: layerId,
+                type: 'fill',
+                source: {
+                  type: 'geojson',
+                  data: feature,
+                },
+                layout: {},
+                paint: {
+                  'fill-color': documentAreaColorMapping, // Assuming documentColorMapping is an object mapping feature IDs to colors
+                  'fill-opacity': 0.5,
+                },
+              });
+            
+              // Add the border layer
+              mapRef.current?.addLayer({
+                id: borderLayerId,
+                type: 'line',
+                source: {
+                  type: 'geojson',
+                  data: feature,
+                },
+                layout: {},
+                paint: {
+                  'line-color': documentBorderColorMapping, // Border color
+                  'line-width': 3,
+                },
+              });
+    
+             
+            });
+//PUNTI--------------------------------------------------------
+            mapRef.current?.addSource('pointsAndCentroids', {
+              type: 'geojson',
+              data: pointsAndCentroids as FeatureCollection,
+            });
+            pointsAndCentroids.features?.forEach((feature, index) => {
+              const id = feature.properties?.id;
+              const pointId = `point-${id}`;
+              const layerId = `drawings-layer-${id}`;
+              const circleLayerId = `drawings-circle-layer-${id}`;
+              const borderLayerId = `drawings-border-layer-${id}`;
+        
+              if (!mapRef.current?.getLayer(pointId)) {
+                
+                mapRef.current?.addLayer({
+                  id: circleLayerId,
+                  type: 'circle',
+                  source: 'pointsAndCentroids',
+                  paint: {
+                    'circle-radius': 15,
+                    'circle-color': [
+                      'case',
+                      ['==', ['get', 'isCentroid'], true], // Check if the feature is a centroid
+                      '#ffffff',
+                      '#7499E8'  
+                    ],
+                  },
+                  filter: ['==', ['get', 'id'], feature.properties?.id]
+                });
+                
+                mapRef.current?.addLayer({
+                  id: pointId,
+                  type: 'symbol',
+                  source: 'pointsAndCentroids',
+                  filter: ['==', ['get', 'id'], id],
+                  layout: {
+                    'icon-image': ['get', 'icon'], // Use the 'icon' property from the dataset
+                    'icon-size': 1,
+                    'icon-padding': 1.5 // Increase the clickable area
+                  }
+                });
+                
+              }
+            });
+
+          }).catch(error => {
+            console.error('Error loading icons:', error);
+          });
+        }
+      });
+
+
     }
   }, [props.drawing]);
 
@@ -698,7 +811,7 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
 
   return (
     <>
-      <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }} >
+        <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }} >
         <Button
           style={{
             backgroundColor: "white",
@@ -775,7 +888,8 @@ const MapControls: React.FC<
   const feature = structuredClone(props?.drawing?.features?.at?.(0));
   const geometry = feature?.geometry;
   const pos = geometry?.type === "Point" ? geometry.coordinates : [NaN, NaN];
-
+  const area = geometry?.type === "Polygon" ? geometry.coordinates : [[[NaN, NaN]]];
+  const kirunaArea = Kiruna.features[0] as Feature<Polygon | MultiPolygon>;
 
   useEffect(() => {
     if (geometry?.type === "Point") {
@@ -787,15 +901,13 @@ const MapControls: React.FC<
   }, [geometry?.type, pos?.[0], pos?.[1]]);
 
   useEffect(() => {
-    const dist = coordDistance(
-      center.toReversed() as [number, number],
-      str2pos(pointCoords).toReversed() as [number, number]
-    );
-    if (dist <= 100 || pointCoords.find((c) => c === "") !== undefined) {
+    if (geometry?.type !== "Point") return;
+    if (booleanPointInPolygon({ type: 'Point', coordinates: str2pos(pointCoords) }, kirunaArea) || pointCoords.find((c) => c === "") !== undefined) {
       setCoordsError(false);
     } else {
       setCoordsError(true);
     }
+
     if (
       index === 1 &&
       PreviewMapDraw.getMode() === "simple_select" &&
@@ -805,6 +917,19 @@ const MapControls: React.FC<
       PreviewMapDraw.changeMode("draw_point");
     }
   }, [pointCoords[0], pointCoords[1]]);
+  
+  useEffect(() => {
+    if (geometry?.type !== "Polygon") return;
+    const allPointsInside = area[0].every((coord) =>
+      booleanPointInPolygon({ type: 'Point', coordinates: coord }, kirunaArea)
+    );
+
+    if (allPointsInside) {
+      setCoordsError(false);
+    } else {
+      setCoordsError(true);
+    }
+  }, [area[0]]);
 
   // Note:
   // React's useEffect() are run starting from the children. This means that we cannot change
@@ -818,6 +943,8 @@ const MapControls: React.FC<
         index={index}
         onIndexChange={(i) => {
           PreviewMapDraw.deleteAll();
+          setCoordsError(false);
+          setPointCoords(["", ""]);
           switch (i) {
             default: // case 0
               PreviewMapDraw.changeMode("simple_select");
@@ -916,7 +1043,7 @@ const MapControls: React.FC<
                   }
                 }}
                 error={coordsError}
-                errorMessage="All points must be within 100Km of Kiruna"
+                errorMessage="All points must be inside the municipality of Kiruna"
                 icon={() => (
                   <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
                     Latitude
@@ -998,6 +1125,11 @@ const MapControls: React.FC<
                 Cut in shape
               </Button>
             </div>
+            {coordsError && (
+              <p className="text-red-500 text-sm mt-4">
+                All points must be inside the municipality of Kiruna
+              </p>
+            )}
           </>
         ) : null}
       </div>
@@ -1066,6 +1198,24 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
       setTmpDrawing({ type: "FeatureCollection", features: e.features });
     });
 
+    mapRef.current?.on("load", function () {
+      //KIRUNA-----------------------------------------------------
+      mapRef.current?.addSource('Kiruna', {
+        type: 'geojson',
+        data: Kiruna as FeatureCollection,
+      });
+
+      mapRef.current?.addLayer({
+        id: "Kiruna-line",
+        type: 'line',
+        source: "Kiruna",
+        paint: {
+          'line-color': '#745296',
+          'line-width': 4,
+          'line-dasharray': [1, 1]
+        },
+      });
+    });
     if (props.drawing) {
       PreviewMapDraw.set(props.drawing);
     }

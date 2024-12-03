@@ -46,18 +46,5 @@ function deg2rad(p: number): number {
  * @param p2 Tuple containing [latitude, longitude], in degrees
  * @returns The distance between the points, in Km
  */
-export function coordDistance(p1: [number, number], p2: [number, number]) {
-    const R = 6371; // km
-    const dLat = deg2rad(p2[0] - p1[0]);
-    const dLon = deg2rad(p2[1] - p1[1]);
-    const lat1 = deg2rad(p1[0]);
-    const lat2 = deg2rad(p2[0]);
-
-    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-        Math.sin(dLon / 2) * Math.sin(dLon / 2) * Math.cos(lat1) * Math.cos(lat2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c;
-    return d;
-}
 
 export type PageRange = [number, number] | number;

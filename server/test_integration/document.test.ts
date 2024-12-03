@@ -6,19 +6,41 @@ import { KxDocument } from "../src/models/model";
 import {db} from "../src/db/dao";
 import { KIRUNA_COORDS } from "../src/utils";
 import { mongoose } from "@typegoose/typegoose";
+import testUsers from "../test_users/db_export.kiruna-ex.users.json";
+import testLogins from "../test_users/user_login.json";
+import { UserModel } from "../src/models/user";
+import { EJSON } from "bson";
 
 const TEST_ID = "6738b18f8da44b335177509e";
 const TEST_FILENAME = "filename";
 
 const date = new Date();
 let documentIds: mongoose.Types.ObjectId[] = [];
+let userIds: mongoose.Types.ObjectId[] = [];
+let urbanPlannerCookie: string;
+
+async function createUserAndGetCookie() {
+    const users = await UserModel.db.collection("users").insertMany(EJSON.deserialize(testUsers));
+    userIds = userIds.concat(Object.values(users.insertedIds));
+    const res = await request(app)
+        .post("/api/sessions")
+        .send(testLogins[0])
+        .expect(201);
+    return res.header["set-cookie"][0];
+}
+
+beforeAll(async () => {
+    urbanPlannerCookie = await createUserAndGetCookie();
+})
 
 describe("Integration Tests for Document API", () => {
 
     afterAll(async () => {
-
         for (const id of documentIds) {
             await db.deleteKxDocument(id);
+        }
+        for (const id of userIds) {
+            await db.deleteUser(id);
         }
 
         await db.disconnectFromDB();
@@ -27,12 +49,15 @@ describe("Integration Tests for Document API", () => {
     test("Test 1 - Should create a new document", async () => {
         const response = await request(app)
             .post('/api/documents')
+            .set("Cookie", urbanPlannerCookie)
             .send({
                 title: "Integration Test Document",
-                stakeholders: [Stakeholders.RESIDENT],
+                stakeholders: [Stakeholders.RESIDENT, "Custom SH"],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -52,6 +77,7 @@ describe("Integration Tests for Document API", () => {
     test("Test 2 - Should fail to create a document with missing required fields (title)", async () => {
         const response = await request(app)
             .post('/api/documents')
+            .set("Cookie", urbanPlannerCookie)
             .send({
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
@@ -74,13 +100,16 @@ describe("Integration Tests for Document API", () => {
     test("Test 3 - Should not create a new document if i send an already existing _id", async () => {
         const response = await request(app)
             .post('/api/documents')
+            .set("Cookie", urbanPlannerCookie)
             .send({
                 _id: documentIds[0],
                 title: "Integration Test Document",
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -105,13 +134,16 @@ describe("Integration Tests for Document API", () => {
 
         const response = await request(app)
             .post('/api/documents')
+            .set("Cookie", urbanPlannerCookie)
             .send({
                 _id: documentIds[0],
                 title: "Integration Test Document",
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -133,6 +165,7 @@ describe("Integration Tests for Document API", () => {
     test("Test 5 - Should fail to create a document with multiple missing required fields (title,stakeholders)", async () => {
         const response = await request(app)
             .post('/api/documents')
+            .set("Cookie", urbanPlannerCookie)
             .send({
                 scale_info: Scale.TEXT,
                 scale: 10,
@@ -154,12 +187,15 @@ describe("Integration Tests for Document API", () => {
     test("Test 6 - Should fail to create a document (area outside of allowed radius)", async () => {
         const response = await request(app)
             .post('/api/documents')
+            .set("Cookie", urbanPlannerCookie)
             .send({
                 title: "Integration Test Document",
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
@@ -173,12 +209,15 @@ describe("Integration Tests for Document API", () => {
     test("Test 7 - Should fail (area overlapping border)", async () => {
         const response = await request(app)
             .post('/api/documents')
+            .set("Cookie", urbanPlannerCookie)
             .send({
                 title: "Integration Test Document",
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [1, 1]]] },
@@ -192,15 +231,18 @@ describe("Integration Tests for Document API", () => {
     test("Test 8 - Should succeed (correct area)", async () => {
         const response = await request(app)
             .post('/api/documents')
+            .set("Cookie", urbanPlannerCookie)
             .send({
                 title: "Integration Test Document",
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
-                type: KxDocumentType.INFORMATIVE,
+                issuance_date: {
+                    from: date,
+                },
+                type: "Custom type",
                 language: "Swedish",
-                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.1)]] },
                 description: "Test document",
                 connections: {
                     direct: [], collateral: [], projection: [], update: []
@@ -216,15 +258,18 @@ describe("Integration Tests for Document API", () => {
         
         const responsePost1 = await request(app)
             .post('/api/documents')
+            .set("Cookie", urbanPlannerCookie)
             .send({
                 title: "Document 1",
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date,
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
-                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.1)]] },
                 description: "Test document 1",
                 connections: {
                     direct: [], collateral: [], projection: [], update: []
@@ -233,15 +278,18 @@ describe("Integration Tests for Document API", () => {
             documentIds.push(responsePost1.body._id);
        const responsePost2 =  await request(app)
             .post('/api/documents')
+            .set("Cookie", urbanPlannerCookie)
             .send({
                 title: "Document 2",
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
-                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.1)]] },
                 description: "Test document 2",
                 connections: {
                     direct: [], collateral: [], projection: [], update: []
@@ -265,12 +313,15 @@ describe("Integration Tests for Document API", () => {
     test("Test 10 - Should fetch a document with specified id", async () => {
         const postResponse = await request(app)
             .post('/api/documents')
+            .set("Cookie", urbanPlannerCookie)
             .send({
                 title: "Test Document for Fetch",
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date,
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -281,6 +332,7 @@ describe("Integration Tests for Document API", () => {
                 }
             } as KxDocument);
 
+        documentIds.push(postResponse.body._id);
         expect(postResponse.status).toBe(201);
         const documentId = postResponse.body._id;
 
@@ -290,7 +342,7 @@ describe("Integration Tests for Document API", () => {
         expect(getResponse.body.title).toBe("Test Document for Fetch");
         expect(getResponse.body.stakeholders).toEqual([Stakeholders.RESIDENT]);
         expect(getResponse.body.scale).toBe(10);
-        expect(getResponse.body.issuance_date).toBe(date.toISOString());
+        expect(getResponse.body.issuance_date).toMatchObject({from: date.toISOString()});
         expect(getResponse.body.type).toBe(KxDocumentType.INFORMATIVE);
         expect(getResponse.body.language).toBe("Swedish");
         expect(getResponse.body.doc_coordinates).toEqual({ type: AreaType.ENTIRE_MUNICIPALITY });
@@ -302,9 +354,60 @@ describe("Integration Tests for Document API", () => {
         const file = Buffer.from("test data");
         const response = await request(app)
             .post(`/api/documents/${TEST_ID}/attachments`)
+            .set("Cookie", urbanPlannerCookie)
             .attach("attachments", file, TEST_FILENAME);
             
         expect(response.status).toBe(404);
+    });
+    test("Test 12 - Remove attachment from non existing document", async () => {
+        const response = await request(app)
+            .delete(`/api/documents/${TEST_ID}/attachments/${TEST_FILENAME}`)
+            .set("Cookie", urbanPlannerCookie);
+            
+        expect(response.status).toBe(404);
+    });
+
+    test('Test 13 - get aggregate data (no auth)', async () => {
+        const response = await request(app)
+            .get(`/api/documents/aggregateData`)
+            .send();
+
+        expect(response.status).toBe(401);
+    });
+
+    test('Test 14 - get aggregate data', async () => {
+        const response = await request(app)
+            .get(`/api/documents/aggregateData`)
+            .set("Cookie", urbanPlannerCookie)
+            .send();
+
+        response.body.types.sort();
+        response.body.stakeholders.sort();
+
+        expect(response.status).toBe(200);
+        expect(response.body).toMatchObject({
+            scales: [
+                10,
+            ],
+            stakeholders: [
+                "Custom SH",
+                "Resident",
+                "Urban Developer",
+                "Urban Planner",
+                "Visitor",
+            ],
+            types: [
+                "Agreement",
+                "Conflict Resolution",
+                "Consultation",
+                "Custom type",
+                "Design Document",
+                "Informative Document",
+                "Prescriptive Document",
+                "Strategy",
+                "Technical Document",
+            ],
+        });
     });
 });
 

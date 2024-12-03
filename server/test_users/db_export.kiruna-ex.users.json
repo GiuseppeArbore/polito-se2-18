@@ -1,0 +1,16 @@
+[{
+  "email": "mario@fake.com",
+  "password": {
+    "$binary": {
+      "base64": "EVmVUykaphV2LuAUnaSKSQ==",
+      "subType": "00"
+    }
+  },
+  "salt": {
+    "$binary": {
+      "base64": "YXNkZnNhZGY=",
+      "subType": "00"
+    }
+  },
+  "role": "Urban Planner"
+}]
