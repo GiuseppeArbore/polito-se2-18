@@ -275,7 +275,7 @@ export default function Document() {
                         <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Description:</i>
                         <i className='text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong'> {description}  </i>
 
-                        <div className='hidden lg:flex flex-end space-y-2 h-full justify-around'>
+                        <div className='hidden lg:flex flex-end space-y-2 h-full w-full justify-around'>
                             <FormDescriptionDialog
                                 document={doc!}
                                 description={description}
@@ -365,7 +365,7 @@ export default function Document() {
 
                     </div>
 
-                    <div className="flex w-full h-full items-center justify-between mb-2 lg:flex-row-reverse">
+                    <div className="flex w-full h-full items-center justify-between mb-2">
 
                         <Accordion className="w-full mr-6 mb-6">
                             <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">More documents [Cooming soon] </AccordionHeader>
@@ -718,7 +718,7 @@ export function FormDescriptionDialog(
 
     return (
         <>
-            <i className="self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+            <i className="ml-auto self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-5" /></i>
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
                 <DialogPanel
                     className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
