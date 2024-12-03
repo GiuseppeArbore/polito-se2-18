@@ -1,5 +1,5 @@
 
-import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription, handleFileUpload, removeAttachmentFromDocument} from './controller';
+import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription, handleFileUpload, removeAttachmentFromDocument, getKxDocumentAggregateData} from './controller';
 import { validateRequest } from './errorHandlers';
 import e, { Application, NextFunction, Request, Response } from 'express';
 import { body, param } from 'express-validator';
@@ -19,15 +19,14 @@ export function initRoutes(app: Application) {
     const kxDocumentValidationChain = [
         body('title').notEmpty().withMessage('Title is required'),
         body('stakeholders').notEmpty().withMessage('Stakeholders are required')
-            .isArray().withMessage('Stakeholders must be an array')
-            .custom((value) => value.every((v: string) => Object.values(Stakeholders).includes(v as Stakeholders)))
-            .withMessage('Invalid stakeholder value'),
+            .isArray().withMessage('Stakeholders must be an array'),
+        body('stakeholders.*').isString().withMessage('Stakeholders must be an array of strings'),
         body('scale').notEmpty().withMessage('Scale is required')
             .isNumeric().withMessage('Scale must be a number'),
         body('issuance_date').notEmpty().withMessage('Issuance date is required')
             .isISO8601().toDate().withMessage('Issuance date must be a valid date'),
         body('type').notEmpty().withMessage('Type is required')
-            .isIn(Object.values(KxDocumentType)).withMessage('Invalid document type'),
+            .isString().withMessage("Type must be a string"),
         body('language').optional().notEmpty().withMessage('Language is required')
             .isString().withMessage('Language must be a string'),
         body('doc_coordinates').notEmpty().withMessage('Document coordinates are required').isObject()
@@ -115,6 +114,14 @@ export function initRoutes(app: Application) {
     );
 
     app.get('/api/documents', getAllKxDocuments);
+
+    app.get(
+        '/api/documents/aggregateData',
+        // This is a potentially onerous operation, so we only allow it for authenticated
+        // users (non authenticated users do not need to call this anyway)
+        isUrbanPlanner,
+        getKxDocumentAggregateData
+    );
 
     app.get('/api/documents/:id',
         [
