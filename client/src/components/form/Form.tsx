@@ -295,6 +295,7 @@ export function FormDialog(props: FormDialogProps) {
           setDrawing={setDrawing}
           hideMap={hideMap}
           setHideMap={setHideMap}
+          user = {props.user}
         />
 
         <Divider />
@@ -606,7 +607,9 @@ export function FormDocumentGeolocalization({
   drawing,
   setDrawing,
   hideMap,
-  setHideMap
+  setHideMap,
+  user
+
 }: {
   isMapOpen: boolean,
   setIsMapOpen: React.Dispatch<React.SetStateAction<boolean>>,
@@ -618,6 +621,7 @@ export function FormDocumentGeolocalization({
   setDrawing: React.Dispatch<React.SetStateAction<any>>,
   hideMap: boolean,
   setHideMap: React.Dispatch<React.SetStateAction<boolean>>
+  user: { email: string; role: Stakeholders } | null;
 }) {
   return (
     <>
@@ -669,6 +673,7 @@ export function FormDocumentGeolocalization({
             <PreviewMap
               drawing={drawing}
               style={{ minHeight: "300px", width: "100%" }}
+              user = {user}
             />
           </Card>
         </>
@@ -688,6 +693,7 @@ export function FormDocumentGeolocalization({
             onCancel={() => setIsMapOpen(false)}
             onDone={(v) => { setDrawing(v); setIsMapOpen(false); }}
             style={{ minHeight: "95vh", width: "100%" }}
+            user = {user}
           ></SatMap>
         </DialogPanel>
       </Dialog>

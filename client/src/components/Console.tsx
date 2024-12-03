@@ -261,6 +261,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
               }}
               drawing={drawing}
               entireMunicipalityDocuments={entireMunicipalityDocuments}
+              user = {user}
             ></DashboardMap>
           </>
         );
