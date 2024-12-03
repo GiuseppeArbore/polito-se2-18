@@ -1,5 +1,10 @@
 import "ag-grid-enterprise";
-import { AdvancedFilterModel, ColDef, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
+import {
+  AdvancedFilterModel,
+  ColDef,
+  GridOptions,
+  ValueGetterParams,
+} from "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -96,7 +101,11 @@ function List(props: ListProps) {
       headerName: "Issuance Date",
       field: "issuance_date",
       filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
-        return params.data && new Date(params.data.issuance_date.from).toLocaleDateString() || "";
+        return (
+          (params.data &&
+            new Date(params.data.issuance_date.from).toLocaleDateString()) ||
+          ""
+        );
       },
       valueFormatter: (params: { value: string | number }) => {
         return params.value !== undefined
@@ -128,17 +137,21 @@ function List(props: ListProps) {
       enableRowGroup: true,
       filter: true,
       filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
-        return locales.find((l) => params.data && l.code === params.data.language)?.name;
+        return locales.find(
+          (l) => params.data && l.code === params.data.language
+        )?.name;
       },
       valueFormatter: (params: { value: string | number }) => {
         return locales.find((l) => l.code === params.value)?.name || "";
       },
+      hide: true,
     },
     {
       headerName: "Pages",
       field: "pages",
       enableRowGroup: false,
       filter: true,
+      hide: true,
     },
     {
       headerName: "Controls",
@@ -166,17 +179,17 @@ function List(props: ListProps) {
       resizable: true,
       sortable: true,
       enableRowGroup: true,
-      filterParams: {newRowsAction: 'keep'}
+      filterParams: { newRowsAction: "keep" },
     },
     statusBar: {
       statusPanels: [
-          { statusPanel: 'agTotalAndFilteredRowCountComponent' },
-          { statusPanel: 'agTotalRowCountComponent' },
-          { statusPanel: 'agFilteredRowCountComponent' },
-          { statusPanel: 'agSelectedRowCountComponent' },
-          { statusPanel: 'agAggregationComponent' }
-      ]
-  },
+        { statusPanel: "agTotalAndFilteredRowCountComponent" },
+        { statusPanel: "agTotalRowCountComponent" },
+        { statusPanel: "agFilteredRowCountComponent" },
+        { statusPanel: "agSelectedRowCountComponent" },
+        { statusPanel: "agAggregationComponent" },
+      ],
+    },
     sideBar: {
       toolPanels: [
         {
@@ -216,24 +229,32 @@ function List(props: ListProps) {
   function onFilterChanged() {
     let rowData: (KxDocument | undefined)[] = [];
     gridRef.current?.api?.forEachNodeAfterFilter((node) => {
-      rowData.push(node.data)
+      rowData.push(node.data);
     });
-    props.updateDocuments(rowData.filter((doc): doc is KxDocument => doc !== undefined));
-    props.updateFilterModel(gridRef.current?.api?.getAdvancedFilterModel() || undefined);
+    props.updateDocuments(
+      rowData.filter((doc): doc is KxDocument => doc !== undefined)
+    );
+    props.updateFilterModel(
+      gridRef.current?.api?.getAdvancedFilterModel() || undefined
+    );
   }
   function addFilterModel() {
-    if(props.filterModel) {
+    if (props.filterModel) {
       gridRef.current?.api?.setAdvancedFilterModel(props.filterModel);
     } else {
-     props.updateFilterModel(undefined);
+      props.updateFilterModel(undefined);
     }
-
   }
   return (
     <>
       <div
         className={"ag-theme-quartz-auto-dark right-0 left-0 ring-0"}
-        style={{ width: "100%", height: "100%", minHeight: "70vh", overflow: "auto" }}
+        style={{
+          width: "100%",
+          height: "100%",
+          minHeight: "70vh",
+          overflow: "auto",
+        }}
       >
         <AgGridReact
           onViewportChanged={addFilterModel}
