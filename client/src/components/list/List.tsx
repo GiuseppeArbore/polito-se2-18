@@ -96,7 +96,7 @@ function List(props: ListProps) {
       headerName: "Issuance Date",
       field: "issuance_date",
       filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
-        return params.data && new Date(params.data.issuance_date).toLocaleDateString() || "";
+        return params.data && new Date(params.data.issuance_date.from).toLocaleDateString() || "";
       },
       valueFormatter: (params: { value: string | number }) => {
         return params.value !== undefined

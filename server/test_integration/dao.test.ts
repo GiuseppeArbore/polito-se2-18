@@ -24,7 +24,9 @@ beforeAll(async () => {
         title: "title 1",
         stakeholders: [Stakeholders.RESIDENT],
         scale: 10,
-        issuance_date: date,
+        issuance_date: {
+            from: date
+        },
         type: KxDocumentType.INFORMATIVE,
         language: "Swedish",
         doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -44,7 +46,9 @@ describe("Test DAO", () => {
             title: "title 2",
             stakeholders: [Stakeholders.RESIDENT],
             scale: 10,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Swedish",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
@@ -67,7 +71,9 @@ describe("Test DAO", () => {
             stakeholders: [Stakeholders.RESIDENT],
             scale: 10,
             pages: [],
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Swedish",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
@@ -90,7 +96,9 @@ describe("Test DAO", () => {
             stakeholders: [Stakeholders.RESIDENT],
             pages: [],
             scale: 10,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Swedish",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
@@ -108,7 +116,9 @@ describe("Test DAO", () => {
             title: "test",
             stakeholders: [],
             scale: 0,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Italian",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
@@ -132,7 +142,9 @@ describe("Test DAO", () => {
             title: "test",
             stakeholders: [],
             scale: 0,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Italian",
             doc_coordinates: {
@@ -157,7 +169,9 @@ describe("Test DAO", () => {
             title: "test",
             stakeholders: [],
             scale: 0,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Italian",
             doc_coordinates: {
@@ -183,7 +197,9 @@ describe("Test DAO", () => {
             title: "test",
             stakeholders: [],
             scale: 0,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Italian",
             doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] } as Area,
@@ -208,7 +224,9 @@ describe("Test DAO", () => {
             title: "test",
             stakeholders: [],
             scale: 0,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Italian",
             doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] } as Area,
@@ -252,7 +270,9 @@ describe("Test DAO", () => {
             title: "title 1",
             stakeholders: [Stakeholders.RESIDENT],
             scale: 10,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Swedish",
             doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -286,7 +306,9 @@ describe("Test DAO", () => {
             title: "title 1",
             stakeholders: [Stakeholders.RESIDENT],
             scale: 10,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Swedish",
             doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -322,7 +344,9 @@ describe("Test DAO", () => {
             title: "test",
             stakeholders: [Stakeholders.RESIDENT, "Custom SH"],
             scale: 10,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: "Custom type",
             language: "Italian",
             doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] } as Area,

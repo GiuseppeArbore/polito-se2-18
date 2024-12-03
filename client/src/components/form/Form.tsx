@@ -140,7 +140,9 @@ export function FormDialog(props: FormDialogProps) {
       //scale_info: Scale.TEXT,
       scale,
       doc_coordinates: draw,
-      issuance_date: issuanceDate!,
+      issuance_date: {
+        from: issuanceDate!
+      },
       type: type,
       language,
       description,

@@ -44,7 +44,9 @@ describe('Document Routes', () => {
             stakeholders: [Stakeholders.RESIDENT],
             scale_info: Scale.TEXT,
             scale: 10,
-            issuance_date: new Date().toISOString(),
+            issuance_date: {
+                from: new Date().toISOString()
+            },
             type: KxDocumentType.INFORMATIVE,
             language: 'Swedish',
             doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -69,7 +71,10 @@ describe('Document Routes', () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString(),
+                    to: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -96,7 +101,9 @@ describe('Document Routes', () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -115,7 +122,9 @@ describe('Document Routes', () => {
             .send({
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -134,7 +143,9 @@ describe('Document Routes', () => {
             .send({
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
@@ -151,7 +162,9 @@ describe('Document Routes', () => {
             .send({
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [0, 0]]] },
@@ -169,7 +182,9 @@ describe('Document Routes', () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },

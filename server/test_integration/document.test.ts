@@ -55,7 +55,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT, "Custom SH"],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -105,7 +107,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -137,7 +141,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -187,7 +193,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
@@ -207,7 +215,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [1, 1]]] },
@@ -227,7 +237,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date,
+                },
                 type: "Custom type",
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.1)]] },
@@ -252,7 +264,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date,
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.1)]] },
@@ -270,7 +284,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.1)]] },
@@ -303,7 +319,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date,
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -324,7 +342,7 @@ describe("Integration Tests for Document API", () => {
         expect(getResponse.body.title).toBe("Test Document for Fetch");
         expect(getResponse.body.stakeholders).toEqual([Stakeholders.RESIDENT]);
         expect(getResponse.body.scale).toBe(10);
-        expect(getResponse.body.issuance_date).toBe(date.toISOString());
+        expect(getResponse.body.issuance_date).toMatchObject({from: date.toISOString()});
         expect(getResponse.body.type).toBe(KxDocumentType.INFORMATIVE);
         expect(getResponse.body.language).toBe("Swedish");
         expect(getResponse.body.doc_coordinates).toEqual({ type: AreaType.ENTIRE_MUNICIPALITY });

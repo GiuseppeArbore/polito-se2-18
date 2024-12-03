@@ -70,7 +70,7 @@ export default function Document() {
                 setTitle(document.title);
                 setStakeholders(document.stakeholders);
                 setScale(document.scale);
-                setIssuanceDate(document.issuance_date);
+                setIssuanceDate(document.issuance_date.from);
                 setType(document.type);
                 setLanguage(document.language || undefined);
                 setPages(document.pages || undefined);

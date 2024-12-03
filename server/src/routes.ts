@@ -24,7 +24,9 @@ export function initRoutes(app: Application) {
         body('scale').notEmpty().withMessage('Scale is required')
             .isNumeric().withMessage('Scale must be a number'),
         body('issuance_date').notEmpty().withMessage('Issuance date is required')
-            .isISO8601().toDate().withMessage('Issuance date must be a valid date'),
+            .isObject().withMessage("Issuance date not valid"),
+        body('issuance_date.from').notEmpty().isISO8601().toDate().withMessage('Issuance date must be a valid date'),
+        body('issuance_date.to').optional().isISO8601().toDate().withMessage('Issuance date must be a valid date'),
         body('type').notEmpty().withMessage('Type is required')
             .isString().withMessage("Type must be a string"),
         body('language').optional().notEmpty().withMessage('Language is required')

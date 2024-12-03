@@ -19,6 +19,19 @@ export interface DocInfo {
         _id: false,
     },
 })
+export class DateRange {
+    @prop({required: true, type: Date})
+    from!: Date;
+
+    @prop({required: false, type: Date})
+    to?: Date;
+}
+
+@modelOptions({
+    schemaOptions: {
+        _id: false,
+    },
+})
 class Connections {
 
     @prop({required: true, ref: () => KxDocument})
@@ -85,8 +98,8 @@ export class KxDocument {
     @prop({required: true, type: Number})
     scale!: number;
 
-    @prop({required: true, type: Date})
-    issuance_date!: Date;
+    @prop({required: true, type: DateRange})
+    issuance_date!: DateRange;
 
     @prop({required: true, type: String})
     type!: string;
