@@ -222,7 +222,7 @@ function List(props: ListProps) {
     });
     props.updateDocuments(rowData.filter((doc): doc is KxDocument => doc !== undefined));
     props.updateFilterModel(gridRef.current?.api?.getAdvancedFilterModel() || undefined);
-    onGridReady();
+    gridRef.current?.api?.sizeColumnsToFit();
   }
   function addFilterModel() {
     if(props.filterModel) {
@@ -230,7 +230,6 @@ function List(props: ListProps) {
     } else {
      props.updateFilterModel(undefined);
     }
-    onGridReady();
   }
   return (
     <>
