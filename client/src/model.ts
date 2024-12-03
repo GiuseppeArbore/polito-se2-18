@@ -1,5 +1,5 @@
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "./enum";
-import { mongoose, getModelForClass, Ref } from "@typegoose/typegoose";
+import { AreaType } from "./enum";
+import { mongoose, Ref } from "@typegoose/typegoose";
 const prop = (..._: any) => (_: any, _a: string) => {};
 const modelOptions = (..._: any) => (_: any) => {};
 
@@ -67,8 +67,8 @@ export class KxDocument {
     @prop({required: true, type: String})
     title!: string;
 
-    @prop({required: true, type: String, enum: Stakeholders})
-    stakeholders!: Stakeholders[];
+    @prop({required: true, type: String})
+    stakeholders!: string[];
 
     @prop({required: true, type: Number})
     scale!: number;
@@ -76,8 +76,8 @@ export class KxDocument {
     @prop({required: true, type: Date})
     issuance_date!: Date;
 
-    @prop({required: true, type: String, enum: KxDocumentType})
-    type!: KxDocumentType;
+    @prop({required: true, type: String})
+    type!: string;
 
     @prop({type: String})
     language?: string;
@@ -105,4 +105,10 @@ export class KxDocument {
 
     @prop({type: String})
     attachments?: string[];
+}
+
+export interface KxDocumentAggregateData {
+    stakeholders: string[];
+    types: string[];
+    scales: number[];
 }

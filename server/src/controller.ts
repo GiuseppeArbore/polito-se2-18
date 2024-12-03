@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from './db/dao';
-import { KxDocumentModel, KxDocument, DocInfo } from './models/model';
+import { KxDocumentModel, KxDocument, DocInfo, KxDocumentAggregateData } from './models/model';
 import { mongoose } from '@typegoose/typegoose';
 import { getPresignedUrl, kxObjectStorageClient, KxObjectStorageCommands } from './object_storage/bucket';
 import { PutObjectCommandOutput, S3ServiceException } from '@aws-sdk/client-s3';
 import { rm } from 'fs/promises';
 import { setTimeout } from 'timers/promises';
+import { KxDocumentType, Stakeholders } from './models/enum';
 
 export const createKxDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
@@ -30,6 +31,36 @@ export const getAllKxDocuments = async (req: Request, res: Response, next: NextF
     }
 };
 
+export const getKxDocumentAggregateData = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const defaultAggregate: KxDocumentAggregateData = {
+            stakeholders: Object.values(Stakeholders),
+            types: Object.values(KxDocumentType),
+            scales: [10_000]
+        };
+
+        const aggregate = await db.getKxDocumentsAggregateData() || defaultAggregate;
+        if (aggregate.stakeholders.length < defaultAggregate.stakeholders.length) {
+            aggregate.stakeholders = [
+                ...new Set([...aggregate.stakeholders, ...defaultAggregate.stakeholders])
+            ];
+        }
+        if (aggregate.types.length < defaultAggregate.types.length) {
+            aggregate.types = [
+                ...new Set([...aggregate.types, ...defaultAggregate.types])
+            ];
+        }
+        if (aggregate.scales.length < defaultAggregate.scales.length) {
+            aggregate.scales = [
+                ...new Set([...aggregate.scales, ...defaultAggregate.scales])
+            ];
+        }
+
+        res.status(200).json(aggregate);
+    } catch (error) {
+        next(error);
+    }
+}
 
 export const getKxDocumentById = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

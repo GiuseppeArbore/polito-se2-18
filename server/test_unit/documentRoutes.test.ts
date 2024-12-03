@@ -16,7 +16,8 @@ jest.mock('../src/controller', () => ({
     ...jest.requireActual("../src/controller"),
     createKxDocument: jest.fn(),
     handleFileUpload: jest.fn(),
-    removeAttachmentFromDocument: jest.fn()
+    removeAttachmentFromDocument: jest.fn(),
+    getKxDocumentAggregateData: jest.fn()
 }));
 jest.mock("@aws-sdk/client-s3");
 jest.mock("@aws-sdk/s3-request-presigner");
@@ -233,7 +234,7 @@ describe('Document Routes', () => {
         expect(cnt.handleFileUpload).toHaveBeenCalledTimes(0);
     });
 
-    test("DELETE /api/documents/:id/attachments/:fileName - nominal case", async () => {
+    test("Test 10 - DELETE /api/documents/:id/attachments/:fileName - nominal case", async () => {
         jest.spyOn(cnt, "removeAttachmentFromDocument").mockImplementation(
             jest.fn(async (req: Request, res: Response, next: NextFunction) => {
                 res.status(200).send();
@@ -247,4 +248,19 @@ describe('Document Routes', () => {
         expect(response.status).toBe(200);
         expect(cnt.removeAttachmentFromDocument).toHaveBeenCalledTimes(1);
     });
+    test('Test 11 - GET /api/documents/aggregateData - get aggregate data', async () => {
+        jest.spyOn(cnt, "getKxDocumentAggregateData").mockImplementation(
+            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+                res.status(200).send();
+                return;
+            })
+        );
+        const response = await request(app)
+            .get(`/api/documents/aggregateData`)
+            .send();
+
+        expect(response.status).toBe(200);
+        expect(cnt.getKxDocumentAggregateData).toHaveBeenCalledTimes(1);
+    });
+
 });
