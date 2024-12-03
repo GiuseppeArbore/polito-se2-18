@@ -52,7 +52,7 @@ describe("Integration Tests for Document API", () => {
             .set("Cookie", urbanPlannerCookie)
             .send({
                 title: "Integration Test Document",
-                stakeholders: [Stakeholders.RESIDENT],
+                stakeholders: [Stakeholders.RESIDENT, "Custom SH"],
                 scale_info: Scale.TEXT,
                 scale: 10,
                 issuance_date: date,
@@ -228,7 +228,7 @@ describe("Integration Tests for Document API", () => {
                 scale_info: Scale.TEXT,
                 scale: 10,
                 issuance_date: date,
-                type: KxDocumentType.INFORMATIVE,
+                type: "Custom type",
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.1)]] },
                 description: "Test document",
@@ -347,6 +347,49 @@ describe("Integration Tests for Document API", () => {
             .set("Cookie", urbanPlannerCookie);
             
         expect(response.status).toBe(404);
+    });
+
+    test('Test 13 - get aggregate data (no auth)', async () => {
+        const response = await request(app)
+            .get(`/api/documents/aggregateData`)
+            .send();
+
+        expect(response.status).toBe(401);
+    });
+
+    test('Test 14 - get aggregate data', async () => {
+        const response = await request(app)
+            .get(`/api/documents/aggregateData`)
+            .set("Cookie", urbanPlannerCookie)
+            .send();
+
+        response.body.types.sort();
+        response.body.stakeholders.sort();
+
+        expect(response.status).toBe(200);
+        expect(response.body).toMatchObject({
+            scales: [
+                10,
+            ],
+            stakeholders: [
+                "Custom SH",
+                "Resident",
+                "Urban Developer",
+                "Urban Planner",
+                "Visitor",
+            ],
+            types: [
+                "Agreement",
+                "Conflict Resolution",
+                "Consultation",
+                "Custom type",
+                "Design Document",
+                "Informative Document",
+                "Prescriptive Document",
+                "Strategy",
+                "Technical Document",
+            ],
+        });
     });
 });
 
