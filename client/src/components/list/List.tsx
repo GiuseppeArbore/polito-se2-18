@@ -230,7 +230,7 @@ function List(props: ListProps) {
     } else {
      props.updateFilterModel(undefined);
     }
-
+    onGridReady();
   }
   return (
     <>
