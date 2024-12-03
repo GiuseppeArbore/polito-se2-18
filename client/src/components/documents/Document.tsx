@@ -29,6 +29,7 @@ import {
 import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
 import exp from 'constants';
+import { DateRange } from '../form/DatePicker';
 
 
 export default function Document() {
@@ -43,7 +44,7 @@ export default function Document() {
     const [title, setTitle] = useState("");
     const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
     const [scale, setScale] = useState(10000);
-    const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(undefined);
+    const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(undefined);
     const [type, setType] = useState<KxDocumentType | undefined>(undefined);
     const [language, setLanguage] = useState<string | undefined>(undefined);
     const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
@@ -428,8 +429,8 @@ export function FormInfoDialog({
     setStakeholders: React.Dispatch<React.SetStateAction<Stakeholders[]>>;
     shError: boolean;
     setShError: React.Dispatch<React.SetStateAction<boolean>>;
-    issuanceDate: Date | undefined;
-    setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+    issuanceDate: DateRange | undefined;
+    setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
     type: KxDocumentType | undefined;
     setType: React.Dispatch<React.SetStateAction<KxDocumentType | undefined>>;
     scale: number;

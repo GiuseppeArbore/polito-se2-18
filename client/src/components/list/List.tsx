@@ -96,12 +96,26 @@ function List(props: ListProps) {
       headerName: "Issuance Date",
       field: "issuance_date",
       filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
-        return params.data && new Date(params.data.issuance_date).toLocaleDateString() || "";
+        if (params.data && params.data.issuance_date) {
+          const { from, to } = params.data.issuance_date;
+          if (from && to) {
+            return `${new Date(from).toLocaleDateString()} - ${new Date(to).toLocaleDateString()}`;
+          } else if (from) {
+            return new Date(from).toLocaleDateString();
+          }
+        }
+        return "";
       },
-      valueFormatter: (params: { value: string | number }) => {
-        return params.value !== undefined
-          ? new Date(params.value).toLocaleDateString()
-          : "";
+      valueFormatter: (params: { value: { from: string | number, to?: string | number } }) => {
+        if (params.value) {
+          const { from, to } = params.value;
+          if (from && to) {
+            return `${new Date(from).toLocaleDateString()} - ${new Date(to).toLocaleDateString()}`;
+          } else if (from) {
+            return new Date(from).toLocaleDateString();
+          }
+        }
+        return "";
       },
     },
     {

@@ -1,5 +1,6 @@
 import { AreaType, KxDocumentType, Scale, Stakeholders } from "./enum";
 import { mongoose, getModelForClass, Ref } from "@typegoose/typegoose";
+import {DateRange} from "./components/form/DatePicker";
 const prop = (..._: any) => (_: any, _a: string) => {};
 const modelOptions = (..._: any) => (_: any) => {};
 
@@ -73,8 +74,8 @@ export class KxDocument {
     @prop({required: true, type: Number})
     scale!: number;
 
-    @prop({required: true, type: Date})
-    issuance_date!: Date;
+    @prop({required: true})
+    issuance_date!: DateRange;
 
     @prop({required: true, type: String, enum: KxDocumentType})
     type!: KxDocumentType;

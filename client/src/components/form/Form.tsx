@@ -40,6 +40,7 @@ import "../../index.css";
 import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
+import { DateRange } from "./DatePicker";
 
 interface FormDialogProps {
   documents: KxDocument[];
@@ -53,8 +54,8 @@ export function FormDialog(props: FormDialogProps) {
   const [titleError, setTitleError] = useState(false);
   const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
   const [shError, setShError] = useState(false);
-  const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(
-    new Date()
+  const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(
+   {from: new Date()}
   );
   const [files, setFiles] = useState<File[]>([]);
   const [type, setType] = useState<KxDocumentType | undefined>(undefined);
@@ -166,7 +167,7 @@ export function FormDialog(props: FormDialogProps) {
 
         setTitle("");
         setScale(0);
-        setIssuanceDate(new Date());
+        setIssuanceDate({from:new Date()});
         setType(undefined);
         setLanguage(undefined);
         setDescription(undefined);
@@ -220,7 +221,7 @@ export function FormDialog(props: FormDialogProps) {
     setTitleError(false);
     setStakeholders([]);
     setShError(false);
-    setIssuanceDate(new Date());
+    setIssuanceDate({from: new Date()});
     setType(undefined);
     setTypeError(false);
     setScale(10000);
@@ -405,8 +406,8 @@ export function FormDocumentInformation({
   setStakeholders: React.Dispatch<React.SetStateAction<Stakeholders[]>>;
   shError: boolean;
   setShError: React.Dispatch<React.SetStateAction<boolean>>;
-  issuanceDate: Date | undefined;
-  setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+  issuanceDate: DateRange | undefined;
+  setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
   type: KxDocumentType | undefined;
   setType: React.Dispatch<React.SetStateAction<KxDocumentType | undefined>>;
   typeError: boolean;
@@ -925,8 +926,8 @@ export function FormDocumentDatePicker({
   issuanceDate,
   setIssuanceDate
 }: {
-  issuanceDate: Date | undefined,
-  setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>
+  issuanceDate: DateRange | undefined,
+  setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>
 }) {
   return (
 
@@ -941,8 +942,8 @@ export function FormDocumentDatePicker({
       <DatePicker
         id="issuance-date"
         className="mt-2"
-        value={issuanceDate}
-        onValueChange={d => setIssuanceDate(d)}
+        value={issuanceDate?.from}
+        onValueChange={d => setIssuanceDate({ from: d })}
         enableYearNavigation={true}
         weekStartsOn={1}
         enableClear={false}
