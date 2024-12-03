@@ -1,7 +1,8 @@
-import { DocInfo, KxDocument } from "../models/model";
+import { DocInfo, KxDocument, KxDocumentAggregateData } from "../models/model";
 import { KxDocumentModel } from "../models/model";
 import { mongoose } from "@typegoose/typegoose";
 import dotenv from 'dotenv'; 
+import { User, UserModel } from "../models/user";
 
 
 class DAO {
@@ -40,7 +41,17 @@ class DAO {
             console.error('Error disconnecting from the database', error);
         }
     }
-
+    async getUserByEmail(email: string): Promise<User | null> {
+        const res = await UserModel.findOne().where("email").equals(email).exec();
+        return this.fromResultToUser(res);
+    }
+    async deleteUser(id: mongoose.Types.ObjectId): Promise<boolean> {
+        const result = await UserModel.deleteOne({_id: id}).exec();
+        if (result.deletedCount === 1) {
+            return true;
+        }
+        return false;
+    }
     async getKxDocumentById(id: mongoose.Types.ObjectId): Promise<KxDocument | null> {
         const result = await KxDocumentModel.find().where("_id").equals(id).exec();
         if (result.length > 0) {
@@ -55,7 +66,46 @@ class DAO {
         }
         return null;
     }
-
+    async getKxDocumentsAggregateData(): Promise<KxDocumentAggregateData | null> {
+        const result = await KxDocumentModel.aggregate([
+            {
+                $project: {
+                    _id: 0,
+                    stakeholders: 1,
+                    type: 1,
+                    scale: 1
+                }
+            },
+            {
+                $unwind: {
+                    path: "$stakeholders"
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    stakeholders: {
+                        $addToSet: "$stakeholders"
+                    },
+                    types: {
+                        $addToSet: "$type"
+                    },
+                    scales: {
+                        $addToSet: "$scale"
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0
+                }
+            }
+        ]).exec();
+        if (result.length > 0) {
+            return this.fromResultToAggregate(result[0]);
+        }
+        return null;
+    }
     async getAlldocuments(): Promise<KxDocument[]> {
         const result = await KxDocumentModel.find().sort({ title: 1 }).exec();
         if (result.length > 0) {
@@ -100,6 +150,22 @@ class DAO {
             return false;
         return true;
     }
+    async removeKxDocumentAttachments(id: mongoose.Types.ObjectId, fileNames: string[]): Promise<boolean> {
+        const result = await KxDocumentModel.updateOne(
+            {_id: id._id},
+            {
+                $pull: {
+                    attachments: {
+                        $in: fileNames
+                    }
+                }
+            }
+        ).exec();
+
+        if (result.modifiedCount === 0)
+            return false;
+        return true;
+    }
     async updateKxDocumentDescription(id: mongoose.Types.ObjectId, description: string): Promise<KxDocument | null> {
         const result = await KxDocumentModel.updateOne(
             {_id: id._id},
@@ -127,6 +193,26 @@ class DAO {
             return null;
 
         return await this.getKxDocumentById(id);
+    }
+    private fromResultToAggregate(result: any): KxDocumentAggregateData | null {
+        try {
+            return {
+                stakeholders: result.stakeholders,
+                types: result.types,
+                scales: result.scales,
+            }
+        } catch {
+            return null;
+        }
+    }
+    private fromResultToUser(result: any | null): User | null {
+        return result && {
+            _id: result._id,
+            email: result.email,
+            password: result.password,
+            salt: result.salt,
+            role: result.role
+        }
     }
     private fromResultToKxDocument(result: any): KxDocument {
         return {
