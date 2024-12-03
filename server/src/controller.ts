@@ -132,6 +132,20 @@ export const handleFileUpload = async (req: Request, res: Response, next: NextFu
     }
 }
 
+export const removeAttachmentFromDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    const id = new mongoose.Types.ObjectId(req.params.id);
+    const fileName = req.params.fileName;
+    const dbUpdate = await db.removeKxDocumentAttachments(id, [fileName]);
+    if (!dbUpdate) {
+        res.status(404).send({ error: "The file does not exist" });
+        return;
+    }
+    // Immediately send a response to avoid blocking the client
+    res.status(200).send();
+
+    await kxObjectStorageClient.send(KxObjectStorageCommands.deleteAttachmentForDocument(id, fileName));
+}
+
 export const updateKxDocumentDescription = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const id = new mongoose.Types.ObjectId(req.params.id);

@@ -111,6 +111,22 @@ class DAO {
             return false;
         return true;
     }
+    async removeKxDocumentAttachments(id: mongoose.Types.ObjectId, fileNames: string[]): Promise<boolean> {
+        const result = await KxDocumentModel.updateOne(
+            {_id: id._id},
+            {
+                $pull: {
+                    attachments: {
+                        $in: fileNames
+                    }
+                }
+            }
+        ).exec();
+
+        if (result.modifiedCount === 0)
+            return false;
+        return true;
+    }
     async updateKxDocumentDescription(id: mongoose.Types.ObjectId, description: string): Promise<KxDocument | null> {
         const result = await KxDocumentModel.updateOne(
             {_id: id._id},

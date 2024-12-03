@@ -15,7 +15,8 @@ const TEST_FILENAME = "filename";
 jest.mock('../src/controller', () => ({
     ...jest.requireActual("../src/controller"),
     createKxDocument: jest.fn(),
-    handleFileUpload: jest.fn()
+    handleFileUpload: jest.fn(),
+    removeAttachmentFromDocument: jest.fn()
 }));
 jest.mock("@aws-sdk/client-s3");
 jest.mock("@aws-sdk/s3-request-presigner");
@@ -232,4 +233,18 @@ describe('Document Routes', () => {
         expect(cnt.handleFileUpload).toHaveBeenCalledTimes(0);
     });
 
+    test("DELETE /api/documents/:id/attachments/:fileName - nominal case", async () => {
+        jest.spyOn(cnt, "removeAttachmentFromDocument").mockImplementation(
+            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+                res.status(200).send();
+                return;
+            })
+        );
+        const response = await request(app)
+            .delete(`/api/documents/${TEST_ID}/attachments/${TEST_FILENAME}`)
+            .send();
+
+        expect(response.status).toBe(200);
+        expect(cnt.removeAttachmentFromDocument).toHaveBeenCalledTimes(1);
+    });
 });
