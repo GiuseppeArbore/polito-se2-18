@@ -3,7 +3,6 @@ export enum Stakeholders {
     URBAN_PLANNER = "Urban Planner",
     RESIDENT = "Resident",
     VISITOR = "Visitor"
-
 }
 
 export enum Scale {

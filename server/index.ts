@@ -1,7 +1,8 @@
 import cors, { CorsOptions } from "cors";
-import express, {Request, Response, NextFunction} from 'express';
+import express from 'express';
 import initRoutes from './src/routes';
 import { registerErrorHandler } from './src/errorHandlers';
+import { initAuthRoutes } from "./src/auth";
 
 const app: express.Application = express();
 
@@ -14,6 +15,7 @@ const corsOptions: CorsOptions = {
 
 app.use(cors(corsOptions));
 app.use(express.json());
+initAuthRoutes(app);
 initRoutes(app);
 registerErrorHandler(app);
 

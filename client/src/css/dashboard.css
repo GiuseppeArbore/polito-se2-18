@@ -1,0 +1,19 @@
+.hider {
+    /*
+     * #3A7CA5 is the color suggested by Golnaz
+     * #e7ebf3 is the color suggested by Alberto
+     */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    border-radius: 5px;
+    padding: 5px;
+    cursor: pointer;
+}
+
+
+@media (max-width: 1024px) {
+    .hide-on-small {
+      display: none;
+    }
+  }

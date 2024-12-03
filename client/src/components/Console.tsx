@@ -5,11 +5,11 @@ import {
   Grid,
   Col,
   Metric,
-  Subtitle,
   TabGroup,
   TabList,
   Tab,
 } from "@tremor/react";
+import "../css/dashboard.css"
 import API from "../API";
 import { useState, useEffect, useMemo } from "react";
 import { FormDialog } from "./form/Form";
@@ -20,7 +20,7 @@ import { Toaster } from "./toast/Toaster";
 import { toast } from "../utils/toaster";
 import { FeatureCollection } from "geojson";
 import { Link } from "react-router-dom";
-import { RiHome2Fill } from "@remixicon/react";
+import { RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine } from "@remixicon/react";
 import { AdvancedFilterModel } from "ag-grid-enterprise";
 
 export default function Console() {
@@ -92,6 +92,8 @@ export default function Console() {
       setRefreshNeeded(false);
     }
   }, [refreshNeeded]);
+
+
   useMemo(() => {
     const entireMunicipalityDocs = tmpDocuments.filter(
       (doc) => doc.doc_coordinates?.type === "EntireMunicipality"
@@ -103,6 +105,30 @@ export default function Console() {
     setEntireMunicipalityDocuments(entireMunicipalityDocs);
     setPointOrAreaDocuments(otherDocs);
   }, [tmpDocuments]);
+
+
+
+
+  const [showSideBar, setShowSideBar] = useState(true);
+
+  useEffect(() => {
+    if(selectedView === 0) {
+      setShowSideBar(true);
+    } else {
+      setShowSideBar(false);
+    }
+  }, [selectedView]);
+
+
+  const [windowWidth, setWindowWidth] = useState(window.innerWidth);
+  useEffect(() => {
+    const handleResize = () => setWindowWidth(window.innerWidth);
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  
+
   return (
     <main>
       <Title className="flex items-center">
@@ -132,44 +158,73 @@ export default function Console() {
           </TabList>
         </TabGroup>
       </div>
+
       <Grid numItemsLg={6} className="gap-6 mt-6">
-        <Col numColSpanLg={5}>
-          <Card className="h-full p-0 m-0" style={{ margin: 0, padding: 0 }}>
-            {renderCurrentSelection(selectedView)}
-          </Card>
-        </Col>
-
-        <Col numColSpanLg={1}>
-          <div className="space-y-6">
-            <FormDialog
-              documents={documents}
-              refresh={() => setRefreshNeeded(true)}
-            />
-
-            <Card>
-              <Metric>KIRUNA</Metric>
-              <Title>Quick facts</Title>
-              <Text>
-                <ul className="list-disc list-inside">
-                <li>20,000 inhabitants</li>
-                <li>Located 140 km north of the Arctic Circle</li>
-                <li>Lowest recorded temperature -42 °C</li>
-                <li>45 days of Midnight Sun each year</li>
-                <li>21 days of Polar Night</li>
-                <li>Covered in snow for 8 months each year</li>
-                </ul>
-              </Text>
-            </Card>
-            <Card className="hidden lg:block w-full h-40">
-              <img
-                src="/kiruna.png"
-                alt="Kiruna"
-                className="w-full h-full object-contain"
-              />
-            </Card>
+        <Col numColSpanLg={showSideBar ? 5 : 6}>
+          <div className="h-full" style={{ display: 'flex', flexDirection: 'row' }}>
+            <Col className="h-full w-full">
+              <Card className="h-full p-0 m-0" style={{ margin: 0, padding: 0, minHeight: "500px" }}>
+                {renderCurrentSelection(selectedView)}
+              </Card>
+            </Col>
+            {!showSideBar &&
+              <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring"  role="Button">
+                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full"/></i>
+              </Col>
+            }
           </div>
+
         </Col>
+        <Col numColSpanLg={1}>
+          <div className="flex flex-row ">
+            {showSideBar &&
+              <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring" role="Button">
+                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full"/></i>
+
+              </Col>
+            }
+            {(showSideBar || windowWidth <= 1024) &&
+              <Col className="w-full">
+                <div className="space-y-6">
+                  <FormDialog
+                    documents={documents}
+                    refresh={() => setRefreshNeeded(true)}
+                  />
+
+                  <Card>
+                    <Metric>KIRUNA</Metric>
+                    <Title>Quick facts</Title>
+                    <Text>
+                      <ul className="list-disc list-inside">
+                        <li>20,000 inhabitants</li>
+                        <li>Located 140 km north of the Arctic Circle</li>
+                        <li>Lowest recorded temperature -42 °C</li>
+                        <li>45 days of Midnight Sun each year</li>
+                        <li>21 days of Polar Night</li>
+                        <li>Covered in snow for 8 months each year</li>
+                      </ul>
+                    </Text>
+                  </Card>
+                  <Card className="hidden lg:block w-full h-40">
+                    <img
+                      src="/kiruna.png"
+                      alt="Kiruna"
+                      className="w-full h-full object-contain"
+                    />
+                  </Card>
+                </div>
+              </Col>
+            }
+
+          </div>
+
+
+        </Col>
+
       </Grid>
+
+
+
       <Card className="mt-6">
         <div
           style={{

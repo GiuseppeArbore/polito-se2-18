@@ -1,9 +1,13 @@
-import React from "react";
-import { Text } from "@tremor/react";
+import React, { useState } from "react";
+import { Button, Dialog, DialogPanel, Select, SelectItem, Text, TextInput } from "@tremor/react";
 import { Link } from "react-router-dom";
 import { Badge } from "@tremor/react";
 
+
 const HeroSection: React.FC = () => {
+
+  const [showLogin, setShowLogin] = useState(false);
+  const [error, setError] = useState(false);
   return (
     <section className="hero-section bg-[#003d8e] text-white h-[40vh] flex flex-col justify-center items-center p-4 rounded-tl-lg rounded-tr-lg">
       <h1 className="text-4xl font-bold animate__animated animate__fadeIn animate__delay-1s text-white">
@@ -19,6 +23,30 @@ const HeroSection: React.FC = () => {
           </Badge>
         </Link>
       </div>
+      {/* hide if not logged in */}
+      <Button className="login" onClick={() => setShowLogin(true)}>Login</Button>
+      <Dialog open={showLogin} onClose={(val) => setShowLogin(val)} static={true}>
+        <DialogPanel>
+          <h2 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Login</h2>
+          <div className="mx-auto max-w-sm space-y-8 mt-2">
+            <div>
+              <TextInput placeholder="Type your username here" error={error} errorMessage="Wrong username" />
+            </div>
+            <div>
+              <TextInput placeholder="Type password here" type="password" />
+            </div>
+          </div>
+
+          <div className="mt-8 flex items-center justify-end space-x-2">
+            <Button size="xs" variant="secondary" onClick={() => setShowLogin(false)}>
+              Cancel
+            </Button>
+            <Button size="xs" variant="primary" onClick={() => setShowLogin(false)}>
+              Login
+            </Button>
+          </div>
+        </DialogPanel>
+      </Dialog>
     </section>
   );
 };
