@@ -107,7 +107,6 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
     const otherDocs = tmpDocuments.filter(
       (doc) => doc.doc_coordinates?.type !== "EntireMunicipality"
     );
-    console.log("modify documents");
     setEntireMunicipalityDocuments(entireMunicipalityDocs);
     setPointOrAreaDocuments(otherDocs);
 
