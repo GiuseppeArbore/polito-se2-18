@@ -93,12 +93,14 @@ export default function Document() {
             })
           }
 
+          files.forEach( (f) => doc?.attachments?.push(f.name));
           toast({
             title: "Upload files", 
             description: "Original resources updated succesfully",
             variant: "success",
             duration: 3000
           })
+
           setIsDragAndDropOpen(false);
 
     };
