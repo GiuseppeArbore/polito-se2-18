@@ -5,16 +5,6 @@ export enum Scale {
     SMALL_ARCHITECTURAL = "Small Architectural Scale"
 }
 
-// export enum KxDocumentType {
-//     INFORMATIVE = "Informative Document",
-//     PRESCRIPTIVE = "Prescriptive Document",
-//     DESIGN = "Design Document",
-//     TECHNICAL = "Technical Document",
-//     STRATEGY = "Strategy",
-//     AGREEMENT = "Agreement",
-//     CONFLICT = "Conflict Resolution",
-//     CONSULTATION = "Consultation",
-// }
 export enum AreaType {
     ENTIRE_MUNICIPALITY = "EntireMunicipality", //The entire municipality of Kiruna
     POINT = "Point", //A point in Kiruna
