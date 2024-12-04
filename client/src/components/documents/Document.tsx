@@ -1,7 +1,9 @@
 
-import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill } from '@remixicon/react';
+import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine, RiAddBoxLine } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
+import { FileUpload } from "../form/DragAndDrop";
+import DeleteResourceDialog from './DeleteResourcesDialog';
 import API from '../../API';
 //import { FileUpload } from './DragDrop';
 import mime from 'mime';
@@ -47,10 +49,10 @@ export default function Document({ user }: DocumentProps) {
     const [share, setShare] = useState(false);
     const [drawings, setDrawings] = useState<any>();
     const [title, setTitle] = useState("");
-    const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
+    const [stakeholders, setStakeholders] = useState<string[]>([]);
     const [scale, setScale] = useState(10000);
     const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(undefined);
-    const [type, setType] = useState<KxDocumentType | undefined>(undefined);
+    const [type, setType] = useState<string | undefined>(undefined);
     const [language, setLanguage] = useState<string | undefined>(undefined);
     const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(undefined);
@@ -63,6 +65,8 @@ export default function Document({ user }: DocumentProps) {
     const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
     const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
+    const [files, setFiles] = useState<File[]>([]);
+
 
     useEffect(() => {
         const fetchDocument = async () => {
@@ -72,7 +76,7 @@ export default function Document({ user }: DocumentProps) {
                 setTitle(document.title);
                 setStakeholders(document.stakeholders);
                 setScale(document.scale);
-                setIssuanceDate(document.issuance_date);
+                setIssuanceDate(document.issuance_date.from);
                 setType(document.type);
                 setLanguage(document.language || undefined);
                 setPages(document.pages || undefined);
@@ -87,26 +91,26 @@ export default function Document({ user }: DocumentProps) {
                 if (document.doc_coordinates.type !== "EntireMunicipality") {
                     function getIconForType(type: string): string {
                         switch (type) {
-                          case 'Informative Document':
-                            return 'icon-InformativeDocument';
-                          case 'Prescriptive Document':
-                            return 'icon-PrescriptiveDocument';
-                          case 'Design Document':
-                            return 'icon-DesignDocument';
-                          case 'Technical Document':
-                            return 'icon-TechnicalDocument';
-                          case 'Strategy':
-                            return 'icon-Strategy';
-                          case 'Agreement':
-                            return 'icon-Agreement';
-                          case 'Conflict Resolution':
-                            return 'icon-ConflictResolution';
-                          case 'Consultation':
-                            return 'icon-Consultation';
-                          default:
-                            return 'default-icon';
+                            case 'Informative Document':
+                                return 'icon-InformativeDocument';
+                            case 'Prescriptive Document':
+                                return 'icon-PrescriptiveDocument';
+                            case 'Design Document':
+                                return 'icon-DesignDocument';
+                            case 'Technical Document':
+                                return 'icon-TechnicalDocument';
+                            case 'Strategy':
+                                return 'icon-Strategy';
+                            case 'Agreement':
+                                return 'icon-Agreement';
+                            case 'Conflict Resolution':
+                                return 'icon-ConflictResolution';
+                            case 'Consultation':
+                                return 'icon-Consultation';
+                            default:
+                                return 'default-icon';
                         }
-                      }
+                    }
 
                     const geoJSON = {
                         type: 'FeatureCollection',
@@ -140,58 +144,61 @@ export default function Document({ user }: DocumentProps) {
     }, []);
 
     useMemo(async () => {
-       if(drawings && saveDrawing){
-        let draw: DocCoords;
-        if (
-            drawings &&
-            drawings.features.length === 1 &&
-            drawings.features[0].geometry.type === "Point"
-          ) {
-            draw = {
-              type: AreaType.POINT,
-              coordinates: drawings.features[0].geometry.coordinates,
-            };
-          } else if ((drawings && drawings.features.length >= 1) && drawings.features[0].geometry.type === "Polygon") {
-            let cord =
-              drawings.features.map((f: any) => f.geometry.coordinates).length === 1
-                ? drawings.features[0].geometry.coordinates
-                : [];
-               
-            draw = {
-              type: AreaType.AREA,
-              coordinates: cord as number[][][],
-            };
-          } else {
-            draw = {
-              type: AreaType.ENTIRE_MUNICIPALITY,
-            };
-          }
-          try{
-            const res = await API.updateKxDocumentInformation(id!, undefined, undefined, undefined, undefined, undefined, undefined, draw);
-            if (res) {
-                toast({
-                    title: "Success",
-                    description:
-                        "The document has been updated successfully",
-                    variant: "success",
-                    duration: 3000,
-                })
+        if (drawings && saveDrawing) {
+            let draw: DocCoords;
+            if (
+                drawings &&
+                drawings.features.length === 1 &&
+                drawings.features[0].geometry.type === "Point"
+            ) {
+                draw = {
+                    type: AreaType.POINT,
+                    coordinates: drawings.features[0].geometry.coordinates,
+                };
+            } else if ((drawings && drawings.features.length >= 1) && drawings.features[0].geometry.type === "Polygon") {
+                let cord =
+                    drawings.features.map((f: any) => f.geometry.coordinates).length === 1
+                        ? drawings.features[0].geometry.coordinates
+                        : [];
+
+                draw = {
+                    type: AreaType.AREA,
+                    coordinates: cord as number[][][],
+                };
             } else {
-                toast({
-                    title: "Error",
-                    description: "Failed to update document",
-                    variant: "error",
-                    duration: 3000,
-                })
+                draw = {
+                    type: AreaType.ENTIRE_MUNICIPALITY,
+                };
             }
-          } catch (error) {
-          
-          }
-          setSaveDrawing(false);
-       }
-    },[saveDrawing]);
+            try {
+                const res = await API.updateKxDocumentInformation(id!, undefined, undefined, undefined, undefined, undefined, undefined, draw);
+                if (res) {
+                    toast({
+                        title: "Success",
+                        description:
+                            "The document has been updated successfully",
+                        variant: "success",
+                        duration: 3000,
+                    })
+                } else {
+                    toast({
+                        title: "Error",
+                        description: "Failed to update document",
+                        variant: "error",
+                        duration: 3000,
+                    })
+                }
+            } catch (error) {
+
+            }
+            setSaveDrawing(false);
+        }
+    }, [saveDrawing]);
 
     const [showCheck, setShowCheck] = useState(false);
+    const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
+    const [selectedResource, setSelectedResource] = useState<string>("");
+    const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
 
 
     return (
@@ -271,6 +278,7 @@ export default function Document({ user }: DocumentProps) {
                         </div>
 
 
+
                         <FormInfoDialog
                             document={doc!}
                             title={title}
@@ -304,7 +312,7 @@ export default function Document({ user }: DocumentProps) {
                         <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Description:</i>
                         <i className='text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong'> {description}  </i>
 
-                        <div className='hidden lg:flex flex-end space-y-2 h-full justify-around'>
+                        <div className='hidden lg:flex flex-end space-y-2 h-full w-full justify-around'>
                             <FormDescriptionDialog
                                 document={doc!}
                                 description={description}
@@ -352,6 +360,125 @@ export default function Document({ user }: DocumentProps) {
 
                 </div>
 
+                <div className="flex flex-col lg:flex-row ">
+
+                    <div className="flex w-full h-full items-center justify-between mb-2">
+                        <Accordion className="w-full mr-6 mb-6">
+                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Original Resources</AccordionHeader>
+                            <AccordionBody className="leading-6 flex flex-col">
+                                <AccordionList style={{ boxShadow: 'none' }}>
+                                    {doc !== undefined && doc?.attachments && doc?.attachments.length >= 1 ? doc?.attachments?.map((title) => (
+                                        <div key={title + doc._id} className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{mime.getType(title)?.split("/")[1] === "pdf" ? "PDF file" : mime.getType(title)?.split("/")[0] === "image" ? "Image file" : "File  ".concat("(." + title.split(".")[1] + ")")}</i>
+                                            <div className="flex space-x-2">
+                                                <Button
+                                                    className="ml-2"
+                                                    onClick={() => {
+                                                        setFileTitle(title)
+                                                        setShowPdfPreview(true)
+                                                    }}
+                                                >
+                                                    Preview File
+                                                </Button>
+                                                <Button
+                                                    className="ml-2"
+                                                    color="red"
+                                                    onClick={async () => {
+                                                        setDeleteOriginalResourceConfirm(true);
+                                                        setSelectedResource(title);
+                                                    }}
+                                                ><RiDeleteBinLine /></Button>
+                                            </div>
+                                        </div>
+                                    )) : <>
+                                        <div className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No original resources added</i>
+                                        </div>
+                                    </>}
+
+                                </AccordionList>
+                            </AccordionBody>
+                        </Accordion>
+                        <i className="h-full lg:mr-9 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+
+                    </div>
+
+                    <div className="flex w-full h-full items-center justify-between mb-2">
+
+                        <Accordion className="w-full mr-6 mb-6">
+                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">More documents [Cooming soon] </AccordionHeader>
+                            <AccordionBody className="leading-6 flex flex-col">
+                                <AccordionList style={{ boxShadow: 'none' }}>
+                                    <div className="flex items-center justify-between m-2">
+                                        <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No more documents added</i>
+                                    </div>
+
+                                </AccordionList>
+                            </AccordionBody>
+                        </Accordion>
+                        <i className="h-full lg:ml-3 lg:mr-5 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+
+
+                    </div>
+
+                    {DeleteResourceDialog(
+                        deleteOriginalResourceConfirm,
+                        setDeleteOriginalResourceConfirm,
+                        async () => {
+                            //this is a draft, we have to implement it in the kx-87, understand the logic and implement it, also the file name
+                            try {
+                                //await API.deleteKxDocumentAttachment(id!, fileTitle!);
+                                const updatedDocument = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
+                                setDoc(updatedDocument);
+                                toast({
+                                    title: "Success",
+                                    description: "The document has been deleted successfully",
+                                    variant: "success",
+                                    duration: 3000,
+                                });
+                            } catch (error) {
+                                toast({
+                                    title: "Error",
+                                    description: "Failed to delete documents",
+                                    variant: "error",
+                                    duration: 3000,
+                                });
+                            }
+                        }
+                        , selectedResource!
+
+                    )}
+
+                    <Dialog open={isDragAndDropOpen} onClose={() => setIsDragAndDropOpen(false)} static={true}>
+                        <DialogPanel>
+                            <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Add Original Resources</h3>
+                            <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                                Add original resources about the document you are uploading.
+                            </p>
+                            <FileUpload
+                                saveFile={(list) => setFiles(list)}
+                            />
+                            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+                                <Button
+                                    className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                                    variant="light"
+                                    onClick={() => setIsDragAndDropOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="w-full sm:w-auto primary"
+                                //onClick={e => handleSubmit(e)}    handleSumbitDragAndDrop to do in kx-87
+                                >
+                                    Submit
+                                </Button>
+                            </div>
+                        </DialogPanel>
+                    </Dialog>
+
+
+                </div>
+
 
 
                 <Accordion className='lg:hidden'>
@@ -375,7 +502,7 @@ export default function Document({ user }: DocumentProps) {
                             className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
                         >
                             <DocumentPageMap
-                                setDrawing={(d) => {setDrawings(d); setSaveDrawing(true)}}
+                                setDrawing={(d) => { setDrawings(d); setSaveDrawing(true) }}
                                 drawing={drawings}
                                 style={{ minHeight: "300px", width: "100%" }}
                                 user = {user}
@@ -435,14 +562,14 @@ export function FormInfoDialog({
     setTitle: React.Dispatch<React.SetStateAction<string>>;
     titleError: boolean;
     setTitleError: React.Dispatch<React.SetStateAction<boolean>>;
-    stakeholders: Stakeholders[];
-    setStakeholders: React.Dispatch<React.SetStateAction<Stakeholders[]>>;
+    stakeholders: string[];
+    setStakeholders: React.Dispatch<React.SetStateAction<string[]>>;
     shError: boolean;
     setShError: React.Dispatch<React.SetStateAction<boolean>>;
     issuanceDate: Date | undefined;
     setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
-    type: KxDocumentType | undefined;
-    setType: React.Dispatch<React.SetStateAction<KxDocumentType | undefined>>;
+    type: string | undefined;
+    setType: React.Dispatch<React.SetStateAction<string | undefined>>;
     scale: number;
     setScale: React.Dispatch<React.SetStateAction<number>>;
     language: string | undefined;
@@ -550,7 +677,7 @@ export function FormInfoDialog({
                             setPages={setPages}
                             pageRanges={pageRanges}
                             setPageRanges={setPageRanges}
-                            
+
                         />
                         <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
                             <Button
@@ -602,7 +729,6 @@ export function FormDescriptionDialog(
             setError("Please fill the description field");
             return;
         }
-        //API call to update description
         try {
             const updatedDocument = await API.updateKxDocumentDescription(id, description);
             if (updatedDocument) {
@@ -640,7 +766,9 @@ export function FormDescriptionDialog(
 
     return (
         <>
+
             {canEdit && <i className="self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
+
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
                 <DialogPanel
                     className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"

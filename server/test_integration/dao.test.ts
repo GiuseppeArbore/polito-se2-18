@@ -8,6 +8,8 @@ import { mongoose } from "@typegoose/typegoose";
 import { KIRUNA_COORDS } from "../src/utils";
 import testUsers from "../test_users/db_export.kiruna-ex.users.json";
 
+const TEST_FILENAME = "filename";
+
 const list: mongoose.Types.ObjectId[] = [];
 const date = new Date();
 const deserializedTestUsers = EJSON.deserialize(testUsers);
@@ -22,7 +24,9 @@ beforeAll(async () => {
         title: "title 1",
         stakeholders: [Stakeholders.RESIDENT],
         scale: 10,
-        issuance_date: date,
+        issuance_date: {
+            from: date
+        },
         type: KxDocumentType.INFORMATIVE,
         language: "Swedish",
         doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -42,7 +46,9 @@ describe("Test DAO", () => {
             title: "title 2",
             stakeholders: [Stakeholders.RESIDENT],
             scale: 10,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Swedish",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
@@ -65,7 +71,9 @@ describe("Test DAO", () => {
             stakeholders: [Stakeholders.RESIDENT],
             scale: 10,
             pages: [],
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Swedish",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
@@ -88,7 +96,9 @@ describe("Test DAO", () => {
             stakeholders: [Stakeholders.RESIDENT],
             pages: [],
             scale: 10,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Swedish",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
@@ -106,7 +116,9 @@ describe("Test DAO", () => {
             title: "test",
             stakeholders: [],
             scale: 0,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Italian",
             doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
@@ -130,7 +142,9 @@ describe("Test DAO", () => {
             title: "test",
             stakeholders: [],
             scale: 0,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Italian",
             doc_coordinates: {
@@ -155,7 +169,9 @@ describe("Test DAO", () => {
             title: "test",
             stakeholders: [],
             scale: 0,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Italian",
             doc_coordinates: {
@@ -181,7 +197,9 @@ describe("Test DAO", () => {
             title: "test",
             stakeholders: [],
             scale: 0,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Italian",
             doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] } as Area,
@@ -206,7 +224,9 @@ describe("Test DAO", () => {
             title: "test",
             stakeholders: [],
             scale: 0,
-            issuance_date: date,
+            issuance_date: {
+                from: date
+            },
             type: KxDocumentType.INFORMATIVE,
             language: "Italian",
             doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] } as Area,
@@ -228,7 +248,7 @@ describe("Test DAO", () => {
         expect(res2).toBeTruthy();
     });
     test("Get user by email", async () => {
-        const user = deserializedTestUsers[0]
+        const user = deserializedTestUsers[0];
         const res = await db.getUserByEmail(user.email);
 
         expect(
@@ -244,6 +264,117 @@ describe("Test DAO", () => {
                 salt: user.salt.toString("base64")
             }
         );
+    });
+    test("Remove attachment", async () => {
+        const doc: KxDocument = {
+            title: "title 1",
+            stakeholders: [Stakeholders.RESIDENT],
+            scale: 10,
+            issuance_date: {
+                from: date
+            },
+            type: KxDocumentType.INFORMATIVE,
+            language: "Swedish",
+            doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
+            description: "Test",
+            connections: {
+                direct: [], collateral: [], projection: [], update: []
+            }
+        };
+        const resCreation = await db.createKxDocument({
+            ...doc,
+            attachments: [
+                TEST_FILENAME
+            ]
+        } as KxDocument);
+        expect(resCreation).toBeTruthy();
+
+        const res = await db.removeKxDocumentAttachments(resCreation!._id!, [TEST_FILENAME]);
+        const newDoc = await db.getKxDocumentById(resCreation!._id!);
+
+        expect(res).toBeTruthy();
+        expect(newDoc).toMatchObject({
+            ...doc,
+            attachments: [],
+            _id: resCreation!._id!
+        });
+        const res2 = await db.deleteKxDocument(resCreation!._id!);
+        expect(res2).toBeTruthy();
+    });
+    test("Remove non existing attachment", async () => {
+        const doc: KxDocument = {
+            title: "title 1",
+            stakeholders: [Stakeholders.RESIDENT],
+            scale: 10,
+            issuance_date: {
+                from: date
+            },
+            type: KxDocumentType.INFORMATIVE,
+            language: "Swedish",
+            doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
+            description: "Test",
+            connections: {
+                direct: [], collateral: [], projection: [], update: []
+            }
+        };
+        const resCreation = await db.createKxDocument({
+            ...doc,
+            attachments: [
+            ]
+        } as KxDocument);
+        expect(resCreation).toBeTruthy();
+
+        const res = await db.removeKxDocumentAttachments(resCreation!._id!, [TEST_FILENAME]);
+        const newDoc = await db.getKxDocumentById(resCreation!._id!);
+
+        expect(res).toBeFalsy();
+        expect(newDoc).toMatchObject({
+            ...doc,
+            attachments: [],
+            _id: resCreation!._id!
+        });
+        const res2 = await db.deleteKxDocument(resCreation!._id!);
+        expect(res2).toBeTruthy();
+    });
+    test("Get aggragate data", async () => {
+
+        const id = new mongoose.Types.ObjectId();
+        const tmpDoc = {
+            _id: id,
+            title: "test",
+            stakeholders: [Stakeholders.RESIDENT, "Custom SH"],
+            scale: 10,
+            issuance_date: {
+                from: date
+            },
+            type: "Custom type",
+            language: "Italian",
+            doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] } as Area,
+            description: "Test",
+            connections: {
+                direct: [], collateral: [], projection: [], update: []
+            },
+        } as KxDocument;
+
+        await db.createKxDocument(tmpDoc);
+        const res = await db.getKxDocumentsAggregateData();
+
+        const res2 = await db.deleteKxDocument(id);
+        expect(res2).toBeTruthy();
+        expect(res).toBeTruthy();
+        res!.stakeholders.sort();
+        expect(res).toMatchObject({
+            scales: [
+                10,
+            ],
+            stakeholders: [
+                "Custom SH",
+                "Resident",
+            ],
+            types: [
+                "Custom type",
+            ],
+        });
     });
 });
 

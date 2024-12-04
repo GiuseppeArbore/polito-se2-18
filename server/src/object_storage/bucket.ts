@@ -1,4 +1,4 @@
-import { S3Client, ListObjectsCommand, GetObjectCommand, PutObjectCommand } from "@aws-sdk/client-s3";
+import { S3Client, ListObjectsCommand, GetObjectCommand, PutObjectCommand, DeleteObjectCommand } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { mongoose } from "@typegoose/typegoose";
 import { createReadStream } from "fs";
@@ -30,6 +30,13 @@ export namespace KxObjectStorageCommands {
             Bucket: BUCKET_NAME,
             Key: `${docId.toString()}/${fileName}`,
             Body: createReadStream(`tmp/${docId.toString()}/${fileName}`)
+        });
+    }
+
+    export function deleteAttachmentForDocument(docId: mongoose.Types.ObjectId, fileName: string) {
+        return new DeleteObjectCommand({
+            Bucket: BUCKET_NAME,
+            Key: `${docId.toString()}/${fileName}`
         });
     }
 }
