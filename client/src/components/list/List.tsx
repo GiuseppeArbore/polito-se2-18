@@ -1,5 +1,11 @@
 import "ag-grid-enterprise";
-import { AdvancedFilterModel, ColDef, GridApi, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
+import {
+  AdvancedFilterModel,
+  ColDef,
+  GridApi,
+  GridOptions,
+  ValueGetterParams,
+} from "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -12,7 +18,6 @@ import { toast } from "../../utils/toaster";
 import locales from "../../locales.json";
 import API from "../../API";
 import DeleteDialog from "./DeleteDialog";
-import { Stakeholders } from "../../enum";
 import { prop } from "@typegoose/typegoose";
 import { on } from "events";
 
@@ -22,9 +27,8 @@ interface ListProps {
   updateFilterModel: (filterModel: AdvancedFilterModel | undefined) => void;
   filterModel: AdvancedFilterModel | undefined;
   quickFilter: string;
-  user: { email: string; role: Stakeholders } | null;
+  user: { email: string; role: string } | null;
 }
-
 
 function List(props: ListProps) {
   const navigator = useNavigate();
@@ -44,7 +48,7 @@ function List(props: ListProps) {
           icon={RiInfoI}
           onClick={() => navigator("/documents/" + params.value)}
         />
-        {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
+        {props.user && props.user.role === "Urban Planner" && (
           <Button
             style={{ backgroundColor: "red" }}
             color="red"
@@ -63,7 +67,7 @@ function List(props: ListProps) {
     return (
       <div className="flex flex-wrap gap-1 mt-2">
         {params.value &&
-          params.value.map((stakeholder: Stakeholders, index: number) => {
+          params.value.map((stakeholder: string, index: number) => {
             return (
               <Badge key={index} className="text-sm">
                 <span className="text-sm">{stakeholder}</span>
@@ -184,16 +188,16 @@ function List(props: ListProps) {
       resizable: true,
       sortable: true,
       enableRowGroup: true,
-      filterParams: { newRowsAction: 'keep' }
+      filterParams: { newRowsAction: "keep" },
     },
     statusBar: {
       statusPanels: [
-        { statusPanel: 'agTotalAndFilteredRowCountComponent' },
-        { statusPanel: 'agTotalRowCountComponent' },
-        { statusPanel: 'agFilteredRowCountComponent' },
-        { statusPanel: 'agSelectedRowCountComponent' },
-        { statusPanel: 'agAggregationComponent' }
-      ]
+        { statusPanel: "agTotalAndFilteredRowCountComponent" },
+        { statusPanel: "agTotalRowCountComponent" },
+        { statusPanel: "agFilteredRowCountComponent" },
+        { statusPanel: "agSelectedRowCountComponent" },
+        { statusPanel: "agAggregationComponent" },
+      ],
     },
     sideBar: {
       toolPanels: [
@@ -254,7 +258,7 @@ function List(props: ListProps) {
     }
   }
 
-  function sizeColumnsToFitGridStategy(params: any){
+  function sizeColumnsToFitGridStategy(params: any) {
     params.api.sizeColumnsToFit();
   }
 
@@ -279,13 +283,10 @@ function List(props: ListProps) {
           ref={gridRef}
           animateRows={true}
           onFilterChanged={onFilterChanged}
-	onGridSizeChanged={sizeColumnsToFitGridStategy}
-		      quickFilterText={props.quickFilter}
+          onGridSizeChanged={sizeColumnsToFitGridStategy}
+          quickFilterText={props.quickFilter}
           onRowDataUpdated={onFilterChanged}
           onModelUpdated={onFilterChanged}
-          
-          
-         
         />
       </div>
 

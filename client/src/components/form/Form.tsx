@@ -18,15 +18,8 @@ import {
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
-import { FeatureCollection } from "geojson";
 import API from "../../API";
-import {
-  AreaType,
-  KxDocumentScale,
-  KxDocumentType,
-  Scale,
-  Stakeholders,
-} from "../../enum";
+import { AreaType } from "../../enum";
 import { DocCoords, KxDocument, KxDocumentAggregateData } from "../../model";
 import { mongoose } from "@typegoose/typegoose";
 import {
@@ -37,21 +30,16 @@ import {
   RiInformation2Line,
 } from "@remixicon/react";
 
-import {
-  parseLocalizedNumber,
-  PageRange,
-  validatePageRangeString,
-} from "../../utils";
+import { PageRange, validatePageRangeString } from "../../utils";
 import "../../index.css";
 import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
 
-
 interface FormDialogProps {
   documents: KxDocument[];
   refresh: () => void;
-  user: { email: string; role: Stakeholders } | null;
+  user: { email: string; role: string } | null;
 }
 
 export function FormDialog(props: FormDialogProps) {
@@ -65,7 +53,7 @@ export function FormDialog(props: FormDialogProps) {
   const [files, setFiles] = useState<File[]>([]);
   const [type, setType] = useState<string | undefined>(undefined);
   const [typeError, setTypeError] = useState(false);
-  const [scale, setScale] = useState<KxDocumentScale | undefined>(undefined);
+  const [scale, setScale] = useState<number | undefined>(undefined);
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -87,8 +75,6 @@ export function FormDialog(props: FormDialogProps) {
   const [showConnectionsInfo, setShowConnectionsInfo] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState("");
-  const [message, setMessage] = useState("");
-
   const [docCoordinates, _] = useState<DocCoords | undefined>(undefined);
   const [aggregatedData, setAggregatedData] = useState<
     KxDocumentAggregateData[] | undefined
@@ -99,7 +85,6 @@ export function FormDialog(props: FormDialogProps) {
       try {
         const aggregateData = await API.aggregateData();
         if (aggregateData) {
-          console.log("aggregateData: ", aggregateData);
           setAggregatedData(aggregateData);
         }
       } catch (error: any) {
@@ -174,7 +159,7 @@ export function FormDialog(props: FormDialogProps) {
     const newDocument: KxDocument = {
       title,
       stakeholders,
-      scale: scale || KxDocumentScale.DEFAULT,
+      scale: scale,
       doc_coordinates: draw,
       issuance_date: {
         from: issuanceDate!,
@@ -333,7 +318,7 @@ export function FormDialog(props: FormDialogProps) {
           setDrawing={setDrawing}
           hideMap={hideMap}
           setHideMap={setHideMap}
-          user = {props.user}
+          user={props.user}
         />
 
         <Divider />
@@ -388,8 +373,14 @@ export function FormDialog(props: FormDialogProps) {
 
   return (
     <>
-      {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
-        <Button className="w-full primary" onClick={() => { setIsOpen(true); clearForm() }}>
+      {props.user && props.user.role === "Urban Planner" && (
+        <Button
+          className="w-full primary"
+          onClick={() => {
+            setIsOpen(true);
+            clearForm();
+          }}
+        >
           Add new document
         </Button>
       )}
@@ -452,8 +443,8 @@ export function FormDocumentInformation({
   setType: React.Dispatch<React.SetStateAction<string | undefined>>;
   typeError: boolean;
   setTypeError: React.Dispatch<React.SetStateAction<boolean>>;
-  scale: KxDocumentScale | undefined;
-  setScale: React.Dispatch<React.SetStateAction<KxDocumentScale | undefined>>;
+  scale: number | undefined;
+  setScale: React.Dispatch<React.SetStateAction<number | undefined>>;
   language: string | undefined;
   setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
   pages: PageRange[] | undefined;
@@ -466,15 +457,54 @@ export function FormDocumentInformation({
   const [newTypeError, setNewTypeError] = useState(false);
 
   const [isNewScaleModalOpen, setIsNewScaleModalOpen] = useState(false);
-  const [newScale, setNewScale] = useState("");
+  const [newScale, setNewScale] = useState<number>(0);
   const [newScaleError, setNewScaleError] = useState(false);
 
   const [isNewStakeholderModalOpen, setisNewStakeholderModalOpen] =
     useState(false);
-  const [newStakeholder, setnewStakeholder] = useState("");
+  const [newStakeholder, setNewStakeholder] = useState("");
   const [newStakeholderError, setNewStakeholderError] = useState(false);
-  const [stakeholderOptions, setStakeholderOptions] =
-    useState<typeof Stakeholders>(Stakeholders); // Dynamic list of stakeholders
+
+  const [scales, setScales] = useState<number[]>([]);
+  const [types, setTypes] = useState<string[]>([]);
+
+  const [stakeholdersList, setStakeholdersList] = useState<string[]>([]);
+  useEffect(() => {
+    const fetchAggregateData = async () => {
+      try {
+        // fetch data
+        const aggregateData = await API.aggregateData();
+
+        // set scales
+        if (Array.isArray(aggregateData.scales)) {
+          setScales(aggregateData.scales);
+        } else {
+          console.error("Invalid scales format:", aggregateData.scales);
+          setScales([]);
+        }
+
+        // set stakeholders
+        if (Array.isArray(aggregateData.stakeholders)) {
+          setStakeholdersList(aggregateData.stakeholders);
+        } else {
+          console.error("Invalid scales format:", aggregateData.stakeholders);
+          setStakeholdersList([]);
+        }
+
+        // set types
+        if (Array.isArray(aggregateData.types)) {
+          setTypes(aggregateData.types);
+        } else {
+          console.error("Invalid scales format:", aggregateData.setTypes);
+          setTypes([]);
+        }
+      } catch (error) {
+        console.error("Failed to fetch aggregate data:", error);
+      }
+    };
+
+    fetchAggregateData();
+  }, []);
 
   const OpenNewTypeModal = () => {
     setIsNewTypeModalOpen(true);
@@ -492,6 +522,8 @@ export function FormDocumentInformation({
       return;
     } else {
       setNewTypeError(false);
+      setTypes((prev) => [...prev, newType]);
+      setType(newType);
       setIsNewTypeModalOpen(false);
     }
   };
@@ -502,6 +534,8 @@ export function FormDocumentInformation({
       return;
     } else {
       setNewScaleError(false);
+      setScales((prev) => [...prev, newScale]);
+      setScale(newScale);
       setIsNewScaleModalOpen(false);
     }
   };
@@ -512,6 +546,9 @@ export function FormDocumentInformation({
       return;
     } else {
       setNewStakeholderError(false);
+      setStakeholders((prev) => [...prev, newStakeholder]);
+      setStakeholdersList((prev) => [...prev, newStakeholder]);
+
       setisNewStakeholderModalOpen(false);
     }
   };
@@ -548,38 +585,30 @@ export function FormDocumentInformation({
           Stakeholders
           <span className="text-red-500">*</span>
         </label>
+
         <MultiSelect
           id="stakeholders"
           name="stakeholders"
           className="mt-2"
-          value={stakeholders
-            .map((sh) =>
-              Object.keys(Stakeholders).find(
-                (key) => Stakeholders[key as keyof typeof Stakeholders] === sh
-              )
-            )
-            .filter((sh): sh is string => sh !== undefined)}
-          onValueChange={(s) => {
-            if (s.includes("NEW")) {
+          value={stakeholders}
+          onValueChange={(selectedItems) => {
+            if (selectedItems.includes("Add New")) {
               OpenNewStakeholderModal();
               return;
+            } else {
+              setStakeholders(selectedItems); // Update the selected items
+              setisNewStakeholderModalOpen(false);
             }
-            setStakeholders(
-              s.map((sh) => Stakeholders[sh as keyof typeof Stakeholders])
-            );
-            setisNewStakeholderModalOpen(false);
           }}
           error={shError}
           errorMessage="You must select at least one stakeholder."
           required
         >
-          {Object.entries(Stakeholders).map((dt) => {
-            return (
-              <MultiSelectItem key={`sh-${dt[0]}`} value={dt[0]}>
-                {dt[1]}
-              </MultiSelectItem>
-            );
-          })}
+          {[...stakeholdersList, "Add New"].map((dt) => (
+            <MultiSelectItem key={`sh-${dt}`} value={dt}>
+              {dt}
+            </MultiSelectItem>
+          ))}
         </MultiSelect>
 
         <Dialog
@@ -602,7 +631,7 @@ export function FormDocumentInformation({
                 value={newStakeholder}
                 autoComplete="new_stakeholder"
                 placeholder="New Stakeholder"
-                onValueChange={(s) => setnewStakeholder(s)}
+                onValueChange={(s) => setNewStakeholder(s)}
                 className="mt-4"
                 error={newStakeholderError}
                 errorMessage="The stakeholder is mandatory"
@@ -634,32 +663,28 @@ export function FormDocumentInformation({
           id="doc_type"
           name="doc_type"
           className="mt-2"
-          value={Object.keys(KxDocumentType).find(
-            (key) => KxDocumentType[key as keyof typeof KxDocumentType] === type
-          )}
+          value={types.find((key) => key === type)}
           onValueChange={(t) => {
-            if (t.includes("NEW")) {
+            if (t.includes("Add New")) {
               OpenNewTypeModal();
               return;
             }
-            setType(KxDocumentType[t as keyof typeof KxDocumentType]);
+            setType(type);
             setIsNewTypeModalOpen(false);
           }}
           error={typeError}
           errorMessage="The type is mandatory"
           required
         >
-          {Object.entries(KxDocumentType).map((dt) => {
-            return (
-              <SearchSelectItem key={`type-${dt[0]}`} value={dt[0]}>
-                {dt[1]}
-              </SearchSelectItem>
-            );
-          })}
+          {[...types, "Add New"].map((t: any) => (
+            <SearchSelectItem key={`type-${t}`} value={String(t)}>
+              {String(t)}
+            </SearchSelectItem>
+          ))}
         </SearchSelect>
         <Dialog
           open={isNewTypeModalOpen}
-          onClose={(val) => setIsNewTypeModalOpen(val)}
+          onClose={(val: any) => setType(val)}
           static={true}
         >
           <DialogPanel
@@ -705,64 +730,34 @@ export function FormDocumentInformation({
           Scale
           <span className="text-red-500">*</span>
         </label>
-        {/* <TextInput
-          id="scale"
-          value={scale.toLocaleString()}
-          onValueChange={(v) => {
-            if (v === "") {
-              setScale(0);
-              return;
-            }
-            const num = parseLocalizedNumber(v);
-            if (
-              !Number.isNaN(num) &&
-              Number.isInteger(num) &&
-              num >= 0 &&
-              num <= 10_000_000_000_000
-            ) {
-              setScale(num);
-            }
-          }}
-          name="scale"
-          autoComplete="scale"
-          placeholder="10.000"
-          className="mt-2"
-          icon={() => (
-            <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default text-end text-right tremor-TextInput-icon shrink-0 h-5 w-5 mx-2.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
-              1:
-            </p>
-          )}
-          required
-        /> */}
 
         <SearchSelect
           id="scale"
           name="scale"
           className="mt-2"
-          value={Object.keys(KxDocumentScale).find(
-            (key) =>
-              KxDocumentScale[key as keyof typeof KxDocumentScale] === scale
-          )}
-          onValueChange={(t) => {
-            if (t.includes("NEW")) {
+          value={String(scale)}
+          onValueChange={(selectedValue: any) => {
+            if (!selectedValue) return;
+
+            if (selectedValue.includes("Add New")) {
               OpenNewScaleModal();
               return;
             }
-            setScale(KxDocumentScale[t as keyof typeof KxDocumentScale]);
+
+            setScale(selectedValue);
             setIsNewScaleModalOpen(false);
           }}
           error={typeError}
           errorMessage="The scale is mandatory"
           required
         >
-          {Object.entries(KxDocumentScale).map((dt) => {
-            return (
-              <SearchSelectItem key={`scale-${dt[0]}`} value={dt[0]}>
-                {dt[1]}
-              </SearchSelectItem>
-            );
-          })}
+          {[...scales, "Add New"].map((s: any) => (
+            <SearchSelectItem key={`scale-${s}`} value={String(s)}>
+              {String(s)}
+            </SearchSelectItem>
+          ))}
         </SearchSelect>
+
         <Dialog
           open={isNewScaleModalOpen}
           onClose={(val) => setIsNewScaleModalOpen(val)}
@@ -780,7 +775,7 @@ export function FormDocumentInformation({
                 type="text"
                 id="new_scale"
                 name="new_scale"
-                value={newScale}
+                value={String(newScale)}
                 autoComplete="new_scale"
                 placeholder="New Scale"
                 onValueChange={(t) => setNewScale(t)}
@@ -862,20 +857,19 @@ export function FormDocumentGeolocalization({
   setDrawing,
   hideMap,
   setHideMap,
-  user
-
+  user,
 }: {
-  isMapOpen: boolean,
-  setIsMapOpen: React.Dispatch<React.SetStateAction<boolean>>,
-  showGeoInfo: boolean,
-  setShowGeoInfo: React.Dispatch<React.SetStateAction<boolean>>,
-  docCoordinatesError: boolean,
-  setDocCoordinatesError: React.Dispatch<React.SetStateAction<boolean>>,
-  drawing: any,
-  setDrawing: React.Dispatch<React.SetStateAction<any>>,
-  hideMap: boolean,
-  setHideMap: React.Dispatch<React.SetStateAction<boolean>>
-  user: { email: string; role: Stakeholders } | null;
+  isMapOpen: boolean;
+  setIsMapOpen: React.Dispatch<React.SetStateAction<boolean>>;
+  showGeoInfo: boolean;
+  setShowGeoInfo: React.Dispatch<React.SetStateAction<boolean>>;
+  docCoordinatesError: boolean;
+  setDocCoordinatesError: React.Dispatch<React.SetStateAction<boolean>>;
+  drawing: any;
+  setDrawing: React.Dispatch<React.SetStateAction<any>>;
+  hideMap: boolean;
+  setHideMap: React.Dispatch<React.SetStateAction<boolean>>;
+  user: { email: string; role: string } | null;
 }) {
   return (
     <>
@@ -934,7 +928,7 @@ export function FormDocumentGeolocalization({
             <PreviewMap
               drawing={drawing}
               style={{ minHeight: "300px", width: "100%" }}
-              user = {user}
+              user={user}
             />
           </Card>
         </>
@@ -961,7 +955,7 @@ export function FormDocumentGeolocalization({
               setIsMapOpen(false);
             }}
             style={{ minHeight: "95vh", width: "100%" }}
-            user = {user}
+            user={user}
           ></SatMap>
         </DialogPanel>
       </Dialog>

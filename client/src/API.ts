@@ -260,5 +260,18 @@ const login = async (credentials: Credentials) => {
     }
   };
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument, login, getUserInfo, logout };
+  const aggregateData = async () => {
+    const response = await fetch(API_URL + '/documents/aggregateData', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      const errMessage = await response.json();
+      throw errMessage;
+    } else {
+        return response.json();
+    }
+  };
+
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument, login, getUserInfo, logout, aggregateData };
 export default API;

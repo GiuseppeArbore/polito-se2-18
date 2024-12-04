@@ -1,4 +1,4 @@
-import { AreaType, KxDocumentScale, KxDocumentType, Scale, Stakeholders } from "./enum";
+import { AreaType } from "./enum";
 import { mongoose, getModelForClass, Ref } from "@typegoose/typegoose";
 const prop = (..._: any) => (_: any, _a: string) => {};
 const modelOptions = (..._: any) => (_: any) => {};
@@ -83,8 +83,8 @@ export class KxDocument {
     @prop({required: true, type: String})
     stakeholders!: string[];
 
-    @prop({required: true, type: String, enum: KxDocumentScale})
-    scale!: KxDocumentScale;
+    @prop({required: true, type: Number})
+    scale!: number | undefined;
 
     @prop({required: true, type: DateRange})
     issuance_date!: DateRange;
