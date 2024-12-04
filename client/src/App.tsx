@@ -6,6 +6,9 @@ import { Route, Routes, useNavigate } from "react-router-dom";
 import Console from "./components/Console";
 import API from "./API";
 import { Stakeholders } from "./enum";
+import { toast } from './utils/toaster';
+
+
 
 export default function App() {
 
@@ -15,21 +18,25 @@ export default function App() {
   const [user, setUser] = useState<{ email: string; role: Stakeholders } | null>(null);
   const [error, setError] = useState< boolean | undefined >(false);
 
-
   const login = async (credentials: { username: string; password: string }) => {
     try {
       const user = await API.login(credentials);
       setLoggedIn(true);
-      setErrorMessage({ msg: `Welcome ${user.username}!`, type: `success` });
+      toast({
+        title: "Success",
+        description: `Welcome ${user.email}!`,
+        variant: "success",
+        duration: 3000,
+      });
       setUser(user);
-      navigate('/');
+      navigate('/dashboard');
     } catch (err) {
       setError(true);
-      if (err instanceof Error) {
-        setErrorMessage({ msg: err.message, type: 'danger' });
-      } else {
-        setErrorMessage({ msg: 'An unknown error occurred', type: 'danger' });
-      }
+      if((err as Error).message === 'Incorrect email and/or password')
+        setErrorMessage({ msg: (err as Error).message, type: 'error' });
+      else 
+        setErrorMessage({ msg: 'Username must be a valide email address', type: 'error' });
+
     }
   };
 
@@ -39,8 +46,13 @@ export default function App() {
         setLoggedIn(true);
         setUser(user);
       }).catch(e => {
-        if (loggedIn)
-          setErrorMessage({ msg: e.message, type: 'danger' });
+         if (loggedIn)
+            toast({
+              title: "Danger",
+              description: e.message,
+              variant: "error",
+              duration: 3000,
+            });
         setLoggedIn(false);
         setUser(null);
       });
@@ -51,20 +63,26 @@ export default function App() {
       await API.logout();
       setLoggedIn(false);
       setUser(null);
-      setErrorMessage({ msg: 'You have been logged out.', type: 'info' });
+      toast({
+        title: "Success",
+        description: `You have been logged out!`,
+        variant: "success",
+        duration: 3000,
+      });
     } catch (err) {
-      if (err instanceof Error) {
-        setErrorMessage({ msg: err.message, type: 'danger' });
-      } else {
-        setErrorMessage({ msg: 'An unknown error occurred', type: 'danger' });
-      }
+      toast({
+        title: "Danger",
+        description: (err as Error).message,
+        variant: "success",
+        duration: 3000,
+      });
     }
   };
 
   return (
     
     <Routes>
-      <Route path="/" element={<Home  login={login} loginErrorMessage={errorMessage} error={error} user={user}/>} />
+      <Route path="/" element={<Home login={login} logout={logout} loginErrorMessage={errorMessage} error={error} setError = {setError} user={user}/>} />
       <Route path="/dashboard" element={<Console user={user}/>} />
       <Route path="/documents/:id" element={<Document user={user} />} />
       <Route path="/*" element={<NotFound />} />

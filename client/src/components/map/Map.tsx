@@ -814,22 +814,21 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
 
   return (
     <>
-      <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }} >
-       {canEdit && <Button
-        <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }} >
-        <Button
 
-          style={{
-            backgroundColor: "white",
-            color: "black",
-            borderColor: "transparent",
-          }}
-          className="ring-0"
-          icon={RiEditBoxLine}
-          onClick={() => setIsOpen(true)}
-        >
-        </Button>
-    }   
+{canEdit && (
+  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }}>
+    <Button
+      style={{
+        backgroundColor: "white",
+        color: "black",
+        borderColor: "transparent",
+      }}
+      className="ring-0"
+      icon={RiEditBoxLine}
+      onClick={() => setIsOpen(true)}
+    />
+  </div>
+)}
         <Dialog
         open={isOpen}
         onClose={(val) => setIsOpen(val)}
@@ -848,7 +847,6 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
           ></SatMap>
         </DialogPanel>
       </Dialog>
-      </div>
       <div
         className={props.className}
         ref={mapContainerRef}

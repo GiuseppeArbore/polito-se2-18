@@ -3,6 +3,7 @@ import { KxDocument, PageRange } from './model';
 
 const API_URL = 'http://localhost:3001/api';
 
+
  const createKxDocument = async (document: KxDocument): Promise<KxDocument | null> => {
     try {
         const response = await fetch(API_URL + "/documents", {
@@ -212,7 +213,7 @@ interface Credentials {
 }
 
 const login = async (credentials: Credentials) => {
-    const response = await fetch(API_URL + '/api/sessions', {
+    const response = await fetch(API_URL + '/sessions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -230,7 +231,7 @@ const login = async (credentials: Credentials) => {
   };
   
   const getUserInfo = async () => {
-    const response = await fetch(API_URL + '/api/sessions/current', {
+    const response = await fetch(API_URL + '/sessions/current', {
       method: 'GET',
       credentials: 'include'
     });
@@ -243,7 +244,7 @@ const login = async (credentials: Credentials) => {
   };
   
   const logout = async () => {
-    const response = await fetch(API_URL + '/api/sessions/current', {
+    const response = await fetch(API_URL + '/sessions/current', {
       method: 'DELETE',
       credentials: 'include'
     });

@@ -1,29 +1,39 @@
 import React, { useState } from "react";
 import { Button, Dialog, DialogPanel, Select, SelectItem, Text, TextInput } from "@tremor/react";
-import { Link } from "react-router-dom";
+import { Link, redirect } from "react-router-dom";
 import { Badge } from "@tremor/react";
 import { Stakeholders } from "../../enum";
 
+
+
 interface HeroSectionProps {
   login: (credentials: { username: string; password: string }) => void;
+  logout: () => void;
+  setError: React.Dispatch<React.SetStateAction<boolean|undefined>>;
   loginErrorMessage: { msg: string; type: string }; 
   error : boolean | undefined;
   user: { email: string; role: Stakeholders } | null;
 }
 
-const HeroSection: React.FC<HeroSectionProps> = ({ login, loginErrorMessage, error, user}) => {
+const HeroSection: React.FC<HeroSectionProps> = ({ login, logout, setError, loginErrorMessage, error, user}) => {
   const [showLogin, setShowLogin] = useState(false);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
 
+
   const handleLogin = () => {
-    login({ username, password });
+   login({ username, password });
   };
+
+  const handleLogout =  () => {
+  logout();
+  }
 
   const handleClose = () => {
     setShowLogin(false);
     setUsername('');
     setPassword('');
+    setError(false)
   };
 
   return (
@@ -41,8 +51,8 @@ const HeroSection: React.FC<HeroSectionProps> = ({ login, loginErrorMessage, err
           </Badge>
         </Link>
       </div>
-       {/* hide if logged in */}
-      <Button className="login" onClick={() => setShowLogin(true)}>Login</Button>
+      {!user && <Button className="login" onClick={() => setShowLogin(true)}>Login</Button>}
+      {user && <Button className="logout" onClick={handleLogout}>Logout</Button>}
       <Dialog open={showLogin} onClose={handleClose} static={true}>
         <DialogPanel>
           <h2 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Login</h2>
@@ -67,16 +77,17 @@ const HeroSection: React.FC<HeroSectionProps> = ({ login, loginErrorMessage, err
             </div>
           </div>
           <div className="mt-8 flex items-center justify-end space-x-2">
-            <Button size="xs" variant="secondary" onClick={handleClose}>
+            <Button size="xs" variant="secondary" onClick={handleClose} >
               Cancel
             </Button>
-            <Button size="xs" variant="primary" onClick={handleLogin}>
+            <Button size="xs" variant="primary" onClick={handleLogin} disabled={!username || !password} >
               Login
             </Button>
           </div>
         </DialogPanel>
       </Dialog>
     </section>
+  
   );
 };
 
