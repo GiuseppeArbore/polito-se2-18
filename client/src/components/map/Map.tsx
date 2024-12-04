@@ -611,7 +611,7 @@ export const DashboardMap: React.FC<SatMapProps& {isVisible:boolean}> = (props) 
       />
     
      
-      <Button className = "Kiruna-area-button"onClick={toggleKirunaVisibility}>
+      <Button className = "Kiruna-area-button" style={{ display: props.isVisible ? "flex" : "none"}} onClick={toggleKirunaVisibility}>
         {isKirunaVisible ? 'Hide Kiruna Area' : 'Show Kiruna Area'}
       </Button>
       
