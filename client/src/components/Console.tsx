@@ -192,12 +192,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
             {(showSideBar || windowWidth <= 1024) &&
               <Col className="w-full">
                 <div className="space-y-6">
-                  <FormDialog
-                    documents={documents}
-                    refresh={() => setRefreshNeeded(true)}
-                    user = {user}
-                  />
-                  <TextInput
+                <TextInput
                     icon={RiSearchLine}
                     id="quickFilter"
                     placeholder="Search..."
@@ -208,6 +203,11 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
 
                     }}
                   ></TextInput>
+                  <FormDialog
+                    documents={documents}
+                    refresh={() => setRefreshNeeded(true)}
+                    user={user}
+                  />
                   <Card>
                     <Metric>KIRUNA</Metric>
                     <Title>Quick facts</Title>

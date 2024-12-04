@@ -30,7 +30,6 @@ import {
 } from "../../utils";
 import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
-import exp from 'constants';
 
 interface DocumentProps {
     user: { email: string; role: Stakeholders } | null;
@@ -248,35 +247,6 @@ export default function Document({ user }: DocumentProps) {
                             <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != undefined && pages.toString() != "" ? pages : "Unknown"} </i>
                         </div>
 
-                        <div className="flex w-full items-center justify-between mb-2">
-                            <Accordion className="w-full mr-6 mb-6">
-                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Original Resources</AccordionHeader>
-                                <AccordionBody className="leading-6 flex flex-col">
-                                    <AccordionList style={{ boxShadow: 'none' }}>
-                                        {doc !== undefined && doc?.attachments && doc?.attachments.length >= 1 ? doc?.attachments?.map((title) => (
-                                            <div key={title + doc._id} className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{mime.getType(title)?.split("/")[1] === "pdf" ? "PDF file" : mime.getType(title)?.split("/")[0] === "image" ? "Image file" : "File  ".concat("(."+ title.split(".")[1] +")") }</i>
-                                               <Button
-                                                    className="ml-2"
-                                                    onClick={() => {
-                                                        setFileTitle(title)
-                                                        setShowPdfPreview(true)
-                                                    }}
-                                                >
-                                                    Preview File
-                                                </Button>
-                                            </div>
-                                        )) : <>
-                                            <div className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No original resources added</i>
-                                            </div>
-                                        </>}
-
-                                    </AccordionList>
-                                </AccordionBody>
-                            </Accordion>
-                        </div>
-
 
 
                         <FormInfoDialog
@@ -399,7 +369,7 @@ export default function Document({ user }: DocumentProps) {
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
-                        <i className="h-full lg:mr-9 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                        {canEdit && <i className="h-full lg:mr-9 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
 
                     </div>
 
@@ -416,7 +386,7 @@ export default function Document({ user }: DocumentProps) {
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
-                        <i className="h-full lg:ml-3 lg:mr-5 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                        {canEdit && <i className="h-full lg:ml-3 lg:mr-5 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
 
 
                     </div>
