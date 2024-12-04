@@ -409,5 +409,76 @@ describe("Integration Tests for Document API", () => {
             ],
         });
     });
+
+    test('Test 15 - set document description', async () => {
+        const response = await request(app)
+            .put(`/api/documents/${documentIds[0].toString()}/description`)
+            .set("Cookie", urbanPlannerCookie)
+            .send({
+                description: "test description"
+            });
+
+        expect(response.status).toBe(200);
+        expect(response.body.description).toBe("test description");
+    });
+
+    test('Test 16 - set document description of non existing document', async () => {
+        const response = await request(app)
+            .put(`/api/documents/${TEST_ID}/description`)
+            .set("Cookie", urbanPlannerCookie)
+            .send({
+                description: "test description"
+            });
+
+        expect(response.status).toBe(404);
+    });
+
+    test('Test 17 - set document info', async () => {
+        const response = await request(app)
+            .put(`/api/documents/${documentIds[0].toString()}/info`)
+            .set("Cookie", urbanPlannerCookie)
+            .send({
+                title: "new title",
+                stakeholders: ["stake"],
+                scale: 10_000,
+                type: "asdf",
+                language: "Italian",
+                pages: [],
+                doc_coordinates: {
+                    type: AreaType.ENTIRE_MUNICIPALITY
+                }
+            });
+
+        expect(response.status).toBe(200);
+        expect(response.body.description).toBe("test description");
+    });
+
+    test('Test 18 - set document info of non existing document', async () => {
+        const response = await request(app)
+            .put(`/api/documents/${TEST_ID}/info`)
+            .set("Cookie", urbanPlannerCookie)
+            .send({
+                title: "new title",
+                stakeholders: ["stake"],
+                scale: 10_000,
+                type: "asdf",
+                language: "Italian",
+                pages: [],
+                doc_coordinates: {
+                    type: AreaType.ENTIRE_MUNICIPALITY
+                }
+            });
+
+        expect(response.status).toBe(404);
+    });
+
+    test('Test 19 - get non existing document', async () => {
+        const response = await request(app)
+            .get(`/api/documents/${TEST_ID}`)
+            .set("Cookie", urbanPlannerCookie)
+            .send();
+
+        expect(response.status).toBe(404);
+    });
 });
 

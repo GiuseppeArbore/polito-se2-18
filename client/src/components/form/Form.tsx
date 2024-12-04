@@ -47,9 +47,11 @@ import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
 
+
 interface FormDialogProps {
   documents: KxDocument[];
   refresh: () => void;
+  user: { email: string; role: Stakeholders } | null;
 }
 
 export function FormDialog(props: FormDialogProps) {
@@ -331,6 +333,7 @@ export function FormDialog(props: FormDialogProps) {
           setDrawing={setDrawing}
           hideMap={hideMap}
           setHideMap={setHideMap}
+          user = {props.user}
         />
 
         <Divider />
@@ -385,15 +388,11 @@ export function FormDialog(props: FormDialogProps) {
 
   return (
     <>
-      <Button
-        className="w-full primary"
-        onClick={() => {
-          setIsOpen(true);
-          clearForm();
-        }}
-      >
-        Add new document
-      </Button>
+      {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
+        <Button className="w-full primary" onClick={() => { setIsOpen(true); clearForm() }}>
+          Add new document
+        </Button>
+      )}
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
         <DialogPanel
           className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
@@ -863,17 +862,20 @@ export function FormDocumentGeolocalization({
   setDrawing,
   hideMap,
   setHideMap,
+  user
+
 }: {
-  isMapOpen: boolean;
-  setIsMapOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  showGeoInfo: boolean;
-  setShowGeoInfo: React.Dispatch<React.SetStateAction<boolean>>;
-  docCoordinatesError: boolean;
-  setDocCoordinatesError: React.Dispatch<React.SetStateAction<boolean>>;
-  drawing: any;
-  setDrawing: React.Dispatch<React.SetStateAction<any>>;
-  hideMap: boolean;
-  setHideMap: React.Dispatch<React.SetStateAction<boolean>>;
+  isMapOpen: boolean,
+  setIsMapOpen: React.Dispatch<React.SetStateAction<boolean>>,
+  showGeoInfo: boolean,
+  setShowGeoInfo: React.Dispatch<React.SetStateAction<boolean>>,
+  docCoordinatesError: boolean,
+  setDocCoordinatesError: React.Dispatch<React.SetStateAction<boolean>>,
+  drawing: any,
+  setDrawing: React.Dispatch<React.SetStateAction<any>>,
+  hideMap: boolean,
+  setHideMap: React.Dispatch<React.SetStateAction<boolean>>
+  user: { email: string; role: Stakeholders } | null;
 }) {
   return (
     <>
@@ -932,6 +934,7 @@ export function FormDocumentGeolocalization({
             <PreviewMap
               drawing={drawing}
               style={{ minHeight: "300px", width: "100%" }}
+              user = {user}
             />
           </Card>
         </>
@@ -958,6 +961,7 @@ export function FormDocumentGeolocalization({
               setIsMapOpen(false);
             }}
             style={{ minHeight: "95vh", width: "100%" }}
+            user = {user}
           ></SatMap>
         </DialogPanel>
       </Dialog>
