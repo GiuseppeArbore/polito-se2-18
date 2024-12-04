@@ -29,7 +29,8 @@ import {
 } from "../../utils";
 import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
-
+import exp from 'constants';
+import { DateRange } from '../form/DatePicker';
 interface DocumentProps {
     user: { email: string; role: Stakeholders } | null;
 }
@@ -43,6 +44,9 @@ interface FormDialogProps {
 
 
 export default function Document({ user }: DocumentProps) {
+    const formatLocalDate = (date: Date) => {
+        return date.toLocaleDateString('sv-SE'); // 'sv-SE' è un formato ISO-like
+      };
 
     const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
 
@@ -56,7 +60,7 @@ export default function Document({ user }: DocumentProps) {
     const [title, setTitle] = useState("");
     const [stakeholders, setStakeholders] = useState<string[]>([]);
     const [scale, setScale] = useState(10000);
-    const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(undefined);
+    const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(undefined);
     const [type, setType] = useState<string | undefined>(undefined);
     const [language, setLanguage] = useState<string | undefined>(undefined);
     const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
@@ -119,7 +123,7 @@ export default function Document({ user }: DocumentProps) {
                 setTitle(document.title);
                 setStakeholders(document.stakeholders);
                 setScale(document.scale);
-                setIssuanceDate(document.issuance_date.from);
+                setIssuanceDate({ from: document.issuance_date.from, to: document.issuance_date.to });
                 setType(document.type);
                 setLanguage(document.language || undefined);
                 setPages(document.pages || undefined);
@@ -272,7 +276,8 @@ export default function Document({ user }: DocumentProps) {
 
                         <div className="flex items-center justify-between mb-2 space-x-2">
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Issuance Date:</i>
-                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {issuanceDate?.toString().split('T')[0]}</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {issuanceDate?.from ? formatLocalDate(new Date(issuanceDate.from)) : ""}{issuanceDate?.to ? ` - ${formatLocalDate(new Date(issuanceDate.to))}` : ""}
+                            </i>
                         </div>
 
                         <div className="flex items-center justify-between mb-2 space-x-2">
@@ -588,8 +593,8 @@ export function FormInfoDialog({
     setStakeholders: React.Dispatch<React.SetStateAction<string[]>>;
     shError: boolean;
     setShError: React.Dispatch<React.SetStateAction<boolean>>;
-    issuanceDate: Date | undefined;
-    setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
+    issuanceDate: DateRange | undefined;
+    setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
     type: string | undefined;
     setType: React.Dispatch<React.SetStateAction<string | undefined>>;
     scale: number;
