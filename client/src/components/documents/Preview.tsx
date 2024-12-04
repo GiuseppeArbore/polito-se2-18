@@ -18,7 +18,6 @@ export default function PreviewDoc(open: boolean, setOpen: (bool: boolean) => vo
                 if (docId && title) {
                     const url = await API.getKxFileByID(docId, title);
                     setFileUrl(url.presignedUrl);
-                    console.log(url.presignedUrl);
                 }
             } catch (error) {
                 console.error(error);

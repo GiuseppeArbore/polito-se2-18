@@ -32,9 +32,14 @@ import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
 import exp from 'constants';
 import { DateRange } from '../form/DatePicker';
+interface DocumentProps {
+    user: { email: string; role: Stakeholders } | null;
+}
 
 
-export default function Document() {
+export default function Document({ user }: DocumentProps) {
+
+    const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
 
     const navigate = useNavigate();
     const { id } = useParams<string>();
@@ -244,6 +249,7 @@ export default function Document() {
                         </div>
 
 
+
                         <FormInfoDialog
                             document={doc!}
                             title={title}
@@ -267,6 +273,7 @@ export default function Document() {
                             pageRanges={pageRanges}
                             setPageRanges={setPageRanges}
                             id={id!}
+                            user = {user}
                         />
 
 
@@ -282,6 +289,7 @@ export default function Document() {
                                 description={description}
                                 setDescription={setDescription}
                                 id={id!}
+                                user={user}
                             />
                         </div>
                     </div>
@@ -362,7 +370,7 @@ export default function Document() {
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
-                        <i className="h-full lg:mr-9 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                        {canEdit && <i className="h-full lg:mr-9 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
 
                     </div>
 
@@ -379,7 +387,7 @@ export default function Document() {
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
-                        <i className="h-full lg:ml-3 lg:mr-5 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                        {canEdit && <i className="h-full lg:ml-3 lg:mr-5 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
 
 
                     </div>
@@ -453,6 +461,7 @@ export default function Document() {
                             description={description}
                             setDescription={setDescription}
                             id={id!}
+                            user={user}
                         />
                     </AccordionBody>
                 </Accordion>
@@ -467,6 +476,7 @@ export default function Document() {
                                 setDrawing={(d) => { setDrawings(d); setSaveDrawing(true) }}
                                 drawing={drawings}
                                 style={{ minHeight: "300px", width: "100%" }}
+                                user = {user}
                             />
                         </Card>
                     ) : (
@@ -515,7 +525,8 @@ export function FormInfoDialog({
     setPages,
     pageRanges,
     setPageRanges,
-    id
+    id,
+    user
 }: {
     document: KxDocument;
     title: string;
@@ -539,11 +550,14 @@ export function FormInfoDialog({
     pageRanges: PageRange[] | undefined;
     setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
     id: string;
+    user: { email: string; role: Stakeholders } | null;
 }) {
 
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState("");
     const [typeError, setTypeError] = useState(false);
+
+    const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
 
 
     const handleInfoSubmit = async (e: React.FormEvent) => {
@@ -583,6 +597,7 @@ export function FormInfoDialog({
     };
 
     const handleCancelSubmit = async (e: React.FormEvent) => {
+  
         e.preventDefault();
         setTitle(document.title);
         setStakeholders(document.stakeholders);
@@ -597,7 +612,7 @@ export function FormInfoDialog({
 
     return (
         <>
-            <i className="ml-auto self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-6" /></i>
+            {canEdit && <i className="ml-auto self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-6" /></i>}
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
                 <DialogPanel
                     className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
@@ -665,16 +680,19 @@ export function FormDescriptionDialog(
         document,
         description,
         setDescription,
-        id
+        id,
+        user
     }: {
         document: KxDocument;
         description: string | undefined;
         setDescription: React.Dispatch<React.SetStateAction<string | undefined>>;
         id: string;
+        user: { email: string; role: Stakeholders } | null;
     }
 ) {
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState("");
+    const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
 
     const handleDescriptionSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -719,7 +737,9 @@ export function FormDescriptionDialog(
 
     return (
         <>
-            <i className="ml-auto self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-5" /></i>
+
+            {canEdit && <i className="self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
+
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
                 <DialogPanel
                     className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"

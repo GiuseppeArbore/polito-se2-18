@@ -48,6 +48,7 @@ import {
 } from "./DropDownMenu";
 import "../../index.css";
 import "../../css/map.css";
+import { Stakeholders } from "../../enum";
 
 
 mapboxgl.accessToken =
@@ -59,6 +60,7 @@ export interface SatMapProps {
   style?: React.CSSProperties;
   className?: string;
   entireMunicipalityDocuments?: KxDocument[];
+  user : {email: string, role: Stakeholders}|null;
 }
 
 const getPointsAndCentroids = (drawing: FeatureCollection<Geometry, GeoJsonProperties> | undefined, offsetDistance: number): FeatureCollection<Geometry, GeoJsonProperties> => {
@@ -155,7 +157,7 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
   );
 };
 
-export const DashboardMap: React.FC<SatMapProps> = (props) => {
+export const DashboardMap: React.FC<SatMapProps& {isVisible:boolean}> = (props) => {
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const [isKirunaVisible, setIsKirunaVisible] = useState(false);
@@ -611,14 +613,14 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       />
     
      
-      <Button className = "Kiruna-area-button"onClick={toggleKirunaVisibility}>
+      <Button className = "Kiruna-area-button" style={{ display: props.isVisible ? "flex" : "none"}} onClick={toggleKirunaVisibility}>
         {isKirunaVisible ? 'Hide Kiruna Area' : 'Show Kiruna Area'}
       </Button>
       
 
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button className="button-whole-Kiruna" variant="primary">
+          <Button className="button-whole-Kiruna" variant="primary" style={{ display: props.isVisible ? "flex" : "none"}}>
             <div style={{ display: "flex", alignItems: "center" }}>
               Whole Kiruna: {props.entireMunicipalityDocuments?.length}
               <RiFileLine
@@ -638,7 +640,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             </div>
           </Button>
         </DropdownMenuTrigger>
-
         <DropdownMenuContent>
           <DropdownMenuLabel>Documents</DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -663,6 +664,7 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
   const [drawing, setDrawing] = useState(props.drawing);
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const canEdit = props.user && props.user.role === Stakeholders.URBAN_PLANNER;
 
   useMemo(() => {
     setDrawing(props.drawing);
@@ -811,18 +813,21 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
 
   return (
     <>
-        <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }} >
-        <Button
-          style={{
-            backgroundColor: "white",
-            color: "black",
-            borderColor: "transparent",
-          }}
-          className="ring-0"
-          icon={RiEditBoxLine}
-          onClick={() => setIsOpen(true)}
-        >
-        </Button>
+
+{canEdit && (
+  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }}>
+    <Button
+      style={{
+        backgroundColor: "white",
+        color: "black",
+        borderColor: "transparent",
+      }}
+      className="ring-0"
+      icon={RiEditBoxLine}
+      onClick={() => setIsOpen(true)}
+    />
+  </div>
+)}
         <Dialog
         open={isOpen}
         onClose={(val) => setIsOpen(val)}
@@ -837,10 +842,10 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
             onCancel={() => setIsOpen(false)}
             onDone={(v) => {props.setDrawing(v); setIsOpen(false); }}
             style={{ minHeight: "95vh", width: "100%" }}
+            user = {props.user}
           ></SatMap>
         </DialogPanel>
       </Dialog>
-      </div>
       <div
         className={props.className}
         ref={mapContainerRef}
