@@ -5,7 +5,6 @@ import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "..
 import { FileUpload } from "../form/DragAndDrop";
 import DeleteResourceDialog from './DeleteResourcesDialog';
 import API from '../../API';
-//import { FileUpload } from './DragDrop';
 import mime from 'mime';
 import {
     Accordion,
@@ -31,6 +30,13 @@ import {
 import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
 import exp from 'constants';
+
+interface FormDialogProps {
+    documents: KxDocument[];
+    refresh: () => void;
+}
+
+
 
 
 export default function Document() {
@@ -60,6 +66,42 @@ export default function Document() {
     const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
+
+
+    const handleSubmitDragAndDrop = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        try {
+              if (files.length > 0) {
+                const FileUpload = await API.addAttachmentToDocument(new mongoose.Types.ObjectId(id), files);
+                if (!FileUpload) {
+                  toast({
+                    title: "Error",
+                    description: "Failed to upload files",
+                    variant: "error",
+                    duration: 3000,
+                  })
+                }
+              }
+            
+          } catch (error: any) {
+            toast({
+              title: "Error",
+              description: "Failed to upload files",
+              variant: "error",
+              duration: 3000,
+            })
+          }
+
+          toast({
+            title: "Upload files", 
+            description: "Original resources updated succesfully",
+            variant: "success",
+            duration: 3000
+          })
+          setIsDragAndDropOpen(false);
+
+    };
 
 
     useEffect(() => {
@@ -193,7 +235,6 @@ export default function Document() {
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
     const [selectedResource, setSelectedResource] = useState<string>("");
     const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
-
 
     return (
         <div>
@@ -378,7 +419,9 @@ export default function Document() {
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
-                        <i className="h-full lg:ml-3 lg:mr-5 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                        <Button disabled className="h-full lg:ml-3 lg:mr-5 mb-5">
+                            <RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" />
+                        </Button>
 
 
                     </div>
@@ -430,7 +473,7 @@ export default function Document() {
                                 </Button>
                                 <Button
                                     className="w-full sm:w-auto primary"
-                                //onClick={e => handleSubmit(e)}    handleSumbitDragAndDrop to do in kx-87
+                                    onClick={e => handleSubmitDragAndDrop(e)}
                                 >
                                     Submit
                                 </Button>
