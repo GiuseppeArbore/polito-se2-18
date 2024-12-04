@@ -894,7 +894,7 @@ const RangeDatePicker = ({
     if (!range) {
       return null
     }
-  
+    onChange?.(range)
     const fromDate = range.from ? formatDate(range.from, locale, showTimePicker) : ""
     const toDate = range.to ? formatDate(range.to, locale, showTimePicker) : ""
   

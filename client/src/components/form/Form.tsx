@@ -1030,7 +1030,7 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
       label: "Month",
       dateRange: {
         from: new Date(issuanceYear, issuanceMonth, 1),
-        to: new Date(issuanceYear, issuanceMonth + 1, 0),
+        to: new Date(issuanceYear, issuanceMonth +1, 0),
       },
     },
     {
