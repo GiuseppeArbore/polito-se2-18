@@ -1059,9 +1059,6 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
         onChange={setIssuanceDate}
         className="w-70"
       />
-      <p className="flex items-center rounded-md bg-gray-100 p-2 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
-         "Selected a range or a single date"
-      </p>
     </div>
   );
 };
