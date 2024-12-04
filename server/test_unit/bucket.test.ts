@@ -38,5 +38,14 @@ describe("Object storage tests", () => {
             Key: `${TEST_ID}/${TEST_FILENAME}`,
             //Body: expect.anything()
         });
+        expect(fs.createReadStream).toHaveBeenCalledTimes(1);
+    });
+
+    test("Test 4 - Correct deleteAttachmentForDocument command generation", () => {
+        KxObjectStorageCommands.deleteAttachmentForDocument(new mongoose.Types.ObjectId(TEST_ID), TEST_FILENAME);
+        expect(ClientS3.DeleteObjectCommand).toHaveBeenCalledWith({
+            Bucket: BUCKET_NAME,
+            Key: `${TEST_ID}/${TEST_FILENAME}`,
+        });
     });
 })

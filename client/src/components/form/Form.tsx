@@ -44,9 +44,11 @@ import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
 import { se } from "date-fns/locale";
 
+
 interface FormDialogProps {
   documents: KxDocument[];
   refresh: () => void;
+  user: { email: string; role: Stakeholders } | null;
 }
 
 
@@ -54,13 +56,14 @@ interface FormDialogProps {
 export function FormDialog(props: FormDialogProps) {
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState(false);
-  const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
+  const [stakeholders, setStakeholders] = useState<string[]>([]);
   const [shError, setShError] = useState(false);
   const [issuanceDate, setIssuanceDate] = React.useState<DateRange | undefined>(
     undefined)
   const [files, setFiles] = useState<File[]>([]);
   const [issuanceDateError, setIssuanceDateError] = useState(false);
-  const [type, setType] = useState<KxDocumentType | undefined>(undefined);
+  const [type, setType] = useState<string | undefined>(undefined);
+
   const [typeError, setTypeError] = useState(false);
   const [scale, setScale] = useState(10000);
   const [language, setLanguage] = useState<string | undefined>(undefined);
@@ -144,7 +147,9 @@ export function FormDialog(props: FormDialogProps) {
       //scale_info: Scale.TEXT,
       scale,
       doc_coordinates: draw,
-      issuance_date: issuanceDate!,
+      issuance_date: {
+        from: issuanceDate!
+      },
       type: type,
       language,
       description,
@@ -300,6 +305,7 @@ export function FormDialog(props: FormDialogProps) {
           setDrawing={setDrawing}
           hideMap={hideMap}
           setHideMap={setHideMap}
+          user = {props.user}
         />
 
         <Divider />
@@ -355,9 +361,11 @@ export function FormDialog(props: FormDialogProps) {
 
   return (
     <>
-      <Button className="w-full primary" onClick={() => { setIsOpen(true); clearForm() }}>
-        Add new document
-      </Button>
+      {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
+        <Button className="w-full primary" onClick={() => { setIsOpen(true); clearForm() }}>
+          Add new document
+        </Button>
+      )}
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
         <DialogPanel
           className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
@@ -408,14 +416,14 @@ export function FormDocumentInformation({
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   titleError: boolean;
   setTitleError: React.Dispatch<React.SetStateAction<boolean>>;
-  stakeholders: Stakeholders[];
-  setStakeholders: React.Dispatch<React.SetStateAction<Stakeholders[]>>;
+  stakeholders: string[];
+  setStakeholders: React.Dispatch<React.SetStateAction<string[]>>;
   shError: boolean;
   setShError: React.Dispatch<React.SetStateAction<boolean>>;
   issuanceDate: DateRange | undefined;
   setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
-  type: KxDocumentType | undefined;
-  setType: React.Dispatch<React.SetStateAction<KxDocumentType | undefined>>;
+  type: string | undefined;
+  setType: React.Dispatch<React.SetStateAction<string | undefined>>;
   typeError: boolean;
   setTypeError: React.Dispatch<React.SetStateAction<boolean>>;
   scale: number;
@@ -609,7 +617,9 @@ export function FormDocumentGeolocalization({
   drawing,
   setDrawing,
   hideMap,
-  setHideMap
+  setHideMap,
+  user
+
 }: {
   isMapOpen: boolean,
   setIsMapOpen: React.Dispatch<React.SetStateAction<boolean>>,
@@ -621,6 +631,7 @@ export function FormDocumentGeolocalization({
   setDrawing: React.Dispatch<React.SetStateAction<any>>,
   hideMap: boolean,
   setHideMap: React.Dispatch<React.SetStateAction<boolean>>
+  user: { email: string; role: Stakeholders } | null;
 }) {
   return (
     <>
@@ -672,6 +683,7 @@ export function FormDocumentGeolocalization({
             <PreviewMap
               drawing={drawing}
               style={{ minHeight: "300px", width: "100%" }}
+              user = {user}
             />
           </Card>
         </>
@@ -691,6 +703,7 @@ export function FormDocumentGeolocalization({
             onCancel={() => setIsMapOpen(false)}
             onDone={(v) => { setDrawing(v); setIsMapOpen(false); }}
             style={{ minHeight: "95vh", width: "100%" }}
+            user = {user}
           ></SatMap>
         </DialogPanel>
       </Dialog>

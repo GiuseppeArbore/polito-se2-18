@@ -1,9 +1,10 @@
 
 import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { AllGeoJSON, featureCollection, area, pointOnFeature,centroid } from "@turf/turf";
+import { AllGeoJSON, featureCollection, area, pointOnFeature, centroid, booleanPointInPolygon } from "@turf/turf";
 import  { documentAreaColorMapping,documentBorderColorMapping } from "./documentcolors";
 import {loadIcons} from "./imagesLoader";
+import Kiruna from "./KirunaMunicipality.json"
 import {
   Button,
   Card,
@@ -33,9 +34,8 @@ import {
 } from "@remixicon/react";
 import {PreviewMapDraw ,DocumentMapDraw} from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { Feature, FeatureCollection, Position, Polygon, Geometry, Point, GeoJsonProperties } from "geojson";
+import { Feature, FeatureCollection, Position, Polygon, MultiPolygon, Geometry, Point, GeoJsonProperties } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
-import { coordDistance } from "../../utils";
 import { KxDocument } from "../../model";
 import {
   DropdownMenu,
@@ -48,6 +48,7 @@ import {
 } from "./DropDownMenu";
 import "../../index.css";
 import "../../css/map.css";
+import { Stakeholders } from "../../enum";
 
 
 mapboxgl.accessToken =
@@ -59,6 +60,7 @@ export interface SatMapProps {
   style?: React.CSSProperties;
   className?: string;
   entireMunicipalityDocuments?: KxDocument[];
+  user : {email: string, role: Stakeholders}|null;
 }
 
 const getPointsAndCentroids = (drawing: FeatureCollection<Geometry, GeoJsonProperties> | undefined, offsetDistance: number): FeatureCollection<Geometry, GeoJsonProperties> => {
@@ -129,7 +131,8 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
         interactive: false,
       });
       mapRef.current.addControl(PreviewMapDraw, "bottom-right");
-     
+
+      
       if (props.drawing) PreviewMapDraw.set(props.drawing);
     }
   }, [props.drawing]);
@@ -154,9 +157,18 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
   );
 };
 
-export const DashboardMap: React.FC<SatMapProps> = (props) => {
+export const DashboardMap: React.FC<SatMapProps& {isVisible:boolean}> = (props) => {
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const [isKirunaVisible, setIsKirunaVisible] = useState(false);
+
+    const toggleKirunaVisibility = () => {
+    if (mapRef.current) {
+      const visibility = isKirunaVisible ? 'none' : 'visible';
+      mapRef.current.setLayoutProperty('Kiruna-fill', 'visibility', visibility);
+      setIsKirunaVisible(!isKirunaVisible);
+    }
+  };
 
   useEffect(() => {
     if (mapRef.current) return;
@@ -203,7 +215,38 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       mapRef.current?.on("load", function () {
         if(mapRef.current){
         loadIcons(mapRef.current).then(() => {
+        //KIRUNA-----------------------------------------------------
+        mapRef.current?.addSource('Kiruna', {
+          type: 'geojson',
+          data: Kiruna as FeatureCollection,
+        });
+        
+        
+        mapRef.current?.addLayer({
+          id: "Kiruna-fill",
+          type: 'fill',
+          source: "Kiruna",
+          layout: {
+            'visibility': 'none'
+          },
+          paint: {
+            'fill-color': '#745296',
+            'fill-opacity': 0.5,
+          },
+        });
+        
+      
+        mapRef.current?.addLayer({
+          id: "Kiruna-line",
+          type: 'line',
+          source: "Kiruna",
+          paint: {
+            'line-color': '#745296',
+            'line-width': 2,
+          },
+        });
         //AREA-------------------------------------------------------
+        
         const sortedDrawing = props.drawing
         ? featureCollection(
             props.drawing.features.sort((a, b) => {
@@ -568,9 +611,16 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
           touchAction: "auto",
         }}
       />
+    
+     
+      <Button className = "Kiruna-area-button" style={{ display: props.isVisible ? "flex" : "none"}} onClick={toggleKirunaVisibility}>
+        {isKirunaVisible ? 'Hide Kiruna Area' : 'Show Kiruna Area'}
+      </Button>
+      
+
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button className="button-whole-Kiruna" variant="primary">
+          <Button className="button-whole-Kiruna" variant="primary" style={{ display: props.isVisible ? "flex" : "none"}}>
             <div style={{ display: "flex", alignItems: "center" }}>
               Whole Kiruna: {props.entireMunicipalityDocuments?.length}
               <RiFileLine
@@ -590,7 +640,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             </div>
           </Button>
         </DropdownMenuTrigger>
-
         <DropdownMenuContent>
           <DropdownMenuLabel>Documents</DropdownMenuLabel>
           <DropdownMenuSeparator />
@@ -615,6 +664,7 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
   const [drawing, setDrawing] = useState(props.drawing);
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
+  const canEdit = props.user && props.user.role === Stakeholders.URBAN_PLANNER;
 
   useMemo(() => {
     setDrawing(props.drawing);
@@ -763,18 +813,21 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
 
   return (
     <>
-      <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }} >
-        <Button
-          style={{
-            backgroundColor: "white",
-            color: "black",
-            borderColor: "transparent",
-          }}
-          className="ring-0"
-          icon={RiEditBoxLine}
-          onClick={() => setIsOpen(true)}
-        >
-        </Button>
+
+{canEdit && (
+  <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }}>
+    <Button
+      style={{
+        backgroundColor: "white",
+        color: "black",
+        borderColor: "transparent",
+      }}
+      className="ring-0"
+      icon={RiEditBoxLine}
+      onClick={() => setIsOpen(true)}
+    />
+  </div>
+)}
         <Dialog
         open={isOpen}
         onClose={(val) => setIsOpen(val)}
@@ -789,10 +842,10 @@ export const DocumentPageMap: React.FC<SatMapProps & {setDrawing: (drawing: Feat
             onCancel={() => setIsOpen(false)}
             onDone={(v) => {props.setDrawing(v); setIsOpen(false); }}
             style={{ minHeight: "95vh", width: "100%" }}
+            user = {props.user}
           ></SatMap>
         </DialogPanel>
       </Dialog>
-      </div>
       <div
         className={props.className}
         ref={mapContainerRef}
@@ -840,7 +893,8 @@ const MapControls: React.FC<
   const feature = structuredClone(props?.drawing?.features?.at?.(0));
   const geometry = feature?.geometry;
   const pos = geometry?.type === "Point" ? geometry.coordinates : [NaN, NaN];
-
+  const area = geometry?.type === "Polygon" ? geometry.coordinates : [[[NaN, NaN]]];
+  const kirunaArea = Kiruna.features[0] as Feature<Polygon | MultiPolygon>;
 
   useEffect(() => {
     if (geometry?.type === "Point") {
@@ -852,15 +906,13 @@ const MapControls: React.FC<
   }, [geometry?.type, pos?.[0], pos?.[1]]);
 
   useEffect(() => {
-    const dist = coordDistance(
-      center.toReversed() as [number, number],
-      str2pos(pointCoords).toReversed() as [number, number]
-    );
-    if (dist <= 100 || pointCoords.find((c) => c === "") !== undefined) {
+    if (geometry?.type !== "Point") return;
+    if (booleanPointInPolygon({ type: 'Point', coordinates: str2pos(pointCoords) }, kirunaArea) || pointCoords.find((c) => c === "") !== undefined) {
       setCoordsError(false);
     } else {
       setCoordsError(true);
     }
+
     if (
       index === 1 &&
       PreviewMapDraw.getMode() === "simple_select" &&
@@ -870,6 +922,19 @@ const MapControls: React.FC<
       PreviewMapDraw.changeMode("draw_point");
     }
   }, [pointCoords[0], pointCoords[1]]);
+  
+  useEffect(() => {
+    if (geometry?.type !== "Polygon") return;
+    const allPointsInside = area[0].every((coord) =>
+      booleanPointInPolygon({ type: 'Point', coordinates: coord }, kirunaArea)
+    );
+
+    if (allPointsInside) {
+      setCoordsError(false);
+    } else {
+      setCoordsError(true);
+    }
+  }, [area[0]]);
 
   // Note:
   // React's useEffect() are run starting from the children. This means that we cannot change
@@ -883,6 +948,8 @@ const MapControls: React.FC<
         index={index}
         onIndexChange={(i) => {
           PreviewMapDraw.deleteAll();
+          setCoordsError(false);
+          setPointCoords(["", ""]);
           switch (i) {
             default: // case 0
               PreviewMapDraw.changeMode("simple_select");
@@ -981,7 +1048,7 @@ const MapControls: React.FC<
                   }
                 }}
                 error={coordsError}
-                errorMessage="All points must be within 100Km of Kiruna"
+                errorMessage="All points must be inside the municipality of Kiruna"
                 icon={() => (
                   <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
                     Latitude
@@ -1063,6 +1130,11 @@ const MapControls: React.FC<
                 Cut in shape
               </Button>
             </div>
+            {coordsError && (
+              <p className="text-red-500 text-sm mt-4">
+                All points must be inside the municipality of Kiruna
+              </p>
+            )}
           </>
         ) : null}
       </div>
@@ -1131,6 +1203,24 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
       setTmpDrawing({ type: "FeatureCollection", features: e.features });
     });
 
+    mapRef.current?.on("load", function () {
+      //KIRUNA-----------------------------------------------------
+      mapRef.current?.addSource('Kiruna', {
+        type: 'geojson',
+        data: Kiruna as FeatureCollection,
+      });
+
+      mapRef.current?.addLayer({
+        id: "Kiruna-line",
+        type: 'line',
+        source: "Kiruna",
+        paint: {
+          'line-color': '#745296',
+          'line-width': 4,
+          'line-dasharray': [1, 1]
+        },
+      });
+    });
     if (props.drawing) {
       PreviewMapDraw.set(props.drawing);
     }
