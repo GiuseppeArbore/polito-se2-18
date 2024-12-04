@@ -11,6 +11,7 @@ const API_URL = 'http://localhost:3001/api';
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify(document),
         });
     
@@ -103,6 +104,7 @@ const updateKxDocumentDescription = async (documentId: string, description: stri
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({ description }),
                   });
 
@@ -166,6 +168,7 @@ const deleteKxDocument = async (id: mongoose.Types.ObjectId): Promise<void> => {
     try {
         const response = await fetch(`${API_URL}/documents/${id}`, {
             method: 'DELETE',
+            credentials: 'include'
         });
 
         if (!response.ok) {
@@ -190,6 +193,7 @@ const addAttachmentToDocument = async (id: mongoose.Types.ObjectId, files: File[
         const response = await fetch(`${API_URL}/documents/${id}/attachments`, {
             method: 'POST',
             body: formData,
+            credentials: 'include'
         });
         
         if (!response.ok) {
