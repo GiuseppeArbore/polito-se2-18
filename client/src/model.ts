@@ -120,8 +120,8 @@ export class KxDocument {
     attachments?: string[];
 }
 
-export interface KxDocumentAggregateData {
-    stakeholders: string[];
-    types: string[];
-    scales: number[];
+export class KxDocumentAggregateData {
+    stakeholders?: string[];
+    types?: string[];
+    scales?: number[];
 }

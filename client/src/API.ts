@@ -1,5 +1,5 @@
 import { mongoose } from '@typegoose/typegoose';
-import { KxDocument, PageRange } from './model';
+import { KxDocument, KxDocumentAggregateData, PageRange } from './model';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -204,5 +204,29 @@ const addAttachmentToDocument = async (id: mongoose.Types.ObjectId, files: File[
     }
 };
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument };
+const aggregateData = async (): Promise<KxDocumentAggregateData[]> => {
+    try {
+        const response = await fetch(API_URL + "/documents/aggregateData", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+
+        const data: KxDocumentAggregateData[] = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to fetch aggregateData: ${error.message}`);
+        } else {
+            throw new Error('Failed to fetch aggregateData: Unknown error');
+        }
+    }
+};
+
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument, aggregateData };
 export default API;

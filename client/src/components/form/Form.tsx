@@ -27,7 +27,7 @@ import {
   Scale,
   Stakeholders,
 } from "../../enum";
-import { DocCoords, KxDocument } from "../../model";
+import { DocCoords, KxDocument, KxDocumentAggregateData } from "../../model";
 import { mongoose } from "@typegoose/typegoose";
 import {
   RiArrowDownCircleLine,
@@ -88,6 +88,25 @@ export function FormDialog(props: FormDialogProps) {
   const [message, setMessage] = useState("");
 
   const [docCoordinates, _] = useState<DocCoords | undefined>(undefined);
+  const [aggregatedData, setAggregatedData] = useState<
+    KxDocumentAggregateData[] | undefined
+  >(undefined);
+
+  useEffect(() => {
+    const fetchAggregateData = async () => {
+      try {
+        const aggregateData = await API.aggregateData();
+        if (aggregateData) {
+          console.log("aggregateData: ", aggregateData);
+          setAggregatedData(aggregateData);
+        }
+      } catch (error: any) {
+        console.error("Failed to fetch aggregate data:", error);
+      }
+    };
+
+    fetchAggregateData();
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -156,7 +175,7 @@ export function FormDialog(props: FormDialogProps) {
       scale: scale || KxDocumentScale.DEFAULT,
       doc_coordinates: draw,
       issuance_date: {
-        from: issuanceDate!
+        from: issuanceDate!,
       },
       type: type,
       language,

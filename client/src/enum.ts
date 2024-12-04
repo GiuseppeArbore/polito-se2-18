@@ -3,8 +3,6 @@ export enum Stakeholders {
     URBAN_PLANNER = "Urban Planner",
     RESIDENT = "Resident",
     VISITOR = "Visitor",
-    NEW = "+Add New..."
-
 }
 
 export enum Scale {
@@ -22,11 +20,9 @@ export enum KxDocumentType {
     AGREEMENT = "Agreement",
     CONFLICT = "Conflict Resolution",
     CONSULTATION = "Consultation",
-    NEW = "+Add New...",
 }
 export enum KxDocumentScale {
     DEFAULT = "1:10000",
-    NEW = "+Add New...",
 }
 
 export enum AreaType {
