@@ -1,4 +1,4 @@
-import { DocInfo, KxDocument } from "../models/model";
+import { DocInfo, KxDocument, KxDocumentAggregateData } from "../models/model";
 import { KxDocumentModel } from "../models/model";
 import { mongoose } from "@typegoose/typegoose";
 import dotenv from 'dotenv'; 
@@ -66,7 +66,46 @@ class DAO {
         }
         return null;
     }
-
+    async getKxDocumentsAggregateData(): Promise<KxDocumentAggregateData | null> {
+        const result = await KxDocumentModel.aggregate([
+            {
+                $project: {
+                    _id: 0,
+                    stakeholders: 1,
+                    type: 1,
+                    scale: 1
+                }
+            },
+            {
+                $unwind: {
+                    path: "$stakeholders"
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    stakeholders: {
+                        $addToSet: "$stakeholders"
+                    },
+                    types: {
+                        $addToSet: "$type"
+                    },
+                    scales: {
+                        $addToSet: "$scale"
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 0
+                }
+            }
+        ]).exec();
+        if (result.length > 0) {
+            return this.fromResultToAggregate(result[0]);
+        }
+        return null;
+    }
     async getAlldocuments(): Promise<KxDocument[]> {
         const result = await KxDocumentModel.find().sort({ title: 1 }).exec();
         if (result.length > 0) {
@@ -111,6 +150,22 @@ class DAO {
             return false;
         return true;
     }
+    async removeKxDocumentAttachments(id: mongoose.Types.ObjectId, fileNames: string[]): Promise<boolean> {
+        const result = await KxDocumentModel.updateOne(
+            {_id: id._id},
+            {
+                $pull: {
+                    attachments: {
+                        $in: fileNames
+                    }
+                }
+            }
+        ).exec();
+
+        if (result.modifiedCount === 0)
+            return false;
+        return true;
+    }
     async updateKxDocumentDescription(id: mongoose.Types.ObjectId, description: string): Promise<KxDocument | null> {
         const result = await KxDocumentModel.updateOne(
             {_id: id._id},
@@ -138,6 +193,17 @@ class DAO {
             return null;
 
         return await this.getKxDocumentById(id);
+    }
+    private fromResultToAggregate(result: any): KxDocumentAggregateData | null {
+        try {
+            return {
+                stakeholders: result.stakeholders,
+                types: result.types,
+                scales: result.scales,
+            }
+        } catch {
+            return null;
+        }
     }
     private fromResultToUser(result: any | null): User | null {
         return result && {

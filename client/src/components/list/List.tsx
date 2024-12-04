@@ -96,6 +96,7 @@ function List(props: ListProps) {
       headerName: "Issuance Date",
       field: "issuance_date",
       filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
+
         if (params.data && params.data.issuance_date) {
           const { from, to } = params.data.issuance_date;
           if (from && to) {

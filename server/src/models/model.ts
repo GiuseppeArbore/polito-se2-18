@@ -1,4 +1,4 @@
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "./enum";
+import { AreaType } from "./enum";
 import { mongoose, prop, modelOptions, getModelForClass, Ref, Severity } from "@typegoose/typegoose";
 
 export type PageRange = [number, number] | number;
@@ -6,12 +6,25 @@ export type PageRange = [number, number] | number;
 export interface DocInfo {
     _id: mongoose.Types.ObjectId;
     title: string;
-    stakeholders: Stakeholders[];
+    stakeholders: string[];
     scale: number;
-    type: KxDocumentType;
+    type: string;
     language?: string;
     pages?: PageRange;
     doc_coordinates?: DocCoords;
+}
+
+@modelOptions({
+    schemaOptions: {
+        _id: false,
+    },
+})
+export class DateRange {
+    @prop({required: true, type: Date})
+    from!: Date;
+
+    @prop({required: false, type: Date})
+    to?: Date;
 }
 
 @modelOptions({
@@ -76,8 +89,8 @@ export class KxDocument {
     @prop({required: true, type: String})
     title!: string;
 
-    @prop({required: true, type: String, enum: Stakeholders})
-    stakeholders!: Stakeholders[];
+    @prop({required: true, type: String})
+    stakeholders!: string[];
 
     //@prop({required: true, type: Scale})
     //scale_info!: Scale;
@@ -85,11 +98,11 @@ export class KxDocument {
     @prop({required: true, type: Number})
     scale!: number;
 
-    @prop({required: true, type: Date})
-    issuance_date!: Date;
+    @prop({required: true, type: DateRange})
+    issuance_date!: DateRange;
 
-    @prop({required: true, type: String, enum: KxDocumentType})
-    type!: KxDocumentType;
+    @prop({required: true, type: String})
+    type!: string;
 
     @prop({type: String})
     language?: string;
@@ -117,6 +130,12 @@ export class KxDocument {
 
     @prop({type: String})
     attachments?: string[];
+}
+
+export interface KxDocumentAggregateData {
+    stakeholders: string[];
+    types: string[];
+    scales: number[];
 }
 
 export const KxDocumentModel = getModelForClass(KxDocument);

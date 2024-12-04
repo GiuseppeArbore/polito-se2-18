@@ -52,10 +52,12 @@ describe("Integration Tests for Document API", () => {
             .set("Cookie", urbanPlannerCookie)
             .send({
                 title: "Integration Test Document",
-                stakeholders: [Stakeholders.RESIDENT],
+                stakeholders: [Stakeholders.RESIDENT, "Custom SH"],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -105,7 +107,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -137,7 +141,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -187,7 +193,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
@@ -207,7 +215,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [1, 1]]] },
@@ -227,10 +237,12 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
-                type: KxDocumentType.INFORMATIVE,
+                issuance_date: {
+                    from: date,
+                },
+                type: "Custom type",
                 language: "Swedish",
-                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.1)]] },
                 description: "Test document",
                 connections: {
                     direct: [], collateral: [], projection: [], update: []
@@ -252,10 +264,12 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date,
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
-                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.1)]] },
                 description: "Test document 1",
                 connections: {
                     direct: [], collateral: [], projection: [], update: []
@@ -270,10 +284,12 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
-                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.5)]] },
+                doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, KIRUNA_COORDS.map(c => c + 0.5), KIRUNA_COORDS.map(c => c - 0.1)]] },
                 description: "Test document 2",
                 connections: {
                     direct: [], collateral: [], projection: [], update: []
@@ -303,7 +319,9 @@ describe("Integration Tests for Document API", () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: date,
+                issuance_date: {
+                    from: date,
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: "Swedish",
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -314,6 +332,7 @@ describe("Integration Tests for Document API", () => {
                 }
             } as KxDocument);
 
+        documentIds.push(postResponse.body._id);
         expect(postResponse.status).toBe(201);
         const documentId = postResponse.body._id;
 
@@ -323,7 +342,7 @@ describe("Integration Tests for Document API", () => {
         expect(getResponse.body.title).toBe("Test Document for Fetch");
         expect(getResponse.body.stakeholders).toEqual([Stakeholders.RESIDENT]);
         expect(getResponse.body.scale).toBe(10);
-        expect(getResponse.body.issuance_date).toBe(date.toISOString());
+        expect(getResponse.body.issuance_date).toMatchObject({from: date.toISOString()});
         expect(getResponse.body.type).toBe(KxDocumentType.INFORMATIVE);
         expect(getResponse.body.language).toBe("Swedish");
         expect(getResponse.body.doc_coordinates).toEqual({ type: AreaType.ENTIRE_MUNICIPALITY });
@@ -339,6 +358,56 @@ describe("Integration Tests for Document API", () => {
             .attach("attachments", file, TEST_FILENAME);
             
         expect(response.status).toBe(404);
+    });
+    test("Test 12 - Remove attachment from non existing document", async () => {
+        const response = await request(app)
+            .delete(`/api/documents/${TEST_ID}/attachments/${TEST_FILENAME}`)
+            .set("Cookie", urbanPlannerCookie);
+            
+        expect(response.status).toBe(404);
+    });
+
+    test('Test 13 - get aggregate data (no auth)', async () => {
+        const response = await request(app)
+            .get(`/api/documents/aggregateData`)
+            .send();
+
+        expect(response.status).toBe(401);
+    });
+
+    test('Test 14 - get aggregate data', async () => {
+        const response = await request(app)
+            .get(`/api/documents/aggregateData`)
+            .set("Cookie", urbanPlannerCookie)
+            .send();
+
+        response.body.types.sort();
+        response.body.stakeholders.sort();
+
+        expect(response.status).toBe(200);
+        expect(response.body).toMatchObject({
+            scales: [
+                10,
+            ],
+            stakeholders: [
+                "Custom SH",
+                "Resident",
+                "Urban Developer",
+                "Urban Planner",
+                "Visitor",
+            ],
+            types: [
+                "Agreement",
+                "Conflict Resolution",
+                "Consultation",
+                "Custom type",
+                "Design Document",
+                "Informative Document",
+                "Prescriptive Document",
+                "Strategy",
+                "Technical Document",
+            ],
+        });
     });
 });
 
