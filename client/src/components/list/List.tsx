@@ -1,5 +1,5 @@
 import "ag-grid-enterprise";
-import { AdvancedFilterModel, ColDef, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
+import { AdvancedFilterModel, ColDef, GridApi, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -13,13 +13,15 @@ import locales from "../../locales.json";
 import API from "../../API";
 import DeleteDialog from "./DeleteDialog";
 import { Stakeholders } from "../../enum";
-
+import { prop } from "@typegoose/typegoose";
+import { on } from "events";
 
 interface ListProps {
   documents: KxDocument[];
   updateDocuments: (documents: KxDocument[]) => void;
   updateFilterModel: (filterModel: AdvancedFilterModel | undefined) => void;
   filterModel: AdvancedFilterModel | undefined;
+  quickFilter: string;
 }
 
 
@@ -228,6 +230,7 @@ function List(props: ListProps) {
     });
     props.updateDocuments(rowData.filter((doc): doc is KxDocument => doc !== undefined));
     props.updateFilterModel(gridRef.current?.api?.getAdvancedFilterModel() || undefined);
+    gridRef.current?.api?.sizeColumnsToFit();
   }
 
   function addFilterModel() {
@@ -258,7 +261,13 @@ function List(props: ListProps) {
           ref={gridRef}
           animateRows={true}
           onFilterChanged={onFilterChanged}
-          onGridSizeChanged={sizeColumnsToFitGridStategy}
+	onGridSizeChanged={sizeColumnsToFitGridStategy}
+		      quickFilterText={props.quickFilter}
+          onRowDataUpdated={onFilterChanged}
+          onModelUpdated={onFilterChanged}
+          
+          
+         
         />
       </div>
 

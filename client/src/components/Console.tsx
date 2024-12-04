@@ -8,6 +8,7 @@ import {
   TabGroup,
   TabList,
   Tab,
+  TextInput,
 } from "@tremor/react";
 import "../css/dashboard.css"
 import API from "../API";
@@ -20,21 +21,21 @@ import { Toaster } from "./toast/Toaster";
 import { toast } from "../utils/toaster";
 import { FeatureCollection } from "geojson";
 import { Link } from "react-router-dom";
-import { RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine } from "@remixicon/react";
-import { AdvancedFilterModel } from "ag-grid-enterprise";
+import { RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine, RiSearchLine } from "@remixicon/react";
+import { AdvancedFilterModel, GridApi } from "ag-grid-enterprise";
 
 export default function Console() {
+  const [quickFilterText, setQuickFilterText] = useState('');
   const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [tmpDocuments, setTmpDocuments] = useState<KxDocument[]>([]);
   const [selectedView, setSelectedView] = useState(0);
   const [refreshNeeded, setRefreshNeeded] = useState(true);
-  const [filterModel, setFilterModel] = useState<AdvancedFilterModel|undefined>(undefined);
+  const [filterModel, setFilterModel] = useState<AdvancedFilterModel | undefined>(undefined);
   const [entireMunicipalityDocuments, setEntireMunicipalityDocuments] =
     useState<KxDocument[]>([]);
   const [pointOrAreaDocuments, setPointOrAreaDocuments] = useState<
     KxDocument[]
   >([]);
-
   function getIconForType(type: string): string {
     switch (type) {
       case 'Informative Document':
@@ -101,9 +102,10 @@ export default function Console() {
     const otherDocs = tmpDocuments.filter(
       (doc) => doc.doc_coordinates?.type !== "EntireMunicipality"
     );
-
+    console.log("modify documents");
     setEntireMunicipalityDocuments(entireMunicipalityDocs);
     setPointOrAreaDocuments(otherDocs);
+
   }, [tmpDocuments]);
 
 
@@ -112,7 +114,7 @@ export default function Console() {
   const [showSideBar, setShowSideBar] = useState(true);
 
   useEffect(() => {
-    if(selectedView === 0) {
+    if (selectedView === 0) {
       setShowSideBar(true);
     } else {
       setShowSideBar(false);
@@ -127,7 +129,7 @@ export default function Console() {
     return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  
+
 
   return (
     <main>
@@ -168,8 +170,8 @@ export default function Console() {
               </Card>
             </Col>
             {!showSideBar &&
-              <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring"  role="Button">
-                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full"/></i>
+              <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring" role="Button">
+                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full" /></i>
               </Col>
             }
           </div>
@@ -179,7 +181,7 @@ export default function Console() {
           <div className="flex flex-row ">
             {showSideBar &&
               <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring" role="Button">
-                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full"/></i>
+                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full" /></i>
 
               </Col>
             }
@@ -190,7 +192,17 @@ export default function Console() {
                     documents={documents}
                     refresh={() => setRefreshNeeded(true)}
                   />
+                  <TextInput
+                    icon={RiSearchLine}
+                    id="quickFilter"
+                    placeholder="Search..."
+                    className="w-full"
+                    value={quickFilterText}
+                    onValueChange={(e) => {
+                      setQuickFilterText(e);
 
+                    }}
+                  ></TextInput>
                   <Card>
                     <Metric>KIRUNA</Metric>
                     <Title>Quick facts</Title>
@@ -222,9 +234,6 @@ export default function Console() {
         </Col>
 
       </Grid>
-
-
-
       <Card className="mt-6">
         <div
           style={{
@@ -241,53 +250,45 @@ export default function Console() {
     </main>
   );
   function renderCurrentSelection(selectedView: number = 0) {
-    switch (selectedView) {
-      case 0:
-        return (
-          <>
-            <DashboardMap
-              style={{
-                margin: 0,
-                minHeight: "300px",
-                width: "100%",
-                height: "100%",
-                borderRadius: 8,
-              }}
-              drawing={drawing}
-              entireMunicipalityDocuments={entireMunicipalityDocuments}
-            ></DashboardMap>
-          </>
-        );
-      case 1:
-        return (
-          <>
-            <div
-              className="ring-0 shadow-none"
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                height: "100%",
-              }}
-            >
-              <List documents={documents} updateDocuments={setTmpDocuments} updateFilterModel={setFilterModel} filterModel={filterModel} />
-            </div>
-          </>
-        );
-      case 2:
-        return (
-          <div
-            style={{
-              display: "flex",
-              justifyContent: "center",
-              alignItems: "center",
-              height: "100%",
-            }}
-          >
-            <div>Coming soon...</div>
-          </div>
-        );
-    }
+    return (
+      <>
+        <DashboardMap
+          style={{
+            margin: 0,
+            minHeight: "300px",
+            width: "100%",
+            height: "100%",
+            borderRadius: 8,
+            display: selectedView === 0 ? 'block' : 'none',
+          }}
+          drawing={drawing}
+          entireMunicipalityDocuments={entireMunicipalityDocuments}
+          isVisible={selectedView === 0 ? true : false}>
+
+        </DashboardMap>
+        <div
+          className="ring-0 shadow-none"
+          style={{
+            display: selectedView === 1 ? 'flex' : 'none',
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <List documents={documents} updateDocuments={setTmpDocuments} updateFilterModel={setFilterModel} filterModel={filterModel} quickFilter={quickFilterText} />
+        </div>
+        <div
+          style={{
+            display: selectedView === 2 ? 'flex' : 'none',
+            justifyContent: "center",
+            alignItems: "center",
+            height: "100%",
+          }}
+        >
+          <div>Coming soon...</div>
+        </div>
+      </>
+    );
   }
 }
 
