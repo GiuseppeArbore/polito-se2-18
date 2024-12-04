@@ -157,7 +157,7 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
   );
 };
 
-export const DashboardMap: React.FC<SatMapProps> = (props) => {
+export const DashboardMap: React.FC<SatMapProps& {isVisible:boolean}> = (props) => {
   const mapContainerRef = useRef<any>(null);
   const mapRef = useRef<mapboxgl.Map | null>(null);
   const [isKirunaVisible, setIsKirunaVisible] = useState(false);
@@ -613,14 +613,14 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
       />
     
      
-      <Button className = "Kiruna-area-button"onClick={toggleKirunaVisibility}>
+      <Button className = "Kiruna-area-button" style={{ display: props.isVisible ? "flex" : "none"}} onClick={toggleKirunaVisibility}>
         {isKirunaVisible ? 'Hide Kiruna Area' : 'Show Kiruna Area'}
       </Button>
       
 
       <DropdownMenu modal={false}>
         <DropdownMenuTrigger asChild>
-          <Button className="button-whole-Kiruna" variant="primary">
+          <Button className="button-whole-Kiruna" variant="primary" style={{ display: props.isVisible ? "flex" : "none"}}>
             <div style={{ display: "flex", alignItems: "center" }}>
               Whole Kiruna: {props.entireMunicipalityDocuments?.length}
               <RiFileLine
@@ -640,7 +640,6 @@ export const DashboardMap: React.FC<SatMapProps> = (props) => {
             </div>
           </Button>
         </DropdownMenuTrigger>
-
         <DropdownMenuContent>
           <DropdownMenuLabel>Documents</DropdownMenuLabel>
           <DropdownMenuSeparator />
