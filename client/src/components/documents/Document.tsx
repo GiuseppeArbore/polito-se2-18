@@ -230,7 +230,8 @@ export default function Document({ user }: DocumentProps) {
 
                         <div className="flex items-center justify-between mb-2 space-x-2">
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Issuance Date:</i>
-                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {issuanceDate?.toString().split('T')[0]}</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {issuanceDate?.from ? issuanceDate.from.toString().split('T')[0] : "Unknown"}
+                            {issuanceDate?.to ? ` - ${issuanceDate.to.toString().split('T')[0]}` : ""}</i>
                         </div>
 
                         <div className="flex items-center justify-between mb-2 space-x-2">

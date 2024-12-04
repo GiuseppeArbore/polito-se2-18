@@ -16,7 +16,7 @@ import {
   Callout,
   Switch,
 } from "@tremor/react";
-import { DateRange, DateRangePicker } from "./DatePicker"
+import { DateRangePicker } from "./DatePicker"
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
@@ -151,7 +151,8 @@ export function FormDialog(props: FormDialogProps) {
       scale,
       doc_coordinates: draw,
       issuance_date: {
-        from: issuanceDate?.from!
+        from: issuanceDate?.from!,
+        to: issuanceDate?.to!
       },
       type: type,
       language,
@@ -987,6 +988,8 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
   setIssuanceDate,
   hasError
 }) => {
+  const issuanceYear = issuanceDate?.from ? issuanceDate.from.getFullYear() : new Date().getFullYear();
+  const issuanceMonth = issuanceDate?.from ? issuanceDate.from.getMonth() : new Date().getMonth();
   const presets = [
     {
       label: "Today",
@@ -1024,17 +1027,17 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
       },
     },
     {
-      label: "Month to date",
+      label: "Month",
       dateRange: {
-        from: new Date(new Date().setDate(1)),
-        to: new Date(),
+        from: new Date(issuanceYear, issuanceMonth, 1),
+        to: new Date(issuanceYear, issuanceMonth + 1, 0),
       },
     },
     {
-      label: "Year to date",
+      label: "Year",
       dateRange: {
-        from: new Date(new Date().setFullYear(new Date().getFullYear(), 0, 1)),
-        to: new Date(),
+        from: new Date(issuanceYear, 0, 1),
+        to: new Date(issuanceYear, 11, 31),
       },
     },
   ];
