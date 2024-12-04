@@ -142,7 +142,7 @@ export function FormDialog(props: FormDialogProps) {
       scale,
       doc_coordinates: draw,
       issuance_date: {
-        from: issuanceDate!
+        from: issuanceDate?.from!
       },
       type: type,
       language,
@@ -410,8 +410,8 @@ export function FormDocumentInformation({
   setShError: React.Dispatch<React.SetStateAction<boolean>>;
   issuanceDate: DateRange | undefined;
   setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
-  type: KxDocumentType | undefined;
-  setType: React.Dispatch<React.SetStateAction<KxDocumentType | undefined>>;
+  type: string | undefined;
+  setType: React.Dispatch<React.SetStateAction<string | undefined>>;
   typeError: boolean;
   setTypeError: React.Dispatch<React.SetStateAction<boolean>>;
   scale: number;
