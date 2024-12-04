@@ -213,6 +213,7 @@ const deleteAttachmentFromDocument = async (id: mongoose.Types.ObjectId, fileNam
     try {
         const response = await fetch(`${API_URL}/documents/${id}/attachments/${fileName}`, {
             method: 'DELETE',
+            credentials: 'include'
         });
 
         if (!response.ok) {

@@ -453,6 +453,7 @@ export default function Document({ user }: DocumentProps) {
                                     variant: "error",
                                     duration: 3000,
                                 });
+                                return;
                             }
 
                             toast({
