@@ -22,9 +22,14 @@ import { toast } from "../utils/toaster";
 import { FeatureCollection } from "geojson";
 import { Link } from "react-router-dom";
 import { RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine, RiSearchLine } from "@remixicon/react";
-import { AdvancedFilterModel, GridApi } from "ag-grid-enterprise";
+import { AdvancedFilterModel } from "ag-grid-enterprise";
+import { Stakeholders } from "../enum";
 
-export default function Console() {
+interface ConsoleProps {
+  user: { email: string; role: Stakeholders } | null;
+}
+
+const Console: React.FC<ConsoleProps> = ({ user }) => {
   const [quickFilterText, setQuickFilterText] = useState('');
   const [documents, setDocuments] = useState<KxDocument[]>([]);
   const [tmpDocuments, setTmpDocuments] = useState<KxDocument[]>([]);
@@ -102,7 +107,6 @@ export default function Console() {
     const otherDocs = tmpDocuments.filter(
       (doc) => doc.doc_coordinates?.type !== "EntireMunicipality"
     );
-    console.log("modify documents");
     setEntireMunicipalityDocuments(entireMunicipalityDocs);
     setPointOrAreaDocuments(otherDocs);
 
@@ -188,11 +192,7 @@ export default function Console() {
             {(showSideBar || windowWidth <= 1024) &&
               <Col className="w-full">
                 <div className="space-y-6">
-                  <FormDialog
-                    documents={documents}
-                    refresh={() => setRefreshNeeded(true)}
-                  />
-                  <TextInput
+                <TextInput
                     icon={RiSearchLine}
                     id="quickFilter"
                     placeholder="Search..."
@@ -203,6 +203,11 @@ export default function Console() {
 
                     }}
                   ></TextInput>
+                  <FormDialog
+                    documents={documents}
+                    refresh={() => setRefreshNeeded(true)}
+                    user={user}
+                  />
                   <Card>
                     <Metric>KIRUNA</Metric>
                     <Title>Quick facts</Title>
@@ -261,6 +266,7 @@ export default function Console() {
             borderRadius: 8,
             display: selectedView === 0 ? 'block' : 'none',
           }}
+          user={user}
           drawing={drawing}
           entireMunicipalityDocuments={entireMunicipalityDocuments}
           isVisible={selectedView === 0 ? true : false}>
@@ -275,7 +281,7 @@ export default function Console() {
             height: "100%",
           }}
         >
-          <List documents={documents} updateDocuments={setTmpDocuments} updateFilterModel={setFilterModel} filterModel={filterModel} quickFilter={quickFilterText} />
+          <List user={user} documents={documents} updateDocuments={setTmpDocuments} updateFilterModel={setFilterModel} filterModel={filterModel} quickFilter={quickFilterText} />
         </div>
         <div
           style={{
@@ -292,3 +298,4 @@ export default function Console() {
   }
 }
 
+export default Console;
