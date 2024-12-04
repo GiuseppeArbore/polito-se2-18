@@ -1060,11 +1060,7 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
         className="w-70"
       />
       <p className="flex items-center rounded-md bg-gray-100 p-2 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
-        {issuanceDate
-          ? issuanceDate.to
-            ? `Selected Range: ${issuanceDate.from?.toLocaleDateString()} – ${issuanceDate.to?.toLocaleDateString()}`
-            : `Selected Date: ${issuanceDate.from?.toLocaleDateString()}`
-          : "Selected a range or a single date"}
+         "Selected a range or a single date"
       </p>
     </div>
   );
