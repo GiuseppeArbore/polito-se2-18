@@ -1043,21 +1043,21 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
   ];
 
   return (
-    <div className="flex flex-col items-center gap-y-2 pt-4">
+    <div className="flex flex-col items-center gap-y-2 pt-4 w-full">
       <label
         htmlFor="issuance-date"
-        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong self-start"
       >
         Issuance date
-        <span className="text-red-500">*</span>
+      <span className="text-red-500">*</span>
       </label>
       <DateRangePicker
-        enableYearNavigation
-        hasError={hasError}
-        presets={presets}
-        value={issuanceDate}
-        onChange={setIssuanceDate}
-        className="w-70"
+      enableYearNavigation
+      hasError={hasError}
+      presets={presets}
+      value={issuanceDate}
+      onChange={setIssuanceDate}
+      className="w-full"
       />
     </div>
   );
