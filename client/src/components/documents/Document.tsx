@@ -390,7 +390,7 @@ export default function Document() {
                                                     color="red"
                                                     onClick={async () => {
                                                         setDeleteOriginalResourceConfirm(true);
-                                                        setSelectedResource(title);
+                                                        setFileTitle(title);
                                                     }}
                                                 ><RiDeleteBinLine /></Button>
                                             </div>
@@ -432,17 +432,9 @@ export default function Document() {
                         deleteOriginalResourceConfirm,
                         setDeleteOriginalResourceConfirm,
                         async () => {
-                            //this is a draft, we have to implement it in the kx-87, understand the logic and implement it, also the file name
                             try {
-                                //await API.deleteKxDocumentAttachment(id!, fileTitle!);
-                                const updatedDocument = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
-                                setDoc(updatedDocument);
-                                toast({
-                                    title: "Success",
-                                    description: "The document has been deleted successfully",
-                                    variant: "success",
-                                    duration: 3000,
-                                });
+                                await API.deleteAttachmentFromDocument(new mongoose.Types.ObjectId(id!), fileTitle!);
+
                             } catch (error) {
                                 toast({
                                     title: "Error",
@@ -451,8 +443,19 @@ export default function Document() {
                                     duration: 3000,
                                 });
                             }
+
+                            toast({
+                                title: "Success",
+                                description: "The document has been deleted successfully",
+                                variant: "success",
+                                duration: 3000,
+                            });
+
+
+                            doc!.attachments=doc?.attachments?.filter((f) => f !== fileTitle);
+                            setDoc({...doc!});                            
                         }
-                        , selectedResource!
+                        , fileTitle!
 
                     )}
 
