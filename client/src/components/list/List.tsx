@@ -3,7 +3,7 @@ import { AdvancedFilterModel, ColDef, GridApi, GridOptions, ValueGetterParams } 
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { KxDocument } from "../../model";
 import { Badge, Button, Flex, Card, Text } from "@tremor/react";
 import { useNavigate } from "react-router-dom";
@@ -24,11 +24,14 @@ interface ListProps {
   quickFilter: string;
 }
 
+
 function List(props: ListProps) {
   const navigator = useNavigate();
+
   const gridRef = useRef<AgGridReact<KxDocument>>(null);
-  const onFirstDataRendered = useCallback(() => {
-    onGridReady();
+  const onFirstDataRendered = useCallback((params: any) => {
+    onGridReady(params);
+    params.api.sizeColumnsToFit();
   }, []);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const rowNode = useRef<any>();
@@ -93,18 +96,20 @@ function List(props: ListProps) {
           ? "1:" + params.value.toLocaleString()
           : "";
       },
+      hide: true,
     },
     {
       headerName: "Issuance Date",
       field: "issuance_date",
       filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
-        return params.data && new Date(params.data.issuance_date).toLocaleDateString() || "";
+        return params.data && new Date(params.data.issuance_date.from).toLocaleDateString() || "";
       },
       valueFormatter: (params: { value: string | number }) => {
         return params.value !== undefined
           ? new Date(params.value).toLocaleDateString()
           : "";
       },
+      hide: true,
     },
     {
       headerName: "Area Type",
@@ -135,12 +140,14 @@ function List(props: ListProps) {
       valueFormatter: (params: { value: string | number }) => {
         return locales.find((l) => l.code === params.value)?.name || "";
       },
+      hide: true,
     },
     {
       headerName: "Pages",
       field: "pages",
       enableRowGroup: false,
       filter: true,
+      hide: true,
     },
     {
       headerName: "Controls",
@@ -168,17 +175,17 @@ function List(props: ListProps) {
       resizable: true,
       sortable: true,
       enableRowGroup: true,
-      filterParams: {newRowsAction: 'keep'}
+      filterParams: { newRowsAction: 'keep' }
     },
     statusBar: {
       statusPanels: [
-          { statusPanel: 'agTotalAndFilteredRowCountComponent' },
-          { statusPanel: 'agTotalRowCountComponent' },
-          { statusPanel: 'agFilteredRowCountComponent' },
-          { statusPanel: 'agSelectedRowCountComponent' },
-          { statusPanel: 'agAggregationComponent' }
+        { statusPanel: 'agTotalAndFilteredRowCountComponent' },
+        { statusPanel: 'agTotalRowCountComponent' },
+        { statusPanel: 'agFilteredRowCountComponent' },
+        { statusPanel: 'agSelectedRowCountComponent' },
+        { statusPanel: 'agAggregationComponent' }
       ]
-  },
+    },
     sideBar: {
       toolPanels: [
         {
@@ -203,12 +210,13 @@ function List(props: ListProps) {
     },
   };
 
-  function onGridReady() {
+  function onGridReady(params: any) {
     const allColumnIds: string[] = [];
     gridRef.current!.api!.getAllGridColumns()!.forEach((column) => {
       allColumnIds.push(column.getId());
     });
     gridRef.current!.api!.autoSizeColumns(allColumnIds, false);
+    params.api.sizeColumnsToFit();
   }
 
   const rowData = useMemo(() => {
@@ -224,13 +232,19 @@ function List(props: ListProps) {
     props.updateFilterModel(gridRef.current?.api?.getAdvancedFilterModel() || undefined);
     gridRef.current?.api?.sizeColumnsToFit();
   }
+
   function addFilterModel() {
-    if(props.filterModel) {
+    if (props.filterModel) {
       gridRef.current?.api?.setAdvancedFilterModel(props.filterModel);
     } else {
-     props.updateFilterModel(undefined);
+      props.updateFilterModel(undefined);
     }
   }
+
+  function sizeColumnsToFitGridStategy(params: any){
+    params.api.sizeColumnsToFit();
+  }
+
   return (
     <>
       <div
@@ -247,6 +261,7 @@ function List(props: ListProps) {
           ref={gridRef}
           animateRows={true}
           onFilterChanged={onFilterChanged}
+	onGridSizeChanged={sizeColumnsToFitGridStategy}
 		      quickFilterText={props.quickFilter}
           onRowDataUpdated={onFilterChanged}
           onModelUpdated={onFilterChanged}
