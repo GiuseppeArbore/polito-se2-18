@@ -47,7 +47,7 @@ export default function Document() {
     const [stakeholders, setStakeholders] = useState<string[]>([]);
     const [scale, setScale] = useState(10000);
     const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(undefined);
-    const [type, setType] = useState<KxDocumentType | undefined>(undefined);
+    const [type, setType] = useState<string | undefined>(undefined);
     const [language, setLanguage] = useState<string | undefined>(undefined);
     const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(undefined);
@@ -71,7 +71,7 @@ export default function Document() {
                 setTitle(document.title);
                 setStakeholders(document.stakeholders);
                 setScale(document.scale);
-                setIssuanceDate(document.issuance_date.from);
+                setIssuanceDate({ from: document.issuance_date.from, to: document.issuance_date.to });
                 setType(document.type);
                 setLanguage(document.language || undefined);
                 setPages(document.pages || undefined);
@@ -528,8 +528,8 @@ export function FormInfoDialog({
     setShError: React.Dispatch<React.SetStateAction<boolean>>;
     issuanceDate: DateRange | undefined;
     setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
-    type: KxDocumentType | undefined;
-    setType: React.Dispatch<React.SetStateAction<KxDocumentType | undefined>>;
+    type: string | undefined;
+    setType: React.Dispatch<React.SetStateAction<string | undefined>>;
     scale: number;
     setScale: React.Dispatch<React.SetStateAction<number>>;
     language: string | undefined;
