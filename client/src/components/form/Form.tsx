@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Card,
   Button,
@@ -15,6 +16,7 @@ import {
   Callout,
   Switch,
 } from "@tremor/react";
+import { DateRange, DateRangePicker } from "./DatePicker"
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
@@ -41,6 +43,8 @@ import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
 import { DateRange } from "./DatePicker";
+import { se } from "date-fns/locale";
+
 
 
 interface FormDialogProps {
@@ -60,7 +64,9 @@ export function FormDialog(props: FormDialogProps) {
    {from: new Date()}
   );
   const [files, setFiles] = useState<File[]>([]);
+  const [issuanceDateError, setIssuanceDateError] = useState(false);
   const [type, setType] = useState<string | undefined>(undefined);
+
   const [typeError, setTypeError] = useState(false);
   const [scale, setScale] = useState(10000);
   const [language, setLanguage] = useState<string | undefined>(undefined);
@@ -121,11 +127,12 @@ export function FormDialog(props: FormDialogProps) {
       };
     }
 
-    if (tmpTitleError || tmpShError || !type || !description || !draw || (drawing === undefined && !hideMap)) {
+    if (tmpTitleError || tmpShError || !type || !description || !draw || !issuanceDate || (drawing === undefined && !hideMap)) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
+      setIssuanceDateError(!issuanceDate); 
       hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
       setError("Please fill all the required fields");
       toast({
@@ -171,7 +178,7 @@ export function FormDialog(props: FormDialogProps) {
 
         setTitle("");
         setScale(0);
-        setIssuanceDate({from:new Date()});
+        setIssuanceDate({ from: new Date() });
         setType(undefined);
         setLanguage(undefined);
         setDescription(undefined);
@@ -225,7 +232,8 @@ export function FormDialog(props: FormDialogProps) {
     setTitleError(false);
     setStakeholders([]);
     setShError(false);
-    setIssuanceDate({from: new Date()});
+    setIssuanceDate({ from: new Date() });
+    setIssuanceDateError(false);
     setType(undefined);
     setTypeError(false);
     setScale(10000);
@@ -278,10 +286,12 @@ export function FormDialog(props: FormDialogProps) {
           setPageRanges={setPageRanges}
         />
 
-        <FormDocumentDatePicker
-          issuanceDate={issuanceDate}
-          setIssuanceDate={setIssuanceDate}
-        />
+ 
+        <DateRangePickerPresets 
+         issuanceDate={issuanceDate}
+         setIssuanceDate={setIssuanceDate} 
+         hasError={issuanceDateError}
+         />
 
 
 
@@ -965,3 +975,94 @@ export function FormDocumentDatePicker({
 
 
 }
+
+interface DateRangePickerPresetsProps {
+  issuanceDate: DateRange | undefined;
+  setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  hasError: boolean;
+}
+
+export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
+  issuanceDate,
+  setIssuanceDate,
+  hasError
+}) => {
+  const presets = [
+    {
+      label: "Today",
+      dateRange: {
+        from: new Date(),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 7 days",
+      dateRange: {
+        from: new Date(new Date().setDate(new Date().getDate() - 7)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 30 days",
+      dateRange: {
+        from: new Date(new Date().setDate(new Date().getDate() - 30)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 3 months",
+      dateRange: {
+        from: new Date(new Date().setMonth(new Date().getMonth() - 3)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 6 months",
+      dateRange: {
+        from: new Date(new Date().setMonth(new Date().getMonth() - 6)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Month to date",
+      dateRange: {
+        from: new Date(new Date().setDate(1)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Year to date",
+      dateRange: {
+        from: new Date(new Date().setFullYear(new Date().getFullYear(), 0, 1)),
+        to: new Date(),
+      },
+    },
+  ];
+
+  return (
+    <div className="flex flex-col items-center gap-y-2 pt-4">
+      <label
+        htmlFor="issuance-date"
+        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong"
+      >
+        Issuance date
+        <span className="text-red-500">*</span>
+      </label>
+      <DateRangePicker
+        enableYearNavigation
+        hasError={hasError}
+        presets={presets}
+        value={issuanceDate}
+        onChange={setIssuanceDate}
+        className="w-70"
+      />
+      <p className="flex items-center rounded-md bg-gray-100 p-2 text-sm text-gray-500 dark:bg-gray-800 dark:text-gray-300">
+        {issuanceDate
+          ? issuanceDate.to
+            ? `Selected Range: ${issuanceDate.from?.toLocaleDateString()} – ${issuanceDate.to?.toLocaleDateString()}`
+            : `Selected Date: ${issuanceDate.from?.toLocaleDateString()}`
+          : "Selected a range or a single date"}
+      </p>
+    </div>
+  );
+};
