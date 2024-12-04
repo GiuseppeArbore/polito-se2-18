@@ -5,7 +5,6 @@ import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "..
 import { FileUpload } from "../form/DragAndDrop";
 import DeleteResourceDialog from './DeleteResourcesDialog';
 import API from '../../API';
-//import { FileUpload } from './DragDrop';
 import mime from 'mime';
 import {
     Accordion,
@@ -34,6 +33,13 @@ import locales from "../../locales.json"
 interface DocumentProps {
     user: { email: string; role: Stakeholders } | null;
 }
+
+interface FormDialogProps {
+    documents: KxDocument[];
+    refresh: () => void;
+}
+
+
 
 
 export default function Document({ user }: DocumentProps) {
@@ -65,6 +71,44 @@ export default function Document({ user }: DocumentProps) {
     const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
+
+
+    const handleSubmitDragAndDrop = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        try {
+            if (files.length > 0) {
+                const FileUpload = await API.addAttachmentToDocument(new mongoose.Types.ObjectId(id), files);
+                if (!FileUpload) {
+                    toast({
+                        title: "Error",
+                        description: "Failed to upload files",
+                        variant: "error",
+                        duration: 3000,
+                    })
+                }
+            }
+
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: "Failed to upload files",
+                variant: "error",
+                duration: 3000,
+            })
+        }
+
+        files.forEach((f) => doc?.attachments?.push(f.name));
+        toast({
+            title: "Upload files",
+            description: "Original resources updated succesfully",
+            variant: "success",
+            duration: 3000
+        })
+
+        setIsDragAndDropOpen(false);
+
+    };
 
 
     useEffect(() => {
@@ -199,7 +243,6 @@ export default function Document({ user }: DocumentProps) {
     const [selectedResource, setSelectedResource] = useState<string>("");
     const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
 
-
     return (
         <div>
             <div className='flex flex-row mb-2'>
@@ -272,7 +315,7 @@ export default function Document({ user }: DocumentProps) {
                             pageRanges={pageRanges}
                             setPageRanges={setPageRanges}
                             id={id!}
-                            user = {user}
+                            user={user}
                         />
 
 
@@ -282,7 +325,7 @@ export default function Document({ user }: DocumentProps) {
                         <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Description:</i>
                         <i className='text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong'> {description}  </i>
 
-                        <div className='hidden lg:flex flex-end space-y-2 h-full w-full justify-around'>
+                        <div className='hidden lg:flex space-y-2 h-full w-full'>
                             <FormDescriptionDialog
                                 document={doc!}
                                 description={description}
@@ -355,7 +398,7 @@ export default function Document({ user }: DocumentProps) {
                                                     color="red"
                                                     onClick={async () => {
                                                         setDeleteOriginalResourceConfirm(true);
-                                                        setSelectedResource(title);
+                                                        setFileTitle(title);
                                                     }}
                                                 ><RiDeleteBinLine /></Button>
                                             </div>
@@ -373,7 +416,7 @@ export default function Document({ user }: DocumentProps) {
 
                     </div>
 
-                    <div className="flex w-full h-full items-center justify-between mb-2">
+                    <div className="hide lg:flex w-full h-full items-center justify-between mb-2 ">
 
                         <Accordion className="w-full mr-6 mb-6">
                             <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">More documents [Cooming soon] </AccordionHeader>
@@ -386,7 +429,12 @@ export default function Document({ user }: DocumentProps) {
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
-                        {canEdit && <i className="h-full lg:ml-3 lg:mr-5 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
+
+                        <div className="hidden lg:flex">
+                            <Button disabled className="h-full lg:ml-3 mb-5">
+                                <RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" />
+                            </Button>
+                        </div>
 
 
                     </div>
@@ -395,17 +443,9 @@ export default function Document({ user }: DocumentProps) {
                         deleteOriginalResourceConfirm,
                         setDeleteOriginalResourceConfirm,
                         async () => {
-                            //this is a draft, we have to implement it in the kx-87, understand the logic and implement it, also the file name
                             try {
-                                //await API.deleteKxDocumentAttachment(id!, fileTitle!);
-                                const updatedDocument = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
-                                setDoc(updatedDocument);
-                                toast({
-                                    title: "Success",
-                                    description: "The document has been deleted successfully",
-                                    variant: "success",
-                                    duration: 3000,
-                                });
+                                await API.deleteAttachmentFromDocument(new mongoose.Types.ObjectId(id!), fileTitle!);
+
                             } catch (error) {
                                 toast({
                                     title: "Error",
@@ -413,9 +453,21 @@ export default function Document({ user }: DocumentProps) {
                                     variant: "error",
                                     duration: 3000,
                                 });
+                                return;
                             }
+
+                            toast({
+                                title: "Success",
+                                description: "The document has been deleted successfully",
+                                variant: "success",
+                                duration: 3000,
+                            });
+
+
+                            doc!.attachments = doc?.attachments?.filter((f) => f !== fileTitle);
+                            setDoc({ ...doc! });
                         }
-                        , selectedResource!
+                        , fileTitle!
 
                     )}
 
@@ -438,7 +490,7 @@ export default function Document({ user }: DocumentProps) {
                                 </Button>
                                 <Button
                                     className="w-full sm:w-auto primary"
-                                //onClick={e => handleSubmit(e)}    handleSumbitDragAndDrop to do in kx-87
+                                    onClick={e => handleSubmitDragAndDrop(e)}
                                 >
                                     Submit
                                 </Button>
@@ -475,7 +527,7 @@ export default function Document({ user }: DocumentProps) {
                                 setDrawing={(d) => { setDrawings(d); setSaveDrawing(true) }}
                                 drawing={drawings}
                                 style={{ minHeight: "300px", width: "100%" }}
-                                user = {user}
+                                user={user}
                             />
                         </Card>
                     ) : (
@@ -596,7 +648,7 @@ export function FormInfoDialog({
     };
 
     const handleCancelSubmit = async (e: React.FormEvent) => {
-  
+
         e.preventDefault();
         setTitle(document.title);
         setStakeholders(document.stakeholders);
@@ -737,7 +789,7 @@ export function FormDescriptionDialog(
     return (
         <>
 
-            {canEdit && <i className="self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
+            {canEdit && <i className="mb-2 w-full flex justify-end" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
 
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
                 <DialogPanel

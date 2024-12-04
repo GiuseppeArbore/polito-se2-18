@@ -209,7 +209,25 @@ const addAttachmentToDocument = async (id: mongoose.Types.ObjectId, files: File[
     }
 };
 
-//LOGIN
+const deleteAttachmentFromDocument = async (id: mongoose.Types.ObjectId, fileName: string): Promise<void> => {
+    try {
+        const response = await fetch(`${API_URL}/documents/${id}/attachments/${fileName}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to delete attachment: ${error.message}`);
+        } else {
+            throw new Error('Failed to delete attachment: Unknown error');
+        }
+    }
+}
+
 
 interface Credentials {
     username: string;
@@ -260,5 +278,5 @@ const login = async (credentials: Credentials) => {
     }
   };
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument, login, getUserInfo, logout };
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument, deleteAttachmentFromDocument, login, getUserInfo, logout };
 export default API;
