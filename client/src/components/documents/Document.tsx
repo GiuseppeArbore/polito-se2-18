@@ -16,10 +16,9 @@ import {
   FormDocumentInformation,
 } from "../form/Form";
 import { FileUpload } from "../form/DragAndDrop";
-import DeleteResourceDialog from "./DeleteResourcesDialog";
-import API from "../../API";
-//import { FileUpload } from './DragDrop';
-import mime from "mime";
+import DeleteResourceDialog from './DeleteResourcesDialog';
+import API from '../../API';
+import mime from 'mime';
 import {
   Accordion,
   AccordionBody,
@@ -42,77 +41,75 @@ import {
   validatePageRangeString,
 } from "../../utils";
 import { toast } from "../../utils/toaster";
-import locales from "../../locales.json";
-
+import locales from "../../locales.json"
+import exp from 'constants';
+import { DateRange } from '../form/DatePicker';
 interface DocumentProps {
   user: { email: string; role: string } | null;
 }
 
+interface FormDialogProps {
+    documents: KxDocument[];
+    refresh: () => void;
+}
+
+
+
+
 export default function Document({ user }: DocumentProps) {
+    const formatLocalDate = (date: Date) => {
+        return date.toLocaleDateString('sv-SE'); // 'sv-SE' è un formato ISO-like
+      };
   const canEdit = user && user.role === "Urban Planner";
 
-  const navigate = useNavigate();
-  const { id } = useParams<string>();
-  const [fileTitle, setFileTitle] = useState<string | undefined>(undefined);
-  const [showPdfPreview, setShowPdfPreview] = useState(false);
-  const [doc, setDoc] = useState<KxDocument | null>(null);
-  const [share, setShare] = useState(false);
-  const [drawings, setDrawings] = useState<any>();
-  const [title, setTitle] = useState("");
-  const [stakeholders, setStakeholders] = useState<string[]>([]);
-  const [scale, setScale] = useState(10000);
-  const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(undefined);
-  const [type, setType] = useState<string | undefined>(undefined);
-  const [language, setLanguage] = useState<string | undefined>(undefined);
-  const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
-  const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(
-    undefined
-  );
-  const [description, setDescription] = useState<string | undefined>(undefined);
-  const [entireMunicipality, setEntireMunicipality] = useState(false);
-  const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(
-    undefined
-  );
-  const [documents, setDocuments] = useState<KxDocument[]>([]);
-  const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
-  const [documentsForCollateral, setDocumentsForCollateral] = useState<
-    string[]
-  >([]);
-  const [documentsForProjection, setDocumentsForProjection] = useState<
-    string[]
-  >([]);
-  const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
-  const [saveDrawing, setSaveDrawing] = useState(false);
-  const [files, setFiles] = useState<File[]>([]);
+  
 
-  useEffect(() => {
-    const fetchDocument = async () => {
-      try {
-        const document = await API.getKxDocumentById(
-          new mongoose.Types.ObjectId(id!)
-        );
-        setDoc(document);
-        setTitle(document.title);
-        setStakeholders(document.stakeholders);
-        setScale(document.scale);
-        setIssuanceDate(document.issuance_date.from);
-        setType(document.type);
-        setLanguage(document.language || undefined);
-        setPages(document.pages || undefined);
-        setDescription(document.description || undefined);
-        setDocumentsForDirect(
-          document.connections.direct.map((doc) => doc._id?.toString())
-        );
-        setDocumentsForCollateral(
-          document.connections.collateral.map((doc) => doc._id?.toString())
-        );
-        setDocumentsForProjection(
-          document.connections.projection.map((doc) => doc._id?.toString())
-        );
-        setDocumentsForUpdate(
-          document.connections.update.map((doc) => doc._id?.toString())
-        );
-        setPageRanges([]);
+    const navigate = useNavigate();
+    const { id } = useParams<string>();
+    const [fileTitle, setFileTitle] = useState<string | undefined>(undefined);
+    const [showPdfPreview, setShowPdfPreview] = useState(false);
+    const [doc, setDoc] = useState<KxDocument | null>(null);
+    const [share, setShare] = useState(false);
+    const [drawings, setDrawings] = useState<any>();
+    const [title, setTitle] = useState("");
+    const [stakeholders, setStakeholders] = useState<string[]>([]);
+    const [scale, setScale] = useState(10000);
+    const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(undefined);
+    const [type, setType] = useState<string | undefined>(undefined);
+    const [language, setLanguage] = useState<string | undefined>(undefined);
+    const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
+    const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(undefined);
+    const [description, setDescription] = useState<string | undefined>(undefined);
+    const [entireMunicipality, setEntireMunicipality] = useState(false);
+    const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
+    const [documents, setDocuments] = useState<KxDocument[]>([]);
+    const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
+    const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
+    const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
+    const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
+    const [saveDrawing, setSaveDrawing] = useState(false);
+    const [files, setFiles] = useState<File[]>([]);
+
+
+    useEffect(() => {
+        const fetchDocument = async () => {
+            try {
+                const document = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
+                setDoc(document);
+                setTitle(document.title);
+                setStakeholders(document.stakeholders);
+                setScale(document.scale);
+                setIssuanceDate({ from: document.issuance_date.from, to: document.issuance_date.to });
+                setType(document.type);
+                setLanguage(document.language || undefined);
+                setPages(document.pages || undefined);
+                setDescription(document.description || undefined);
+                setDocumentsForDirect(document.connections.direct.map((doc) => doc._id?.toString()));
+                setDocumentsForCollateral(document.connections.collateral.map((doc) => doc._id?.toString()));
+                setDocumentsForProjection(document.connections.projection.map((doc) => doc._id?.toString()));
+                setDocumentsForUpdate(document.connections.update.map((doc) => doc._id?.toString()));
+                setPageRanges([]);
+
 
         if (document.doc_coordinates.type !== "EntireMunicipality") {
           function getIconForType(type: string): string {
@@ -229,11 +226,10 @@ export default function Document({ user }: DocumentProps) {
     }
   }, [saveDrawing]);
 
-  const [showCheck, setShowCheck] = useState(false);
-  const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] =
-    useState(false);
-  const [selectedResource, setSelectedResource] = useState<string>("");
-  const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
+    const [showCheck, setShowCheck] = useState(false);
+    const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
+    const [selectedResource, setSelectedResource] = useState<string>("");
+    const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
 
   return (
     <div>
@@ -276,15 +272,11 @@ export default function Document({ user }: DocumentProps) {
               </i>
             </div>
 
-            <div className="flex items-center justify-between mb-2 space-x-2">
-              <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                Issuance Date:
-              </i>
-              <i className="text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                {" "}
-                {issuanceDate?.toString().split("T")[0]}
-              </i>
-            </div>
+                        <div className="flex items-center justify-between mb-2 space-x-2">
+                            <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Issuance Date:</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {issuanceDate?.from ? formatLocalDate(new Date(issuanceDate.from)) : ""}{issuanceDate?.to ? ` - ${formatLocalDate(new Date(issuanceDate.to))}` : ""}
+                            </i>
+                        </div>
 
             <div className="flex items-center justify-between mb-2 space-x-2">
               <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">
@@ -316,32 +308,34 @@ export default function Document({ user }: DocumentProps) {
               </i>
             </div>
 
-            <FormInfoDialog
-              document={doc!}
-              title={title}
-              setTitle={setTitle}
-              titleError={false}
-              setTitleError={() => {}}
-              stakeholders={stakeholders}
-              setStakeholders={setStakeholders}
-              shError={false}
-              setShError={() => {}}
-              issuanceDate={issuanceDate}
-              setIssuanceDate={setIssuanceDate}
-              type={type}
-              setType={setType}
-              scale={scale}
-              setScale={setScale}
-              language={language}
-              setLanguage={setLanguage}
-              pages={pages}
-              setPages={setPages}
-              pageRanges={pageRanges}
-              setPageRanges={setPageRanges}
-              id={id!}
-              user={user}
-            />
-          </div>
+                        <FormInfoDialog
+                            document={doc!}
+                            title={title}
+                            setTitle={setTitle}
+                            titleError={false}
+                            setTitleError={() => { }}
+                            stakeholders={stakeholders}
+                            setStakeholders={setStakeholders}
+                            shError={false}
+                            setShError={() => { }}
+                            issuanceDate={issuanceDate}
+                            setIssuanceDate={setIssuanceDate}
+                            type={type}
+                            setType={setType}
+                            scale={scale}
+                            setScale={setScale}
+                            language={language}
+                            setLanguage={setLanguage}
+                            pages={pages}
+                            setPages={setPages}
+                            pageRanges={pageRanges}
+                            setPageRanges={setPageRanges}
+                            id={id!}
+                            user={user}
+                        />
+
+
+                    </div>
 
           <div className="hidden lg:flex flex-col items-start col space-y-2 w-1/2">
             <i className="text-md font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">
@@ -352,37 +346,33 @@ export default function Document({ user }: DocumentProps) {
               {description}{" "}
             </i>
 
-            <div className="hidden lg:flex flex-end space-y-2 h-full w-full justify-around">
-              <FormDescriptionDialog
-                document={doc!}
-                description={description}
-                setDescription={setDescription}
-                id={id!}
-                user={user}
-              />
-            </div>
-          </div>
-          <div className="flex justify-end w-full absolute right-3">
-            <i onClick={() => setShare(true)}>
-              <RiShareLine className="self-end text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" />
-            </i>
-            <Dialog open={share} onClose={() => setShare(false)} static={true}>
-              <DialogPanel>
-                <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                  Share "{title}"
-                </h3>
-                <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-                  Share the link of the document.
-                </p>
-                <div className="flex flex-row justify-between">
-                  <div className="mt-4 w-full  me-2">
-                    <input
-                      type="text"
-                      className="w-full p-2 border border-tremor-border rounded-md"
-                      value={window.location.href}
-                      readOnly
-                    />
-                  </div>
+                        <div className='hidden lg:flex space-y-2 h-full w-full'>
+                            <FormDescriptionDialog
+                                document={doc!}
+                                description={description}
+                                setDescription={setDescription}
+                                id={id!}
+                                user={user}
+                            />
+                        </div>
+                    </div>
+                    <div className="flex justify-end w-full absolute right-3">
+                        <i onClick={() => setShare(true)}><RiShareLine className="self-end text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+                        <Dialog open={share} onClose={() => setShare(false)} static={true}>
+                            <DialogPanel>
+                                <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Share "{title}"</h3>
+                                <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                                    Share the link of the document.
+                                </p>
+                                <div className="flex flex-row justify-between">
+                                    <div className="mt-4 w-full  me-2">
+                                        <input
+                                            type="text"
+                                            className="w-full p-2 border border-tremor-border rounded-md"
+                                            value={window.location.href}
+                                            readOnly
+                                        />
+                                    </div>
 
                   <Button
                     className="mt-4 w-1/6 flex flex-col items-center justify-between"
@@ -410,159 +400,133 @@ export default function Document({ user }: DocumentProps) {
           </div>
         </div>
 
-        <div className="flex flex-col lg:flex-row ">
-          <div className="flex w-full h-full items-center justify-between mb-2">
-            <Accordion className="w-full mr-6 mb-6">
-              <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                Original Resources
-              </AccordionHeader>
-              <AccordionBody className="leading-6 flex flex-col">
-                <AccordionList style={{ boxShadow: "none" }}>
-                  {doc !== undefined &&
-                  doc?.attachments &&
-                  doc?.attachments.length >= 1 ? (
-                    doc?.attachments?.map((title) => (
-                      <div
-                        key={title + doc._id}
-                        className="flex items-center justify-between m-2"
-                      >
-                        <i className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                          {mime.getType(title)?.split("/")[1] === "pdf"
-                            ? "PDF file"
-                            : mime.getType(title)?.split("/")[0] === "image"
-                            ? "Image file"
-                            : "File  ".concat("(." + title.split(".")[1] + ")")}
-                        </i>
-                        <div className="flex space-x-2">
-                          <Button
-                            className="ml-2"
-                            onClick={() => {
-                              setFileTitle(title);
-                              setShowPdfPreview(true);
-                            }}
-                          >
-                            Preview File
-                          </Button>
-                          <Button
-                            className="ml-2"
-                            color="red"
-                            onClick={async () => {
-                              setDeleteOriginalResourceConfirm(true);
-                              setSelectedResource(title);
-                            }}
-                          >
-                            <RiDeleteBinLine />
-                          </Button>
+                <div className="flex flex-col lg:flex-row ">
+
+                    <div className="flex w-full h-full items-center justify-between mb-2">
+                        <Accordion className="w-full mr-6 mb-6">
+                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Original Resources</AccordionHeader>
+                            <AccordionBody className="leading-6 flex flex-col">
+                                <AccordionList style={{ boxShadow: 'none' }}>
+                                    {doc !== undefined && doc?.attachments && doc?.attachments.length >= 1 ? doc?.attachments?.map((title) => (
+                                        <div key={title + doc._id} className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{mime.getType(title)?.split("/")[1] === "pdf" ? "PDF file" : mime.getType(title)?.split("/")[0] === "image" ? "Image file" : "File  ".concat("(." + title.split(".")[1] + ")")}</i>
+                                            <div className="flex space-x-2">
+                                                <Button
+                                                    className="ml-2"
+                                                    onClick={() => {
+                                                        setFileTitle(title)
+                                                        setShowPdfPreview(true)
+                                                    }}
+                                                >
+                                                    Preview File
+                                                </Button>
+                                                <Button
+                                                    className="ml-2"
+                                                    color="red"
+                                                    onClick={async () => {
+                                                        setDeleteOriginalResourceConfirm(true);
+                                                        setFileTitle(title);
+                                                    }}
+                                                ><RiDeleteBinLine /></Button>
+                                            </div>
+                                        </div>
+                                    )) : <>
+                                        <div className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No original resources added</i>
+                                        </div>
+                                    </>}
+
+                                </AccordionList>
+                            </AccordionBody>
+                        </Accordion>
+                        {canEdit && <i className="h-full lg:mr-9 mb-5" onClick={() => setIsDragAndDropOpen(true)}><RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
+
+                    </div>
+
+                    <div className="hide lg:flex w-full h-full items-center justify-between mb-2 ">
+
+                        <Accordion className="w-full mr-6 mb-6">
+                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">More documents [Cooming soon] </AccordionHeader>
+                            <AccordionBody className="leading-6 flex flex-col">
+                                <AccordionList style={{ boxShadow: 'none' }}>
+                                    <div className="flex items-center justify-between m-2">
+                                        <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No more documents added</i>
+                                    </div>
+
+                                </AccordionList>
+                            </AccordionBody>
+                        </Accordion>
+
+                        <div className="hidden lg:flex">
+                            <Button disabled className="h-full lg:ml-3 mb-5">
+                                <RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" />
+                            </Button>
                         </div>
-                      </div>
-                    ))
-                  ) : (
-                    <>
-                      <div className="flex items-center justify-between m-2">
-                        <i className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                          No original resources added
-                        </i>
-                      </div>
-                    </>
-                  )}
-                </AccordionList>
-              </AccordionBody>
-            </Accordion>
-            {canEdit && (
-              <i
-                className="h-full lg:mr-9 mb-5"
-                onClick={() => setIsDragAndDropOpen(true)}
-              >
-                <RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" />
-              </i>
-            )}
-          </div>
 
-          <div className="flex w-full h-full items-center justify-between mb-2">
-            <Accordion className="w-full mr-6 mb-6">
-              <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                More documents [Cooming soon]{" "}
-              </AccordionHeader>
-              <AccordionBody className="leading-6 flex flex-col">
-                <AccordionList style={{ boxShadow: "none" }}>
-                  <div className="flex items-center justify-between m-2">
-                    <i className="font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                      No more documents added
-                    </i>
-                  </div>
-                </AccordionList>
-              </AccordionBody>
-            </Accordion>
-            {canEdit && (
-              <i
-                className="h-full lg:ml-3 lg:mr-5 mb-5"
-                onClick={() => setIsDragAndDropOpen(true)}
-              >
-                <RiAddBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" />
-              </i>
-            )}
-          </div>
 
-          {DeleteResourceDialog(
-            deleteOriginalResourceConfirm,
-            setDeleteOriginalResourceConfirm,
-            async () => {
-              //this is a draft, we have to implement it in the kx-87, understand the logic and implement it, also the file name
-              try {
-                //await API.deleteKxDocumentAttachment(id!, fileTitle!);
-                const updatedDocument = await API.getKxDocumentById(
-                  new mongoose.Types.ObjectId(id!)
-                );
-                setDoc(updatedDocument);
-                toast({
-                  title: "Success",
-                  description: "The document has been deleted successfully",
-                  variant: "success",
-                  duration: 3000,
-                });
-              } catch (error) {
-                toast({
-                  title: "Error",
-                  description: "Failed to delete documents",
-                  variant: "error",
-                  duration: 3000,
-                });
-              }
-            },
-            selectedResource!
-          )}
+                    </div>
 
-          <Dialog
-            open={isDragAndDropOpen}
-            onClose={() => setIsDragAndDropOpen(false)}
-            static={true}
-          >
-            <DialogPanel>
-              <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-                Add Original Resources
-              </h3>
-              <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
-                Add original resources about the document you are uploading.
-              </p>
-              <FileUpload saveFile={(list) => setFiles(list)} />
-              <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
-                <Button
-                  className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
-                  variant="light"
-                  onClick={() => setIsDragAndDropOpen(false)}
-                >
-                  Cancel
-                </Button>
-                <Button
-                  className="w-full sm:w-auto primary"
-                  //onClick={e => handleSubmit(e)}    handleSumbitDragAndDrop to do in kx-87
-                >
-                  Submit
-                </Button>
-              </div>
-            </DialogPanel>
-          </Dialog>
-        </div>
+                    {DeleteResourceDialog(
+                        deleteOriginalResourceConfirm,
+                        setDeleteOriginalResourceConfirm,
+                        async () => {
+                            try {
+                                await API.deleteAttachmentFromDocument(new mongoose.Types.ObjectId(id!), fileTitle!);
+
+                            } catch (error) {
+                                toast({
+                                    title: "Error",
+                                    description: "Failed to delete documents",
+                                    variant: "error",
+                                    duration: 3000,
+                                });
+                                return;
+                            }
+
+                            toast({
+                                title: "Success",
+                                description: "The document has been deleted successfully",
+                                variant: "success",
+                                duration: 3000,
+                            });
+
+
+                            doc!.attachments = doc?.attachments?.filter((f) => f !== fileTitle);
+                            setDoc({ ...doc! });
+                        }
+                        , fileTitle!
+
+                    )}
+
+                    <Dialog open={isDragAndDropOpen} onClose={() => setIsDragAndDropOpen(false)} static={true}>
+                        <DialogPanel>
+                            <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Add Original Resources</h3>
+                            <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
+                                Add original resources about the document you are uploading.
+                            </p>
+                            <FileUpload
+                                saveFile={(list) => setFiles(list)}
+                            />
+                            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+                                <Button
+                                    className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                                    variant="light"
+                                    onClick={() => setIsDragAndDropOpen(false)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="w-full sm:w-auto primary"
+                                    onClick={e => handleSubmitDragAndDrop(e)}
+                                >
+                                    Submit
+                                </Button>
+                            </div>
+                        </DialogPanel>
+                    </Dialog>
+
+
+                </div>
 
         <Accordion className="lg:hidden">
           <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">
@@ -580,46 +544,41 @@ export default function Document({ user }: DocumentProps) {
           </AccordionBody>
         </Accordion>
 
-        {!entireMunicipality ? (
-          <Card
-            className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
-          >
-            <DocumentPageMap
-              setDrawing={(d) => {
-                setDrawings(d);
-                setSaveDrawing(true);
-              }}
-              drawing={drawings}
-              style={{ minHeight: "300px", width: "100%" }}
-              user={user}
-            />
-          </Card>
-        ) : (
-          <div className="flex justify-center items-start pt-10">
-            <div className=" document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3">
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-                }}
-              >
-                <span>The document covers the entire municipality</span>
-              </div>
-            </div>
-          </div>
-        )}
-        {PreviewDoc(
-          showPdfPreview,
-          () => setShowPdfPreview(false),
-          doc?._id,
-          fileTitle
-        )}
-        <Toaster />
-      </Card>
-    </div>
-  );
+
+                {
+                    !entireMunicipality ? (
+                        <Card
+                            className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
+                        >
+                            <DocumentPageMap
+                                setDrawing={(d) => { setDrawings(d); setSaveDrawing(true) }}
+                                drawing={drawings}
+                                style={{ minHeight: "300px", width: "100%" }}
+                                user={user}
+                            />
+                        </Card>
+                    ) : (
+                        <div className="flex justify-center items-start pt-10">
+                            <div className=' document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
+                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                    <span>
+                                        The document covers the entire municipality
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                }
+                {
+                    PreviewDoc(showPdfPreview, () => setShowPdfPreview(false), doc?._id, fileTitle)
+
+                }
+                <Toaster />
+
+            </Card >
+
+        </div >
+    );
 }
 
 export function FormInfoDialog({
@@ -647,29 +606,29 @@ export function FormInfoDialog({
   id,
   user,
 }: {
-  document: KxDocument;
-  title: string;
-  setTitle: React.Dispatch<React.SetStateAction<string>>;
-  titleError: boolean;
-  setTitleError: React.Dispatch<React.SetStateAction<boolean>>;
-  stakeholders: string[];
-  setStakeholders: React.Dispatch<React.SetStateAction<string[]>>;
-  shError: boolean;
-  setShError: React.Dispatch<React.SetStateAction<boolean>>;
-  issuanceDate: Date | undefined;
-  setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
-  type: string | undefined;
-  setType: React.Dispatch<React.SetStateAction<string | undefined>>;
-  scale: number;
-  setScale: React.Dispatch<React.SetStateAction<number | undefined>>;
-  language: string | undefined;
-  setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
-  pages: PageRange[] | undefined;
-  setPages: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
-  pageRanges: PageRange[] | undefined;
-  setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
-  id: string;
-  user: { email: string; role: string } | null;
+    document: KxDocument;
+    title: string;
+    setTitle: React.Dispatch<React.SetStateAction<string>>;
+    titleError: boolean;
+    setTitleError: React.Dispatch<React.SetStateAction<boolean>>;
+    stakeholders: string[];
+    setStakeholders: React.Dispatch<React.SetStateAction<string[]>>;
+    shError: boolean;
+    setShError: React.Dispatch<React.SetStateAction<boolean>>;
+    issuanceDate: DateRange | undefined;
+    setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+    type: string | undefined;
+    setType: React.Dispatch<React.SetStateAction<string | undefined>>;
+    scale: number;
+    setScale: React.Dispatch<React.SetStateAction<number>>;
+    language: string | undefined;
+    setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
+    pages: PageRange[] | undefined;
+    setPages: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
+    pageRanges: PageRange[] | undefined;
+    setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
+    id: string;
+    user: { email: string; role: Stakeholders } | null;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const [error, setError] = useState("");
@@ -724,16 +683,17 @@ export function FormInfoDialog({
     setIsOpen(false);
   };
 
-  const handleCancelSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setTitle(document.title);
-    setStakeholders(document.stakeholders);
-    setScale(document.scale);
-    setType(document.type);
-    setLanguage(document.language || undefined);
-    setPages(document.pages || undefined);
-    setIsOpen(false);
-  };
+    const handleCancelSubmit = async (e: React.FormEvent) => {
+
+        e.preventDefault();
+        setTitle(document.title);
+        setStakeholders(document.stakeholders);
+        setScale(document.scale);
+        setType(document.type);
+        setLanguage(document.language || undefined);
+        setPages(document.pages || undefined);
+        setIsOpen(false);
+    }
 
   return (
     <>
@@ -868,49 +828,46 @@ export function FormDescriptionDialog({
         </i>
       )}
 
-      <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
-        <DialogPanel
-          className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
-          style={{ maxWidth: "80vw" }}
-        >
-          <div className="sm:mx-auto sm:max-w-2xl">
-            <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
-              Update description
-            </h3>
-            <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
-              Update the description of the document
-            </p>
-            <form action="" method="patch" className="mt-8">
-              <FormDocumentDescription
-                description={description}
-                setDescription={setDescription}
-                descriptionError={false}
-                setDescriptionError={function (
-                  value: React.SetStateAction<boolean>
-                ): void {
-                  throw new Error("Function not implemented.");
-                }}
-              />
-              <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
-                <Button
-                  className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
-                  variant="light"
-                  onClick={(e) => handleDescriptionCancel(e)}
+            {canEdit && <i className="mb-2 w-full flex justify-end" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
+
+            <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
+                <DialogPanel
+                    className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
+                    style={{ maxWidth: "80vw" }}
                 >
-                  Cancel
-                </Button>
-                <Button
-                  className="w-full sm:w-auto primary"
-                  onClick={(e) => handleDescriptionSubmit(e)}
-                >
-                  Submit
-                </Button>
-              </div>
-            </form>
-          </div>
-        </DialogPanel>
-      </Dialog>
-      <Toaster />
-    </>
-  );
+                    <div className="sm:mx-auto sm:max-w-2xl">
+                        <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                            Update description
+                        </h3>
+                        <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                            Update the description of the document
+                        </p>
+                        <form action="" method="patch" className="mt-8">
+                            <FormDocumentDescription
+                                description={description}
+                                setDescription={setDescription} descriptionError={false} setDescriptionError={function (value: React.SetStateAction<boolean>): void {
+                                    throw new Error('Function not implemented.');
+                                }} />
+                            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+                                <Button
+                                    className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                                    variant="light"
+                                    onClick={(e) => handleDescriptionCancel(e)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="w-full sm:w-auto primary"
+                                    onClick={e => handleDescriptionSubmit(e)}
+                                >
+                                    Submit
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </DialogPanel>
+            </Dialog>
+            <Toaster />
+        </>
+    );
 }

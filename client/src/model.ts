@@ -87,6 +87,7 @@ export class KxDocument {
     scale!: number | undefined;
 
     @prop({required: true, type: DateRange})
+
     issuance_date!: DateRange;
 
     @prop({required: true, type: String})
