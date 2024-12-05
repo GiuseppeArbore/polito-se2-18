@@ -10,7 +10,7 @@
 
 For this sprint, the team selected 2 stories to complete, with a total of 13 story points planned and committed to by the end.
 In addition to the stories, we've worked on technical dept.
-The initial estimation made during the planning meeting was 80 hours 45 minutes, while the actual time spent was **add** hours and **add** minutes, completing the sprint slightly above the planned estimate.
+The initial estimation made during the planning meeting was 80 hours 45 minutes, while the actual time spent was 76 hours and 38 minutes, completing the sprint slightly above the planned estimate.
 
 **Sum-up**
 
@@ -18,7 +18,7 @@ The initial estimation made during the planning meeting was 80 hours 45 minutes,
 | ---------------- | ----------------------- | ----------------------- |
 | **Stories**      | 2 (plus technical debt) | 2 (plus technical debt) |
 | **Story Points** | 13                      | 13                      |
-| **Hours**        | 80 hours 45 min         | **add**                 |
+| **Hours**        | 80 hours 45 min         | 76 hours 38 min                 |
 
 ### Quality Assurance Highlights
 
@@ -37,7 +37,7 @@ The initial estimation made during the planning meeting was 80 hours 45 minutes,
 
 | Story                                      | # Tasks | Points | Hours est. | Hours actual |
 | ------------------------------------------ | ------- | ------ | ---------- | ------------ |
-| _#0_                                       | 23      | -      | 70h 15m    | **add**      |
+| _#0_                                       | 23      | -      | 70h 15m    | 65h 18min      |
 | KX-8 Search documents                      | 3       | 5      | 8h 00m     | 8h 15m       |
 | KX-9 Define the geolocated area on the map | 1       | 8      | 2h 30m     | 3h 05m       |
 
