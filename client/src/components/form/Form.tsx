@@ -663,13 +663,13 @@ export function FormDocumentInformation({
           id="doc_type"
           name="doc_type"
           className="mt-2"
-          value={types.find((key) => key === type)}
+          value={type}
           onValueChange={(t) => {
             if (t.includes("Add New")) {
               OpenNewTypeModal();
               return;
             }
-            setType(type);
+            setType(t);
             setIsNewTypeModalOpen(false);
           }}
           error={typeError}
@@ -772,7 +772,7 @@ export function FormDocumentInformation({
                 Add new scale
               </h3>
               <TextInput
-                type="text"
+                type="number"
                 id="new_scale"
                 name="new_scale"
                 value={String(newScale)}
