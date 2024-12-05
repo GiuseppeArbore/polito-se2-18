@@ -84,7 +84,7 @@ export class KxDocument {
     stakeholders!: string[];
 
     @prop({required: true, type: Number})
-    scale!: number | undefined;
+    scale!: number;
 
     @prop({required: true, type: DateRange})
 
