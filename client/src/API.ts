@@ -3,6 +3,7 @@ import { KxDocument, PageRange } from './model';
 
 const API_URL = 'http://localhost:3001/api';
 
+
  const createKxDocument = async (document: KxDocument): Promise<KxDocument | null> => {
     try {
         const response = await fetch(API_URL + "/documents", {
@@ -10,6 +11,7 @@ const API_URL = 'http://localhost:3001/api';
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify(document),
         });
     
@@ -76,7 +78,9 @@ const updateKxDocumentInformation = async (
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                credentials: 'include'
             },
+            credentials: 'include',
             body: JSON.stringify(body),
         });
 
@@ -102,6 +106,7 @@ const updateKxDocumentDescription = async (documentId: string, description: stri
             headers: {
                 'Content-Type': 'application/json',
             },
+            credentials: 'include',
             body: JSON.stringify({ description }),
                   });
 
@@ -165,6 +170,7 @@ const deleteKxDocument = async (id: mongoose.Types.ObjectId): Promise<void> => {
     try {
         const response = await fetch(`${API_URL}/documents/${id}`, {
             method: 'DELETE',
+            credentials: 'include'
         });
 
         if (!response.ok) {
@@ -189,6 +195,7 @@ const addAttachmentToDocument = async (id: mongoose.Types.ObjectId, files: File[
         const response = await fetch(`${API_URL}/documents/${id}/attachments`, {
             method: 'POST',
             body: formData,
+            credentials: 'include'
         });
         
         if (!response.ok) {
@@ -204,5 +211,74 @@ const addAttachmentToDocument = async (id: mongoose.Types.ObjectId, files: File[
     }
 };
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument };
+const deleteAttachmentFromDocument = async (id: mongoose.Types.ObjectId, fileName: string): Promise<void> => {
+    try {
+        const response = await fetch(`${API_URL}/documents/${id}/attachments/${fileName}`, {
+            method: 'DELETE',
+            credentials: 'include'
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to delete attachment: ${error.message}`);
+        } else {
+            throw new Error('Failed to delete attachment: Unknown error');
+        }
+    }
+}
+
+
+interface Credentials {
+    username: string;
+    password: string;
+}
+
+const login = async (credentials: Credentials) => {
+    const response = await fetch(API_URL + '/sessions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      credentials: 'include',
+      body: JSON.stringify(credentials),
+    });
+    if (response.ok) {
+      const user = await response.json();
+      return user;
+    } else {
+      const errDetails = await response.json();
+      throw errDetails;
+    }
+  };
+  
+  const getUserInfo = async () => {
+    const response = await fetch(API_URL + '/sessions/current', {
+      method: 'GET',
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      const errMessage = await response.json();
+      throw errMessage;
+    } else {
+      return response.json();
+    }
+  };
+  
+  const logout = async () => {
+    const response = await fetch(API_URL + '/sessions/current', {
+      method: 'DELETE',
+      credentials: 'include'
+    });
+    if (!response.ok) {
+      const errMessage = await response.json();
+      throw errMessage;
+    } else {
+      return null;
+    }
+  };
+
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument, deleteAttachmentFromDocument, login, getUserInfo, logout };
 export default API;

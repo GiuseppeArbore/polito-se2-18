@@ -1,9 +1,9 @@
 import "ag-grid-enterprise";
-import { ColDef, GridOptions } from "ag-grid-enterprise";
+import { AdvancedFilterModel, ColDef, GridApi, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { KxDocument } from "../../model";
 import { Badge, Button, Flex, Card, Text } from "@tremor/react";
 import { useNavigate } from "react-router-dom";
@@ -13,16 +13,26 @@ import locales from "../../locales.json";
 import API from "../../API";
 import DeleteDialog from "./DeleteDialog";
 import { Stakeholders } from "../../enum";
+import { prop } from "@typegoose/typegoose";
+import { on } from "events";
 
 interface ListProps {
   documents: KxDocument[];
+  updateDocuments: (documents: KxDocument[]) => void;
+  updateFilterModel: (filterModel: AdvancedFilterModel | undefined) => void;
+  filterModel: AdvancedFilterModel | undefined;
+  quickFilter: string;
+  user: { email: string; role: Stakeholders } | null;
 }
+
 
 function List(props: ListProps) {
   const navigator = useNavigate();
+
   const gridRef = useRef<AgGridReact<KxDocument>>(null);
-  const onFirstDataRendered = useCallback(() => {
-    onGridReady();
+  const onFirstDataRendered = useCallback((params: any) => {
+    onGridReady(params);
+    params.api.sizeColumnsToFit();
   }, []);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const rowNode = useRef<any>();
@@ -34,16 +44,18 @@ function List(props: ListProps) {
           icon={RiInfoI}
           onClick={() => navigator("/documents/" + params.value)}
         />
-        <Button
-          style={{ backgroundColor: "red" }}
-          color="red"
-          size="xs"
-          icon={RiDeleteBinLine}
-          onClick={async () => {
-            setDeleteConfirm(true);
-            rowNode.current = params.data;
-          }}
-        />
+        {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
+          <Button
+            style={{ backgroundColor: "red" }}
+            color="red"
+            size="xs"
+            icon={RiDeleteBinLine}
+            onClick={async () => {
+              setDeleteConfirm(true);
+              rowNode.current = params.data;
+            }}
+          />
+        )}
       </Flex>
     );
   };
@@ -87,15 +99,35 @@ function List(props: ListProps) {
           ? "1:" + params.value.toLocaleString()
           : "";
       },
+      hide: true,
     },
     {
       headerName: "Issuance Date",
       field: "issuance_date",
-      valueFormatter: (params: { value: string | number }) => {
-        return params.value !== undefined
-          ? new Date(params.value).toLocaleDateString()
-          : "";
+      filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
+
+        if (params.data && params.data.issuance_date) {
+          const { from, to } = params.data.issuance_date;
+          if (from && to) {
+            return `${new Date(from).toLocaleDateString()} - ${new Date(to).toLocaleDateString()}`;
+          } else if (from) {
+            return new Date(from).toLocaleDateString();
+          }
+        }
+        return "";
       },
+      valueFormatter: (params: { value: { from: string | number, to?: string | number } }) => {
+        if (params.value) {
+          const { from, to } = params.value;
+          if (from && to) {
+            return `${new Date(from).toLocaleDateString()} - ${new Date(to).toLocaleDateString()}`;
+          } else if (from) {
+            return new Date(from).toLocaleDateString();
+          }
+        }
+        return "";
+      },
+      hide: true,
     },
     {
       headerName: "Area Type",
@@ -120,15 +152,20 @@ function List(props: ListProps) {
       field: "language",
       enableRowGroup: true,
       filter: true,
+      filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
+        return locales.find((l) => params.data && l.code === params.data.language)?.name;
+      },
       valueFormatter: (params: { value: string | number }) => {
         return locales.find((l) => l.code === params.value)?.name || "";
       },
+      hide: true,
     },
     {
       headerName: "Pages",
       field: "pages",
       enableRowGroup: false,
       filter: true,
+      hide: true,
     },
     {
       headerName: "Controls",
@@ -136,6 +173,7 @@ function List(props: ListProps) {
       minWidth: 30,
       enableRowGroup: false,
       cellRenderer: (params: any) => infoButton(params),
+      filter: false,
     },
   ];
 
@@ -148,12 +186,23 @@ function List(props: ListProps) {
     rowGroupPanelShow: "always",
     animateRows: true,
     pagination: false,
+    enableAdvancedFilter: true,
     defaultColDef: {
       filter: true,
       flex: 1,
       resizable: true,
       sortable: true,
       enableRowGroup: true,
+      filterParams: { newRowsAction: 'keep' }
+    },
+    statusBar: {
+      statusPanels: [
+        { statusPanel: 'agTotalAndFilteredRowCountComponent' },
+        { statusPanel: 'agTotalRowCountComponent' },
+        { statusPanel: 'agFilteredRowCountComponent' },
+        { statusPanel: 'agSelectedRowCountComponent' },
+        { statusPanel: 'agAggregationComponent' }
+      ]
     },
     sideBar: {
       toolPanels: [
@@ -179,28 +228,49 @@ function List(props: ListProps) {
     },
   };
 
-  function onGridReady() {
+  function onGridReady(params: any) {
     const allColumnIds: string[] = [];
     gridRef.current!.api!.getAllGridColumns()!.forEach((column) => {
       allColumnIds.push(column.getId());
     });
     gridRef.current!.api!.autoSizeColumns(allColumnIds, false);
+    params.api.sizeColumnsToFit();
   }
 
   const rowData = useMemo(() => {
     return props.documents;
   }, [props.documents]);
 
-  const defaultColDef: ColDef = {};
+  function onFilterChanged() {
+    let rowData: (KxDocument | undefined)[] = [];
+    gridRef.current?.api?.forEachNodeAfterFilter((node) => {
+      rowData.push(node.data)
+    });
+    props.updateDocuments(rowData.filter((doc): doc is KxDocument => doc !== undefined));
+    props.updateFilterModel(gridRef.current?.api?.getAdvancedFilterModel() || undefined);
+    gridRef.current?.api?.sizeColumnsToFit();
+  }
+
+  function addFilterModel() {
+    if (props.filterModel) {
+      gridRef.current?.api?.setAdvancedFilterModel(props.filterModel);
+    } else {
+      props.updateFilterModel(undefined);
+    }
+  }
+
+  function sizeColumnsToFitGridStategy(params: any){
+    params.api.sizeColumnsToFit();
+  }
 
   return (
-    <Card className="p-4">
-      <Text className="mb-4 text-center">Document</Text>
+    <>
       <div
-        className={"ag-theme-quartz-auto-dark"}
-        style={{ width: "100%", height: "70vh", overflow: "auto" }}
+        className={"ag-theme-quartz-auto-dark right-0 left-0 ring-0"}
+        style={{ width: "100%", height: "100%", minHeight: "70vh", overflow: "auto" }}
       >
         <AgGridReact
+          onViewportChanged={addFilterModel}
           onGridColumnsChanged={onGridReady}
           rowData={rowData}
           onFirstDataRendered={onFirstDataRendered}
@@ -208,6 +278,14 @@ function List(props: ListProps) {
           onGridReady={onGridReady}
           ref={gridRef}
           animateRows={true}
+          onFilterChanged={onFilterChanged}
+	onGridSizeChanged={sizeColumnsToFitGridStategy}
+		      quickFilterText={props.quickFilter}
+          onRowDataUpdated={onFilterChanged}
+          onModelUpdated={onFilterChanged}
+          
+          
+         
         />
       </div>
 
@@ -237,7 +315,7 @@ function List(props: ListProps) {
         },
         rowNode.current?.title
       )}
-    </Card>
+    </>
   );
 }
 

@@ -3,7 +3,7 @@
 @tailwind utilities;
 
 body {
-    padding: 2% !important;
+    padding: 1% !important;
 }
 
 .no-click {
@@ -23,6 +23,16 @@ body {
     background-color: transparent;
 }
 
+.login {
+    background-color: white;
+    color: #003d8e;
+}
+
+.login:hover {
+    background-color: #003d8e;
+    color: white;
+}
+
 /* Styles for Landing page */
 
 .hero-section {
@@ -32,7 +42,6 @@ body {
 }
 
 .hero-section h1 {
-  font-size: 3rem;
   font-weight: bold;
   margin-bottom: 10px;
   opacity: 0;
@@ -45,7 +54,7 @@ body {
 }
 
 .features-section {
-  padding: 40px 20px;
+  padding: 20px 20px;
   width: 100%;
   background-color: #002e70;
 }
@@ -64,7 +73,6 @@ body {
 }
 
 .feature-card {
-  width: 200px;
   padding: 20px;
   border-radius: 8px;
   text-align: center;
@@ -81,9 +89,18 @@ body {
   font-size: 2rem;
   margin-bottom: 10px;
 }
+.phases-section {
+  padding: 5px 20px;
+  width: 100%;
+  background-color: #023883;
+}
+
+.phases-section h2 {
+  text-align: center;
+}
 
 .footer {
-  padding: 20px;
+  padding: 10px;
   font-size: 0.9rem;
   text-align: center;
 }
@@ -106,7 +123,6 @@ body {
 .custom-blink {
   animation: blink 1s infinite ease-in-out;
 }
-
   /* Styles for Landing page - End */
   
 

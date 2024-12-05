@@ -1,5 +1,5 @@
 
-import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription, handleFileUpload} from './controller';
+import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription, handleFileUpload, removeAttachmentFromDocument, getKxDocumentAggregateData} from './controller';
 import { validateRequest } from './errorHandlers';
 import e, { Application, NextFunction, Request, Response } from 'express';
 import { body, param } from 'express-validator';
@@ -9,31 +9,37 @@ import multer from 'multer';
 import * as mime from 'mime-types';
 import { randomBytes } from 'crypto';
 import { mkdir } from 'fs/promises';
+import { isUrbanPlanner } from './auth';
+import kirunaPolygon from './KirunaMunicipality.json';
+import { booleanPointInPolygon } from '@turf/boolean-point-in-polygon';
+import { Feature, Polygon, MultiPolygon} from "geojson";
 
 export function initRoutes(app: Application) {
 
     const kxDocumentValidationChain = [
         body('title').notEmpty().withMessage('Title is required'),
         body('stakeholders').notEmpty().withMessage('Stakeholders are required')
-            .isArray().withMessage('Stakeholders must be an array')
-            .custom((value) => value.every((v: string) => Object.values(Stakeholders).includes(v as Stakeholders)))
-            .withMessage('Invalid stakeholder value'),
+            .isArray().withMessage('Stakeholders must be an array'),
+        body('stakeholders.*').isString().withMessage('Stakeholders must be an array of strings'),
         body('scale').notEmpty().withMessage('Scale is required')
             .isNumeric().withMessage('Scale must be a number'),
         body('issuance_date').notEmpty().withMessage('Issuance date is required')
-            .isISO8601().toDate().withMessage('Issuance date must be a valid date'),
+            .isObject().withMessage("Issuance date not valid"),
+        body('issuance_date.from').notEmpty().isISO8601().toDate().withMessage('Issuance date must be a valid date'),
+        body('issuance_date.to').optional().isISO8601().toDate().withMessage('Issuance date must be a valid date'),
         body('type').notEmpty().withMessage('Type is required')
-            .isIn(Object.values(KxDocumentType)).withMessage('Invalid document type'),
+            .isString().withMessage("Type must be a string"),
         body('language').optional().notEmpty().withMessage('Language is required')
             .isString().withMessage('Language must be a string'),
         body('doc_coordinates').notEmpty().withMessage('Document coordinates are required').isObject()
             .custom((v) => {
+                const poly = kirunaPolygon.features[0] as Feature<Polygon | MultiPolygon>;
                 return isDocCoords(v) &&  
-                    (
-                        (v.type === AreaType.ENTIRE_MUNICIPALITY) ||
-                        (v.type === AreaType.POINT && coordDistance(v.coordinates as [number, number], KIRUNA_COORDS) < 100) ||
-                        (v.type === AreaType.AREA && v.coordinates.every(c => c.every(c => coordDistance(c as [number, number], KIRUNA_COORDS) < 100)))
-                    )
+                (
+                    (v.type === AreaType.ENTIRE_MUNICIPALITY) ||
+                    (v.type === AreaType.POINT && booleanPointInPolygon([v.coordinates[0], v.coordinates[1]], poly)) ||
+                    (v.type === AreaType.AREA && v.coordinates.every(c => c.every(c => booleanPointInPolygon([c[0], c[1]], poly))))
+                )
             }).withMessage('Invalid document coordinates'),
         body('description').notEmpty().withMessage('Description is required'),
         body('pages').optional().isArray().custom((v) => {
@@ -81,6 +87,7 @@ export function initRoutes(app: Application) {
 
     app.post(
         '/api/documents',
+        isUrbanPlanner,
         kxDocumentValidationChain,
         validateRequest,
         createKxDocument
@@ -88,6 +95,7 @@ export function initRoutes(app: Application) {
 
     app.post(
         '/api/documents/:id/attachments',
+        isUrbanPlanner,
         [
             param("id").notEmpty().withMessage("Missing id").isString().isHexadecimal().withMessage("Invalid id")
         ],
@@ -96,7 +104,26 @@ export function initRoutes(app: Application) {
         handleFileUpload
     );
 
+    app.delete(
+        '/api/documents/:id/attachments/:fileName',
+        isUrbanPlanner,
+        [
+            param("id").notEmpty().withMessage("Missing id").isString().isHexadecimal().withMessage("Invalid id"),
+            param("fileName").notEmpty().withMessage("Missing file name").isString().withMessage("Invalid file name")
+        ],
+        validateRequest,
+        removeAttachmentFromDocument
+    );
+
     app.get('/api/documents', getAllKxDocuments);
+
+    app.get(
+        '/api/documents/aggregateData',
+        // This is a potentially onerous operation, so we only allow it for authenticated
+        // users (non authenticated users do not need to call this anyway)
+        isUrbanPlanner,
+        getKxDocumentAggregateData
+    );
 
     app.get('/api/documents/:id',
         [
@@ -130,9 +157,13 @@ export function initRoutes(app: Application) {
         getPresignedUrlForAttachment
     );
 
-    app.delete('/api/documents/:id', deleteKxDocument);
+    app.delete('/api/documents/:id',
+        isUrbanPlanner,
+        deleteKxDocument
+    );
 
     app.put('/api/documents/:id/description',
+        isUrbanPlanner,
         [
             param("id").notEmpty().withMessage("id is required"),
             body("description").notEmpty().withMessage("description is required"),
@@ -142,6 +173,7 @@ export function initRoutes(app: Application) {
     );
 
     app.put('/api/documents/:id/info',
+        isUrbanPlanner,
         [
             param("id").notEmpty().withMessage("id is required"),
             body("title").optional(),
@@ -155,8 +187,6 @@ export function initRoutes(app: Application) {
         validateRequest,
         updateKxDocumentInfo
     )
-
-
 }
 
 export default initRoutes;

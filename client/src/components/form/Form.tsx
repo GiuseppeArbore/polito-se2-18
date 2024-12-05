@@ -1,3 +1,4 @@
+import React from "react";
 import {
   Card,
   Button,
@@ -15,6 +16,7 @@ import {
   Callout,
   Switch,
 } from "@tremor/react";
+import { DateRangePicker } from "./DatePicker"
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
@@ -40,10 +42,15 @@ import "../../index.css";
 import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
+import { DateRange } from "./DatePicker";
+import { se } from "date-fns/locale";
+
+
 
 interface FormDialogProps {
   documents: KxDocument[];
   refresh: () => void;
+  user: { email: string; role: Stakeholders } | null;
 }
 
 
@@ -51,13 +58,15 @@ interface FormDialogProps {
 export function FormDialog(props: FormDialogProps) {
   const [title, setTitle] = useState("");
   const [titleError, setTitleError] = useState(false);
-  const [stakeholders, setStakeholders] = useState<Stakeholders[]>([]);
+  const [stakeholders, setStakeholders] = useState<string[]>([]);
   const [shError, setShError] = useState(false);
-  const [issuanceDate, setIssuanceDate] = useState<Date | undefined>(
-    new Date()
+  const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(
+   {from: new Date()}
   );
   const [files, setFiles] = useState<File[]>([]);
-  const [type, setType] = useState<KxDocumentType | undefined>(undefined);
+  const [issuanceDateError, setIssuanceDateError] = useState(false);
+  const [type, setType] = useState<string | undefined>(undefined);
+
   const [typeError, setTypeError] = useState(false);
   const [scale, setScale] = useState(10000);
   const [language, setLanguage] = useState<string | undefined>(undefined);
@@ -118,11 +127,12 @@ export function FormDialog(props: FormDialogProps) {
       };
     }
 
-    if (tmpTitleError || tmpShError || !type || !description || !draw || (drawing === undefined && !hideMap)) {
+    if (tmpTitleError || tmpShError || !type || !description || !draw || !issuanceDate || (drawing === undefined && !hideMap)) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
+      setIssuanceDateError(!issuanceDate); 
       hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
       setError("Please fill all the required fields");
       toast({
@@ -140,7 +150,10 @@ export function FormDialog(props: FormDialogProps) {
       //scale_info: Scale.TEXT,
       scale,
       doc_coordinates: draw,
-      issuance_date: issuanceDate!,
+      issuance_date: {
+        from: issuanceDate?.from!,
+        to: issuanceDate?.to!
+      },
       type: type,
       language,
       description,
@@ -166,7 +179,7 @@ export function FormDialog(props: FormDialogProps) {
 
         setTitle("");
         setScale(0);
-        setIssuanceDate(new Date());
+        setIssuanceDate({ from: new Date() });
         setType(undefined);
         setLanguage(undefined);
         setDescription(undefined);
@@ -220,7 +233,8 @@ export function FormDialog(props: FormDialogProps) {
     setTitleError(false);
     setStakeholders([]);
     setShError(false);
-    setIssuanceDate(new Date());
+    setIssuanceDate({ from: new Date() });
+    setIssuanceDateError(false);
     setType(undefined);
     setTypeError(false);
     setScale(10000);
@@ -273,10 +287,12 @@ export function FormDialog(props: FormDialogProps) {
           setPageRanges={setPageRanges}
         />
 
-        <FormDocumentDatePicker
-          issuanceDate={issuanceDate}
-          setIssuanceDate={setIssuanceDate}
-        />
+ 
+        <DateRangePickerPresets 
+         issuanceDate={issuanceDate}
+         setIssuanceDate={setIssuanceDate} 
+         hasError={issuanceDateError}
+         />
 
 
 
@@ -293,6 +309,7 @@ export function FormDialog(props: FormDialogProps) {
           setDrawing={setDrawing}
           hideMap={hideMap}
           setHideMap={setHideMap}
+          user = {props.user}
         />
 
         <Divider />
@@ -348,9 +365,11 @@ export function FormDialog(props: FormDialogProps) {
 
   return (
     <>
-      <Button className="w-full primary" onClick={() => { setIsOpen(true); clearForm() }}>
-        Add new document
-      </Button>
+      {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
+        <Button className="w-full primary" onClick={() => { setIsOpen(true); clearForm() }}>
+          Add new document
+        </Button>
+      )}
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
         <DialogPanel
           className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
@@ -401,14 +420,14 @@ export function FormDocumentInformation({
   setTitle: React.Dispatch<React.SetStateAction<string>>;
   titleError: boolean;
   setTitleError: React.Dispatch<React.SetStateAction<boolean>>;
-  stakeholders: Stakeholders[];
-  setStakeholders: React.Dispatch<React.SetStateAction<Stakeholders[]>>;
+  stakeholders: string[];
+  setStakeholders: React.Dispatch<React.SetStateAction<string[]>>;
   shError: boolean;
   setShError: React.Dispatch<React.SetStateAction<boolean>>;
-  issuanceDate: Date | undefined;
-  setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>;
-  type: KxDocumentType | undefined;
-  setType: React.Dispatch<React.SetStateAction<KxDocumentType | undefined>>;
+  issuanceDate: DateRange | undefined;
+  setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  type: string | undefined;
+  setType: React.Dispatch<React.SetStateAction<string | undefined>>;
   typeError: boolean;
   setTypeError: React.Dispatch<React.SetStateAction<boolean>>;
   scale: number;
@@ -602,7 +621,9 @@ export function FormDocumentGeolocalization({
   drawing,
   setDrawing,
   hideMap,
-  setHideMap
+  setHideMap,
+  user
+
 }: {
   isMapOpen: boolean,
   setIsMapOpen: React.Dispatch<React.SetStateAction<boolean>>,
@@ -614,6 +635,7 @@ export function FormDocumentGeolocalization({
   setDrawing: React.Dispatch<React.SetStateAction<any>>,
   hideMap: boolean,
   setHideMap: React.Dispatch<React.SetStateAction<boolean>>
+  user: { email: string; role: Stakeholders } | null;
 }) {
   return (
     <>
@@ -665,6 +687,7 @@ export function FormDocumentGeolocalization({
             <PreviewMap
               drawing={drawing}
               style={{ minHeight: "300px", width: "100%" }}
+              user = {user}
             />
           </Card>
         </>
@@ -684,6 +707,7 @@ export function FormDocumentGeolocalization({
             onCancel={() => setIsMapOpen(false)}
             onDone={(v) => { setDrawing(v); setIsMapOpen(false); }}
             style={{ minHeight: "95vh", width: "100%" }}
+            user = {user}
           ></SatMap>
         </DialogPanel>
       </Dialog>
@@ -925,8 +949,8 @@ export function FormDocumentDatePicker({
   issuanceDate,
   setIssuanceDate
 }: {
-  issuanceDate: Date | undefined,
-  setIssuanceDate: React.Dispatch<React.SetStateAction<Date | undefined>>
+  issuanceDate: DateRange | undefined,
+  setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>
 }) {
   return (
 
@@ -941,8 +965,8 @@ export function FormDocumentDatePicker({
       <DatePicker
         id="issuance-date"
         className="mt-2"
-        value={issuanceDate}
-        onValueChange={d => setIssuanceDate(d)}
+        value={issuanceDate?.from}
+        onValueChange={d => setIssuanceDate({ from: d })}
         enableYearNavigation={true}
         weekStartsOn={1}
         enableClear={false}
@@ -952,3 +976,89 @@ export function FormDocumentDatePicker({
 
 
 }
+
+interface DateRangePickerPresetsProps {
+  issuanceDate: DateRange | undefined;
+  setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
+  hasError: boolean;
+}
+
+export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
+  issuanceDate,
+  setIssuanceDate,
+  hasError
+}) => {
+  const issuanceYear = issuanceDate?.from ? issuanceDate.from.getFullYear() : new Date().getFullYear();
+  const issuanceMonth = issuanceDate?.from ? issuanceDate.from.getMonth() : new Date().getMonth();
+  const presets = [
+    {
+      label: "Today",
+      dateRange: {
+        from: new Date(),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 7 days",
+      dateRange: {
+        from: new Date(new Date().setDate(new Date().getDate() - 7)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 30 days",
+      dateRange: {
+        from: new Date(new Date().setDate(new Date().getDate() - 30)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 3 months",
+      dateRange: {
+        from: new Date(new Date().setMonth(new Date().getMonth() - 3)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Last 6 months",
+      dateRange: {
+        from: new Date(new Date().setMonth(new Date().getMonth() - 6)),
+        to: new Date(),
+      },
+    },
+    {
+      label: "Month",
+      dateRange: {
+        from: new Date(issuanceYear, issuanceMonth, 1),
+        to: new Date(issuanceYear, issuanceMonth +1, 0),
+      },
+    },
+    {
+      label: "Year",
+      dateRange: {
+        from: new Date(issuanceYear, 0, 1),
+        to: new Date(issuanceYear, 11, 31),
+      },
+    },
+  ];
+
+  return (
+    <div className="flex flex-col items-center gap-y-2 pt-4 w-full">
+      <label
+        htmlFor="issuance-date"
+        className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong self-start"
+      >
+        Issuance date
+      <span className="text-red-500">*</span>
+      </label>
+      <DateRangePicker
+      enableYearNavigation
+      hasError={hasError}
+      presets={presets}
+      value={issuanceDate}
+      onChange={setIssuanceDate}
+      className="w-full"
+      />
+    </div>
+  );
+};
