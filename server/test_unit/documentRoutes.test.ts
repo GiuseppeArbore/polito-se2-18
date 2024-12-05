@@ -6,22 +6,33 @@ import {app} from "../index";
 import { db } from '../src/db/dao'
 import { AreaType, KxDocumentType, Scale, Stakeholders } from '../src/models/enum';
 import { KIRUNA_COORDS } from '../src/utils';
-import { connections } from 'mongoose';
-import {get} from 'http';
 import { randomBytes } from 'crypto';
+import { isUrbanPlanner } from '../src/auth';
 
 const TEST_ID = "6738b18f8da44b335177509e";
 const TEST_FILENAME = "filename";
 
-jest.mock('../src/controller');
+jest.mock('../src/controller', () => ({
+    ...jest.requireActual("../src/controller"),
+    createKxDocument: jest.fn(),
+    handleFileUpload: jest.fn(),
+    removeAttachmentFromDocument: jest.fn(),
+    getKxDocumentAggregateData: jest.fn()
+}));
 jest.mock("@aws-sdk/client-s3");
 jest.mock("@aws-sdk/s3-request-presigner");
-
-afterAll(async () => {
-    await db.disconnectFromDB();
-});
+jest.mock("../src/auth", () => ({
+    ...jest.requireActual("../src/auth"),
+    isUrbanPlanner: jest.fn((_req, _res, next) => {
+        next();
+    })
+}));
 
 describe('Document Routes', () => {
+    afterAll(async () => {
+        await db.disconnectFromDB();
+    });
+
     beforeEach(() => {
         jest.clearAllMocks();
     });
@@ -33,7 +44,9 @@ describe('Document Routes', () => {
             stakeholders: [Stakeholders.RESIDENT],
             scale_info: Scale.TEXT,
             scale: 10,
-            issuance_date: new Date().toISOString(),
+            issuance_date: {
+                from: new Date().toISOString()
+            },
             type: KxDocumentType.INFORMATIVE,
             language: 'Swedish',
             doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -58,7 +71,10 @@ describe('Document Routes', () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString(),
+                    to: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -85,7 +101,9 @@ describe('Document Routes', () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -104,7 +122,9 @@ describe('Document Routes', () => {
             .send({
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -123,7 +143,9 @@ describe('Document Routes', () => {
             .send({
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.POINT, coordinates: [0, 0] },
@@ -140,7 +162,9 @@ describe('Document Routes', () => {
             .send({
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.AREA, coordinates: [[KIRUNA_COORDS, [0, 0], [0, 0]]] },
@@ -158,7 +182,9 @@ describe('Document Routes', () => {
                 stakeholders: [Stakeholders.RESIDENT],
                 scale_info: Scale.TEXT,
                 scale: 10,
-                issuance_date: new Date().toISOString(),
+                issuance_date: {
+                    from: new Date().toISOString()
+                },
                 type: KxDocumentType.INFORMATIVE,
                 language: 'Swedish',
                 doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
@@ -221,6 +247,35 @@ describe('Document Routes', () => {
 
         expect(response.status).toBe(500);
         expect(cnt.handleFileUpload).toHaveBeenCalledTimes(0);
+    });
+
+    test("Test 10 - DELETE /api/documents/:id/attachments/:fileName - nominal case", async () => {
+        jest.spyOn(cnt, "removeAttachmentFromDocument").mockImplementation(
+            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+                res.status(200).send();
+                return;
+            })
+        );
+        const response = await request(app)
+            .delete(`/api/documents/${TEST_ID}/attachments/${TEST_FILENAME}`)
+            .send();
+
+        expect(response.status).toBe(200);
+        expect(cnt.removeAttachmentFromDocument).toHaveBeenCalledTimes(1);
+    });
+    test('Test 11 - GET /api/documents/aggregateData - get aggregate data', async () => {
+        jest.spyOn(cnt, "getKxDocumentAggregateData").mockImplementation(
+            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+                res.status(200).send();
+                return;
+            })
+        );
+        const response = await request(app)
+            .get(`/api/documents/aggregateData`)
+            .send();
+
+        expect(response.status).toBe(200);
+        expect(cnt.getKxDocumentAggregateData).toHaveBeenCalledTimes(1);
     });
 
 });
