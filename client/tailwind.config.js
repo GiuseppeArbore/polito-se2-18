@@ -1,3 +1,4 @@
+/*eslint no-undef: "error"*/
 /** @type {import('tailwindcss').Config} */
 
 module.exports = {
