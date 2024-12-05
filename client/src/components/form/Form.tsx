@@ -16,7 +16,7 @@ import {
   Callout,
   Switch,
 } from "@tremor/react";
-import { DateRangePicker } from "./DatePicker"
+import { DateRangePicker } from "./DatePicker";
 import { useState, useEffect } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
@@ -40,8 +40,6 @@ import { FileUpload } from "./DragAndDrop";
 import { DateRange } from "./DatePicker";
 import { se } from "date-fns/locale";
 
-
-
 interface FormDialogProps {
   documents: KxDocument[];
   refresh: () => void;
@@ -53,15 +51,15 @@ export function FormDialog(props: FormDialogProps) {
   const [titleError, setTitleError] = useState(false);
   const [stakeholders, setStakeholders] = useState<string[]>([]);
   const [shError, setShError] = useState(false);
-  const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(
-   {from: new Date()}
-  );
+  const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>({
+    from: new Date(),
+  });
   const [files, setFiles] = useState<File[]>([]);
   const [issuanceDateError, setIssuanceDateError] = useState(false);
   const [type, setType] = useState<string | undefined>(undefined);
 
   const [typeError, setTypeError] = useState(false);
-  const [scale, setScale] = useState<number | undefined>(undefined);
+  const [scale, setScale] = useState<number>(0);
   const [language, setLanguage] = useState<string | undefined>(undefined);
   const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
   const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -139,13 +137,23 @@ export function FormDialog(props: FormDialogProps) {
       };
     }
 
-    if (tmpTitleError || tmpShError || !type || !description || !draw || !issuanceDate || (drawing === undefined && !hideMap)) {
+    if (
+      tmpTitleError ||
+      tmpShError ||
+      !type ||
+      !description ||
+      !draw ||
+      !issuanceDate ||
+      (drawing === undefined && !hideMap)
+    ) {
       setTitleError(tmpTitleError);
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
-      setIssuanceDateError(!issuanceDate); 
-      hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
+      setIssuanceDateError(!issuanceDate);
+      hideMap
+        ? setDocCoordinatesError(false)
+        : setDocCoordinatesError(!docCoordinates);
       setError("Please fill all the required fields");
       toast({
         title: "Error",
@@ -163,7 +171,7 @@ export function FormDialog(props: FormDialogProps) {
       doc_coordinates: draw,
       issuance_date: {
         from: issuanceDate?.from!,
-        to: issuanceDate?.to!
+        to: issuanceDate?.to!,
       },
       type: type,
       language,
@@ -255,7 +263,7 @@ export function FormDialog(props: FormDialogProps) {
     setIssuanceDateError(false);
     setType(undefined);
     setTypeError(false);
-    setScale(undefined);
+    setScale(0);
     setLanguage(undefined);
     setPages(undefined);
     setPageRanges([]);
@@ -302,14 +310,11 @@ export function FormDialog(props: FormDialogProps) {
           setPageRanges={setPageRanges}
         />
 
- 
-        <DateRangePickerPresets 
-         issuanceDate={issuanceDate}
-         setIssuanceDate={setIssuanceDate} 
-         hasError={issuanceDateError}
-         />
-
-
+        <DateRangePickerPresets
+          issuanceDate={issuanceDate}
+          setIssuanceDate={setIssuanceDate}
+          hasError={issuanceDateError}
+        />
 
         <Divider />
 
@@ -450,7 +455,7 @@ export function FormDocumentInformation({
   typeError: boolean;
   setTypeError: React.Dispatch<React.SetStateAction<boolean>>;
   scale: number | undefined;
-  setScale: React.Dispatch<React.SetStateAction<number | undefined>>;
+  setScale: React.Dispatch<React.SetStateAction<number>>;
   language: string | undefined;
   setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
   pages: PageRange[] | undefined;
@@ -1217,8 +1222,8 @@ export function FormDocumentDatePicker({
   issuanceDate,
   setIssuanceDate,
 }: {
-  issuanceDate: DateRange | undefined,
-  setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>
+  issuanceDate: DateRange | undefined;
+  setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
 }) {
   return (
     <div className="col-span-full mt-4">
@@ -1233,7 +1238,7 @@ export function FormDocumentDatePicker({
         id="issuance-date"
         className="mt-2"
         value={issuanceDate?.from}
-        onValueChange={d => setIssuanceDate({ from: d })}
+        onValueChange={(d) => setIssuanceDate({ from: d })}
         enableYearNavigation={true}
         weekStartsOn={1}
         enableClear={false}
@@ -1251,10 +1256,14 @@ interface DateRangePickerPresetsProps {
 export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
   issuanceDate,
   setIssuanceDate,
-  hasError
+  hasError,
 }) => {
-  const issuanceYear = issuanceDate?.from ? issuanceDate.from.getFullYear() : new Date().getFullYear();
-  const issuanceMonth = issuanceDate?.from ? issuanceDate.from.getMonth() : new Date().getMonth();
+  const issuanceYear = issuanceDate?.from
+    ? issuanceDate.from.getFullYear()
+    : new Date().getFullYear();
+  const issuanceMonth = issuanceDate?.from
+    ? issuanceDate.from.getMonth()
+    : new Date().getMonth();
   const presets = [
     {
       label: "Today",
@@ -1295,7 +1304,7 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
       label: "Month",
       dateRange: {
         from: new Date(issuanceYear, issuanceMonth, 1),
-        to: new Date(issuanceYear, issuanceMonth +1, 0),
+        to: new Date(issuanceYear, issuanceMonth + 1, 0),
       },
     },
     {
@@ -1314,15 +1323,15 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
         className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong self-start"
       >
         Issuance date
-      <span className="text-red-500">*</span>
+        <span className="text-red-500">*</span>
       </label>
       <DateRangePicker
-      enableYearNavigation
-      hasError={hasError}
-      presets={presets}
-      value={issuanceDate}
-      onChange={setIssuanceDate}
-      className="w-full"
+        enableYearNavigation
+        hasError={hasError}
+        presets={presets}
+        value={issuanceDate}
+        onChange={setIssuanceDate}
+        className="w-full"
       />
     </div>
   );
