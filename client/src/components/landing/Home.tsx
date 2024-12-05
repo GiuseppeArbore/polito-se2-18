@@ -1,6 +1,7 @@
 import HeroSection from "./HeroSection";
 import FeaturesSection from "./FeaturesSection";
 import Footer from "./Footer";
+import Phases from "./Phases/Phases";
 import { Stakeholders } from "../../enum";
 import { Toaster } from "../toast/Toaster";
 
@@ -16,10 +17,10 @@ const Home: React.FC<HomeProps> = ({ login, logout, setError, loginErrorMessage,
   return (
     <div className="App">
       <HeroSection login={login} logout= {logout} setError = {setError} loginErrorMessage={loginErrorMessage} error={error} user={user} />
+      <Phases />
       <FeaturesSection />
       <Footer />
-      <Toaster/>
-    </div>
+      </div>
   );
 };
 

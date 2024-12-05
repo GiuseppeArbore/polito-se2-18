@@ -39,7 +39,8 @@
     "react-dropzone": "^11.4.2",
     "react-pdf-viewer": "^0.1.0",
     "react-router-dom": "^6.11.2",
-    "tailwind-variants": "^0.3.0"
+    "tailwind-variants": "^0.3.0",
+    "swiper": "^11.1.15"
   },
   "devDependencies": {
     "@tremor/react": "^3.3.0",
