@@ -1,7 +1,8 @@
+/* Default light theme styles */
 .button-whole-Kiruna {
     background-color: white;
     color: #4A4A4A;
-    border: 1px solid #ccc;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for floating effect */
     position: absolute;
     top: 0.625rem;
     left: 1.2rem;
@@ -13,11 +14,12 @@
     align-items: center;
     height: 2rem;
     width: 11rem;
+    border: none; /* Remove border */
+    border-radius: 0.5rem; /* Optional: Add border-radius for rounded corners */
 }
 
 .button-whole-Kiruna:hover {
     background-color: #f0f0f0;
-    border-color: #b0b0b0; 
 }
 
 .popup-content {
@@ -26,13 +28,12 @@
     min-width: 100px;
     max-width: 100%;
     word-wrap: break-word;
-  }
+}
 
-
-  .Kiruna-area-button {
+.Kiruna-area-button {
     background-color: white;
     color: #4A4A4A;
-    border: 1px solid #ccc;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add shadow for floating effect */
     position: absolute;
     top: 0.625rem;
     left: 13rem;
@@ -44,11 +45,12 @@
     align-items: center;
     height: 2rem;
     width: 9rem;
+    border: none; /* Remove border */
+    border-radius: 0.5rem; /* Optional: Add border-radius for rounded corners */
 }
 
 .Kiruna-area-button:hover {
     background-color: #f0f0f0;
-    border-color: #b0b0b0; 
 }
 
 .quickfilter {
@@ -71,3 +73,24 @@
     cursor: pointer; /* Change cursor to pointer */
 }
 
+/* Dark theme styles */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #121212;
+        color: #E0E0E0;
+    }
+
+    .button-whole-Kiruna,
+    .Kiruna-area-button,
+    .quickfilter {
+        background-color: #1a1a1a; /* Shinier black */
+        color: #E0E0E0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5); /* Darker shadow */
+    }
+
+    .button-whole-Kiruna:hover,
+    .Kiruna-area-button:hover,
+    .quickfilter:hover {
+        background-color: #333; /* Slightly lighter black on hover */
+    }
+}
