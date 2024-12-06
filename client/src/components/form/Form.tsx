@@ -31,6 +31,7 @@ import {
   RiLoopLeftLine,
   RiProjector2Line,
   RiInformation2Line,
+  RiAddLine,
 } from "@remixicon/react";
 
 import {
@@ -61,7 +62,7 @@ export function FormDialog(props: FormDialogProps) {
   const [stakeholders, setStakeholders] = useState<string[]>([]);
   const [shError, setShError] = useState(false);
   const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(
-   {from: new Date()}
+    { from: new Date() }
   );
   const [files, setFiles] = useState<File[]>([]);
   const [issuanceDateError, setIssuanceDateError] = useState(false);
@@ -132,7 +133,7 @@ export function FormDialog(props: FormDialogProps) {
       setShError(tmpShError);
       setTypeError(!type);
       setDescriptionError(!description);
-      setIssuanceDateError(!issuanceDate); 
+      setIssuanceDateError(!issuanceDate);
       hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
       setError("Please fill all the required fields");
       toast({
@@ -287,12 +288,12 @@ export function FormDialog(props: FormDialogProps) {
           setPageRanges={setPageRanges}
         />
 
- 
-        <DateRangePickerPresets 
-         issuanceDate={issuanceDate}
-         setIssuanceDate={setIssuanceDate} 
-         hasError={issuanceDateError}
-         />
+
+        <DateRangePickerPresets
+          issuanceDate={issuanceDate}
+          setIssuanceDate={setIssuanceDate}
+          hasError={issuanceDateError}
+        />
 
 
 
@@ -309,7 +310,7 @@ export function FormDialog(props: FormDialogProps) {
           setDrawing={setDrawing}
           hideMap={hideMap}
           setHideMap={setHideMap}
-          user = {props.user}
+          user={props.user}
         />
 
         <Divider />
@@ -365,11 +366,18 @@ export function FormDialog(props: FormDialogProps) {
 
   return (
     <>
-      {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
-        <Button className="w-full primary" onClick={() => { setIsOpen(true); clearForm() }}>
-          Add new document
-        </Button>
-      )}
+{props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
+  <Button
+    className="w-full primary"
+    style={{ borderRadius: '0.3rem', width: '11rem' }}
+    onClick={() => { setIsOpen(true); clearForm() }}
+  >
+    <div style={{ display: 'flex', alignItems: 'center' }}>
+      <RiAddLine style={{ marginRight: '0.5rem' }} />
+      Add new document
+    </div>
+  </Button>
+)}
       <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
         <DialogPanel
           className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
@@ -687,7 +695,7 @@ export function FormDocumentGeolocalization({
             <PreviewMap
               drawing={drawing}
               style={{ minHeight: "300px", width: "100%" }}
-              user = {user}
+              user={user}
             />
           </Card>
         </>
@@ -707,7 +715,7 @@ export function FormDocumentGeolocalization({
             onCancel={() => setIsMapOpen(false)}
             onDone={(v) => { setDrawing(v); setIsMapOpen(false); }}
             style={{ minHeight: "95vh", width: "100%" }}
-            user = {user}
+            user={user}
           ></SatMap>
         </DialogPanel>
       </Dialog>
@@ -1030,7 +1038,7 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
       label: "Month",
       dateRange: {
         from: new Date(issuanceYear, issuanceMonth, 1),
-        to: new Date(issuanceYear, issuanceMonth +1, 0),
+        to: new Date(issuanceYear, issuanceMonth + 1, 0),
       },
     },
     {
@@ -1049,15 +1057,15 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
         className="text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong self-start"
       >
         Issuance date
-      <span className="text-red-500">*</span>
+        <span className="text-red-500">*</span>
       </label>
       <DateRangePicker
-      enableYearNavigation
-      hasError={hasError}
-      presets={presets}
-      value={issuanceDate}
-      onChange={setIssuanceDate}
-      className="w-full"
+        enableYearNavigation
+        hasError={hasError}
+        presets={presets}
+        value={issuanceDate}
+        onChange={setIssuanceDate}
+        className="w-full"
       />
     </div>
   );
