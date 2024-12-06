@@ -46,7 +46,7 @@ interface FormDialogProps {
 export default function Document({ user }: DocumentProps) {
     const formatLocalDate = (date: Date) => {
         return date.toLocaleDateString('sv-SE'); // 'sv-SE' è un formato ISO-like
-      };
+    };
 
     const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
 
@@ -249,13 +249,7 @@ export default function Document({ user }: DocumentProps) {
 
     return (
         <div>
-            <div className='flex flex-row mb-2'>
-                <i onClick={() => navigate("/")}><RiHome3Line className="mt-1 text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
-                <h1 className="text-2xl font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Document Page</h1>
-
-
-            </div>
-            <Card>
+            <Card >
                 <div className='flex flex-row '>
 
                     <div className="flex flex-col items-start justify-between w-full lg:w-1/2 lg:border-r lg:border-gray-300 lg:me-6">
@@ -526,12 +520,12 @@ export default function Document({ user }: DocumentProps) {
                 {
                     !entireMunicipality ? (
                         <Card
-                            className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
+                            className={`my-0 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
                         >
                             <DocumentPageMap
                                 setDrawing={(d) => { setDrawings(d); setSaveDrawing(true) }}
                                 drawing={drawings}
-                                style={{ minHeight: "300px", width: "100%" }}
+                                style={{ minHeight: "30rem", flex: 1 }}
                                 user={user}
                             />
                         </Card>

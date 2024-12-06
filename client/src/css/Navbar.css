@@ -1,0 +1,13 @@
+.buttonStyle {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-decoration: none;
+  }
+  
+  .buttonStyle:hover {
+    background-color: #e0e0e0; /* Change this to your desired hover color */
+}

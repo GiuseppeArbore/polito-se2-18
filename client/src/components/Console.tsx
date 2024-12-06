@@ -137,19 +137,6 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
 
   return (
     <main>
-      <Title className="flex items-center">
-        <Link to="/">
-          {" "}
-          <span title="Return to Home">
-            <RiHome2Fill
-              className="text-black dark:text-white animate-pulse hover:scale-110 hover:shadow-lg transition-transform duration-300 pr-3"
-              size="32"
-            />
-          </span>
-        </Link>
-        Dashboard
-      </Title>
-      <Text>Explore Kiruna</Text>
       <div className="flex items-stretch mt-6">
         <TabGroup
           className="flex-1"
@@ -157,7 +144,18 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
             setSelectedView(index);
           }}
         >
-          <TabList>
+
+<div style={{ position: 'relative' }}>
+  <div style={{ gridColumn: '11 / span 2', position: 'absolute', right: '0', marginTop: '-2.5rem' }}>
+    <FormDialog
+      documents={documents}
+      refresh={() => setRefreshNeeded(true)}
+      user={user}
+    />
+  </div>
+</div>
+
+          <TabList style={{ marginTop: '-2rem'}}>
             <Tab>Map</Tab>
             <Tab>List</Tab>
             <Tab>Timeline</Tab>
@@ -165,80 +163,15 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
         </TabGroup>
       </div>
 
-      <Grid numItemsLg={6} className="gap-6 mt-6">
-        <Col numColSpanLg={showSideBar ? 5 : 6}>
-          <div className="h-full" style={{ display: 'flex', flexDirection: 'row' }}>
-            <Col className="h-full w-full">
-              <Card className="h-full p-0 m-0" style={{ margin: 0, padding: 0, minHeight: "500px" }}>
-                {renderCurrentSelection(selectedView)}
-              </Card>
-            </Col>
-            {!showSideBar &&
-              <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring" role="Button">
-                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full" /></i>
-              </Col>
-            }
-          </div>
-
-        </Col>
-        <Col numColSpanLg={1}>
-          <div className="flex flex-row ">
-            {showSideBar &&
-              <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring" role="Button">
-                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full" /></i>
-
-              </Col>
-            }
-            {(showSideBar || windowWidth <= 1024) &&
-              <Col className="w-full">
-                <div className="space-y-6">
-                <TextInput
-                    icon={RiSearchLine}
-                    id="quickFilter"
-                    placeholder="Search..."
-                    className="w-full"
-                    value={quickFilterText}
-                    onValueChange={(e) => {
-                      setQuickFilterText(e);
-
-                    }}
-                  ></TextInput>
-                  <FormDialog
-                    documents={documents}
-                    refresh={() => setRefreshNeeded(true)}
-                    user={user}
-                  />
-                  <Card>
-                    <Metric>KIRUNA</Metric>
-                    <Title>Quick facts</Title>
-                    <Text>
-                      <ul className="list-disc list-inside">
-                        <li>20,000 inhabitants</li>
-                        <li>Located 140 km north of the Arctic Circle</li>
-                        <li>Lowest recorded temperature -42 °C</li>
-                        <li>45 days of Midnight Sun each year</li>
-                        <li>21 days of Polar Night</li>
-                        <li>Covered in snow for 8 months each year</li>
-                      </ul>
-                    </Text>
-                  </Card>
-                  <Card className="hidden lg:block w-full h-40">
-                    <img
-                      src="/kiruna.png"
-                      alt="Kiruna"
-                      className="w-full h-full object-contain"
-                    />
-                  </Card>
-                </div>
-              </Col>
-            }
-
-          </div>
-
-
-        </Col>
-
-      </Grid>
+      <Grid numItemsLg={12} className="gap-6 mt-6">
+  <Col numColSpanLg={12}>
+    <div className="h-full w-full" style={{ display: 'flex', flexDirection: 'row' }}>
+      <Card className="h-full w-full p-0 m-0" style={{ marginTop: '-1rem', padding: 0, minHeight: "600px" }}>
+        {renderCurrentSelection(selectedView , setQuickFilterText)}
+      </Card>
+    </div>
+  </Col>
+</Grid>
       <Card className="mt-6">
         <div
           style={{
@@ -254,7 +187,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
       <Toaster />
     </main>
   );
-  function renderCurrentSelection(selectedView: number = 0) {
+  function renderCurrentSelection(selectedView: number = 0 , setQuickFilterText: any) {
     return (
       <>
         <DashboardMap
@@ -269,9 +202,9 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
           user={user}
           drawing={drawing}
           entireMunicipalityDocuments={entireMunicipalityDocuments}
-          isVisible={selectedView === 0 ? true : false}>
-
-        </DashboardMap>
+          isVisible={selectedView === 0 ? true : false}
+          setQuickFilterText={setQuickFilterText}
+        />
         <div
           className="ring-0 shadow-none"
           style={{

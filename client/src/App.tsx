@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import  Home  from "./components/landing/Home";
+import Home from "./components/landing/Home";
 import Document from "./components/documents/Document";
 import { NotFound } from "./components/NotFound";
 import { Route, Routes, useNavigate } from "react-router-dom";
@@ -7,6 +7,7 @@ import Console from "./components/Console";
 import API from "./API";
 import { Stakeholders } from "./enum";
 import { toast } from './utils/toaster';
+import Layout from './components/Layout'; // Adjust the import based on your file structure
 
 
 
@@ -16,7 +17,7 @@ export default function App() {
   const [loggedIn, setLoggedIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState<{ msg: string; type: string }>({ msg: '', type: '' });
   const [user, setUser] = useState<{ email: string; role: Stakeholders } | null>(null);
-  const [error, setError] = useState< boolean | undefined >(false);
+  const [error, setError] = useState<boolean | undefined>(false);
 
   const login = async (credentials: { username: string; password: string }) => {
     try {
@@ -32,10 +33,11 @@ export default function App() {
       navigate('/dashboard');
     } catch (err) {
       setError(true);
-      if((err as Error).message === 'Incorrect email and/or password')
+      if ((err as Error).message === 'Incorrect email and/or password')
         setErrorMessage({ msg: (err as Error).message, type: 'error' });
-      else 
+      else
         setErrorMessage({ msg: 'Username must be a valide email address', type: 'error' });
+      throw err;
 
     }
   };
@@ -46,13 +48,13 @@ export default function App() {
         setLoggedIn(true);
         setUser(user);
       }).catch(e => {
-         if (loggedIn)
-            toast({
-              title: "Danger",
-              description: e.message,
-              variant: "error",
-              duration: 3000,
-            });
+        if (loggedIn)
+          toast({
+            title: "Danger",
+            description: e.message,
+            variant: "error",
+            duration: 3000,
+          });
         setLoggedIn(false);
         setUser(null);
       });
@@ -80,12 +82,19 @@ export default function App() {
   };
 
   return (
-    
-    <Routes>
-      <Route path="/" element={<Home login={login} logout={logout} loginErrorMessage={errorMessage} error={error} setError = {setError} user={user}/>} />
-      <Route path="/dashboard" element={<Console user={user}/>} />
-      <Route path="/documents/:id" element={<Document user={user} />} />
-      <Route path="/*" element={<NotFound />} />
-    </Routes>
+    <Layout
+      login={login}
+      logout={logout}
+      loginErrorMessage={errorMessage}
+      error={error}
+      setError={setError}
+      user={user}>
+      <Routes>
+        <Route path="/" element={<Home user={user} />} />
+        <Route path="/dashboard" element={<Console user={user} />} />
+        <Route path="/documents/:id" element={<Document user={user} />} />
+        <Route path="/*" element={<NotFound />} />
+      </Routes>
+    </Layout>
   );
 }
