@@ -63,6 +63,8 @@ The initial estimation made during the planning meeting was 80 hours 45 minutes,
   - Total hours estimated estimated at sprint planning 38 hours
   - Total hours spent 34 hours
 
+![image](sprint3_coverage.png)
+
 ## ASSESSMENT
 
 - What caused your errors in estimation (if any)?
