@@ -8,7 +8,7 @@ interface NavbarProps {
   login: (credentials: { username: string; password: string }) => Promise<void>;
   logout: () => void;
   loginErrorMessage: { msg: string; type: string };
-  error: boolean|undefined;
+  error: boolean | undefined;
   setError: (error: boolean) => void;
   user: any;
 }
@@ -30,17 +30,17 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
       setError(true); // Handle error if login fails
     }
   };
- 
-   const handleLogout =  () => {
-   logout();
-   }
- 
-   const handleClose = () => {
-     setShowLogin(false);
-     setUsername('');
-     setPassword('');
-     setError(false)
-   };
+
+  const handleLogout = () => {
+    logout();
+  }
+
+  const handleClose = () => {
+    setShowLogin(false);
+    setUsername('');
+    setPassword('');
+    setError(false)
+  };
 
   if (isHome) {
     return null;
@@ -51,31 +51,31 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
       <nav style={{ padding: '0.5rem', marginTop: '-1rem', marginBottom: isDashboard ? '2.5rem' : '0' }}>
         <ul style={{ display: 'flex', listStyle: 'none', margin: 0, padding: 0, width: '100%' }}>
           <li style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}>
-            <div className="buttonStyle">
+            <Link className="buttonStyle" to="/">
               <RiHome3Line style={{ marginRight: '0.5rem' }} />
-              <Link to="/" style={{ textDecoration: 'none', color: 'inherit' }}>Home</Link>
-            </div>
+              Home
+            </Link>
           </li>
           {!isDashboard && (
             <li style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}>
-              <div className="buttonStyle">
+              <Link className="buttonStyle" to="/dashboard">
                 <RiDashboardFill style={{ marginRight: '0.5rem' }} />
-                <Link to="/dashboard" style={{ textDecoration: 'none', color: 'inherit' }}>Dashboard</Link>
-              </div>
+                Dashboard
+              </Link>
             </li>
           )}
           <li style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
-            <div className="buttonStyle">
+            <div style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', borderRadius: '0.25rem', cursor: 'pointer', transition: 'background-color 0.3s', textDecoration: 'none' }}>
               {user ? (
-                <>
+                <button className="buttonStyle" onClick={handleLogout}>
                   <RiLogoutBoxLine style={{ marginRight: '0.5rem' }} />
-                  <button onClick={handleLogout} style={{ textDecoration: 'none', color: 'inherit', background: 'none', border: 'none', cursor: 'pointer' }}>Logout</button>
-                </>
+                  Logout
+                </button>
               ) : (
-                <>
+                <button className="buttonStyle" onClick={() => setShowLogin(true)}>
                   <RiLoginBoxLine style={{ marginRight: '0.5rem' }} />
-                  <button onClick={() => setShowLogin(true)} style={{ textDecoration: 'none', color: 'inherit', background: 'none', border: 'none', cursor: 'pointer' }}>Login</button>
-                </>
+                  Login
+                </button>
               )}
             </div>
           </li>
