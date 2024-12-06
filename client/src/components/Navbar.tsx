@@ -25,7 +25,7 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
   const handleLogin = async () => {
     try {
       await login({ username, password });
-      setShowLogin(false); // Close the dialog if login is successful
+      handleClose() // Close the dialog if login is successful
     } catch (e) {
       setError(true); // Handle error if login fails
     }
@@ -48,7 +48,7 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
 
   return (
     <>
-      <nav style={{ padding: '0.5rem', marginTop: '-1rem', marginBottom: isDashboard ? '2.5rem' : '0' }}>
+      <nav style={{ padding: '0.5rem', marginTop: '-1.8rem', marginBottom: isDashboard ? '1.8rem' : '0' }}>
         <ul style={{ display: 'flex', listStyle: 'none', margin: 0, padding: 0, width: '100%' }}>
           <li style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}>
             <Link className="buttonStyle" to="/">
