@@ -10,7 +10,7 @@
 
 For this sprint, the team selected 2 stories to complete, with a total of 13 story points planned and committed to by the end.
 In addition to the stories, we've worked on technical dept.
-The initial estimation made during the planning meeting was 80 hours 45 minutes, while the actual time spent was **add** hours and **add** minutes, completing the sprint slightly above the planned estimate.
+The initial estimation made during the planning meeting was 80 hours 45 minutes, while the actual time spent was 76 hours and 38 minutes, completing the sprint slightly above the planned estimate.
 
 **Sum-up**
 
@@ -18,7 +18,7 @@ The initial estimation made during the planning meeting was 80 hours 45 minutes,
 | ---------------- | ----------------------- | ----------------------- |
 | **Stories**      | 2 (plus technical debt) | 2 (plus technical debt) |
 | **Story Points** | 13                      | 13                      |
-| **Hours**        | 80 hours 45 min         | **add**                 |
+| **Hours**        | 80 hours 45 min         | 76 hours 38 min         |
 
 ### Quality Assurance Highlights
 
