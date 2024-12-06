@@ -37,7 +37,7 @@ The initial estimation made during the planning meeting was 80 hours 45 minutes,
 
 | Story                                      | # Tasks | Points | Hours est. | Hours actual |
 | ------------------------------------------ | ------- | ------ | ---------- | ------------ |
-| _#0_                                       | 23      | -      | 70h 15m    | **add**      |
+| _#0_                                       | 23      | -      | 70h 15m    | 65h 18min      |
 | KX-8 Search documents                      | 3       | 5      | 8h 00m     | 8h 15m       |
 | KX-9 Define the geolocated area on the map | 1       | 8      | 2h 30m     | 3h 05m       |
 
