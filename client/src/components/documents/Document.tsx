@@ -46,7 +46,7 @@ interface FormDialogProps {
 export default function Document({ user }: DocumentProps) {
     const formatLocalDate = (date: Date) => {
         return date.toLocaleDateString('sv-SE'); // 'sv-SE' è un formato ISO-like
-      };
+    };
 
     const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
 
@@ -503,8 +503,48 @@ export default function Document({ user }: DocumentProps) {
                         </DialogPanel>
                     </Dialog>
 
-
                 </div>
+
+                <div className="flex flex-col lg:flex-row ">
+                    <div className="flex w-full h-full items-center justify-between mb-2">
+                        <Accordion className="w-full mr-6 mb-6">
+                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Direct connections</AccordionHeader>
+                            <AccordionBody className="leading-6 flex flex-col">
+                                <AccordionList style={{ boxShadow: 'none' }}>
+                                </AccordionList>
+                            </AccordionBody>
+                        </Accordion>
+                    </div>
+                    <div className="flex w-full h-full items-center justify-between mb-2">
+                        <Accordion className="w-full mr-6 mb-6">
+                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Collateral connections</AccordionHeader>
+                            <AccordionBody className="leading-6 flex flex-col">
+                                <AccordionList style={{ boxShadow: 'none' }}>
+                                </AccordionList>
+                            </AccordionBody>
+                        </Accordion>
+                    </div>
+                    <div className="flex w-full h-full items-center justify-between mb-2">
+                        <Accordion className="w-full mr-6 mb-6">
+                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Projection connections</AccordionHeader>
+                            <AccordionBody className="leading-6 flex flex-col">
+                                <AccordionList style={{ boxShadow: 'none' }}>
+                                </AccordionList>
+                            </AccordionBody>
+                        </Accordion>
+                    </div>
+                    <div className="flex w-full h-full items-center justify-between mb-2">
+                        <Accordion className="w-full mr-6 mb-6">
+                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Update connections</AccordionHeader>
+                            <AccordionBody className="leading-6 flex flex-col">
+                                <AccordionList style={{ boxShadow: 'none' }}>
+                                </AccordionList>
+                            </AccordionBody>
+                        </Accordion>
+                    </div>
+                </div>
+
+
 
 
 
