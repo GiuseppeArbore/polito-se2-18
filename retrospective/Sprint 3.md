@@ -18,7 +18,7 @@ The initial estimation made during the planning meeting was 80 hours 45 minutes,
 | ---------------- | ----------------------- | ----------------------- |
 | **Stories**      | 2 (plus technical debt) | 2 (plus technical debt) |
 | **Story Points** | 13                      | 13                      |
-| **Hours**        | 80 hours 45 min         | 76 hours 38 min                 |
+| **Hours**        | 80 hours 45 min         | 76 hours 38 min         |
 
 ### Quality Assurance Highlights
 
@@ -62,6 +62,8 @@ The initial estimation made during the planning meeting was 80 hours 45 minutes,
   - Strategy adopted **priority first**
   - Total hours estimated estimated at sprint planning 38 hours
   - Total hours spent 34 hours
+
+![image](sprint3_coverage.png)
 
 ## ASSESSMENT
 
