@@ -1,5 +1,5 @@
 
-import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine, RiAddBoxLine } from '@remixicon/react';
+import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine, RiAddBoxLine, RiInfoI } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
 import { FileUpload } from "../form/DragAndDrop";
@@ -75,6 +75,7 @@ export default function Document({ user }: DocumentProps) {
     const [documentsForUpdate, setDocumentsForUpdate] = useState<KxDocument[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
+    const navigator = useNavigate();
 
 
     const handleSubmitDragAndDrop = async (e: React.FormEvent) => {
@@ -514,7 +515,11 @@ export default function Document({ user }: DocumentProps) {
                                     {documentsForDirect.length > 0 ? documentsForDirect.map((doc) => (
                                         <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                             <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
-                                            <text>ciao</text>
+                                            <Button
+                                                size="xs"
+                                                icon={RiInfoI}
+                                                onClick={() => navigator("/documents/" + doc._id)}
+                                            />
                                         </div>
                                     )) : <>
                                         <div className="flex items-center justify-between m-2">
@@ -530,10 +535,14 @@ export default function Document({ user }: DocumentProps) {
                             <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Collateral connections</AccordionHeader>
                             <AccordionBody className="leading-6 flex flex-col">
                                 <AccordionList style={{ boxShadow: 'none' }}>
-                                {documentsForCollateral.length > 0 ? documentsForCollateral.map((doc) => (
+                                    {documentsForCollateral.length > 0 ? documentsForCollateral.map((doc) => (
                                         <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                             <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
-                                            <text>ciao</text>
+                                            <Button
+                                                size="xs"
+                                                icon={RiInfoI}
+                                                onClick={() => navigator("/documents/" + doc._id)}
+                                            />
                                         </div>
                                     )) : <>
                                         <div className="flex items-center justify-between m-2">
@@ -549,10 +558,14 @@ export default function Document({ user }: DocumentProps) {
                             <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Projection connections</AccordionHeader>
                             <AccordionBody className="leading-6 flex flex-col">
                                 <AccordionList style={{ boxShadow: 'none' }}>
-                                {documentsForProjection.length > 0 ? documentsForProjection.map((doc) => (
+                                    {documentsForProjection.length > 0 ? documentsForProjection.map((doc) => (
                                         <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                             <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
-                                            <text>ciao</text>
+                                            <Button
+                                                size="xs"
+                                                icon={RiInfoI}
+                                                onClick={() => navigator("/documents/" + doc._id)}
+                                            />
                                         </div>
                                     )) : <>
                                         <div className="flex items-center justify-between m-2">
@@ -568,10 +581,15 @@ export default function Document({ user }: DocumentProps) {
                             <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Update connections</AccordionHeader>
                             <AccordionBody className="leading-6 flex flex-col">
                                 <AccordionList style={{ boxShadow: 'none' }}>
-                                {documentsForUpdate.length > 0 ? documentsForUpdate.map((doc) => (
+                                    {documentsForUpdate.length > 0 ? documentsForUpdate.map((doc) => (
                                         <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                             <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
-                                            <text>ciao</text>
+
+                                            <Button
+                                                size="xs"
+                                                icon={RiInfoI}
+                                                onClick={() => navigator("/documents/" + doc._id)}
+                                            />
                                         </div>
                                     )) : <>
                                         <div className="flex items-center justify-between m-2">
