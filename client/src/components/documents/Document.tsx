@@ -189,7 +189,7 @@ export default function Document({ user }: DocumentProps) {
         };
 
         fetchDocument();
-    }, []);
+    }, [id]);
 
     useMemo(async () => {
         if (drawings && saveDrawing) {
