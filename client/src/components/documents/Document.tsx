@@ -69,10 +69,10 @@ export default function Document({ user }: DocumentProps) {
     const [entireMunicipality, setEntireMunicipality] = useState(false);
     const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
     const [documents, setDocuments] = useState<KxDocument[]>([]);
-    const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
-    const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
-    const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
-    const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
+    const [documentsForDirect, setDocumentsForDirect] = useState<KxDocument[]>([]);
+    const [documentsForCollateral, setDocumentsForCollateral] = useState<KxDocument[]>([]);
+    const [documentsForProjection, setDocumentsForProjection] = useState<KxDocument[]>([]);
+    const [documentsForUpdate, setDocumentsForUpdate] = useState<KxDocument[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
 
@@ -128,10 +128,10 @@ export default function Document({ user }: DocumentProps) {
                 setLanguage(document.language || undefined);
                 setPages(document.pages || undefined);
                 setDescription(document.description || undefined);
-                setDocumentsForDirect(document.connections.direct.map((doc) => doc._id?.toString()));
-                setDocumentsForCollateral(document.connections.collateral.map((doc) => doc._id?.toString()));
-                setDocumentsForProjection(document.connections.projection.map((doc) => doc._id?.toString()));
-                setDocumentsForUpdate(document.connections.update.map((doc) => doc._id?.toString()));
+                setDocumentsForDirect(await Promise.all(document.connections.direct.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
+                setDocumentsForCollateral(await Promise.all(document.connections.collateral.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
+                setDocumentsForProjection(await Promise.all(document.connections.projection.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
+                setDocumentsForUpdate(await Promise.all(document.connections.update.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
                 setPageRanges([]);
 
 
@@ -511,6 +511,16 @@ export default function Document({ user }: DocumentProps) {
                             <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Direct connections</AccordionHeader>
                             <AccordionBody className="leading-6 flex flex-col">
                                 <AccordionList style={{ boxShadow: 'none' }}>
+                                    {documentsForDirect.length > 0 ? documentsForDirect.map((doc) => (
+                                        <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+                                            <text>ciao</text>
+                                        </div>
+                                    )) : <>
+                                        <div className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No direct connections added</i>
+                                        </div>
+                                    </>}
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
@@ -520,6 +530,16 @@ export default function Document({ user }: DocumentProps) {
                             <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Collateral connections</AccordionHeader>
                             <AccordionBody className="leading-6 flex flex-col">
                                 <AccordionList style={{ boxShadow: 'none' }}>
+                                {documentsForCollateral.length > 0 ? documentsForCollateral.map((doc) => (
+                                        <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+                                            <text>ciao</text>
+                                        </div>
+                                    )) : <>
+                                        <div className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No collateral connections added</i>
+                                        </div>
+                                    </>}
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
@@ -529,6 +549,16 @@ export default function Document({ user }: DocumentProps) {
                             <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Projection connections</AccordionHeader>
                             <AccordionBody className="leading-6 flex flex-col">
                                 <AccordionList style={{ boxShadow: 'none' }}>
+                                {documentsForProjection.length > 0 ? documentsForProjection.map((doc) => (
+                                        <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+                                            <text>ciao</text>
+                                        </div>
+                                    )) : <>
+                                        <div className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No projection connections added</i>
+                                        </div>
+                                    </>}
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
@@ -538,6 +568,16 @@ export default function Document({ user }: DocumentProps) {
                             <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Update connections</AccordionHeader>
                             <AccordionBody className="leading-6 flex flex-col">
                                 <AccordionList style={{ boxShadow: 'none' }}>
+                                {documentsForUpdate.length > 0 ? documentsForUpdate.map((doc) => (
+                                        <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+                                            <text>ciao</text>
+                                        </div>
+                                    )) : <>
+                                        <div className="flex items-center justify-between m-2">
+                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No update connections added</i>
+                                        </div>
+                                    </>}
                                 </AccordionList>
                             </AccordionBody>
                         </Accordion>
