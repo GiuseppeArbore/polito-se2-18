@@ -9,7 +9,8 @@ export enum Stakeholders {
 export enum Scale {
     TEXT = "Text",
     LARGE_ARCHITECTURAL = "Large Architectural Scale",
-    SMALL_ARCHITECTURAL = "Small Architectural Scale"
+    SMALL_ARCHITECTURAL = "Small Architectural Scale",
+    ONE_TO_N = "1:N"
 }
 
 export enum KxDocumentType {

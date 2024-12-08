@@ -71,7 +71,7 @@ export function FormDialog(props: FormDialogProps) {
 
     const [typeError, setTypeError] = useState(false);
     const [scale, setScale] = useState(10000);
-    const [scaleType, setScaleType] = useState<string | undefined>(undefined); //todo: fix this according to the enum
+    const [scaleType, setScaleType] = useState<Scale>(Scale.TEXT); //todo: fix this according to the enum
     const [language, setLanguage] = useState<string | undefined>(undefined);
     const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -241,7 +241,7 @@ export function FormDialog(props: FormDialogProps) {
         setType(undefined);
         setTypeError(false);
         setScale(10000);
-        setScaleType(undefined);
+        setScaleType(Scale.TEXT);
         setLanguage(undefined);
         setPages(undefined);
         setPageRanges([]);
@@ -440,8 +440,8 @@ export function FormDocumentInformation({
     setTypeError: React.Dispatch<React.SetStateAction<boolean>>;
     scale: number;
     setScale: React.Dispatch<React.SetStateAction<number>>;
-    scaleType: string | undefined;
-    setScaleType: React.Dispatch<React.SetStateAction<string | undefined>>;
+    scaleType: Scale;
+    setScaleType: React.Dispatch<React.SetStateAction<Scale>>;
     language: string | undefined;
     setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
     pages: PageRange[] | undefined;
@@ -544,15 +544,15 @@ export function FormDocumentInformation({
                 </label>
                 <Select
                     value={scaleType?.toString()}
-                    onValueChange={(value) => setScaleType(value)}
+                    onValueChange={(value) => setScaleType(value as Scale)}
                     className="mt-2"
                 >
-                    <SelectItem value="1">text</SelectItem>
+                    <SelectItem value="Text">text</SelectItem>
                     <SelectItem value="2">blueprints/effects</SelectItem>
                     <SelectItem value="3">Option Three</SelectItem>
-                    <SelectItem value="4">1:n</SelectItem>
+                    <SelectItem value="1:N">1:N</SelectItem>
                 </Select>
-                {scaleType === "4" &&
+                {scaleType === Scale.ONE_TO_N &&
                     <TextInput
                         id="scale"
                         value={scale.toLocaleString()}

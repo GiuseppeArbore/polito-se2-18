@@ -31,6 +31,7 @@ import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
 import exp from 'constants';
 import { DateRange } from '../form/DatePicker';
+import { set } from 'date-fns';
 interface DocumentProps {
     user: { email: string; role: Stakeholders } | null;
 }
@@ -60,6 +61,7 @@ export default function Document({ user }: DocumentProps) {
     const [title, setTitle] = useState("");
     const [stakeholders, setStakeholders] = useState<string[]>([]);
     const [scale, setScale] = useState(10000);
+    const [scaleType, setScaleType] = useState<Scale>(Scale.ONE_TO_N);
     const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(undefined);
     const [type, setType] = useState<string | undefined>(undefined);
     const [language, setLanguage] = useState<string | undefined>(undefined);
@@ -123,6 +125,7 @@ export default function Document({ user }: DocumentProps) {
                 setTitle(document.title);
                 setStakeholders(document.stakeholders);
                 setScale(document.scale);
+                setScaleType(Scale.ONE_TO_N);  //TODO: fix this
                 setIssuanceDate({ from: document.issuance_date.from, to: document.issuance_date.to });
                 setType(document.type);
                 setLanguage(document.language || undefined);
@@ -313,6 +316,8 @@ export default function Document({ user }: DocumentProps) {
                             setType={setType}
                             scale={scale}
                             setScale={setScale}
+                            scaleType={scaleType}
+                            setScaleType={setScaleType}
                             language={language}
                             setLanguage={setLanguage}
                             pages={pages}
@@ -575,6 +580,8 @@ export function FormInfoDialog({
     setType,
     scale,
     setScale,
+    scaleType,
+    setScaleType,
     language,
     setLanguage,
     pages,
@@ -599,6 +606,8 @@ export function FormInfoDialog({
     setType: React.Dispatch<React.SetStateAction<string | undefined>>;
     scale: number;
     setScale: React.Dispatch<React.SetStateAction<number>>;
+    scaleType: Scale;
+    setScaleType: React.Dispatch<React.SetStateAction<Scale>>;
     language: string | undefined;
     setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
     pages: PageRange[] | undefined;
@@ -698,6 +707,8 @@ export function FormInfoDialog({
                             setTypeError={setTypeError}
                             scale={scale}
                             setScale={setScale}
+                            scaleType={scaleType}
+                            setScaleType={setScaleType}
                             language={language}
                             setLanguage={setLanguage}
                             pages={pages}
