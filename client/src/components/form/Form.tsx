@@ -15,6 +15,8 @@ import {
     Badge,
     Callout,
     Switch,
+    Select,
+    SelectItem,
 } from "@tremor/react";
 import { DateRangePicker } from "./DatePicker"
 import { useState, useEffect } from "react";
@@ -69,6 +71,7 @@ export function FormDialog(props: FormDialogProps) {
 
     const [typeError, setTypeError] = useState(false);
     const [scale, setScale] = useState(10000);
+    const [scaleType, setScaleType] = useState<string | undefined>(undefined); //todo: fix this according to the enum
     const [language, setLanguage] = useState<string | undefined>(undefined);
     const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -238,6 +241,7 @@ export function FormDialog(props: FormDialogProps) {
         setType(undefined);
         setTypeError(false);
         setScale(10000);
+        setScaleType(undefined);
         setLanguage(undefined);
         setPages(undefined);
         setPageRanges([]);
@@ -279,6 +283,8 @@ export function FormDialog(props: FormDialogProps) {
                     setTypeError={setTypeError}
                     scale={scale}
                     setScale={setScale}
+                    scaleType={scaleType}
+                    setScaleType={setScaleType}
                     language={language}
                     setLanguage={setLanguage}
                     pages={pages}
@@ -409,6 +415,8 @@ export function FormDocumentInformation({
     setTypeError,
     scale,
     setScale,
+    scaleType,
+    setScaleType,
     language,
     setLanguage,
     pages,
@@ -432,6 +440,8 @@ export function FormDocumentInformation({
     setTypeError: React.Dispatch<React.SetStateAction<boolean>>;
     scale: number;
     setScale: React.Dispatch<React.SetStateAction<number>>;
+    scaleType: string | undefined;
+    setScaleType: React.Dispatch<React.SetStateAction<string | undefined>>;
     language: string | undefined;
     setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
     pages: PageRange[] | undefined;
@@ -532,35 +542,47 @@ export function FormDocumentInformation({
                     Scale
                     <span className="text-red-500">*</span>
                 </label>
-                <TextInput
-                    id="scale"
-                    value={scale.toLocaleString()}
-                    onValueChange={(v) => {
-                        if (v === "") {
-                            setScale(0);
-                            return;
-                        }
-                        const num = parseLocalizedNumber(v);
-                        if (
-                            !Number.isNaN(num) &&
-                            Number.isInteger(num) &&
-                            num >= 0 &&
-                            num <= 10_000_000_000_000
-                        ) {
-                            setScale(num);
-                        }
-                    }}
-                    name="scale"
-                    autoComplete="scale"
-                    placeholder="10.000"
+                <Select
+                    value={scaleType?.toString()}
+                    onValueChange={(value) => setScaleType(value)}
                     className="mt-2"
-                    icon={() => (
-                        <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default text-end text-right tremor-TextInput-icon shrink-0 h-5 w-5 mx-2.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
-                            1:
-                        </p>
-                    )}
-                    required
-                />
+                >
+                    <SelectItem value="1">text</SelectItem>
+                    <SelectItem value="2">blueprints/effects</SelectItem>
+                    <SelectItem value="3">Option Three</SelectItem>
+                    <SelectItem value="4">1:n</SelectItem>
+                </Select>
+                {scaleType === "4" &&
+                    <TextInput
+                        id="scale"
+                        value={scale.toLocaleString()}
+                        onValueChange={(v) => {
+                            if (v === "") {
+                                setScale(0);
+                                return;
+                            }
+                            const num = parseLocalizedNumber(v);
+                            if (
+                                !Number.isNaN(num) &&
+                                Number.isInteger(num) &&
+                                num >= 0 &&
+                                num <= 10_000_000_000_000
+                            ) {
+                                setScale(num);
+                            }
+                        }}
+                        name="scale"
+                        autoComplete="scale"
+                        placeholder="10.000"
+                        className="mt-2"
+                        icon={() => (
+                            <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default text-end text-right tremor-TextInput-icon shrink-0 h-5 w-5 mx-2.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
+                                1:
+                            </p>
+                        )}
+                        required
+                    />
+                }
             </div>
 
             <div className="col-span-full sm:col-span-3">
