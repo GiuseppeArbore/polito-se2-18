@@ -75,7 +75,7 @@ export default function Document({ user }: DocumentProps) {
     const [documentsForUpdate, setDocumentsForUpdate] = useState<KxDocument[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
-    const navigator = useNavigate();
+
 
 
     const handleSubmitDragAndDrop = async (e: React.FormEvent) => {
@@ -506,99 +506,107 @@ export default function Document({ user }: DocumentProps) {
 
                 </div>
 
-                <div className="flex flex-col lg:flex-row ">
-                    <div className="flex w-full h-full items-center justify-between mb-2">
-                        <Accordion className="w-full mr-6 mb-6">
-                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Direct connections</AccordionHeader>
-                            <AccordionBody className="leading-6 flex flex-col">
-                                <AccordionList style={{ boxShadow: 'none' }}>
-                                    {documentsForDirect.length > 0 ? documentsForDirect.map((doc) => (
-                                        <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
-                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
-                                            <Button
-                                                size="xs"
-                                                icon={RiInfoI}
-                                                onClick={() => navigator("/documents/" + doc._id)}
-                                            />
-                                        </div>
-                                    )) : <>
-                                        <div className="flex items-center justify-between m-2">
-                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No direct connections added</i>
-                                        </div>
-                                    </>}
-                                </AccordionList>
-                            </AccordionBody>
-                        </Accordion>
+                <div className="flex flex-col space-y-2 ">
+                    <div className="flex flex-row">
+                        <h3 className="text-l font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Connections</h3>
+                        {canEdit && <i className="ml-2" /*onClick={() => setIsOpen(true)}*/><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong " /></i>}
                     </div>
-                    <div className="flex w-full h-full items-center justify-between mb-2">
-                        <Accordion className="w-full mr-6 mb-6">
-                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Collateral connections</AccordionHeader>
-                            <AccordionBody className="leading-6 flex flex-col">
-                                <AccordionList style={{ boxShadow: 'none' }}>
-                                    {documentsForCollateral.length > 0 ? documentsForCollateral.map((doc) => (
-                                        <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
-                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
-                                            <Button
-                                                size="xs"
-                                                icon={RiInfoI}
-                                                onClick={() => navigator("/documents/" + doc._id)}
-                                            />
-                                        </div>
-                                    )) : <>
-                                        <div className="flex items-center justify-between m-2">
-                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No collateral connections added</i>
-                                        </div>
-                                    </>}
-                                </AccordionList>
-                            </AccordionBody>
-                        </Accordion>
-                    </div>
-                    <div className="flex w-full h-full items-center justify-between mb-2">
-                        <Accordion className="w-full mr-6 mb-6">
-                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Projection connections</AccordionHeader>
-                            <AccordionBody className="leading-6 flex flex-col">
-                                <AccordionList style={{ boxShadow: 'none' }}>
-                                    {documentsForProjection.length > 0 ? documentsForProjection.map((doc) => (
-                                        <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
-                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
-                                            <Button
-                                                size="xs"
-                                                icon={RiInfoI}
-                                                onClick={() => navigator("/documents/" + doc._id)}
-                                            />
-                                        </div>
-                                    )) : <>
-                                        <div className="flex items-center justify-between m-2">
-                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No projection connections added</i>
-                                        </div>
-                                    </>}
-                                </AccordionList>
-                            </AccordionBody>
-                        </Accordion>
-                    </div>
-                    <div className="flex w-full h-full items-center justify-between mb-2">
-                        <Accordion className="w-full mr-6 mb-6">
-                            <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Update connections</AccordionHeader>
-                            <AccordionBody className="leading-6 flex flex-col">
-                                <AccordionList style={{ boxShadow: 'none' }}>
-                                    {documentsForUpdate.length > 0 ? documentsForUpdate.map((doc) => (
-                                        <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
-                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
 
-                                            <Button
-                                                size="xs"
-                                                icon={RiInfoI}
-                                                onClick={() => navigator("/documents/" + doc._id)}
-                                            />
-                                        </div>
-                                    )) : <>
-                                        <div className="flex items-center justify-between m-2">
-                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No update connections added</i>
-                                        </div>
-                                    </>}
-                                </AccordionList>
-                            </AccordionBody>
-                        </Accordion>
+                    <div className="flex flex-col lg:flex-row ">
+
+                        <div className="flex w-full h-full items-center justify-between mb-2">
+                            <Accordion className="w-full mr-6 mb-6">
+                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Direct connections</AccordionHeader>
+                                <AccordionBody className="leading-6 flex flex-col">
+                                    <AccordionList style={{ boxShadow: 'none' }}>
+                                        {documentsForDirect.length > 0 ? documentsForDirect.map((doc) => (
+                                            <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+                                                <Button
+                                                    size="xs"
+                                                    icon={RiInfoI}
+                                                    onClick={() => navigate("/documents/" + doc._id)}
+                                                />
+                                            </div>
+                                        )) : <>
+                                            <div className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No direct connections added</i>
+                                            </div>
+                                        </>}
+                                    </AccordionList>
+                                </AccordionBody>
+                            </Accordion>
+                        </div>
+                        <div className="flex w-full h-full items-center justify-between mb-2">
+                            <Accordion className="w-full mr-6 mb-6">
+                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Collateral connections</AccordionHeader>
+                                <AccordionBody className="leading-6 flex flex-col">
+                                    <AccordionList style={{ boxShadow: 'none' }}>
+                                        {documentsForCollateral.length > 0 ? documentsForCollateral.map((doc) => (
+                                            <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+                                                <Button
+                                                    size="xs"
+                                                    icon={RiInfoI}
+                                                    onClick={() => navigate("/documents/" + doc._id)}
+                                                />
+                                            </div>
+                                        )) : <>
+                                            <div className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No collateral connections added</i>
+                                            </div>
+                                        </>}
+                                    </AccordionList>
+                                </AccordionBody>
+                            </Accordion>
+                        </div>
+                        <div className="flex w-full h-full items-center justify-between mb-2">
+                            <Accordion className="w-full mr-6 mb-6">
+                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Projection connections</AccordionHeader>
+                                <AccordionBody className="leading-6 flex flex-col">
+                                    <AccordionList style={{ boxShadow: 'none' }}>
+                                        {documentsForProjection.length > 0 ? documentsForProjection.map((doc) => (
+                                            <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+                                                <Button
+                                                    size="xs"
+                                                    icon={RiInfoI}
+                                                    onClick={() => navigate("/documents/" + doc._id)}
+                                                />
+                                            </div>
+                                        )) : <>
+                                            <div className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No projection connections added</i>
+                                            </div>
+                                        </>}
+                                    </AccordionList>
+                                </AccordionBody>
+                            </Accordion>
+                        </div>
+                        <div className="flex w-full h-full items-center justify-between mb-2">
+                            <Accordion className="w-full mr-6 mb-6">
+                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Update connections</AccordionHeader>
+                                <AccordionBody className="leading-6 flex flex-col">
+                                    <AccordionList style={{ boxShadow: 'none' }}>
+                                        {documentsForUpdate.length > 0 ? documentsForUpdate.map((doc) => (
+                                            <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+
+                                                <Button
+                                                    size="xs"
+                                                    icon={RiInfoI}
+                                                    onClick={() => navigate("/documents/" + doc._id)}
+                                                />
+                                            </div>
+                                        )) : <>
+                                            <div className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No update connections added</i>
+                                            </div>
+                                        </>}
+                                    </AccordionList>
+                                </AccordionBody>
+                            </Accordion>
+                        </div>
                     </div>
                 </div>
 
