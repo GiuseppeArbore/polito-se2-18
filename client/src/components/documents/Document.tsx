@@ -249,11 +249,8 @@ export default function Document({ user }: DocumentProps) {
 
     return (
         <div>
-            <div className='flex flex-row mb-2'>
-                <i onClick={() => navigate("/")}><RiHome3Line className="mt-1 text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
+            <div className='flex flex-row mb-2'style={{marginLeft: '0.5rem',marginTop: '-1rem'}}>
                 <h1 className="text-2xl font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Document Page</h1>
-
-
             </div>
             <Card>
                 <div className='flex flex-row '>

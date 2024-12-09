@@ -137,7 +137,10 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
 
   return (
     <main>
-      <div className="flex items-stretch mt-6">
+      <div className='flex flex-row mb-0' style={{ marginTop: '-2.8rem',marginLeft: '0.5rem'}}>
+        <h1 className="text-2xl font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Dashboard</h1>
+      </div>
+      <div className="flex items-stretch mt-7">
         <TabGroup
           className="flex-1"
           onIndexChange={(index) => {
@@ -173,7 +176,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                 padding: 0,
                 minHeight: "300px",
                 width: "100%",
-                height: "70vh", 
+                height: "70vh",
               }}
             >
               {renderCurrentSelection(selectedView, setQuickFilterText)}
