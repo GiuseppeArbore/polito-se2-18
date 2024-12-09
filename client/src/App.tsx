@@ -82,7 +82,7 @@ export default function App() {
     return (
 
         <Routes>
-            <Route path="/" element={<Home login={login} logout={logout} loginErrorMessage={errorMessage} error={error} setError={setError} user={user} />} />
+            <Route path="/" element={<Home user={user} />} />
             <Route path="/dashboard" element={<Console user={user} />} />
             <Route path="/documents/:id" element={<Document user={user} />} />
             <Route path="/*" element={<NotFound />} />
