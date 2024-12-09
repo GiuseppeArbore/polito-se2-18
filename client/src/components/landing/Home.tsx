@@ -6,6 +6,7 @@ import { Stakeholders } from "../../enum";
 import { Toaster } from "../toast/Toaster";
 
 interface HomeProps {
+
   user: { email: string; role: Stakeholders } | null;
 }
 const Home: React.FC<HomeProps> = ({user }) => {
