@@ -196,7 +196,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
             minHeight: "300px",
             width: "100%",
             height: "100%",
-            borderRadius: 8,
+            borderRadius: 4,
             display: selectedView === 0 ? 'block' : 'none',
           }}
           user={user}
