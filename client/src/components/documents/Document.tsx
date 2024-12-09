@@ -526,12 +526,12 @@ export default function Document({ user }: DocumentProps) {
                 {
                     !entireMunicipality ? (
                         <Card
-                            className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
+                            className={`my-4 p-0 mb-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
                         >
                             <DocumentPageMap
                                 setDrawing={(d) => { setDrawings(d); setSaveDrawing(true) }}
                                 drawing={drawings}
-                                style={{ minHeight: "300px", width: "100%" }}
+                                style={{ minHeight: "300px", width: "100%", height: "80vh" }} 
                                 user={user}
                             />
                         </Card>

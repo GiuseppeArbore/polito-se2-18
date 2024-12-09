@@ -166,7 +166,16 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
       <Grid numItemsLg={12} className="gap-6 mt-6">
         <Col numColSpanLg={12}>
           <div className="h-full w-full" style={{ display: 'flex', flexDirection: 'row' }}>
-            <Card className="h-full w-full p-0 m-0" style={{ marginTop: '-1rem', padding: 0, minHeight: "600px" }}>
+            <Card
+              className="p-0 m-0"
+              style={{
+                marginTop: '-1rem',
+                padding: 0,
+                minHeight: "300px",
+                width: "100%",
+                height: "70vh", 
+              }}
+            >
               {renderCurrentSelection(selectedView, setQuickFilterText)}
             </Card>
           </div>
@@ -195,7 +204,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
             margin: 0,
             minHeight: "300px",
             width: "100%",
-            height: "100%",
+            height: "70vh",
             borderRadius: 4,
             display: selectedView === 0 ? 'block' : 'none',
           }}
