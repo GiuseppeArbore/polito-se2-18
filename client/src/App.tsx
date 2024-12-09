@@ -13,6 +13,7 @@ import Layout from './components/Layout'; // Adjust the import based on your fil
 
 export default function App() {
 
+
   const navigate = useNavigate();
   const [loggedIn, setLoggedIn] = useState(false);
   const [errorMessage, setErrorMessage] = useState<{ msg: string; type: string }>({ msg: '', type: '' });
@@ -39,47 +40,47 @@ export default function App() {
         setErrorMessage({ msg: 'Username must be a valide email address', type: 'error' });
       throw err;
 
-    }
-  };
 
-  useEffect(() => {
-    API.getUserInfo()
-      .then(user => {
-        setLoggedIn(true);
-        setUser(user);
-      }).catch(e => {
-        if (loggedIn)
-          toast({
-            title: "Danger",
-            description: e.message,
-            variant: "error",
-            duration: 3000,
-          });
-        setLoggedIn(false);
-        setUser(null);
-      });
-  }, []);
+    useEffect(() => {
+        API.getUserInfo()
+            .then(user => {
+                setLoggedIn(true);
+                setUser(user);
+            }).catch(e => {
+                if (loggedIn)
+                    toast({
+                        title: "Danger",
+                        description: e.message,
+                        variant: "error",
+                        duration: 3000,
+                    });
+                setLoggedIn(false);
+                setUser(null);
+            });
+    }, []);
 
-  const logout = async () => {
-    try {
-      await API.logout();
-      setLoggedIn(false);
-      setUser(null);
-      toast({
-        title: "Success",
-        description: `You have been logged out!`,
-        variant: "success",
-        duration: 3000,
-      });
-    } catch (err) {
-      toast({
-        title: "Danger",
-        description: (err as Error).message,
-        variant: "success",
-        duration: 3000,
-      });
-    }
-  };
+
+    const logout = async () => {
+        try {
+            await API.logout();
+            setLoggedIn(false);
+            setUser(null);
+            toast({
+                title: "Success",
+                description: `You have been logged out!`,
+                variant: "success",
+                duration: 3000,
+            });
+        } catch (err) {
+            toast({
+                title: "Danger",
+                description: (err as Error).message,
+                variant: "success",
+                duration: 3000,
+            });
+        }
+    };
+
 
   return (
     <Layout
@@ -97,4 +98,5 @@ export default function App() {
       </Routes>
     </Layout>
   );
+
 }
