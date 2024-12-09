@@ -521,16 +521,16 @@ export default function Document({ user }: DocumentProps) {
                                     <AccordionList style={{ boxShadow: 'none' }}>
                                         {documentsForDirect.length > 0 ? documentsForDirect.map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
                                                 <Button
                                                     size="xs"
                                                     icon={RiInfoI}
-                                                    onClick={() => navigate("/documents/" + doc._id)}
+                                                    onClick={() => window.open("/documents/" + doc._id)}
                                                 />
                                             </div>
                                         )) : <>
-                                            <div className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No direct connections added</i>
+                                            <div className="flex items-center justify-around m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No direct connections added</i>
                                             </div>
                                         </>}
                                     </AccordionList>
@@ -544,16 +544,16 @@ export default function Document({ user }: DocumentProps) {
                                     <AccordionList style={{ boxShadow: 'none' }}>
                                         {documentsForCollateral.length > 0 ? documentsForCollateral.map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
                                                 <Button
                                                     size="xs"
                                                     icon={RiInfoI}
-                                                    onClick={() => navigate("/documents/" + doc._id)}
+                                                    onClick={() => window.open("/documents/" + doc._id)}
                                                 />
                                             </div>
                                         )) : <>
-                                            <div className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No collateral connections added</i>
+                                            <div className="flex items-center justify-around m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No collateral connections added</i>
                                             </div>
                                         </>}
                                     </AccordionList>
@@ -567,16 +567,16 @@ export default function Document({ user }: DocumentProps) {
                                     <AccordionList style={{ boxShadow: 'none' }}>
                                         {documentsForProjection.length > 0 ? documentsForProjection.map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
                                                 <Button
                                                     size="xs"
                                                     icon={RiInfoI}
-                                                    onClick={() => navigate("/documents/" + doc._id)}
+                                                    onClick={() => window.open("/documents/" + doc._id)}
                                                 />
                                             </div>
                                         )) : <>
-                                            <div className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No projection connections added</i>
+                                            <div className="flex items-center justify-around m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No projection connections added</i>
                                             </div>
                                         </>}
                                     </AccordionList>
@@ -590,17 +590,17 @@ export default function Document({ user }: DocumentProps) {
                                     <AccordionList style={{ boxShadow: 'none' }}>
                                         {documentsForUpdate.length > 0 ? documentsForUpdate.map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>{doc.title} </i>
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
 
                                                 <Button
                                                     size="xs"
                                                     icon={RiInfoI}
-                                                    onClick={() => navigate("/documents/" + doc._id)}
+                                                    onClick={() => window.open("/documents/" + doc._id)}
                                                 />
                                             </div>
                                         )) : <>
-                                            <div className="flex items-center justify-between m-2">
-                                                <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No update connections added</i>
+                                            <div className="flex items-center justify-around m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No update connections added</i>
                                             </div>
                                         </>}
                                     </AccordionList>
