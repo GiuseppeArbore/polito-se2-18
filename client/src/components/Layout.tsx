@@ -1,5 +1,4 @@
-// Layout.tsx
-import Navbar from './Navbar'; // Adjust the import based on your file structure
+import Navbar from './Navbar';
 import { ReactNode } from 'react';
 
 interface LayoutProps {

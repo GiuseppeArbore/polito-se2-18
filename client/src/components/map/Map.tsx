@@ -607,6 +607,12 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
         map.setZoom(props.zoom || defaultZoom);
     }, [props.zoom]);
 
+    useEffect(() => {
+        if (!props.isVisible) {
+          props.setQuickFilterText?.('');
+        }
+      }, [props.isVisible]);
+
     return (
         <>
             <div

@@ -199,7 +199,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
             <Toaster />
         </main>
     );
-    function renderCurrentSelection(setQuickFilterText: any, selectedView: number = 0) {
+    function renderCurrentSelection(setQuickFilterText: (_: string) => void, selectedView: number = 0) {
         return (
             <>
                 <DashboardMap

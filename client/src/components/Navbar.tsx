@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { RiHome3Line, RiDashboardFill, RiLoginBoxLine, RiLogoutBoxLine } from '@remixicon/react';
 import "../css/Navbar.css";
-import { Button, Dialog, DialogPanel,TextInput } from "@tremor/react"; // Adjust the import based on your component library
+import { Button, Dialog, DialogPanel,TextInput } from "@tremor/react";
 
 interface NavbarProps {
     login: (credentials: { username: string; password: string }) => Promise<void>;
@@ -64,7 +64,7 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
                             </Link>
                         </li>
                     )}
-                    <li style={{ marginLeft: 'auto', marginRight: '-1.7rem', display: 'flex', alignItems: 'center' }}>
+                    <li style={{ marginLeft: 'auto', marginRight: '-1.4rem', display: 'flex', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', borderRadius: '0.25rem', cursor: 'pointer', transition: 'background-color 0.3s', textDecoration: 'none' }}>
                             {user ? (
                                 <button className="buttonStyle" onClick={handleLogout}  >

@@ -7,7 +7,7 @@ import Console from "./components/Console";
 import API from "./API";
 import { Stakeholders } from "./enum";
 import { toast } from './utils/toaster';
-import Layout from './components/Layout'; // Adjust the import based on your file structure
+import Layout from './components/Layout';
 
 
 
