@@ -633,7 +633,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                 className="quickfilter w-full"
                 // value={props.quickFilterText}
                 onValueChange={(e) => {
-                    props.setQuickFilterText && props.setQuickFilterText(e);
+                    props.setQuickFilterText?.(e);
 
                 }}
             ></TextInput>}

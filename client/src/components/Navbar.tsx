@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { RiHome3Line, RiDashboardFill, RiLoginBoxLine, RiLogoutBoxLine } from '@remixicon/react';
 import "../css/Navbar.css";
-import { Button, Dialog, DialogPanel, Select, SelectItem, Text, TextInput } from "@tremor/react"; // Adjust the import based on your component library
+import { Button, Dialog, DialogPanel,TextInput } from "@tremor/react"; // Adjust the import based on your component library
 
 interface NavbarProps {
     login: (credentials: { username: string; password: string }) => Promise<void>;

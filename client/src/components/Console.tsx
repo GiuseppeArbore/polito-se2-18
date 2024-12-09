@@ -179,7 +179,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                                 height: "70vh",
                             }}
                         >
-                            {renderCurrentSelection(selectedView, setQuickFilterText)}
+                            {renderCurrentSelection( setQuickFilterText, selectedView)}
                         </Card>
                     </div>
                 </Col>
@@ -199,7 +199,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
             <Toaster />
         </main>
     );
-    function renderCurrentSelection(selectedView: number = 0, setQuickFilterText: any) {
+    function renderCurrentSelection(setQuickFilterText: any, selectedView: number = 0) {
         return (
             <>
                 <DashboardMap
