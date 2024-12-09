@@ -580,7 +580,7 @@ export function FormDocumentInformation({
                     {locales.map((l) => {
                         return (
                             <SearchSelectItem value={l.code} key={`lang-${l.code}`}>
-                                {l.name}
+                                {l.name === "English" || l.name === "Swedish" ? <strong>{l.name}</strong> : l.name}
                             </SearchSelectItem>
                         );
                     })}
