@@ -137,7 +137,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
 
   return (
     <main>
-      <div className='flex flex-row mb-0' style={{ marginTop: '-2.8rem',marginLeft: '0.5rem'}}>
+      <div className='flex flex-row mb-0' style={{ marginTop: '-2rem',marginBottom:'2.3rem'}}>
         <h1 className="text-2xl font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Dashboard</h1>
       </div>
       <div className="flex items-stretch mt-7">

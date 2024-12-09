@@ -50,29 +50,29 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
     <>
       <nav style={{ padding: '0.5rem', marginTop: '-1.8rem', marginBottom: isDashboard ? '1.8rem' : '0' }}>
         <ul style={{ display: 'flex', listStyle: 'none', margin: 0, padding: 0, width: '100%' }}>
-          <li style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}>
+          <li style={{ marginLeft:"-1rem", marginRight: '1rem', display: 'flex', alignItems: 'center' }}>
             <Link className="buttonStyle" to="/">
               <RiHome3Line style={{ marginRight: '0.5rem' }} />
               Home
             </Link>
           </li>
           {!isDashboard && (
-            <li style={{ marginRight: '1rem', display: 'flex', alignItems: 'center' }}>
+            <li style={{ marginRight: '1rem', marginLeft:"-1rem", display: 'flex', alignItems: 'center' }}>
               <Link className="buttonStyle" to="/dashboard">
                 <RiDashboardFill style={{ marginRight: '0.5rem' }} />
                 Dashboard
               </Link>
             </li>
           )}
-          <li style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center' }}>
+          <li style={{ marginLeft: 'auto', marginRight: '-1.7rem', display: 'flex', alignItems: 'center' }}>
             <div style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', borderRadius: '0.25rem', cursor: 'pointer', transition: 'background-color 0.3s', textDecoration: 'none' }}>
               {user ? (
-                <button className="buttonStyle" onClick={handleLogout}>
+                <button className="buttonStyle" onClick={handleLogout}  >
                   <RiLogoutBoxLine style={{ marginRight: '0.5rem' }} />
                   Logout
                 </button>
               ) : (
-                <button className="buttonStyle" onClick={() => setShowLogin(true)}>
+                <button className="buttonStyle" onClick={() => setShowLogin(true)}  >
                   <RiLoginBoxLine style={{ marginRight: '0.5rem' }} />
                   Login
                 </button>
