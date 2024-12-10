@@ -1,8 +1,7 @@
 import { mongoose } from '@typegoose/typegoose';
 import { KxDocument, PageRange } from './model';
 
-const API_URL =  process.env.SERVER_ENV || 'http://localhost:3001/api';
-console.log('API_URL', API_URL);
+const API_URL =  import.meta.env.VITE_SERVER_ENV as string;
 
 const createKxDocument = async (document: KxDocument): Promise<KxDocument | null> => {
     try {
