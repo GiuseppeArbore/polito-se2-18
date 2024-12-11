@@ -6,6 +6,7 @@
   cursor: pointer;
   transition: background-color 0.3s;
   text-decoration: none;
+  margin-top: 0.5rem;
 }
 
 .buttonStyle a {
@@ -23,6 +24,7 @@
   body {
     background-color: #121212;
     color: #E0E0E0;
+    margin-top: 0.5rem; /* Assicurati che il margine superiore sia fisso anche nel tema scuro */
   }
 
   .buttonStyle {
@@ -31,12 +33,25 @@
 
   .buttonStyle:hover {
     background-color: white;
-    /* Change background color on hover */
     color: black;
-    /* Change text color on hover */
   }
 
   .buttonStyle a {
     color: inherit;
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .buttonStyle {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .buttonStyle {
+    padding: 0.5rem 0.5rem;
+    font-size: 0.75rem;
   }
 }

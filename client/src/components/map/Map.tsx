@@ -609,9 +609,9 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
 
     useEffect(() => {
         if (!props.isVisible) {
-          props.setQuickFilterText?.('');
+            props.setQuickFilterText?.('');
         }
-      }, [props.isVisible]);
+    }, [props.isVisible]);
 
     return (
         <>
@@ -627,9 +627,6 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
             />
 
 
-            <Button className="Kiruna-area-button" style={{ display: props.isVisible ? "flex" : "none" }} onClick={toggleKirunaVisibility}>
-                {isKirunaVisible ? 'Hide Kiruna Area' : 'Show Kiruna Area'}
-            </Button>
 
             {props.isVisible && <TextInput
 
@@ -647,7 +644,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
 
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                    <Button className="button-whole-Kiruna" variant="primary" style={{ display: props.isVisible ? "flex" : "none" }}>
+                    <Button className="button-whole-Kiruna" variant="primary" style={{ display: props.isVisible ? "flex" : "none" }} onMouseEnter={toggleKirunaVisibility} onMouseLeave={toggleKirunaVisibility} >
                         <div style={{ display: "flex", alignItems: "center" }}>
                             Whole Kiruna: {props.entireMunicipalityDocuments?.length}
                             <RiFileLine
