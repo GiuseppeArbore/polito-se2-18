@@ -7,7 +7,7 @@
     "start": "cross-env DISABLE_AUTH=no nodemon index.ts",
     "dev": "cross-env DISABLE_AUTH=yes nodemon index.ts",
     "test": "jest --coverage",
-    "prepare": "husky"
+    "prepare": "cd ..  && husky server/.husky"
   },
   "author": "",
   "license": "ISC",

@@ -7,7 +7,7 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "prepare": "husky"
+    "prepare": "cd .. && husky client/.husky"
   },
   "dependencies": {
     "@heroicons/react": "1.0.6",
