@@ -2,8 +2,8 @@
 FROM node:21
 
 # Set the environment variable
-ENV MONGO_CONN_STR mongodb://db:27017/kiruna-ex
-
+ENV MONGO_CONN_STR=mongodb://db:27017/kiruna-ex
+ENV HUSKY=0
 # Set the working directory in the container
 WORKDIR /app
 

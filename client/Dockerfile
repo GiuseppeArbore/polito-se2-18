@@ -2,6 +2,7 @@ FROM node:lts-alpine3.18 as builder
 
 WORKDIR /app
 ENV VITE_SERVER_ENV='https://kx-beta.veebor.dev/api'
+ENV HUSKY=0
 COPY package*.json ./
 RUN npm install
 COPY . .
