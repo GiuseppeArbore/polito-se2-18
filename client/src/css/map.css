@@ -18,6 +18,31 @@
     border-color: #b0b0b0; 
 }
 
+.Kiruna-map-style-button {
+    background-color: white;
+    color: #4A4A4A;
+    border: 1px solid #ccc;
+    position: absolute;
+    bottom: 2rem; /* Move to bottom */
+    right: 0.5rem; /* Move to right */
+    z-index: 1;
+    width: 1.8rem; /* Set width */
+    height: 1.8rem; /* Set height */
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    border-radius: 0.3rem; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for floating effect */
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.Kiruna-map-style-button:hover {
+    background-color: #f0f0f0;
+    border-color: #b0b0b0;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
+  
+}
+
 .popup-content {
     display: inline-block;
     padding: 10px;

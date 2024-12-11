@@ -30,7 +30,9 @@ import {
     RiShapeLine,
     RiArrowDownSLine,
     RiFileLine,
-    RiEditBoxLine
+    RiEditBoxLine,
+    RiRoadMapLine,
+    RiEarthLine
 } from "@remixicon/react";
 import { PreviewMapDraw, DocumentMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
@@ -157,10 +159,310 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
     );
 };
 
+const initializeMapLayers = async (map: mapboxgl.Map, props: SatMapProps, isKirunaVisible: boolean) => {
+    try {
+        await loadIcons(map);
+
+        // KIRUNA
+        if (!map.getSource('Kiruna')) {
+            map.addSource('Kiruna', {
+                type: 'geojson',
+                data: Kiruna as FeatureCollection,
+            });
+        }
+
+        if (!map.getLayer('Kiruna-fill')) {
+            map.addLayer({
+                id: "Kiruna-fill",
+                type: 'fill',
+                source: "Kiruna",
+                layout: {
+                    'visibility': isKirunaVisible ? 'visible' : 'none'
+                },
+                paint: {
+                    'fill-color': '#745296',
+                    'fill-opacity': 0.5,
+                },
+            });
+        }
+
+        if (!map.getLayer('Kiruna-line')) {
+            map.addLayer({
+                id: "Kiruna-line",
+                type: 'line',
+                source: "Kiruna",
+                paint: {
+                    'line-color': '#745296',
+                    'line-width': 2,
+                },
+            });
+        }
+
+        // AREA
+        const sortedDrawing = props.drawing
+            ? featureCollection(
+                props.drawing.features.sort((a, b) => {
+                    const areaA = area(a as AllGeoJSON);
+                    const areaB = area(b as AllGeoJSON);
+                    return areaB - areaA; // Sort in descending order
+                })
+            )
+            : featureCollection([]);
+
+        if (!map.getSource('drawings')) {
+            map.addSource('drawings', {
+                type: 'geojson',
+                data: sortedDrawing as FeatureCollection,
+            });
+        }
+
+        props.drawing?.features.forEach((feature) => {
+            const id = feature.properties?.id;
+            const pointId = `point-${id}`;
+            const layerId = `drawings-layer-${id}`;
+            const borderLayerId = `drawings-border-layer-${id}`;
+            const circleLayerId = `drawings-circle-layer-${id}`;
+
+            if (!map.getLayer(layerId)) {
+                map.addLayer({
+                    id: layerId,
+                    type: 'fill',
+                    source: {
+                        type: 'geojson',
+                        data: feature,
+                    },
+                    layout: {},
+                    paint: {
+                        'fill-color': documentAreaColorMapping, // Assuming documentColorMapping is an object mapping feature IDs to colors
+                        'fill-opacity': 0,
+                    },
+                });
+            }
+
+            if (!map.getLayer(borderLayerId)) {
+                map.addLayer({
+                    id: borderLayerId,
+                    type: 'line',
+                    source: {
+                        type: 'geojson',
+                        data: feature,
+                    },
+                    layout: {},
+                    paint: {
+                        'line-color': documentBorderColorMapping, // Border color
+                        'line-width': 0,
+                    },
+                });
+            }
+        });
+
+        // CLUSTERS
+        const offsetDistance = 0.0001; // offsetDistance
+        const pointsAndCentroids = getPointsAndCentroids(props.drawing, offsetDistance);
+
+        if (!map.getSource('pointsAndCentroids')) {
+            map.addSource('pointsAndCentroids', {
+                type: 'geojson',
+                data: pointsAndCentroids as FeatureCollection,
+                cluster: true,
+                clusterMaxZoom: 14,
+                clusterRadius: 50
+            });
+        }
+
+        if (!map.getLayer('clusters')) {
+            map.addLayer({
+                id: 'clusters',
+                type: 'circle',
+                source: 'pointsAndCentroids',
+                filter: ['has', 'point_count'],
+                paint: {
+                    'circle-color': [
+                        'step',
+                        ['get', 'point_count'],
+                        '#51bbd6',
+                        100,
+                        '#f1f075',
+                        750,
+                        '#f28cb1'
+                    ],
+                    'circle-radius': [
+                        'step',
+                        ['get', 'point_count'],
+                        20,
+                        100,
+                        30,
+                        750,
+                        40
+                    ]
+                }
+            });
+        }
+
+        if (!map.getLayer('clusters-count')) {
+            map.addLayer({
+                id: 'clusters-count',
+                type: 'symbol',
+                source: 'pointsAndCentroids',
+                filter: ['has', 'point_count'],
+                layout: {
+                    'text-field': '{point_count_abbreviated}',
+                    'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
+                    'text-size': 12
+                }
+            });
+        }
+
+        map.on('mouseenter', 'clusters', (e) => {
+            if (map) {
+                map.getCanvas().style.cursor = 'pointer';
+            }
+
+            const features = map.queryRenderedFeatures(e.point, {
+                layers: ['clusters']
+            });
+
+            if (!features || features.length === 0) return;
+            const clusterId = features[0].properties?.cluster_id;
+            (map.getSource('pointsAndCentroids') as mapboxgl.GeoJSONSource).getClusterLeaves(clusterId, 10, 0, (err, leaves) => {
+                if (err) return;
+
+                if (!leaves) return;
+                const descriptions = "Documents titles:<br>" + leaves.map(leaf => {
+                    if (leaf.properties) {
+                        return `<b>${leaf.properties.title}</b>`;
+                    }
+                    return '';
+                }).join('<br>');
+                const coordinates: [number, number] = (features[0].geometry as Point).coordinates.slice(0, 2) as [number, number];
+
+                const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
+                    .setLngLat(coordinates)
+                    .setHTML(descriptions)
+                    .addTo(map);
+            });
+        });
+
+        map.on('mouseleave', 'clusters', () => {
+            if (map) {
+                map.getCanvas().style.cursor = '';
+            }
+            const popups = document.getElementsByClassName('mapboxgl-popup');
+            while (popups[0]) {
+                if (popups[0]?.parentNode) {
+                    popups[0].parentNode.removeChild(popups[0]);
+                }
+            }
+        });
+
+        map.on('click', 'clusters', (e) => {
+            if (!map) return;
+            const features = map.queryRenderedFeatures(e.point, {
+                layers: ['clusters']
+            });
+
+            const clusterId = features[0].properties?.cluster_id;
+            const source = map.getSource('pointsAndCentroids');
+            if (source && 'getClusterExpansionZoom' in source) {
+                (source as mapboxgl.GeoJSONSource).getClusterExpansionZoom(clusterId, (err: any, zoom: number | null | undefined) => {
+                    if (err || zoom === undefined || zoom === null) return;
+                    const newZoom = zoom + 2;
+                    map.easeTo({
+                        center: (features[0].geometry.type === 'Point' ? features[0].geometry.coordinates : center) as LngLatLike,
+                        zoom: newZoom
+                    });
+                });
+            }
+        });
+
+        // POINTS
+        pointsAndCentroids.features?.forEach((feature) => {
+            const id = feature.properties?.id;
+            const pointId = `point-${id}`;
+            const layerId = `drawings-layer-${id}`;
+            const circleLayerId = `drawings-circle-layer-${id}`;
+            const borderLayerId = `drawings-border-layer-${id}`;
+
+            if (!map.getLayer(pointId)) {
+                map.addLayer({
+                    id: circleLayerId,
+                    type: 'circle',
+                    source: 'pointsAndCentroids',
+                    paint: {
+                        'circle-radius': 15,
+                        'circle-color': [
+                            'case',
+                            ['==', ['get', 'isCentroid'], true], // Check if the feature is a centroid
+                            '#ffffff',
+                            '#7499E8'
+                        ],
+                    },
+                    filter: ['==', ['get', 'id'], feature.properties?.id]
+                });
+
+                map.addLayer({
+                    id: pointId,
+                    type: 'symbol',
+                    source: 'pointsAndCentroids',
+                    filter: ['==', ['get', 'id'], id],
+                    layout: {
+                        'icon-image': ['get', 'icon'], // Use the 'icon' property from the dataset
+                        'icon-size': 1,
+                        'icon-padding': 1.5 // Increase the clickable area
+                    }
+                });
+            }
+
+            let coordinates: [number, number] = [0, 0];
+            if (feature.geometry.type === 'Point') {
+                coordinates = [feature.geometry.coordinates[0], feature.geometry.coordinates[1]];
+            }
+
+            const description = `Document Title:<br> <b>${feature.properties?.title}</b>`;
+            const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
+                .setLngLat(coordinates)
+                .setHTML(`<div class="popup-content">${description}</div>`);
+
+            map.on('mouseenter', pointId, () => {
+                if (map) {
+                    map.getCanvas().style.cursor = 'pointer';
+                }
+                popup.addTo(map);
+                map.setLayoutProperty(pointId, 'icon-padding', 2);
+                map.setPaintProperty(circleLayerId, 'circle-radius', 25);
+                map.setPaintProperty(borderLayerId, 'line-width', 3);
+                map.setPaintProperty(layerId, 'fill-opacity', 0.5);
+            });
+
+            map.on('mouseleave', pointId, () => {
+                if (map) {
+                    map.getCanvas().style.cursor = '';
+                }
+                popup.remove();
+                map.setLayoutProperty(pointId, 'icon-padding', 1);
+                map.setPaintProperty(circleLayerId, 'circle-radius', 15);
+                map.setPaintProperty(borderLayerId, 'line-width', 0);
+                map.setPaintProperty(layerId, 'fill-opacity', 0);
+            });
+
+            map.on('click', pointId, () => {
+                window.location.href = `/documents/${id}`;
+            });
+        });
+    } catch (error) {
+        console.error('Error loading icons:', error);
+    }
+}
+
 export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (props) => {
     const mapContainerRef = useRef<any>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
     const [isKirunaVisible, setIsKirunaVisible] = useState(false);
+    const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-streets-v12");
+
+    const toggleMapStyle = () => {
+        setMapStyle(mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? "mapbox://styles/mapbox/streets-v12" : "mapbox://styles/mapbox/satellite-streets-v12");
+    }
 
     const toggleKirunaVisibility = () => {
         if (mapRef.current) {
@@ -182,9 +484,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
             interactive: true,
         });
 
-        mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
-        mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
-        mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
+
     }, [mapContainerRef.current]);
 
     useEffect(() => {
@@ -194,403 +494,26 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
 
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
-                style: "mapbox://styles/mapbox/satellite-streets-v12",
+                style: mapStyle,
                 center: center,
                 zoom: props.zoom || defaultZoom,
                 pitch: 40,
                 interactive: true,
             });
 
-            mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
-            mapRef.current.addControl(
-                new mapboxgl.NavigationControl(),
-                "bottom-right"
-            );
-            mapRef.current.addControl(
-                new mapboxgl.FullscreenControl(),
-                "bottom-right"
-            );
+
 
 
             mapRef.current?.on("load", function () {
                 if (mapRef.current) {
-                    loadIcons(mapRef.current).then(() => {
-                        //KIRUNA-----------------------------------------------------
-                        mapRef.current?.addSource('Kiruna', {
-                            type: 'geojson',
-                            data: Kiruna as FeatureCollection,
-                        });
-
-
-                        mapRef.current?.addLayer({
-                            id: "Kiruna-fill",
-                            type: 'fill',
-                            source: "Kiruna",
-                            layout: {
-                                'visibility': 'none'
-                            },
-                            paint: {
-                                'fill-color': '#745296',
-                                'fill-opacity': 0.5,
-                            },
-                        });
-
-
-                        mapRef.current?.addLayer({
-                            id: "Kiruna-line",
-                            type: 'line',
-                            source: "Kiruna",
-                            paint: {
-                                'line-color': '#745296',
-                                'line-width': 2,
-                            },
-                        });
-                        //AREA-------------------------------------------------------
-
-                        const sortedDrawing = props.drawing
-                            ? featureCollection(
-                                props.drawing.features.sort((a, b) => {
-                                    const areaA = area(a as AllGeoJSON);
-                                    const areaB = area(b as AllGeoJSON);
-                                    return areaB - areaA; // Sort in descending order
-                                })
-                            )
-                            : featureCollection([]);
-
-
-                        // Adding source for feature collection
-                        mapRef.current?.addSource('drawings', {
-                            type: 'geojson',
-                            data: sortedDrawing as FeatureCollection,
-                        });
-
-                        props.drawing?.features.forEach((feature, index) => {
-                            const id = feature.properties?.id;
-                            const pointId = `point-${id}`;
-                            const layerId = `drawings-layer-${id}`;
-                            const borderLayerId = `drawings-border-layer-${id}`;
-                            const circleLayerId = `drawings-circle-layer-${id}`;
-
-                            // Add the main fill layer
-                            mapRef.current?.addLayer({
-                                id: layerId,
-                                type: 'fill',
-                                source: {
-                                    type: 'geojson',
-                                    data: feature,
-                                },
-                                layout: {},
-                                paint: {
-                                    'fill-color': documentAreaColorMapping, // Assuming documentColorMapping is an object mapping feature IDs to colors
-                                    'fill-opacity': 0,
-                                },
-                            });
-
-                            // Add the border layer
-                            mapRef.current?.addLayer({
-                                id: borderLayerId,
-                                type: 'line',
-                                source: {
-                                    type: 'geojson',
-                                    data: feature,
-                                },
-                                layout: {},
-                                paint: {
-                                    'line-color': documentBorderColorMapping, // Border color
-                                    'line-width': 0,
-                                },
-                            });
-
-
-                        });
-
-                        //CLUSTERS---------------------------------------------------------
-                        const offsetDistance = 0.0001; // offsetDistance
-
-                        const pointsAndCentroids = getPointsAndCentroids(props.drawing, offsetDistance);
-
-
-                        mapRef.current?.addSource('pointsAndCentroids', {
-                            type: 'geojson',
-                            data: pointsAndCentroids as FeatureCollection,
-                            cluster: true,
-                            clusterMaxZoom: 14,
-                            clusterRadius: 50
-                        });
-
-
-
-                        mapRef.current?.addLayer({
-                            id: 'clusters',
-                            type: 'circle',
-                            source: 'pointsAndCentroids',
-                            filter: ['has', 'point_count'],
-                            paint: {
-                                'circle-color': [
-                                    'step',
-                                    ['get', 'point_count'],
-                                    '#51bbd6',
-                                    100,
-                                    '#f1f075',
-                                    750,
-                                    '#f28cb1'
-                                ],
-                                'circle-radius': [
-                                    'step',
-                                    ['get', 'point_count'],
-                                    20,
-                                    100,
-                                    30,
-                                    750,
-                                    40
-                                ]
-                            }
-                        });
-
-                        // Add a layer for the cluster count.
-                        mapRef.current?.addLayer({
-                            id: 'clusters-count',
-                            type: 'symbol',
-                            source: 'pointsAndCentroids',
-                            filter: ['has', 'point_count'],
-                            layout: {
-                                'text-field': '{point_count_abbreviated}',
-                                'text-font': ['DIN Offc Pro Medium', 'Arial Unicode MS Bold'],
-                                'text-size': 12
-                            }
-                        });
-
-                        mapRef.current?.on('mouseenter', 'clusters', (e) => {
-                            if (mapRef.current) {
-                                mapRef.current.getCanvas().style.cursor = 'pointer';
-                            }
-
-                            const features = mapRef.current?.queryRenderedFeatures(e.point, {
-                                layers: ['clusters']
-                            });
-
-                            if (!features || features.length === 0) return;
-                            const clusterId = features[0].properties?.cluster_id;
-                            (mapRef.current?.getSource('pointsAndCentroids') as mapboxgl.GeoJSONSource).getClusterLeaves(clusterId, 10, 0, (err, leaves) => {
-                                if (err) return;
-
-                                if (!leaves) return;
-                                const descriptions = "Documents titles:<br>" + leaves.map(leaf => {
-                                    if (leaf.properties) {
-                                        return `<b>${leaf.properties.title}</b>`;
-                                    }
-                                    return '';
-                                }).join('<br>');
-                                const coordinates: [number, number] = (features[0].geometry as Point).coordinates.slice(0, 2) as [number, number];
-
-                                const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
-                                    .setLngLat(coordinates)
-                                    .setHTML(descriptions)
-                                    .addTo(mapRef.current!);
-                            });
-                        });
-
-                        mapRef.current?.on('mouseleave', 'clusters', () => {
-                            if (mapRef.current) {
-                                mapRef.current.getCanvas().style.cursor = '';
-                            }
-                            const popups = document.getElementsByClassName('mapboxgl-popup');
-                            while (popups[0]) {
-                                if (popups[0]?.parentNode) {
-                                    popups[0].parentNode.removeChild(popups[0]);
-                                }
-                            }
-                        });
-
-
-
-
-                        mapRef.current?.on('click', 'clusters', (e) => {
-                            if (!mapRef.current) return;
-                            const features = mapRef.current.queryRenderedFeatures(e.point, {
-                                layers: ['clusters']
-                            });
-
-                            const clusterId = features[0].properties?.cluster_id;
-                            const source = mapRef.current?.getSource('pointsAndCentroids');
-                            if (source && 'getClusterExpansionZoom' in source) {
-                                (source as mapboxgl.GeoJSONSource).getClusterExpansionZoom(clusterId, (err: any, zoom: number | null | undefined) => {
-                                    if (err || zoom === undefined || zoom === null) return;
-                                    const newZoom = zoom + 2;
-                                    mapRef.current?.easeTo({
-                                        center: (features[0].geometry.type === 'Point' ? features[0].geometry.coordinates : center) as LngLatLike,
-                                        zoom: newZoom
-                                    });
-                                });
-                            }
-                        });
-
-
-
-                        mapRef.current?.on('mouseenter', 'clusters', (e) => {
-                            if (mapRef.current) {
-                                mapRef.current.getCanvas().style.cursor = 'pointer';
-                            }
-
-                            const features = mapRef.current?.queryRenderedFeatures(e.point, {
-                                layers: ['clusters']
-                            });
-
-                            if (!features || features.length === 0) return;
-                            const clusterId = features[0].properties?.cluster_id;
-                            (mapRef.current?.getSource('pointsAndCentroids') as mapboxgl.GeoJSONSource).getClusterLeaves(clusterId, 10, 0, (err, leaves) => {
-                                if (err) return;
-
-                                if (!leaves) return;
-                                const descriptions = "Documents titles:<br>" + leaves.map(leaf => {
-                                    if (leaf.properties) {
-                                        return `<b>${leaf.properties.title}</b>`;
-                                    }
-                                    return '';
-                                }).join('<br>');
-                                const coordinates: [number, number] = (features[0].geometry as Point).coordinates.slice(0, 2) as [number, number];
-
-                                const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
-                                    .setLngLat(coordinates)
-                                    .setHTML(descriptions)
-                                    .addTo(mapRef.current!);
-                            });
-                        });
-
-                        mapRef.current?.on('mouseleave', 'clusters', () => {
-                            if (mapRef.current) {
-                                mapRef.current.getCanvas().style.cursor = '';
-                            }
-                            const popups = document.getElementsByClassName('mapboxgl-popup');
-                            while (popups[0]) {
-                                if (popups[0]?.parentNode) {
-                                    popups[0].parentNode.removeChild(popups[0]);
-                                }
-                            }
-                        });
-
-
-
-
-                        mapRef.current?.on('click', 'clusters', (e) => {
-                            if (!mapRef.current) return;
-                            const features = mapRef.current.queryRenderedFeatures(e.point, {
-                                layers: ['clusters']
-                            });
-
-                            const clusterId = features[0].properties?.cluster_id;
-                            const source = mapRef.current?.getSource('pointsAndCentroids');
-                            if (source && 'getClusterExpansionZoom' in source) {
-                                (source as mapboxgl.GeoJSONSource).getClusterExpansionZoom(clusterId, (err: any, zoom: number | null | undefined) => {
-                                    if (err || zoom === undefined || zoom === null) return;
-                                    const newZoom = zoom + 2;
-                                    mapRef.current?.easeTo({
-                                        center: (features[0].geometry.type === 'Point' ? features[0].geometry.coordinates : center) as LngLatLike,
-                                        zoom: newZoom
-                                    });
-                                });
-                            }
-                        });
-
-
-
-
-
-
-                        //POINTS--------------------------------------------------------
-                        if (mapRef.current) {
-
-                            pointsAndCentroids.features?.forEach((feature, index) => {
-                                const id = feature.properties?.id;
-                                const pointId = `point-${id}`;
-                                const layerId = `drawings-layer-${id}`;
-                                const circleLayerId = `drawings-circle-layer-${id}`;
-                                const borderLayerId = `drawings-border-layer-${id}`;
-
-                                if (!mapRef.current?.getLayer(pointId)) {
-
-                                    mapRef.current?.addLayer({
-                                        id: circleLayerId,
-                                        type: 'circle',
-                                        source: 'pointsAndCentroids',
-                                        paint: {
-                                            'circle-radius': 15,
-                                            'circle-color': [
-                                                'case',
-                                                ['==', ['get', 'isCentroid'], true], // Check if the feature is a centroid
-                                                '#ffffff',
-                                                '#7499E8'
-                                            ],
-                                        },
-                                        filter: ['==', ['get', 'id'], feature.properties?.id]
-                                    });
-
-                                    mapRef.current?.addLayer({
-                                        id: pointId,
-                                        type: 'symbol',
-                                        source: 'pointsAndCentroids',
-                                        filter: ['==', ['get', 'id'], id],
-                                        layout: {
-                                            'icon-image': ['get', 'icon'], // Use the 'icon' property from the dataset
-                                            'icon-size': 1,
-                                            'icon-padding': 1.5 // Increase the clickable area
-                                        }
-                                    });
-
-                                }
-
-                                let coordinates: [number, number] = [0, 0];
-                                if (feature.geometry.type === 'Point') {
-                                    coordinates = [feature.geometry.coordinates[0], feature.geometry.coordinates[1]];
-                                }
-
-                                const description = `Document Title:<br> <b>${feature.properties?.title}</b>`;
-                                const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
-                                    .setLngLat(coordinates)
-                                    .setHTML(`<div class="popup-content">${description}</div>`);
-
-                                mapRef.current?.on('mouseenter', pointId, () => {
-                                    if (mapRef.current) {
-                                        mapRef.current.getCanvas().style.cursor = 'pointer';
-                                    }
-                                    popup.addTo(mapRef.current!);
-                                    mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 2);
-                                    mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 25);
-                                    mapRef.current?.setPaintProperty(borderLayerId, 'line-width', 3);
-                                    mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0.5);
-                                });
-
-                                mapRef.current?.on('mouseleave', pointId, () => {
-                                    if (mapRef.current) {
-                                        mapRef.current.getCanvas().style.cursor = '';
-                                    }
-                                    popup.remove();
-                                    mapRef.current?.setLayoutProperty(pointId, 'icon-padding', 1);
-                                    mapRef.current?.setPaintProperty(circleLayerId, 'circle-radius', 15);
-                                    mapRef.current?.setPaintProperty(borderLayerId, 'line-width', 0);
-                                    mapRef.current?.setPaintProperty(layerId, 'fill-opacity', 0);
-                                });
-
-
-
-                                mapRef.current?.on('click', pointId, () => {
-                                    window.location.href = `/documents/${id}`;
-                                });
-                            });
-
-                        };
-
-
-                    }).catch(error => {
-                        console.error('Error loading icons:', error);
-                    });
+                    initializeMapLayers(mapRef.current, props, isKirunaVisible);
                 };
 
             });
 
 
         }
-    }, [props.drawing]);
+    }, [props.drawing, mapStyle]);
 
     useEffect(() => {
         if (!mapRef.current) return;
@@ -612,15 +535,14 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                 }}
             />
 
-
-            <Button className="Kiruna-area-button" style={{ display: props.isVisible ? "flex" : "none" }} onClick={toggleKirunaVisibility}>
-                {isKirunaVisible ? 'Hide Kiruna Area' : 'Show Kiruna Area'}
+            <Button className="Kiruna-map-style-button" style={{ display: props.isVisible ? "flex" : "none" }} onClick={toggleMapStyle}>
+                {mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? <RiRoadMapLine /> : <RiEarthLine />}
             </Button>
 
-
-            <DropdownMenu modal={false}>
+            <DropdownMenu modal={false} >
                 <DropdownMenuTrigger asChild>
-                    <Button className="button-whole-Kiruna" variant="primary" style={{ display: props.isVisible ? "flex" : "none" }}>
+                    <Button className="button-whole-Kiruna" variant="primary" style={{ display: props.isVisible ? "flex" : "none" }} onMouseEnter={toggleKirunaVisibility}
+                        onMouseLeave={toggleKirunaVisibility}>
                         <div style={{ display: "flex", alignItems: "center" }}>
                             Whole Kiruna: {props.entireMunicipalityDocuments?.length}
                             <RiFileLine
@@ -658,6 +580,8 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
         </>
     );
 };
+
+
 
 export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: FeatureCollection<Geometry, GeoJsonProperties> | undefined) => void }> = (props) => {
     const [isOpen, setIsOpen] = useState(false);
