@@ -21,7 +21,6 @@
 .Kiruna-map-style-button {
     background-color: white;
     color: #4A4A4A;
-    border: 1px solid #ccc;
     position: absolute;
     bottom: 2rem; /* Move to bottom */
     right: 0.5rem; /* Move to right */
@@ -33,14 +32,13 @@
     align-items: center; /* Center content vertically */
     border-radius: 0.3rem; /* Rounded corners */
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for floating effect */
+    border: none;
     transition: all 0.3s ease; /* Smooth transition for hover effect */
 }
 
 .Kiruna-map-style-button:hover {
     background-color: #f0f0f0;
-    border-color: #b0b0b0;
     box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
-  
 }
 
 .popup-content {
@@ -70,4 +68,18 @@
 .Kiruna-area-button:hover {
     background-color: #f0f0f0;
     border-color: #b0b0b0; 
+}
+
+/* Dark theme styles */
+@media (prefers-color-scheme: dark) {
+    .Kiruna-map-style-button {
+        background-color: #1a1a1a; /* Shinier black */
+        color: #E0E0E0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Darker shadow */
+    }
+
+    .Kiruna-map-style-button:hover {
+        background-color: #333; /* Slightly lighter black on hover */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Increased shadow on hover */
+    }
 }
