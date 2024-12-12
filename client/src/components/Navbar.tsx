@@ -78,7 +78,7 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
 
     return (
         <>
-            <nav style={{ position: 'relative', padding: '0.5rem', marginTop: '-1.5rem', marginBottom: isDashboard ? '1.8rem' : '0' }}>
+            <nav style={{ position: 'relative', padding: '0.5rem', marginTop: '-1.8rem', marginBottom: isDashboard ? '1.8rem' : '0' }}>
                 <ul style={{ display: 'flex', listStyle: 'none', margin: 0, padding: 0, width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
                     <li style={{ marginLeft: '0rem', marginRight: '0.5rem', display: 'flex', alignItems: 'center' }}>
                         <Link className="buttonStyle" to="/">
