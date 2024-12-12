@@ -368,70 +368,6 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                             }
                         });
 
-                        mapRef.current?.on('mouseenter', 'clusters', (e) => {
-                            if (mapRef.current) {
-                                mapRef.current.getCanvas().style.cursor = 'pointer';
-                            }
-
-                            const features = mapRef.current?.queryRenderedFeatures(e.point, {
-                                layers: ['clusters']
-                            });
-
-                            if (!features || features.length === 0) return;
-                            const clusterId = features[0].properties?.cluster_id;
-                            (mapRef.current?.getSource('pointsAndCentroids') as mapboxgl.GeoJSONSource).getClusterLeaves(clusterId, 10, 0, (err, leaves) => {
-                                if (err) return;
-
-                                if (!leaves) return;
-                                const descriptions = "Documents titles:<br>" + leaves.map(leaf => {
-                                    if (leaf.properties) {
-                                        return `<b>${leaf.properties.title}</b>`;
-                                    }
-                                    return '';
-                                }).join('<br>');
-                                const coordinates: [number, number] = (features[0].geometry as Point).coordinates.slice(0, 2) as [number, number];
-
-                                const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
-                                    .setLngLat(coordinates)
-                                    .setHTML(descriptions)
-                                    .addTo(mapRef.current!);
-                            });
-                        });
-
-                        mapRef.current?.on('mouseleave', 'clusters', () => {
-                            if (mapRef.current) {
-                                mapRef.current.getCanvas().style.cursor = '';
-                            }
-                            const popups = document.getElementsByClassName('mapboxgl-popup');
-                            while (popups[0]) {
-                                if (popups[0]?.parentNode) {
-                                    popups[0].parentNode.removeChild(popups[0]);
-                                }
-                            }
-                        });
-
-
-
-
-                        mapRef.current?.on('click', 'clusters', (e) => {
-                            if (!mapRef.current) return;
-                            const features = mapRef.current.queryRenderedFeatures(e.point, {
-                                layers: ['clusters']
-                            });
-
-                            const clusterId = features[0].properties?.cluster_id;
-                            const source = mapRef.current?.getSource('pointsAndCentroids');
-                            if (source && 'getClusterExpansionZoom' in source) {
-                                (source as mapboxgl.GeoJSONSource).getClusterExpansionZoom(clusterId, (err: any, zoom: number | null | undefined) => {
-                                    if (err || zoom === undefined || zoom === null) return;
-                                    const newZoom = zoom + 2;
-                                    mapRef.current?.easeTo({
-                                        center: (features[0].geometry.type === 'Point' ? features[0].geometry.coordinates : center) as LngLatLike,
-                                        zoom: newZoom
-                                    });
-                                });
-                            }
-                        });
 
 
 
@@ -450,9 +386,9 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                                 if (err) return;
 
                                 if (!leaves) return;
-                                const descriptions = "Documents titles:<br>" + leaves.map(leaf => {
+                                const descriptions = `<span style="color: black;">Documents titles:</span><br>` + leaves.map(leaf => {
                                     if (leaf.properties) {
-                                        return `<b>${leaf.properties.title}</b>`;
+                                        return `<b style="color: black;">${leaf.properties.title}</b>`;
                                     }
                                     return '';
                                 }).join('<br>');
