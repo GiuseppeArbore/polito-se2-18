@@ -49,6 +49,7 @@ import {
 import "../../index.css";
 import "../../css/map.css";
 import { Stakeholders } from "../../enum";
+import API from "../../API";
 
 
 mapboxgl.accessToken =
@@ -891,10 +892,66 @@ const MapControls: React.FC<
     };
     // structuredClone is necessary to avoid modifying the prop's original value.
     const feature = structuredClone(props?.drawing?.features?.at?.(0));
-    const geometry = feature?.geometry;
+    let geometry = feature?.geometry;
     const pos = geometry?.type === "Point" ? geometry.coordinates : [NaN, NaN];
     const area = geometry?.type === "Polygon" ? geometry.coordinates : [[[NaN, NaN]]];
     const kirunaArea = Kiruna.features[0] as Feature<Polygon | MultiPolygon>;
+    const [documents, setDocuments] = useState<KxDocument[]>([]);
+    const [selectedTitle, setSelectedTitle] = useState<string>('');
+    const [selectedDocument, setSelectedDocument] = useState<KxDocument | null>(null);
+
+    useEffect(() => {
+        const fetchDocuments = async () => {
+            try {
+                const fetchedDocuments = await API.getAllKxDocuments();
+                setDocuments(fetchedDocuments);
+                console.log(fetchedDocuments);
+            } catch (error) {
+                console.error('Error fetching documents:', error);
+            }
+        };
+
+        fetchDocuments();
+    }, []);
+
+    useEffect(() => {
+        if (!selectedTitle) return;
+
+        const selectedDoc = documents.find(doc => doc.title === selectedTitle);
+        setSelectedDocument(selectedDoc || null);
+    }, [selectedTitle]);
+
+
+    useEffect(() => {
+        if (!selectedDocument?.doc_coordinates) return;
+
+        const geometry = selectedDocument.doc_coordinates as Geometry;
+        console.log(geometry);
+
+        const feature: Feature<Geometry, GeoJsonProperties> = {
+            type: 'Feature',
+            geometry: geometry,
+            properties: {} // Add any properties if needed
+        };
+
+        if (geometry.type === 'Point') {
+            const coordinates = geometry.coordinates;
+            setPointCoords([coordinates[0].toString(), coordinates[1].toString()]);
+            PreviewMapDraw.changeMode('simple_select');
+            PreviewMapDraw.set({
+                type: 'FeatureCollection',
+                features: [feature],
+            });
+        } else if (geometry.type === 'Polygon') {
+            PreviewMapDraw.changeMode('simple_select');
+            PreviewMapDraw.set({
+                type: 'FeatureCollection',
+                features: [feature],
+            });
+        }
+    }, [selectedDocument]);
+
+
 
     useEffect(() => {
         if (geometry?.type === "Point") {
@@ -942,229 +999,269 @@ const MapControls: React.FC<
     // be completely initialized and it's going to cause an exception.
 
     return (
-        <Card className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50">
-            <TabGroup
-                className="mt-1 flex justify-center"
-                index={index}
-                onIndexChange={(i) => {
-                    PreviewMapDraw.deleteAll();
-                    setCoordsError(false);
-                    setPointCoords(["", ""]);
-                    switch (i) {
-                        default: // case 0
-                            PreviewMapDraw.changeMode("simple_select");
-                            break;
-                        case 1:
-                            PreviewMapDraw.changeMode("draw_point");
-                            break;
-                        case 2:
-                            PreviewMapDraw.changeMode("draw_polygon");
-                            break;
-                    }
-                    setIndex(i);
-                }}
-            >
-                <TabList variant="solid">
-                    <Tab value="1" icon={RiHand}>
-                        Drag
-                    </Tab>
-                    <Tab value="2" icon={RiMapPinLine}>
-                        Point
-                    </Tab>
-                    <Tab value="3" icon={RiShapeLine}>
-                        Area
-                    </Tab>
-                </TabList>
-            </TabGroup>
-            <div className="mt-4 px-2">
-                {index === 0 ? (
-                    <></>
-                ) : index === 1 ? (
-                    <>
-                        <p className="text-sm italic mx-2">
-                            Click on the map or type the coordinates to add a Point
-                        </p>
-                        <div className="mt-2">
-                            <TextInput
-                                value={pointCoords[0]}
-                                onValueChange={(longitude) => {
-                                    const tmp = Number(longitude);
-                                    if (tmp < 0 || tmp > 180) return;
-                                    const newCoords: [string, string] = [
-                                        isNaN(tmp) ? pointCoords[0] : longitude,
-                                        pointCoords[1],
-                                    ];
-                                    setPointCoords(newCoords);
-                                    if (newCoords.every((c) => !isNaN(Number(c)) && c !== "")) {
-                                        let tmp =
-                                            feature?.geometry.type === "Point"
-                                                ? feature
-                                                : emptyPointFeature;
-                                        tmp.geometry = {
-                                            ...tmp.geometry,
-                                            type: "Point",
-                                            coordinates: str2pos(newCoords),
-                                        };
-                                        PreviewMapDraw.changeMode("simple_select");
-                                        PreviewMapDraw.set({
-                                            type: "FeatureCollection",
-                                            features: [tmp],
-                                        });
-                                    }
+        <>
+            <DropdownMenu modal={false}>
+                <DropdownMenuTrigger asChild>
+                    <Button className="button-whole-Kiruna" variant="primary">
+                        <div style={{ display: "flex", alignItems: "center" }}>
+                           Select a document
+                            <RiFileLine
+                                style={{
+                                    fontSize: "1rem",
+                                    color: "#4A4A4A",
+                                    transform: "scale(0.80)",
                                 }}
-                                error={coordsError}
-                                icon={() => (
-                                    <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
-                                        Longitude
-                                    </p>
-                                )}
-                                className="mt-1 pl-9 rounded-b-none"
                             />
-                            <TextInput
-                                value={pointCoords[1]}
-                                onValueChange={(latitude) => {
-                                    const tmp = Number(latitude);
-                                    if (tmp < -90 || tmp > 90) return;
-                                    const newCoords: [string, string] = [
-                                        pointCoords[0],
-                                        isNaN(tmp) ? pointCoords[1] : latitude,
-                                    ];
-                                    setPointCoords(newCoords);
-                                    if (newCoords.every((c) => !isNaN(Number(c)) && c !== "")) {
-                                        let tmp =
-                                            feature?.geometry.type === "Point"
-                                                ? feature
-                                                : emptyPointFeature;
-                                        tmp.geometry = {
-                                            ...tmp.geometry,
-                                            type: "Point",
-                                            coordinates: str2pos(newCoords),
-                                        };
-                                        PreviewMapDraw.changeMode("simple_select");
-                                        PreviewMapDraw.set({
-                                            type: "FeatureCollection",
-                                            features: [tmp],
-                                        });
-                                    }
+                            <RiArrowDownSLine
+                                style={{
+                                    fontSize: "1rem",
+                                    color: "#4A4A4A",
+                                    marginLeft: "0.25rem",
                                 }}
-                                error={coordsError}
-                                errorMessage="All points must be inside the municipality of Kiruna"
-                                icon={() => (
-                                    <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
-                                        Latitude
-                                    </p>
-                                )}
-                                className="pl-9 border-t-0 rounded-t-none"
                             />
-                            {!coordsError &&
-                                pointCoords.every((c) => c !== "") &&
-                                !props.bounds?.contains(str2pos(pointCoords) as LngLatLike) ? (
-                                <div className="flex justify-center mt-2">
-                                    <Button
-                                        icon={RiCrosshair2Fill}
-                                        size="xs"
-                                        variant="light"
-                                        onClick={() => {
-                                            props.flyTo(str2pos(pointCoords) as LngLatLike);
-                                        }}
-                                    >
-                                        Navigate to point
-                                    </Button>
-                                </div>
-                            ) : null}
                         </div>
-                        <div className="mt-2 flex justify-center ">
-                            <Button
-                                size="xs"
-                                variant="secondary"
-                                icon={RiDeleteBinFill}
-                                color="red"
-                                className="flex-1"
-                                onClick={() => {
-                                    setPointCoords(["", ""]);
-                                    PreviewMapDraw.deleteAll();
-                                    PreviewMapDraw.changeMode("draw_point");
-                                }}
+                    </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent>
+                    <DropdownMenuLabel>Documents</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuGroup>
+                        {documents.map((doc, index) => (
+                            <DropdownMenuItem
+                            key={index}
+                            onMouseEnter={() => setSelectedTitle(doc.title)}
+                            className="dropdown-item"
                             >
-                                Remove point
-                            </Button>
-                        </div>
-                    </>
-                ) : index === 2 ? (
-                    <>
-                        <p className="text-sm italic mx-2">
-                            Click to add points; to terminate a selection, double click on the
-                            last point.
-                        </p>
-                        <div className="mt-2 flex justify-center space-x-2">
-                            <Button
-                                size="xs"
-                                variant="secondary"
-                                icon={RiDeleteBinFill}
-                                color="red"
-                                className="flex-1"
-                                onClick={() => {
-                                    PreviewMapDraw.deleteAll();
-                                    PreviewMapDraw.changeMode("draw_polygon");
-                                }}
-                            >
-                                Remove area
-                            </Button>
-                            <Button
-                                size="xs"
-                                variant="secondary"
-                                icon={RiScissorsCutFill}
-                                className="flex-1"
-                                onClick={() => {
-                                    if (PreviewMapDraw.getMode() === "draw_polygon") return;
-                                    const features = PreviewMapDraw.getAll().features.map(
-                                        (f: any) => f.id
-                                    );
-                                    if (features.length === 0) return;
-                                    PreviewMapDraw.changeMode("simple_select", {
-                                        featureIds: features,
-                                    });
-                                    PreviewMapDraw.changeMode("cut_polygon");
-                                }}
-                            >
-                                Cut in shape
-                            </Button>
-                        </div>
-                        {coordsError && (
-                            <p className="text-red-500 text-sm mt-4">
-                                All points must be inside the municipality of Kiruna
-                            </p>
-                        )}
-                    </>
-                ) : null}
-            </div>
-            <Divider />
-            <div className="px-2 flex justify-between space-x-2">
-                <Button
-                    size="xs"
-                    variant="secondary"
-                    icon={RiCloseLine}
-                    onClick={props.onCancel}
-                    className="flex-1"
-                >
-                    Cancel
-                </Button>
-                <Button
-                    disabled={coordsError}
-                    size="xs"
-                    variant="primary"
-                    icon={RiCheckFill}
-                    onClick={() => {
-                        // This changeMode is necessary, otherwise the MapDraw might contain malformed data
-                        PreviewMapDraw.changeMode("simple_select");
-                        props.onDone(PreviewMapDraw.getAll());
+                                {doc.title}
+                            </DropdownMenuItem>
+                        ))}
+                    </DropdownMenuGroup>
+                </DropdownMenuContent>
+            </DropdownMenu>
+            <Card className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50">
+                <TabGroup
+                    className="mt-1 flex justify-center"
+                    index={index}
+                    onIndexChange={(i) => {
+                        PreviewMapDraw.deleteAll();
+                        setCoordsError(false);
+                        setPointCoords(["", ""]);
+                        switch (i) {
+                            default: // case 0
+                                PreviewMapDraw.changeMode("simple_select");
+                                break;
+                            case 1:
+                                PreviewMapDraw.changeMode("draw_point");
+                                break;
+                            case 2:
+                                PreviewMapDraw.changeMode("draw_polygon");
+                                break;
+                        }
+                        setIndex(i);
                     }}
-                    className="flex-1"
                 >
-                    Save
-                </Button>
-            </div>
-        </Card>
+                    <TabList variant="solid">
+                        <Tab value="1" icon={RiHand}>
+                            Drag
+                        </Tab>
+                        <Tab value="2" icon={RiMapPinLine}>
+                            Point
+                        </Tab>
+                        <Tab value="3" icon={RiShapeLine}>
+                            Area
+                        </Tab>
+                    </TabList>
+                </TabGroup>
+                <div className="mt-4 px-2">
+                    {index === 0 ? (
+                        <></>
+                    ) : index === 1 ? (
+                        <>
+                            <p className="text-sm italic mx-2">
+                                Click on the map or type the coordinates to add a Point
+                            </p>
+                            <div className="mt-2">
+                                <TextInput
+                                    value={pointCoords[0]}
+                                    onValueChange={(longitude) => {
+                                        const tmp = Number(longitude);
+                                        if (tmp < 0 || tmp > 180) return;
+                                        const newCoords: [string, string] = [
+                                            isNaN(tmp) ? pointCoords[0] : longitude,
+                                            pointCoords[1],
+                                        ];
+                                        setPointCoords(newCoords);
+                                        if (newCoords.every((c) => !isNaN(Number(c)) && c !== "")) {
+                                            let tmp =
+                                                feature?.geometry.type === "Point"
+                                                    ? feature
+                                                    : emptyPointFeature;
+                                            tmp.geometry = {
+                                                ...tmp.geometry,
+                                                type: "Point",
+                                                coordinates: str2pos(newCoords),
+                                            };
+                                            PreviewMapDraw.changeMode("simple_select");
+                                            PreviewMapDraw.set({
+                                                type: "FeatureCollection",
+                                                features: [tmp],
+                                            });
+                                        }
+                                    }}
+                                    error={coordsError}
+                                    icon={() => (
+                                        <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
+                                            Longitude
+                                        </p>
+                                    )}
+                                    className="mt-1 pl-9 rounded-b-none"
+                                />
+                                <TextInput
+                                    value={pointCoords[1]}
+                                    onValueChange={(latitude) => {
+                                        const tmp = Number(latitude);
+                                        if (tmp < -90 || tmp > 90) return;
+                                        const newCoords: [string, string] = [
+                                            pointCoords[0],
+                                            isNaN(tmp) ? pointCoords[1] : latitude,
+                                        ];
+                                        setPointCoords(newCoords);
+                                        if (newCoords.every((c) => !isNaN(Number(c)) && c !== "")) {
+                                            let tmp =
+                                                feature?.geometry.type === "Point"
+                                                    ? feature
+                                                    : emptyPointFeature;
+                                            tmp.geometry = {
+                                                ...tmp.geometry,
+                                                type: "Point",
+                                                coordinates: str2pos(newCoords),
+                                            };
+                                            PreviewMapDraw.changeMode("simple_select");
+                                            PreviewMapDraw.set({
+                                                type: "FeatureCollection",
+                                                features: [tmp],
+                                            });
+                                        }
+                                    }}
+                                    error={coordsError}
+                                    errorMessage="All points must be inside the municipality of Kiruna"
+                                    icon={() => (
+                                        <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default italic text-end text-right tremor-TextInput-icon shrink-0 h-5 w-16 mx-1.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
+                                            Latitude
+                                        </p>
+                                    )}
+                                    className="pl-9 border-t-0 rounded-t-none"
+                                />
+                                {!coordsError &&
+                                    pointCoords.every((c) => c !== "") &&
+                                    !props.bounds?.contains(str2pos(pointCoords) as LngLatLike) ? (
+                                    <div className="flex justify-center mt-2">
+                                        <Button
+                                            icon={RiCrosshair2Fill}
+                                            size="xs"
+                                            variant="light"
+                                            onClick={() => {
+                                                props.flyTo(str2pos(pointCoords) as LngLatLike);
+                                            }}
+                                        >
+                                            Navigate to point
+                                        </Button>
+                                    </div>
+                                ) : null}
+                            </div>
+                            <div className="mt-2 flex justify-center ">
+                                <Button
+                                    size="xs"
+                                    variant="secondary"
+                                    icon={RiDeleteBinFill}
+                                    color="red"
+                                    className="flex-1"
+                                    onClick={() => {
+                                        setPointCoords(["", ""]);
+                                        PreviewMapDraw.deleteAll();
+                                        PreviewMapDraw.changeMode("draw_point");
+                                    }}
+                                >
+                                    Remove point
+                                </Button>
+                            </div>
+                        </>
+                    ) : index === 2 ? (
+                        <>
+                            <p className="text-sm italic mx-2">
+                                Click to add points; to terminate a selection, double click on the
+                                last point.
+                            </p>
+                            <div className="mt-2 flex justify-center space-x-2">
+                                <Button
+                                    size="xs"
+                                    variant="secondary"
+                                    icon={RiDeleteBinFill}
+                                    color="red"
+                                    className="flex-1"
+                                    onClick={() => {
+                                        PreviewMapDraw.deleteAll();
+                                        PreviewMapDraw.changeMode("draw_polygon");
+                                    }}
+                                >
+                                    Remove area
+                                </Button>
+                                <Button
+                                    size="xs"
+                                    variant="secondary"
+                                    icon={RiScissorsCutFill}
+                                    className="flex-1"
+                                    onClick={() => {
+                                        if (PreviewMapDraw.getMode() === "draw_polygon") return;
+                                        const features = PreviewMapDraw.getAll().features.map(
+                                            (f: any) => f.id
+                                        );
+                                        if (features.length === 0) return;
+                                        PreviewMapDraw.changeMode("simple_select", {
+                                            featureIds: features,
+                                        });
+                                        PreviewMapDraw.changeMode("cut_polygon");
+                                    }}
+                                >
+                                    Cut in shape
+                                </Button>
+                            </div>
+                            {coordsError && (
+                                <p className="text-red-500 text-sm mt-4">
+                                    All points must be inside the municipality of Kiruna
+                                </p>
+                            )}
+                        </>
+                    ) : null}
+                </div>
+                <Divider />
+                <div className="px-2 flex justify-between space-x-2">
+                    <Button
+                        size="xs"
+                        variant="secondary"
+                        icon={RiCloseLine}
+                        onClick={props.onCancel}
+                        className="flex-1"
+                    >
+                        Cancel
+                    </Button>
+                    <Button
+                        disabled={coordsError}
+                        size="xs"
+                        variant="primary"
+                        icon={RiCheckFill}
+                        onClick={() => {
+                            // This changeMode is necessary, otherwise the MapDraw might contain malformed data
+                            PreviewMapDraw.changeMode("simple_select");
+                            props.onDone(PreviewMapDraw.getAll());
+                        }}
+                        className="flex-1"
+                    >
+                        Save
+                    </Button>
+                </div>
+            </Card>
+        </>
     );
 };
 
