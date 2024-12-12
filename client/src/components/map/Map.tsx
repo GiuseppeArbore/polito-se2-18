@@ -1032,7 +1032,7 @@ const MapControls: React.FC<
                         {documents.map((doc, index) => (
                             <DropdownMenuItem
                             key={index}
-                            onClick={() => setSelectedTitle(doc.title)}
+                            onMouseEnter={() => setSelectedTitle(doc.title)}
                             className="dropdown-item"
                             >
                                 {doc.title}
