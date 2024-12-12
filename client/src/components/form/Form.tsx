@@ -538,7 +538,7 @@ export function FormDocumentInformation({
                     <span className="text-red-500">*</span>
                 </label>
                 <Select
-                    value={scale.type.toString()}
+                    value={scale.type}
                     onValueChange={(value) => {
                         const v = value as ScaleType;
                         if (v === ScaleType.ONE_TO_N) {
