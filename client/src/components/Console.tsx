@@ -137,9 +137,6 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
 
     return (
         <main>
-            <div className='flex flex-row mb-0' style={{ marginTop: '-2rem', marginBottom: '2.3rem' }}>
-                <h1 className="text-2xl font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Dashboard</h1>
-            </div>
             <div className="flex items-stretch mt-7">
                 <TabGroup
                     className="flex-1"
@@ -158,7 +155,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         </div>
                     </div>
 
-                    <TabList style={{ marginTop: '-2rem' }}>
+                    <TabList style={{ marginTop: '-2.5rem' }}>
                         <Tab>Map</Tab>
                         <Tab>List</Tab>
                         <Tab>Timeline</Tab>
@@ -176,7 +173,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                                 padding: 0,
                                 minHeight: "300px",
                                 width: "100%",
-                                height: "70vh",
+                                height: "85vh",
                             }}
                         >
                             {renderCurrentSelection( setQuickFilterText, selectedView)}
@@ -207,7 +204,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         margin: 0,
                         minHeight: "300px",
                         width: "100%",
-                        height: "70vh",
+                        height: "85vh",
                         borderRadius: 4,
                         display: selectedView === 0 ? 'block' : 'none',
                     }}
