@@ -249,10 +249,7 @@ export default function Document({ user }: DocumentProps) {
 
     return (
         <div>
-            <div className='flex flex-row mb-2'style={{marginTop: '0rem'}}>
-                <h1 className="text-2xl font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Document Page</h1>
-            </div>
-            <Card>
+            <Card style={{ marginTop: '-0.5rem' }}>
                 <div className='flex flex-row '>
 
                     <div className="flex flex-col items-start justify-between w-full lg:w-1/2 lg:border-r lg:border-gray-300 lg:me-6">

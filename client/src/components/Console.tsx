@@ -155,7 +155,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         </div>
                     </div>
 
-                    <TabList style={{ marginTop: '-2.5rem' }}>
+                    <TabList style={{ marginTop: '-2.8rem' }}>
                         <Tab>Map</Tab>
                         <Tab>List</Tab>
                         <Tab>Timeline</Tab>

@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { RiHome3Line, RiDashboardFill, RiLoginBoxLine, RiLogoutBoxLine } from '@remixicon/react';
+import { RiHome3Line, RiDashboardFill, RiLoginBoxLine, RiLogoutBoxLine, RiFileList2Line } from '@remixicon/react';
 import "../css/Navbar.css";
-import { Button, Dialog, DialogPanel,TextInput } from "@tremor/react";
+import { Button, Dialog, DialogPanel, TextInput } from "@tremor/react";
 
 interface NavbarProps {
     login: (credentials: { username: string; password: string }) => Promise<void>;
@@ -25,7 +25,7 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
     const handleLogin = async () => {
         try {
             await login({ username, password });
-            handleClose() // Close the dialog if login is successful
+            handleClose(); // Close the dialog if login is successful
         } catch (e) {
             setError(true); // Handle error if login fails
         }
@@ -33,14 +33,44 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
 
     const handleLogout = () => {
         logout();
-    }
+    };
 
     const handleClose = () => {
         setShowLogin(false);
         setUsername('');
         setPassword('');
-        setError(false)
+        setError(false);
     };
+
+    const getTitle = (path: string) => {
+        switch (path) {
+            case '/':
+                return 'Home';
+            case '/dashboard':
+                return 'Dashboard';
+            default:
+                if (path.includes('/documents')) {
+                    return 'Document Page';
+                }
+                return '';
+        }
+    };
+
+    const getTitleIcon = (title: string) => {
+        switch (title) {
+            case 'Home':
+                return <RiHome3Line style={{ marginRight: '0.5rem' }} />;
+            case 'Dashboard':
+                return <RiDashboardFill style={{ marginRight: '0.5rem' }} />;
+            case 'Document Page':
+                return <RiFileList2Line style={{ marginRight: '0.5rem' }} />;
+            default:
+                return null;
+        }
+    };
+
+    const title = getTitle(location.pathname);
+    const titleIcon = getTitleIcon(title);
 
     if (isHome) {
         return null;
@@ -48,31 +78,37 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
 
     return (
         <>
-            <nav style={{ padding: '0.5rem', marginTop: '-2rem', marginBottom: isDashboard ? '1.8rem' : '0' }}>
-                <ul style={{ display: 'flex', listStyle: 'none', margin: 0, padding: 0, width: '100%' }}>
-                    <li style={{ marginLeft: "-1rem", marginRight: '1rem', display: 'flex', alignItems: 'center' }}>
+            <nav style={{ position: 'relative', padding: '0.5rem', marginTop: '-1.5rem', marginBottom: isDashboard ? '1.8rem' : '0' }}>
+                <ul style={{ display: 'flex', listStyle: 'none', margin: 0, padding: 0, width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
+                    <li style={{ marginLeft: '0rem', marginRight: '0.5rem', display: 'flex', alignItems: 'center' }}>
                         <Link className="buttonStyle" to="/">
                             <RiHome3Line style={{ marginRight: '0.5rem' }} />
                             Home
                         </Link>
                     </li>
                     {!isDashboard && (
-                        <li style={{ marginRight: '1rem', marginLeft: "-1rem", display: 'flex', alignItems: 'center' }}>
+                        <li style={{ marginRight: '1rem', marginLeft: '0rem', display: 'flex', alignItems: 'center' }}>
                             <Link className="buttonStyle" to="/dashboard">
                                 <RiDashboardFill style={{ marginRight: '0.5rem' }} />
                                 Dashboard
                             </Link>
                         </li>
                     )}
+                    <li style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', fontFamily: 'Spartan, sans-serif', fontWeight: 'bold', fontSize: '1.5rem', color: '#444444', marginTop: '0.5rem', display: 'flex', alignItems: 'center' }}>
+                        {titleIcon}
+                        <span>
+                            {title}
+                        </span>
+                    </li>
                     <li style={{ marginLeft: 'auto', marginRight: '-1.4rem', display: 'flex', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', borderRadius: '0.25rem', cursor: 'pointer', transition: 'background-color 0.3s', textDecoration: 'none' }}>
                             {user ? (
-                                <button className="buttonStyle" onClick={handleLogout}  >
+                                <button className="buttonStyle" onClick={handleLogout}>
                                     <RiLogoutBoxLine style={{ marginRight: '0.5rem' }} />
                                     Logout
                                 </button>
                             ) : (
-                                <button className="buttonStyle" onClick={() => setShowLogin(true)}  >
+                                <button className="buttonStyle" onClick={() => setShowLogin(true)}>
                                     <RiLoginBoxLine style={{ marginRight: '0.5rem' }} />
                                     Login
                                 </button>

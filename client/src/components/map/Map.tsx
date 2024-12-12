@@ -169,11 +169,11 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
         doc.title.toLowerCase().includes(searchText.toLowerCase())
     );
 
-    const toggleKirunaVisibility = () => {
+    const toggleKirunaVisibility = (bolean: boolean) => {
         if (mapRef.current) {
-            const visibility = isKirunaVisible ? 'none' : 'visible';
+            const visibility = bolean ? 'visible' : 'none';
             mapRef.current.setLayoutProperty('Kiruna-fill', 'visibility', visibility);
-            setIsKirunaVisible(!isKirunaVisible);
+            setIsKirunaVisible(bolean);
         }
     };
 
@@ -580,7 +580,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
 
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
-                    <Button className="button-whole-Kiruna" variant="primary" style={{ display: props.isVisible ? "flex" : "none" }} onMouseEnter={toggleKirunaVisibility} onMouseLeave={toggleKirunaVisibility} >
+                    <Button className="button-whole-Kiruna" variant="primary" style={{ display: props.isVisible ? "flex" : "none" }} onMouseEnter={() => toggleKirunaVisibility(true)} onMouseLeave={() => toggleKirunaVisibility(false)} >
                         <div style={{ display: "flex", alignItems: "center" }}>
                             Whole Kiruna: {props.entireMunicipalityDocuments?.length}
                             <RiFileLine
@@ -603,7 +603,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                 <DropdownMenuContent >
                     <DropdownMenuLabel>Documents</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <div className='input-dropdown'style={{ padding: '0.2rem' }}>
+                    <div className='input-dropdown' style={{ padding: '0.2rem' }}>
                         <input
                             type="text"
                             placeholder="Search documents..."
