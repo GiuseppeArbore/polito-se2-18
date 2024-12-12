@@ -910,7 +910,7 @@ const MapControls: React.FC<
                 console.error('Error fetching documents:', error);
             }
         };
-        
+
         fetchDocuments();
     }, []);
 
@@ -922,34 +922,34 @@ const MapControls: React.FC<
     }, [selectedTitle]);
 
 
-         useEffect(() => {
-            if (!selectedDocument?.doc_coordinates) return;
-        
-            const geometry = selectedDocument.doc_coordinates as Geometry;
-            console.log(geometry);
-        
-            const feature: Feature<Geometry, GeoJsonProperties> = {
-                type: 'Feature',
-                geometry: geometry,
-                properties: {} // Add any properties if needed
-            };
-        
-            if (geometry.type === 'Point') {
-                const coordinates = geometry.coordinates;
-                setPointCoords([coordinates[0].toString(), coordinates[1].toString()]);
-                PreviewMapDraw.changeMode('simple_select');
-                PreviewMapDraw.set({
-                    type: 'FeatureCollection',
-                    features: [feature],
-                });
-            } else if (geometry.type === 'Polygon') {
-                PreviewMapDraw.changeMode('simple_select');
-                PreviewMapDraw.set({
-                    type: 'FeatureCollection',
-                    features: [feature],
-                });
-            }
-        }, [selectedDocument]);
+    useEffect(() => {
+        if (!selectedDocument?.doc_coordinates) return;
+
+        const geometry = selectedDocument.doc_coordinates as Geometry;
+        console.log(geometry);
+
+        const feature: Feature<Geometry, GeoJsonProperties> = {
+            type: 'Feature',
+            geometry: geometry,
+            properties: {} // Add any properties if needed
+        };
+
+        if (geometry.type === 'Point') {
+            const coordinates = geometry.coordinates;
+            setPointCoords([coordinates[0].toString(), coordinates[1].toString()]);
+            PreviewMapDraw.changeMode('simple_select');
+            PreviewMapDraw.set({
+                type: 'FeatureCollection',
+                features: [feature],
+            });
+        } else if (geometry.type === 'Polygon') {
+            PreviewMapDraw.changeMode('simple_select');
+            PreviewMapDraw.set({
+                type: 'FeatureCollection',
+                features: [feature],
+            });
+        }
+    }, [selectedDocument]);
 
 
 
@@ -1000,21 +1000,11 @@ const MapControls: React.FC<
 
     return (
         <>
-            <div>
-                <select onChange={(e) => setSelectedTitle(e.target.value)}>
-                    <option value="">Select a document</option>
-                    {documents.map((doc, index) => (
-                        <option key={index} value={doc.title}>
-                            {doc.title}
-                        </option>
-                    ))}
-                </select>
-            </div>
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                     <Button className="button-whole-Kiruna" variant="primary">
                         <div style={{ display: "flex", alignItems: "center" }}>
-                        {selectedTitle || "Select a document"}
+                            {selectedTitle || "Select a document"}
                             <RiArrowDownSLine
                                 style={{
                                     fontSize: "1rem",
@@ -1031,9 +1021,9 @@ const MapControls: React.FC<
                     <DropdownMenuGroup>
                         {documents.map((doc, index) => (
                             <DropdownMenuItem
-                            key={index}
-                            onMouseEnter={() => setSelectedTitle(doc.title)}
-                            className="dropdown-item"
+                                key={index}
+                                onMouseEnter={() => setSelectedTitle(doc.title)}
+                                className="dropdown-item"
                             >
                                 {doc.title}
                             </DropdownMenuItem>
@@ -1041,7 +1031,10 @@ const MapControls: React.FC<
                     </DropdownMenuGroup>
                 </DropdownMenuContent>
             </DropdownMenu>
-            <Card className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full sm:w-80 backdrop-blur bg-white/50">
+            <Card
+                className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full backdrop-blur bg-white/50"
+                style={{ width: '25rem', padding: '1rem' }}
+            >
                 <TabGroup
                     className="mt-1 flex justify-center"
                     index={index}
@@ -1072,6 +1065,9 @@ const MapControls: React.FC<
                         </Tab>
                         <Tab value="3" icon={RiShapeLine}>
                             Area
+                        </Tab>
+                        <Tab value="4" icon={RiShapeLine}>
+                            Area2
                         </Tab>
                     </TabList>
                 </TabGroup>
@@ -1234,6 +1230,46 @@ const MapControls: React.FC<
                                     All points must be inside the municipality of Kiruna
                                 </p>
                             )}
+                        </>
+                    ) : index === 3 ? (
+                        <>
+                            <p className="text-sm italic mx-2">
+                                Click to add points; to terminate a selection, double click on the
+                                last point.
+                            </p>
+                            <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
+                                <DropdownMenu modal={false}>
+                                    <DropdownMenuTrigger asChild>
+                                        <Button variant="primary" style={{ marginTop: '0rem' }}>
+                                            <div style={{ display: "flex", alignItems: "center" }}>
+                                                {selectedTitle || "Select a document"}
+                                                <RiArrowDownSLine
+                                                    style={{
+                                                        fontSize: "1rem",
+                                                        color: "#4A4A4A",
+                                                        marginLeft: "0.25rem",
+                                                    }}
+                                                />
+                                            </div>
+                                        </Button>
+                                    </DropdownMenuTrigger>
+                                    <DropdownMenuContent>
+                                        <DropdownMenuLabel>Documents</DropdownMenuLabel>
+                                        <DropdownMenuSeparator />
+                                        <DropdownMenuGroup>
+                                            {documents.map((doc, index) => (
+                                                <DropdownMenuItem
+                                                    key={index}
+                                                    onMouseEnter={() => setSelectedTitle(doc.title)}
+                                                    className="dropdown-item"
+                                                >
+                                                    {doc.title}
+                                                </DropdownMenuItem>
+                                            ))}
+                                        </DropdownMenuGroup>
+                                    </DropdownMenuContent>
+                                </DropdownMenu>
+                            </div>
                         </>
                     ) : null}
                 </div>
