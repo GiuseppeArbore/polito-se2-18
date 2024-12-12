@@ -83,18 +83,18 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
                     <li style={{ marginLeft: '0rem', marginRight: '0.5rem', display: 'flex', alignItems: 'center' }}>
                         <Link className="buttonStyle" to="/">
                             <RiHome3Line style={{ marginRight: '0.5rem' }} />
-                            Home
+                            <span className="button-text">Home</span>
                         </Link>
                     </li>
                     {!isDashboard && (
                         <li style={{ marginRight: '1rem', marginLeft: '0rem', display: 'flex', alignItems: 'center' }}>
                             <Link className="buttonStyle" to="/dashboard">
                                 <RiDashboardFill style={{ marginRight: '0.5rem' }} />
-                                Dashboard
+                                <span className="button-text">Dashboard</span>
                             </Link>
                         </li>
                     )}
-                    <li style={{ position: 'absolute', left: '50%', transform: 'translateX(-50%)', textAlign: 'center', fontFamily: 'Spartan, sans-serif', fontWeight: 'bold', fontSize: '1.5rem', color: '#444444', marginTop: '0.5rem', display: 'flex', alignItems: 'center' }}>
+                    <li className="navbar-title" style={{ fontFamily: 'Spartan, sans-serif'}}>
                         {titleIcon}
                         <span>
                             {title}
@@ -105,12 +105,12 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
                             {user ? (
                                 <button className="buttonStyle" onClick={handleLogout}>
                                     <RiLogoutBoxLine style={{ marginRight: '0.5rem' }} />
-                                    Logout
+                                    <span className="button-text">Logout</span>
                                 </button>
                             ) : (
                                 <button className="buttonStyle" onClick={() => setShowLogin(true)}>
                                     <RiLoginBoxLine style={{ marginRight: '0.5rem' }} />
-                                    Login
+                                    <span className="button-text">Login</span>
                                 </button>
                             )}
                         </div>
