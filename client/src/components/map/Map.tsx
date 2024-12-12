@@ -1000,18 +1000,21 @@ const MapControls: React.FC<
 
     return (
         <>
+            <div>
+                <select onChange={(e) => setSelectedTitle(e.target.value)}>
+                    <option value="">Select a document</option>
+                    {documents.map((doc, index) => (
+                        <option key={index} value={doc.title}>
+                            {doc.title}
+                        </option>
+                    ))}
+                </select>
+            </div>
             <DropdownMenu modal={false}>
                 <DropdownMenuTrigger asChild>
                     <Button className="button-whole-Kiruna" variant="primary">
                         <div style={{ display: "flex", alignItems: "center" }}>
-                           Select a document
-                            <RiFileLine
-                                style={{
-                                    fontSize: "1rem",
-                                    color: "#4A4A4A",
-                                    transform: "scale(0.80)",
-                                }}
-                            />
+                        {selectedTitle || "Select a document"}
                             <RiArrowDownSLine
                                 style={{
                                     fontSize: "1rem",
