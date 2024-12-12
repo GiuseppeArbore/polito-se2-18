@@ -15,6 +15,7 @@ import {
     Badge,
     Callout,
     Switch,
+    Icon,
     Select,
     SelectItem,
 } from "@tremor/react";
@@ -24,8 +25,8 @@ import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
 import { FeatureCollection } from "geojson"
 import API from "../../API";
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "../../enum";
-import { DocCoords, KxDocument } from "../../model";
+import { AreaType, KxDocumentType, ScaleType, Stakeholders } from "../../enum";
+import { DocCoords, KxDocument, ScaleOneToN, Scale } from "../../model";
 import { mongoose } from "@typegoose/typegoose";
 import {
     RiArrowDownCircleLine,
@@ -33,6 +34,7 @@ import {
     RiLoopLeftLine,
     RiProjector2Line,
     RiInformation2Line,
+    RiStarFill,
 } from "@remixicon/react";
 
 import {
@@ -46,6 +48,7 @@ import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
 import { DateRange } from "./DatePicker";
 import { se } from "date-fns/locale";
+import { set } from "date-fns";
 
 
 
@@ -70,8 +73,8 @@ export function FormDialog(props: FormDialogProps) {
     const [type, setType] = useState<string | undefined>(undefined);
 
     const [typeError, setTypeError] = useState(false);
-    const [scale, setScale] = useState(10000);
-    const [scaleType, setScaleType] = useState<Scale>(Scale.TEXT); //todo: fix this according to the enum
+
+    const [scale, setScale] = useState<Scale>({ type: ScaleType.TEXT });
     const [language, setLanguage] = useState<string | undefined>(undefined);
     const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -150,7 +153,6 @@ export function FormDialog(props: FormDialogProps) {
         const newDocument: KxDocument = {
             title,
             stakeholders,
-            //scale_info: Scale.TEXT,
             scale,
             doc_coordinates: draw,
             issuance_date: {
@@ -181,7 +183,7 @@ export function FormDialog(props: FormDialogProps) {
                 });
 
                 setTitle("");
-                setScale(0);
+                setScale({ type: ScaleType.TEXT });
                 setIssuanceDate({ from: new Date() });
                 setType(undefined);
                 setLanguage(undefined);
@@ -240,8 +242,7 @@ export function FormDialog(props: FormDialogProps) {
         setIssuanceDateError(false);
         setType(undefined);
         setTypeError(false);
-        setScale(10000);
-        setScaleType(Scale.TEXT);
+        setScale({ type: ScaleType.TEXT });
         setLanguage(undefined);
         setPages(undefined);
         setPageRanges([]);
@@ -283,8 +284,6 @@ export function FormDialog(props: FormDialogProps) {
                     setTypeError={setTypeError}
                     scale={scale}
                     setScale={setScale}
-                    scaleType={scaleType}
-                    setScaleType={setScaleType}
                     language={language}
                     setLanguage={setLanguage}
                     pages={pages}
@@ -415,8 +414,6 @@ export function FormDocumentInformation({
     setTypeError,
     scale,
     setScale,
-    scaleType,
-    setScaleType,
     language,
     setLanguage,
     pages,
@@ -438,10 +435,8 @@ export function FormDocumentInformation({
     setType: React.Dispatch<React.SetStateAction<string | undefined>>;
     typeError: boolean;
     setTypeError: React.Dispatch<React.SetStateAction<boolean>>;
-    scale: number;
-    setScale: React.Dispatch<React.SetStateAction<number>>;
-    scaleType: Scale;
-    setScaleType: React.Dispatch<React.SetStateAction<Scale>>;
+    scale: Scale;
+    setScale: React.Dispatch<React.SetStateAction<Scale>>;
     language: string | undefined;
     setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
     pages: PageRange[] | undefined;
@@ -543,22 +538,32 @@ export function FormDocumentInformation({
                     <span className="text-red-500">*</span>
                 </label>
                 <Select
-                    value={scaleType?.toString()}
-                    onValueChange={(value) => setScaleType(value as Scale)}
+                    value={scale.type.toString()}
+                    onValueChange={(value) => {
+                        const v = value as ScaleType;
+                        if (v === ScaleType.ONE_TO_N) {
+                            setScale({ type: ScaleType.ONE_TO_N, scale: 10000 });
+                        } else {
+                            setScale({ type: v });
+                        }
+                    }}
                     className="mt-2"
                 >
-                    <SelectItem value="Text">text</SelectItem>
-                    <SelectItem value="2">blueprints/effects</SelectItem>
-                    <SelectItem value="3">Option Three</SelectItem>
-                    <SelectItem value="1:N">1:N</SelectItem>
+                    {Object.values(ScaleType).map((t) => {
+                        return (
+                            <SelectItem value={t} key={t}>
+                                {t}
+                            </SelectItem>
+                        );
+                    })}
                 </Select>
-                {scaleType === Scale.ONE_TO_N &&
+                {scale.type === ScaleType.ONE_TO_N &&
                     <TextInput
                         id="scale"
-                        value={scale.toLocaleString()}
+                        value={scale.scale.toLocaleString()}
                         onValueChange={(v) => {
                             if (v === "") {
-                                setScale(0);
+                                setScale({ type: ScaleType.ONE_TO_N, scale: 10000 });
                                 return;
                             }
                             const num = parseLocalizedNumber(v);
@@ -568,7 +573,7 @@ export function FormDocumentInformation({
                                 num >= 0 &&
                                 num <= 10_000_000_000_000
                             ) {
-                                setScale(num);
+                                setScale({ type: ScaleType.ONE_TO_N, scale: num });
                             }
                         }}
                         name="scale"
@@ -602,7 +607,7 @@ export function FormDocumentInformation({
                     {locales.map((l) => {
                         return (
                             <SearchSelectItem value={l.code} key={`lang-${l.code}`}>
-                                {l.name}
+                                {l.name === "English" || l.name === "Swedish" ? <><Icon className="py-0" size="xs" icon={RiStarFill} /><strong>{l.name}</strong></> : l.name}
                             </SearchSelectItem>
                         );
                     })}
