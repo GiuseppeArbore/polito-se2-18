@@ -1,7 +1,7 @@
 
 import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine, RiAddBoxLine, RiInfoI } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
-import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
+import { FormDialog, FormDocumentDescription, FormDocumentInformation, FormDocumentConnections } from "../form/Form";
 import { FileUpload } from "../form/DragAndDrop";
 import DeleteResourceDialog from './DeleteResourcesDialog';
 import API from '../../API';
@@ -73,6 +73,10 @@ export default function Document({ user }: DocumentProps) {
     const [documentsForCollateral, setDocumentsForCollateral] = useState<KxDocument[]>([]);
     const [documentsForProjection, setDocumentsForProjection] = useState<KxDocument[]>([]);
     const [documentsForUpdate, setDocumentsForUpdate] = useState<KxDocument[]>([]);
+    const [udocumentsForDirect, usetDocumentsForDirect] = useState<string[]>([]);
+    const [udocumentsForCollateral, usetDocumentsForCollateral] = useState<string[]>([]);
+    const [udocumentsForProjection, usetDocumentsForProjection] = useState<string[]>([]);
+    const [udocumentsForUpdate, usetDocumentsForUpdate] = useState<string[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
 
@@ -133,6 +137,10 @@ export default function Document({ user }: DocumentProps) {
                 setDocumentsForCollateral(await Promise.all(document.connections.collateral.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
                 setDocumentsForProjection(await Promise.all(document.connections.projection.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
                 setDocumentsForUpdate(await Promise.all(document.connections.update.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
+                usetDocumentsForDirect(document.connections.direct.map((doc) => doc.toString()));
+                usetDocumentsForCollateral(document.connections.collateral.map((doc) => doc.toString()));
+                usetDocumentsForProjection(document.connections.projection.map((doc) => doc.toString()));
+                usetDocumentsForUpdate(document.connections.update.map((doc) => doc.toString()));
                 setPageRanges([]);
 
 
@@ -247,6 +255,7 @@ export default function Document({ user }: DocumentProps) {
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
     const [selectedResource, setSelectedResource] = useState<string>("");
     const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
+    const [isUpdateConnectionsOpen, setIsUpdateConnectionsOpen] = useState(false);
 
     return (
         <div>
@@ -509,7 +518,19 @@ export default function Document({ user }: DocumentProps) {
                 <div className="flex flex-col space-y-2 ">
                     <div className="flex flex-row">
                         <h3 className="text-l font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Connections</h3>
-                        {canEdit && <i className="ml-2" /*onClick={() => setIsOpen(true)}*/><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong " /></i>}
+                        <FormConnectionsDialog
+                            documents={documents}
+                            documentsForDirect = {udocumentsForDirect}
+                            documentsForCollateral = {udocumentsForCollateral}
+                            documentsForProjection = {udocumentsForProjection}
+                            documentsForUpdate = {udocumentsForUpdate}
+                            setDocumentsForDirect = {usetDocumentsForDirect}
+                            setDocumentsForCollateral = {usetDocumentsForCollateral}
+                            setDocumentsForProjection = {usetDocumentsForProjection}
+                            setDocumentsForUpdate = {usetDocumentsForUpdate}
+                            id = {id!}
+                            user={user}
+                            ></FormConnectionsDialog>
                     </div>
 
                     <div className="flex flex-col lg:flex-row ">
@@ -943,3 +964,129 @@ export function FormDescriptionDialog(
         </>
     );
 }
+
+export function FormConnectionsDialog({
+    documents,
+    documentsForDirect,
+    documentsForCollateral,
+    documentsForProjection,
+    documentsForUpdate,
+    setDocumentsForDirect,
+    setDocumentsForCollateral,
+    setDocumentsForProjection,
+    setDocumentsForUpdate,
+    id,
+    user
+}: {
+    documents: KxDocument[];
+    documentsForDirect: string[];
+    documentsForCollateral: string[];
+    documentsForProjection: string[];
+    documentsForUpdate: string[];
+    setDocumentsForDirect: React.Dispatch<React.SetStateAction<string[]>>;
+    setDocumentsForCollateral: React.Dispatch<React.SetStateAction<string[]>>;
+    setDocumentsForProjection: React.Dispatch<React.SetStateAction<string[]>>;
+    setDocumentsForUpdate: React.Dispatch<React.SetStateAction<string[]>>;
+    id: string;
+    user: { email: string; role: Stakeholders } | null;
+}) {
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [error, setError] = useState("");
+    const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
+    const [showConnectionsInfo, setShowConnectionsInfo] = useState(false);
+
+    const handleConnectionsSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const updatedDocument = null;//await API.updateKxDocumentConnections(id, documentsForDirect.map((d) => d._id), documentsForCollateral.map((d) => d._id), documentsForProjection.map((d) => d._id), documentsForUpdate.map((d) => d._id));
+            if (updatedDocument) {
+                toast({
+                    title: "Success",
+                    description:
+                        "The connections have been updated successfully",
+                    variant: "success",
+                    duration: 3000,
+                })
+            } else {
+                toast({
+                    title: "Error",
+                    description: "Failed to update connections",
+                    variant: "error",
+                    duration: 3000,
+                })
+            }
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: "Failed to update connections",
+                variant: "error",
+                duration: 3000,
+            })
+        }
+        setIsOpen(false);
+    };
+
+    const handleConnectionsCancel = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+
+        setIsOpen(false);
+    }
+
+    return (
+        <>
+            {canEdit && <i className="mb-2 w-full flex justify-end" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
+            <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
+                <DialogPanel
+                    className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
+                    style={{ maxWidth: "80vw" }}
+                >
+                    <div className="sm:mx-auto sm:max-w-2xl">
+                        <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                            Update connections
+                        </h3>
+                        <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                            Update the connections of the document
+                        </p>
+                        <form action="" method="patch" className="mt-8">
+                            <FormDocumentConnections
+                                documents={documents}
+                                documentsForDirect={documentsForDirect}
+                                setDocumentsForDirect={setDocumentsForDirect}
+                                documentsForCollateral={documentsForCollateral}
+                                setDocumentsForCollateral={setDocumentsForCollateral}
+                                documentsForProjection={documentsForProjection}
+                                setDocumentsForProjection={setDocumentsForProjection}
+                                documentsForUpdate={documentsForUpdate}
+                                setDocumentsForUpdate={setDocumentsForUpdate}
+                                showConnectionsInfo={showConnectionsInfo}
+                                setShowConnectionsInfo={setShowConnectionsInfo}
+                            />
+                            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+                                <Button
+                                    className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                                    variant="light"
+                                    onClick={(e) => handleConnectionsCancel(e)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="w-full sm:w-auto primary"
+                                    onClick={e => handleConnectionsSubmit(e)}
+                                >
+                                    Submit
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </DialogPanel>
+            </Dialog>
+            <Toaster />
+        </>
+    );
+
+
+
+}
+
