@@ -103,7 +103,7 @@
 /* Dark theme styles */
 @media (prefers-color-scheme: dark) {
     .input-dropdown {
-        background-color: #1a1a1a;
+        background-color: #040711;
         color: #000000; /* Corrected color for better contrast */
     }
 }
@@ -116,14 +116,14 @@
 /* Dark theme styles */
 @media (prefers-color-scheme: dark) {
     body {
-        background-color: #1a1a1a;
+        background-color: #040711;
         color: #E0E0E0;
     }
 
     .button-whole-Kiruna,
     .Kiruna-area-button,
     .quickfilter {
-        background-color: #1a1a1a;
+        background-color: #040711;
         /* Shinier black */
         color: #E0E0E0;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
