@@ -667,7 +667,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                 <DropdownMenuContent >
                     <DropdownMenuLabel>Documents</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <div style={{ padding: '0.2rem' }}>
+                    <div className='input-dropdown'style={{ padding: '0.2rem' }}>
                         <input
                             type="text"
                             placeholder="Search documents..."

@@ -84,11 +84,39 @@
     cursor: pointer;
     /* Change cursor to pointer */
 }
+/* Light theme styles */
+.input-dropdown {
+    width: 100%;
+    height: 1.5rem;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    background-color: white;
+    color: #4A4A4A;
+    display: flex;
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+
+}
 
 /* Dark theme styles */
 @media (prefers-color-scheme: dark) {
+    .input-dropdown {
+        background-color: #1a1a1a;
+        color: #000000; /* Corrected color for better contrast */
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .popup-content {
+        color: #000000; /* Light text color */
+    }
+}
+/* Dark theme styles */
+@media (prefers-color-scheme: dark) {
     body {
-        background-color: #121212;
+        background-color: #1a1a1a;
         color: #E0E0E0;
     }
 
