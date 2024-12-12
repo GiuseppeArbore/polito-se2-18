@@ -910,7 +910,7 @@ const MapControls: React.FC<
                 console.error('Error fetching documents:', error);
             }
         };
-
+        
         fetchDocuments();
     }, []);
 
@@ -922,34 +922,34 @@ const MapControls: React.FC<
     }, [selectedTitle]);
 
 
-    useEffect(() => {
-        if (!selectedDocument?.doc_coordinates) return;
-
-        const geometry = selectedDocument.doc_coordinates as Geometry;
-        console.log(geometry);
-
-        const feature: Feature<Geometry, GeoJsonProperties> = {
-            type: 'Feature',
-            geometry: geometry,
-            properties: {} // Add any properties if needed
-        };
-
-        if (geometry.type === 'Point') {
-            const coordinates = geometry.coordinates;
-            setPointCoords([coordinates[0].toString(), coordinates[1].toString()]);
-            PreviewMapDraw.changeMode('simple_select');
-            PreviewMapDraw.set({
-                type: 'FeatureCollection',
-                features: [feature],
-            });
-        } else if (geometry.type === 'Polygon') {
-            PreviewMapDraw.changeMode('simple_select');
-            PreviewMapDraw.set({
-                type: 'FeatureCollection',
-                features: [feature],
-            });
-        }
-    }, [selectedDocument]);
+         useEffect(() => {
+            if (!selectedDocument?.doc_coordinates) return;
+        
+            const geometry = selectedDocument.doc_coordinates as Geometry;
+            console.log(geometry);
+        
+            const feature: Feature<Geometry, GeoJsonProperties> = {
+                type: 'Feature',
+                geometry: geometry,
+                properties: {} // Add any properties if needed
+            };
+        
+            if (geometry.type === 'Point') {
+                const coordinates = geometry.coordinates;
+                setPointCoords([coordinates[0].toString(), coordinates[1].toString()]);
+                PreviewMapDraw.changeMode('simple_select');
+                PreviewMapDraw.set({
+                    type: 'FeatureCollection',
+                    features: [feature],
+                });
+            } else if (geometry.type === 'Polygon') {
+                PreviewMapDraw.changeMode('simple_select');
+                PreviewMapDraw.set({
+                    type: 'FeatureCollection',
+                    features: [feature],
+                });
+            }
+        }, [selectedDocument]);
 
 
 
@@ -1029,7 +1029,7 @@ const MapControls: React.FC<
                         {documents.map((doc, index) => (
                             <DropdownMenuItem
                             key={index}
-                            onMouseEnter={() => setSelectedTitle(doc.title)}
+                            onClick={() => setSelectedTitle(doc.title)}
                             className="dropdown-item"
                             >
                                 {doc.title}
