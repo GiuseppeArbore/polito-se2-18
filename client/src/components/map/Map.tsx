@@ -1229,9 +1229,9 @@ const MapControls: React.FC<
                                     <DropdownMenuContent>
                                         <DropdownMenuLabel className='input-dropdown-area-item'>Documents</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
-                                        <div  style={{ padding: '0.2rem' }}>
+                                        <div style={{ padding: '0.2rem' }}>
                                             <input
-                                            className='input-dropdown-area'
+                                                className='input-dropdown-area'
                                                 type="text"
                                                 placeholder="Search documents..."
                                                 value={searchText}
@@ -1251,7 +1251,7 @@ const MapControls: React.FC<
                                         <DropdownMenuGroup className="dropdown-menu-group light-scrollbar dark-scrollbar" style={{ maxHeight: '15rem', overflowY: 'auto' }}>
                                             {filteredDocuments.map((doc, index) => (
                                                 <DropdownMenuItem
-                                                    
+
                                                     key={index}
                                                     onMouseEnter={() => setSelectedTitle(doc.title)}
                                                     className='input-dropdown-area-item'
@@ -1315,7 +1315,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
             pitch: 40,
         });
         // mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
-        // mapRef.current.addControl(PreviewMapDraw, "top-left");
+        mapRef.current.addControl(PreviewMapDraw, "top-left");
         // mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
         // mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
