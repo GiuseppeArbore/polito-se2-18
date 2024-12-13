@@ -584,6 +584,104 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
     );
 };
 
+const loadMapData = async (map: mapboxgl.Map, drawing: FeatureCollection<Geometry, GeoJsonProperties>) => {
+    try {
+        await loadIcons(map);
+
+        const offsetDistance = 0.0001; // offsetDistance
+        const pointsAndCentroids = getPointsAndCentroids(drawing, offsetDistance);
+
+        // Add source for drawings
+        map?.addSource('drawings', {
+            type: 'geojson',
+            data: drawing as FeatureCollection,
+        });
+
+        // Add layers for each feature in drawings
+        drawing?.features.forEach((feature) => {
+            const id = feature.properties?.id;
+            const pointId = `point-${id}`;
+            const layerId = `drawings-layer-${id}`;
+            const borderLayerId = `drawings-border-layer-${id}`;
+            const circleLayerId = `drawings-circle-layer-${id}`;
+
+            // Add the main fill layer
+            map?.addLayer({
+                id: layerId,
+                type: 'fill',
+                source: {
+                    type: 'geojson',
+                    data: feature,
+                },
+                layout: {},
+                paint: {
+                    'fill-color': documentAreaColorMapping, // Assuming documentColorMapping is an object mapping feature IDs to colors
+                    'fill-opacity': 0.5,
+                },
+            });
+
+            // Add the border layer
+            map?.addLayer({
+                id: borderLayerId,
+                type: 'line',
+                source: {
+                    type: 'geojson',
+                    data: feature,
+                },
+                layout: {},
+                paint: {
+                    'line-color': documentBorderColorMapping, // Border color
+                    'line-width': 3,
+                },
+            });
+        });
+
+        // Add source for points and centroids
+        map?.addSource('pointsAndCentroids', {
+            type: 'geojson',
+            data: pointsAndCentroids as FeatureCollection,
+        });
+
+        // Add layers for each feature in points and centroids
+        pointsAndCentroids.features?.forEach((feature) => {
+            const id = feature.properties?.id;
+            const pointId = `point-${id}`;
+            const circleLayerId = `drawings-circle-layer-${id}`;
+
+            if (!map?.getLayer(pointId)) {
+                map?.addLayer({
+                    id: circleLayerId,
+                    type: 'circle',
+                    source: 'pointsAndCentroids',
+                    paint: {
+                        'circle-radius': 15,
+                        'circle-color': [
+                            'case',
+                            ['==', ['get', 'isCentroid'], true], // Check if the feature is a centroid
+                            '#ffffff',
+                            '#7499E8'
+                        ],
+                    },
+                    filter: ['==', ['get', 'id'], feature.properties?.id]
+                });
+
+                map?.addLayer({
+                    id: pointId,
+                    type: 'symbol',
+                    source: 'pointsAndCentroids',
+                    filter: ['==', ['get', 'id'], id],
+                    layout: {
+                        'icon-image': ['get', 'icon'], // Use the 'icon' property from the dataset
+                        'icon-size': 1,
+                        'icon-padding': 1.5 // Increase the clickable area
+                    }
+                });
+            }
+        });
+    } catch (error) {
+        console.error('Error loading icons:', error);
+    }
+};
 
 
 export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: FeatureCollection<Geometry, GeoJsonProperties> | undefined) => void }> = (props) => {
@@ -592,6 +690,11 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
     const mapContainerRef = useRef<any>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
     const canEdit = props.user && props.user.role === Stakeholders.URBAN_PLANNER;
+    const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-streets-v12");
+
+    const toggleMapStyle = () => {
+        setMapStyle(mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? "mapbox://styles/mapbox/streets-v12" : "mapbox://styles/mapbox/satellite-streets-v12");
+    }
 
     useMemo(() => {
         setDrawing(props.drawing);
@@ -617,7 +720,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
             mapRef.current = null;
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
-                style: "mapbox://styles/mapbox/satellite-streets-v12",
+                style: mapStyle,
                 center: center,
                 zoom: props.zoom || defaultZoom,
                 pitch: 40,
@@ -627,109 +730,15 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
             mapRef.current?.on("load", function () {
                 if (mapRef.current) {
                     mapRef.current.addControl(PreviewMapDraw, "bottom-right");
-                    loadIcons(mapRef.current).then(() => {
-
-                        const offsetDistance = 0.0001; // offsetDistance
-                        const pointsAndCentroids = getPointsAndCentroids(props.drawing, offsetDistance);
-                        //AREA----------------------------------------------------------------
-                        mapRef.current?.addSource('drawings', {
-                            type: 'geojson',
-                            data: props.drawing as FeatureCollection,
-                        });
-
-                        props.drawing?.features.forEach((feature, index) => {
-                            const id = feature.properties?.id;
-                            const pointId = `point-${id}`;
-                            const layerId = `drawings-layer-${id}`;
-                            const borderLayerId = `drawings-border-layer-${id}`;
-                            const circleLayerId = `drawings-circle-layer-${id}`;
-
-                            // Add the main fill layer
-                            mapRef.current?.addLayer({
-                                id: layerId,
-                                type: 'fill',
-                                source: {
-                                    type: 'geojson',
-                                    data: feature,
-                                },
-                                layout: {},
-                                paint: {
-                                    'fill-color': documentAreaColorMapping, // Assuming documentColorMapping is an object mapping feature IDs to colors
-                                    'fill-opacity': 0.5,
-                                },
-                            });
-
-                            // Add the border layer
-                            mapRef.current?.addLayer({
-                                id: borderLayerId,
-                                type: 'line',
-                                source: {
-                                    type: 'geojson',
-                                    data: feature,
-                                },
-                                layout: {},
-                                paint: {
-                                    'line-color': documentBorderColorMapping, // Border color
-                                    'line-width': 3,
-                                },
-                            });
-
-
-                        });
-                        //PUNTI--------------------------------------------------------
-                        mapRef.current?.addSource('pointsAndCentroids', {
-                            type: 'geojson',
-                            data: pointsAndCentroids as FeatureCollection,
-                        });
-                        pointsAndCentroids.features?.forEach((feature, index) => {
-                            const id = feature.properties?.id;
-                            const pointId = `point-${id}`;
-                            const layerId = `drawings-layer-${id}`;
-                            const circleLayerId = `drawings-circle-layer-${id}`;
-                            const borderLayerId = `drawings-border-layer-${id}`;
-
-                            if (!mapRef.current?.getLayer(pointId)) {
-
-                                mapRef.current?.addLayer({
-                                    id: circleLayerId,
-                                    type: 'circle',
-                                    source: 'pointsAndCentroids',
-                                    paint: {
-                                        'circle-radius': 15,
-                                        'circle-color': [
-                                            'case',
-                                            ['==', ['get', 'isCentroid'], true], // Check if the feature is a centroid
-                                            '#ffffff',
-                                            '#7499E8'
-                                        ],
-                                    },
-                                    filter: ['==', ['get', 'id'], feature.properties?.id]
-                                });
-
-                                mapRef.current?.addLayer({
-                                    id: pointId,
-                                    type: 'symbol',
-                                    source: 'pointsAndCentroids',
-                                    filter: ['==', ['get', 'id'], id],
-                                    layout: {
-                                        'icon-image': ['get', 'icon'], // Use the 'icon' property from the dataset
-                                        'icon-size': 1,
-                                        'icon-padding': 1.5 // Increase the clickable area
-                                    }
-                                });
-
-                            }
-                        });
-
-                    }).catch(error => {
-                        console.error('Error loading icons:', error);
-                    });
+                    if (props.drawing) {
+                        loadMapData(mapRef.current, props.drawing);
+                    }
                 }
             });
 
 
         }
-    }, [props.drawing]);
+    }, [props.drawing, mapStyle]);
 
     useEffect(() => {
         if (!mapRef.current) return;
@@ -773,6 +782,9 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
                     ></SatMap>
                 </DialogPanel>
             </Dialog>
+            <Button className="Kiruna-map-style-button" onClick={toggleMapStyle}>
+                {mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? <RiRoadMapLine /> : <RiEarthLine />}
+            </Button>
             <div
                 className={props.className}
                 ref={mapContainerRef}
@@ -1102,7 +1114,10 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         props.drawing
     );
     const [mapBounds, setMapBounds] = useState<LngLatBounds | null>(null);
-
+    const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-streets-v12");
+    const toggleMapStyle = () => {
+        setMapStyle(mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? "mapbox://styles/mapbox/streets-v12" : "mapbox://styles/mapbox/satellite-streets-v12");
+    };
     useEffect(() => {
         if (mapRef.current) return;
         mapRef.current = new mapboxgl.Map({
@@ -1112,10 +1127,10 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
             zoom: props.zoom || defaultZoom,
             pitch: 40,
         });
-        mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
+        //mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
         mapRef.current.addControl(PreviewMapDraw, "top-left");
-        mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
-        mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
+        // mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
+        // mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
         mapRef.current.on("move", (e) => {
             setMapBounds(e.target.getBounds());
@@ -1148,10 +1163,64 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
                 },
             });
         });
-        if (props.drawing) {
-            PreviewMapDraw.set(props.drawing);
+    },[mapStyle]);
+    useEffect(() => {
+        if (mapRef.current) {
+            const currentCenter = mapRef.current?.getCenter();
+            const currentZoom = mapRef.current?.getZoom();
+
+            mapRef.current?.remove();
+            mapRef.current = null;
+
+            mapRef.current = new mapboxgl.Map({
+                container: mapContainerRef.current,
+                style: mapStyle,
+                center: currentCenter || center,
+                zoom: currentZoom || props.zoom || defaultZoom,
+                pitch: 40,
+                interactive: true,
+            });
+            //mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
+            mapRef.current.addControl(PreviewMapDraw, "top-left");
+            // mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
+            // mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
+
+            mapRef.current.on("move", (e) => {
+                setMapBounds(e.target.getBounds());
+            });
+            mapRef.current.on("draw.create", (e: DrawCreateEvent) => {
+                setTmpDrawing({ type: "FeatureCollection", features: e.features });
+            });
+            mapRef.current.on("draw.delete", () => {
+                setTmpDrawing(undefined);
+            });
+            mapRef.current.on("draw.update", (e: DrawUpdateEvent) => {
+                setTmpDrawing({ type: "FeatureCollection", features: e.features });
+            });
+
+            mapRef.current?.on("load", function () {
+                //KIRUNA-----------------------------------------------------
+                mapRef.current?.addSource('Kiruna', {
+                    type: 'geojson',
+                    data: Kiruna as FeatureCollection,
+                });
+
+                mapRef.current?.addLayer({
+                    id: "Kiruna-line",
+                    type: 'line',
+                    source: "Kiruna",
+                    paint: {
+                        'line-color': '#745296',
+                        'line-width': 4,
+                        'line-dasharray': [1, 1]
+                    },
+                });
+            });
+            if (tmpDrawing) {
+                PreviewMapDraw.set(tmpDrawing);
+            }
         }
-    }, []);
+    }, [props.drawing, mapStyle]);
 
     useEffect(() => {
         if (!mapRef.current) return;
@@ -1169,6 +1238,9 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
                 id="map"
                 style={props.style}
             />
+            <Button className="Kiruna-map-style-button" onClick={toggleMapStyle}>
+                {mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? <RiRoadMapLine /> : <RiEarthLine />}
+            </Button>
             <MapControls
                 onCancel={props.onCancel}
                 onDone={props.onDone}
