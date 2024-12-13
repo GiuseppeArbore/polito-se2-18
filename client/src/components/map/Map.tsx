@@ -1163,7 +1163,10 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
                 },
             });
         });
-    },[mapStyle]);
+        if (props.drawing) {
+            PreviewMapDraw.set(props.drawing);
+        }
+    },[]);
     useEffect(() => {
         if (mapRef.current) {
             const currentCenter = mapRef.current?.getCenter();
@@ -1213,14 +1216,18 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
                         'line-color': '#745296',
                         'line-width': 4,
                         'line-dasharray': [1, 1]
-                    },
+                    }, 
                 });
-            });
-            if (tmpDrawing) {
+            }); 
+            if (props.drawing) {
+                PreviewMapDraw.set(props.drawing);
+            }
+            if (tmpDrawing ) {
                 PreviewMapDraw.set(tmpDrawing);
             }
+
         }
-    }, [props.drawing, mapStyle]);
+    }, [mapStyle]);
 
     useEffect(() => {
         if (!mapRef.current) return;
