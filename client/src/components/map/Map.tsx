@@ -30,7 +30,8 @@ import {
     RiShapeLine,
     RiArrowDownSLine,
     RiFileLine,
-    RiEditBoxLine
+    RiEditBoxLine,
+    RiShapesLine
 } from "@remixicon/react";
 import { PreviewMapDraw, DocumentMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
@@ -644,7 +645,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                 <DropdownMenuContent>
                     <DropdownMenuLabel>Documents</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
+                    <DropdownMenuGroup className="dropdown-menu-group light-scrollbar dark-scrollbar" style={{ maxHeight: '15rem', overflowY: 'auto' }}>
                         {props.entireMunicipalityDocuments?.map((doc, index) => (
                             <DropdownMenuItem
                                 key={index}
@@ -899,13 +900,18 @@ const MapControls: React.FC<
     const [documents, setDocuments] = useState<KxDocument[]>([]);
     const [selectedTitle, setSelectedTitle] = useState<string>('');
     const [selectedDocument, setSelectedDocument] = useState<KxDocument | null>(null);
+    const [searchText, setSearchText] = useState('');
+    const filteredDocuments = documents?.filter((doc) =>
+        doc.title.toLowerCase().includes(searchText.toLowerCase())
+    );
+
 
     useEffect(() => {
         const fetchDocuments = async () => {
             try {
                 const fetchedDocuments = await API.getAllKxDocuments();
-                setDocuments(fetchedDocuments);
-                console.log(fetchedDocuments);
+                const filteredDocuments = fetchedDocuments.filter(doc => doc.doc_coordinates.type !== 'EntireMunicipality');
+                setDocuments(filteredDocuments);
             } catch (error) {
                 console.error('Error fetching documents:', error);
             }
@@ -926,7 +932,6 @@ const MapControls: React.FC<
         if (!selectedDocument?.doc_coordinates) return;
 
         const geometry = selectedDocument.doc_coordinates as Geometry;
-        console.log(geometry);
 
         const feature: Feature<Geometry, GeoJsonProperties> = {
             type: 'Feature',
@@ -1000,43 +1005,12 @@ const MapControls: React.FC<
 
     return (
         <>
-            <DropdownMenu modal={false}>
-                <DropdownMenuTrigger asChild>
-                    <Button className="button-whole-Kiruna" variant="primary">
-                        <div style={{ display: "flex", alignItems: "center" }}>
-                            {selectedTitle || "Select a document"}
-                            <RiArrowDownSLine
-                                style={{
-                                    fontSize: "1rem",
-                                    color: "#4A4A4A",
-                                    marginLeft: "0.25rem",
-                                }}
-                            />
-                        </div>
-                    </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent>
-                    <DropdownMenuLabel>Documents</DropdownMenuLabel>
-                    <DropdownMenuSeparator />
-                    <DropdownMenuGroup>
-                        {documents.map((doc, index) => (
-                            <DropdownMenuItem
-                                key={index}
-                                onMouseEnter={() => setSelectedTitle(doc.title)}
-                                className="dropdown-item"
-                            >
-                                {doc.title}
-                            </DropdownMenuItem>
-                        ))}
-                    </DropdownMenuGroup>
-                </DropdownMenuContent>
-            </DropdownMenu>
             <Card
-                className="ring-transparent absolute top-0 sm:m-2 right-0 xsm:w-full backdrop-blur bg-white/50"
-                style={{ width: '25rem', padding: '1rem' }}
+                className="ring-transparent absolute top-0 sm:m-2 sm:right-0 sm:left-auto left-0 right-0 mx-auto xsm:w-full backdrop-blur bg-white/50"
+                style={{ width: '80%', maxWidth: '25rem', padding: '1rem' }}
             >
                 <TabGroup
-                    className="mt-1 flex justify-center"
+                    className="mt-1 flex justify-center mx-auto tab-group"
                     index={index}
                     onIndexChange={(i) => {
                         PreviewMapDraw.deleteAll();
@@ -1056,18 +1030,18 @@ const MapControls: React.FC<
                         setIndex(i);
                     }}
                 >
-                    <TabList variant="solid">
-                        <Tab value="1" icon={RiHand}>
+                    <TabList variant="solid" className='tab-group'>
+                        <Tab value="1" icon={RiHand} className="tab">
                             Drag
                         </Tab>
-                        <Tab value="2" icon={RiMapPinLine}>
+                        <Tab value="2" icon={RiMapPinLine} className="tab">
                             Point
                         </Tab>
-                        <Tab value="3" icon={RiShapeLine}>
-                            Area
+                        <Tab value="3" icon={RiShapeLine} className="tab">
+                            Draw
                         </Tab>
-                        <Tab value="4" icon={RiShapeLine}>
-                            Area2
+                        <Tab value="4" icon={RiShapesLine} className="tab">
+                            Select
                         </Tab>
                     </TabList>
                 </TabGroup>
@@ -1234,13 +1208,12 @@ const MapControls: React.FC<
                     ) : index === 3 ? (
                         <>
                             <p className="text-sm italic mx-2">
-                                Click to add points; to terminate a selection, double click on the
-                                last point.
+                                Select an area or a point of an existing document from the dropdown menu.
                             </p>
                             <div style={{ display: 'flex', justifyContent: 'center', marginTop: '1rem' }}>
                                 <DropdownMenu modal={false}>
                                     <DropdownMenuTrigger asChild>
-                                        <Button variant="primary" style={{ marginTop: '0rem' }}>
+                                        <Button className='button-select-area' variant="primary" style={{ marginTop: '0rem' }}>
                                             <div style={{ display: "flex", alignItems: "center" }}>
                                                 {selectedTitle || "Select a document"}
                                                 <RiArrowDownSLine
@@ -1254,14 +1227,34 @@ const MapControls: React.FC<
                                         </Button>
                                     </DropdownMenuTrigger>
                                     <DropdownMenuContent>
-                                        <DropdownMenuLabel>Documents</DropdownMenuLabel>
+                                        <DropdownMenuLabel className='input-dropdown-area-item'>Documents</DropdownMenuLabel>
                                         <DropdownMenuSeparator />
-                                        <DropdownMenuGroup>
-                                            {documents.map((doc, index) => (
+                                        <div  style={{ padding: '0.2rem' }}>
+                                            <input
+                                            className='input-dropdown-area'
+                                                type="text"
+                                                placeholder="Search documents..."
+                                                value={searchText}
+                                                onChange={(e) => setSearchText(e.target.value)}
+                                                onKeyDown={(e) => e.stopPropagation()}
+                                                style={{
+                                                    width: '100%',
+                                                    height: '1.5rem',
+                                                    padding: '0.5rem',
+                                                    boxSizing: 'border-box',
+                                                    borderRadius: '0.5rem',
+                                                    fontSize: '0.75rem',
+                                                }}
+                                            />
+                                        </div>
+
+                                        <DropdownMenuGroup className="dropdown-menu-group light-scrollbar dark-scrollbar" style={{ maxHeight: '15rem', overflowY: 'auto' }}>
+                                            {filteredDocuments.map((doc, index) => (
                                                 <DropdownMenuItem
+                                                    
                                                     key={index}
                                                     onMouseEnter={() => setSelectedTitle(doc.title)}
-                                                    className="dropdown-item"
+                                                    className='input-dropdown-area-item'
                                                 >
                                                     {doc.title}
                                                 </DropdownMenuItem>
@@ -1321,10 +1314,10 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
             zoom: props.zoom || defaultZoom,
             pitch: 40,
         });
-        mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
-        mapRef.current.addControl(PreviewMapDraw, "top-left");
-        mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
-        mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
+        // mapRef.current.addControl(new mapboxgl.ScaleControl(), "bottom-right");
+        // mapRef.current.addControl(PreviewMapDraw, "top-left");
+        // mapRef.current.addControl(new mapboxgl.NavigationControl(), "bottom-right");
+        // mapRef.current.addControl(new mapboxgl.FullscreenControl(), "bottom-right");
 
         mapRef.current.on("move", (e) => {
             setMapBounds(e.target.getBounds());
