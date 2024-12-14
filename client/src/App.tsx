@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Home from "./components/landing/Home";
 import Document from "./components/documents/Document";
 import { NotFound } from "./components/NotFound";
@@ -16,20 +16,20 @@ export default function App() {
     const navigate = useNavigate();
     const [loggedIn, setLoggedIn] = useState(false);
     const [errorMessage, setErrorMessage] = useState<{ msg: string; type: string }>({ msg: '', type: '' });
-    const [user, setUser] = useState<{ email: string; role: Stakeholders } | null>(null);
+    const user = useRef<{ email: string; role: Stakeholders } | null>(null);
     const [error, setError] = useState<boolean | undefined>(false);
 
     const login = async (credentials: { username: string; password: string }) => {
         try {
-            const user = await API.login(credentials);
+            const usr = await API.login(credentials);
             setLoggedIn(true);
             toast({
                 title: "Success",
-                description: `Welcome ${user.email}!`,
+                description: `Welcome ${usr.email}!`,
                 variant: "success",
                 duration: 3000,
             });
-            setUser(user);
+            user.current = usr;
             navigate('/dashboard');
         } catch (err) {
             setError(true);
@@ -44,9 +44,9 @@ export default function App() {
 
     useEffect(() => {
         API.getUserInfo()
-            .then(user => {
+            .then(usr => {
                 setLoggedIn(true);
-                setUser(user);
+                user.current = usr;
             }).catch(e => {
                 if (loggedIn)
                     toast({
@@ -56,7 +56,7 @@ export default function App() {
                         duration: 3000,
                     });
                 setLoggedIn(false);
-                setUser(null);
+                user.current = null
             });
     }, []);
 
@@ -64,7 +64,7 @@ export default function App() {
         try {
             await API.logout();
             setLoggedIn(false);
-            setUser(null);
+            user.current = null;
             toast({
                 title: "Success",
                 description: `You have been logged out!`,
@@ -72,10 +72,11 @@ export default function App() {
                 duration: 3000,
             });
         } catch (err) {
+            console.error(err);
             toast({
                 title: "Danger",
                 description: (err as Error).message,
-                variant: "success",
+                variant: "error",
                 duration: 3000,
             });
         }

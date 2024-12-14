@@ -29,7 +29,7 @@ interface ListProps {
   updateFilterModel: (filterModel: AdvancedFilterModel | undefined) => void;
   filterModel: AdvancedFilterModel | undefined;
   quickFilter: string;
-  user: { email: string; role: Stakeholders } | null;
+  user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }
 
 function List(props: ListProps) {
@@ -42,7 +42,7 @@ function List(props: ListProps) {
   }, []);
   const [deleteConfirm, setDeleteConfirm] = useState(false);
   const rowNode = useRef<any>();
-  const infoButton = (params: any) => {
+  const infoButton = (params: any, user: any) => {
     return (
       <Flex justifyContent="evenly" className="mt-1">
         <Button
@@ -50,7 +50,7 @@ function List(props: ListProps) {
           icon={RiInfoI}
           onClick={() => navigator("/documents/" + params.value)}
         />
-        {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
+        {user && user.role === Stakeholders.URBAN_PLANNER && (
           <Button
             style={{ backgroundColor: "red" }}
             color="red"
@@ -79,6 +79,7 @@ function List(props: ListProps) {
       </div>
     );
   };
+ 
   const KxColDefs: ColDef<KxDocument>[] = [
     {
       headerName: "Title",
@@ -181,11 +182,13 @@ function List(props: ListProps) {
       field: "_id",
       minWidth: 30,
       enableRowGroup: false,
-      cellRenderer: (params: any) => infoButton(params),
+      cellRenderer: (params: any) => infoButton(params, props.user.current),
       filter: false,
     },
   ];
-
+  useMemo(() => {
+    gridRef.current?.api.setGridOption('columnDefs', KxColDefs);
+  }, [props.user.current]);
   const autoGroupColumnDef = {
     sortable: false,
     headerName: "Group",

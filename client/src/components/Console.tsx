@@ -26,7 +26,7 @@ import { AdvancedFilterModel } from "ag-grid-enterprise";
 import { Stakeholders } from "../enum";
 
 interface ConsoleProps {
-    user: { email: string; role: Stakeholders } | null;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }
 
 const Console: React.FC<ConsoleProps> = ({ user }) => {
@@ -150,7 +150,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                             <FormDialog
                                 documents={documents}
                                 refresh={() => setRefreshNeeded(true)}
-                                user={user}
+                                user={user.current}
                             />
                         </div>
                     </div>
@@ -208,7 +208,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         borderRadius: 4,
                         display: selectedView === 0 ? 'block' : 'none',
                     }}
-                    user={user}
+                    user={user.current}
                     drawing={drawing}
                     entireMunicipalityDocuments={entireMunicipalityDocuments}
                     isVisible={selectedView === 0 ? true : false}

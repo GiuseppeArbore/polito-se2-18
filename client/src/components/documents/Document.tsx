@@ -32,7 +32,7 @@ import locales from "../../locales.json"
 import exp from 'constants';
 import { DateRange } from '../form/DatePicker';
 interface DocumentProps {
-    user: { email: string; role: Stakeholders } | null;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }
 
 interface FormDialogProps {
@@ -48,7 +48,7 @@ export default function Document({ user }: DocumentProps) {
         return date.toLocaleDateString('sv-SE'); // 'sv-SE' è un formato ISO-like
     };
 
-    const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
+    const canEdit = user.current && user.current.role === Stakeholders.URBAN_PLANNER;
 
     const navigate = useNavigate();
     const { id } = useParams<string>();
@@ -314,9 +314,8 @@ export default function Document({ user }: DocumentProps) {
                             pageRanges={pageRanges}
                             setPageRanges={setPageRanges}
                             id={id!}
-                            user={user}
+                            user={user.current}
                         />
-
 
                     </div>
 
@@ -330,7 +329,7 @@ export default function Document({ user }: DocumentProps) {
                                 description={description}
                                 setDescription={setDescription}
                                 id={id!}
-                                user={user}
+                                user={user.current}
                             />
                         </div>
                     </div>
@@ -511,7 +510,7 @@ export default function Document({ user }: DocumentProps) {
                             description={description}
                             setDescription={setDescription}
                             id={id!}
-                            user={user}
+                            user={user.current}
                         />
                     </AccordionBody>
                 </Accordion>
@@ -526,7 +525,7 @@ export default function Document({ user }: DocumentProps) {
                                 setDrawing={(d) => { setDrawings(d); setSaveDrawing(true) }}
                                 drawing={drawings}
                                 style={{ minHeight: "300px", width: "100%", height: "80vh" }} 
-                                user={user}
+                                user={user.current}
                             />
                         </Card>
                     ) : (

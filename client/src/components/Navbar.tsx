@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { RiHome3Line, RiDashboardFill, RiLoginBoxLine, RiLogoutBoxLine, RiFileList2Line } from '@remixicon/react';
 import "../css/Navbar.css";
 import { Button, Dialog, DialogPanel, TextInput } from "@tremor/react";
+import { Stakeholders } from '../enum';
 
 interface NavbarProps {
     login: (credentials: { username: string; password: string }) => Promise<void>;
@@ -10,7 +11,7 @@ interface NavbarProps {
     loginErrorMessage: { msg: string; type: string };
     error: boolean | undefined;
     setError: (error: boolean) => void;
-    user: any;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }
 
 const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error, setError, user }) => {
@@ -102,7 +103,7 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
                     </li>
                     <li style={{ marginLeft: 'auto', marginRight: '-1.4rem', display: 'flex', alignItems: 'center' }}>
                         <div style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', borderRadius: '0.25rem', cursor: 'pointer', transition: 'background-color 0.3s', textDecoration: 'none' }}>
-                            {user ? (
+                            {user.current ? (
                                 <button className="buttonStyle" onClick={handleLogout}>
                                     <RiLogoutBoxLine style={{ marginRight: '0.5rem' }} />
                                     <span className="button-text">Logout</span>
