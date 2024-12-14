@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Button, Dialog, DialogPanel, Select, SelectItem, Text, TextInput } from "@tremor/react";
-import { Link, redirect } from "react-router-dom";
+import { Button, Dialog, DialogPanel, Text, TextInput } from "@tremor/react";
+import { Link } from "react-router-dom";
 import { Badge } from "@tremor/react";
 import { Stakeholders } from "../../enum";
 
 
 
 interface HeroSectionProps {
+    // eslint-disable-next-line no-unused-vars
     login: (credentials: { username: string; password: string }) => void;
     logout: () => void;
     setError: React.Dispatch<React.SetStateAction<boolean | undefined>>;
@@ -43,7 +44,7 @@ const HeroSection: React.FC<HeroSectionProps> = ({ login, logout, setError, logi
                     Kiruna Explorer: A City on the Move
                 </h1>
                 <Text className="text-md md:mb-2 mt-1 animate__animated animate__fadeIn animate__delay-2s">
-                    Discover the journey of Sweden's moving city
+                    Discover the journey of Sweden&apos;s moving city
                 </Text>
             </div>
             <div className="animate__animated animate__fadeIn animate__delay-2s custom-blink">

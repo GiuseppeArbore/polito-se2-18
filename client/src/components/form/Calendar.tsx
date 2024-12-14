@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // Tremor Calendar [v0.1.0]
 
 "use client"

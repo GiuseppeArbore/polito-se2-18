@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 export enum Stakeholders {
     URBAN_DEVELOPER = "Urban Developer",
     URBAN_PLANNER = "Urban Planner",

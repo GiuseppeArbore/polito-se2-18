@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 /*eslint no-undef: "error"*/
 /** @type {import('tailwindcss').Config} */
 

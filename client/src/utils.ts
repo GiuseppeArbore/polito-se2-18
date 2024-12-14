@@ -12,7 +12,7 @@ export function validatePageRangeString(pr: string): PageRange[] | undefined {
         return [];
 
     const tmpRanges = pr.replaceAll(" ", "").split(",")
-    let ranges: PageRange[] = [];
+    const ranges: PageRange[] = [];
     for (const r of tmpRanges) {
         const tmpRange = r.split("-");
         if (tmpRange.length > 2 || !tmpRange.every(r => r.length > 0))
@@ -36,9 +36,6 @@ export function validatePageRangeString(pr: string): PageRange[] | undefined {
     return ranges;
 }
 
-function deg2rad(p: number): number {
-    return p * (Math.PI / 180);
-}
 
 /**
  * Computes the distance between two points

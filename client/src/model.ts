@@ -1,6 +1,9 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "./enum";
-import { mongoose, getModelForClass, Ref } from "@typegoose/typegoose";
+import { AreaType} from "./enum";
+import { mongoose, Ref } from "@typegoose/typegoose";
 const prop = (..._: any) => (_: any, _a: string) => { };
 const modelOptions = (..._: any) => (_: any) => { };
 

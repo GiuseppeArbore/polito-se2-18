@@ -56,7 +56,7 @@ export default function App() {
                 setLoggedIn(false);
                 setUser(null);
             });
-    }, []);
+    }, [loggedIn]);
 
     const logout = async () => {
         try {

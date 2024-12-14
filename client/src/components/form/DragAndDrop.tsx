@@ -1,6 +1,7 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { useMemo } from 'react';
 import { RiDeleteBinLine, RiFileLine, RiInformation2Line } from '@remixicon/react';
-import { Callout, Divider, Select, SelectItem, TextInput } from '@tremor/react';
+import { Callout } from '@tremor/react';
 import { useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 
@@ -9,11 +10,13 @@ function classNames(...classes: string[]) {
 }
 
 interface FileUploadProps {
+    // eslint-disable-next-line no-unused-vars, no-undef
     saveFile: (files: File[]) => void;
 }
 
 export function FileUpload(props: FileUploadProps) {
     const [showAttachmentInfo, setShowAttachmentInfo] = useState(false);
+    // eslint-disable-next-line no-undef
     const [files, setFiles] = React.useState<File[]>([]);
     const { getRootProps, getInputProps, isDragActive } = useDropzone({
         onDrop: (acceptedFiles) =>

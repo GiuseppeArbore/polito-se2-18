@@ -1,13 +1,14 @@
 import { Dialog, DialogPanel, Button } from "@tremor/react";
 import { Viewer, Worker, ViewMode } from '@react-pdf-viewer/core';
-import { RiCloseLargeFill, RiCloseLargeLine, RiDownload2Line, RiExternalLinkLine, RiFileCloseFill } from "@remixicon/react";
-import { KxDocument } from "../../model";
+import { RiCloseLargeFill, RiDownload2Line } from "@remixicon/react";
 import { useEffect, useState } from "react";
 import API from "../../API";
 import { toast } from "../../utils/toaster";
 import { mongoose } from "@typegoose/typegoose";
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import mime from 'mime';
+
+// eslint-disable-next-line no-unused-vars
 export default function PreviewDoc(open: boolean, setOpen: (bool: boolean) => void, docId: mongoose.Types.ObjectId | undefined, title: string | undefined) {
 
     const [fileUrl, setFileUrl] = useState<string | undefined>(undefined);
@@ -19,8 +20,7 @@ export default function PreviewDoc(open: boolean, setOpen: (bool: boolean) => vo
                     const url = await API.getKxFileByID(docId, title);
                     setFileUrl(url.presignedUrl);
                 }
-            } catch (error) {
-                console.error(error);
+            } catch  {
                 toast({
                     title: "Error",
                     description: "Failed to retrieve file",

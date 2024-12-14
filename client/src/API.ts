@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-undef */
 import { mongoose } from '@typegoose/typegoose';
 import { KxDocument, PageRange } from './model';
 
@@ -187,7 +189,7 @@ const deleteKxDocument = async (id: mongoose.Types.ObjectId): Promise<void> => {
     }
 };
 
-const addAttachmentToDocument = async (id: mongoose.Types.ObjectId, files: File[]): Promise<Boolean> => {
+const addAttachmentToDocument = async (id: mongoose.Types.ObjectId, files: File[]): Promise<boolean> => {
     try {
         const formData = new FormData();
         files.forEach(file => formData.append('attachments', file, file.name));

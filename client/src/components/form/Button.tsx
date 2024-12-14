@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // Tremor Button [v0.2.0]
 
 import React from "react"

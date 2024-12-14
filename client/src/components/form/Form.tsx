@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from "react";
 import {
     Card,
@@ -17,12 +18,11 @@ import {
     Switch,
 } from "@tremor/react";
 import { DateRangePicker } from "./DatePicker"
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import locales from "./../../locales.json";
 import { PreviewMap, SatMap } from "../map/Map";
-import { FeatureCollection } from "geojson"
 import API from "../../API";
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "../../enum";
+import { AreaType, KxDocumentType, Stakeholders } from "../../enum";
 import { DocCoords, KxDocument } from "../../model";
 import { mongoose } from "@typegoose/typegoose";
 import {
@@ -43,7 +43,6 @@ import { toast } from "../../utils/toaster";
 import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
 import { DateRange } from "./DatePicker";
-import { se } from "date-fns/locale";
 
 
 
@@ -63,6 +62,7 @@ export function FormDialog(props: FormDialogProps) {
     const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(
         { from: new Date() }
     );
+    // eslint-disable-next-line no-undef
     const [files, setFiles] = useState<File[]>([]);
     const [issuanceDateError, setIssuanceDateError] = useState(false);
     const [type, setType] = useState<string | undefined>(undefined);
@@ -89,10 +89,8 @@ export function FormDialog(props: FormDialogProps) {
     const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
     const [showConnectionsInfo, setShowConnectionsInfo] = useState(false);
     const [isOpen, setIsOpen] = useState(false);
-    const [error, setError] = useState("");
-    const [message, setMessage] = useState("");
 
-    const [docCoordinates, _] = useState<DocCoords | undefined>(undefined);
+    const docCoordinates = useState<DocCoords | undefined>(undefined);
     // Example usage
     //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
 
@@ -127,14 +125,13 @@ export function FormDialog(props: FormDialogProps) {
             };
         }
 
-        if (tmpTitleError || tmpShError || !type || !description || !draw || !issuanceDate || (drawing === undefined && !hideMap)) {
+        if (tmpTitleError || tmpShError || !type || !description || !draw || !issuanceDate || !issuanceDate.from || !issuanceDate.to || (drawing === undefined && !hideMap) ) {
             setTitleError(tmpTitleError);
             setShError(tmpShError);
             setTypeError(!type);
             setDescriptionError(!description);
             setIssuanceDateError(!issuanceDate);
-            hideMap ? setDocCoordinatesError(false) : setDocCoordinatesError(!docCoordinates);
-            setError("Please fill all the required fields");
+            if(hideMap){setDocCoordinatesError(false)} else {setDocCoordinatesError(!docCoordinates)};
             toast({
                 title: "Error",
                 description: "Please fill all the required fields",
@@ -143,7 +140,6 @@ export function FormDialog(props: FormDialogProps) {
             })
             return;
         }
-
         const newDocument: KxDocument = {
             title,
             stakeholders,
@@ -151,8 +147,8 @@ export function FormDialog(props: FormDialogProps) {
             scale,
             doc_coordinates: draw,
             issuance_date: {
-                from: issuanceDate?.from!,
-                to: issuanceDate?.to!
+                from: issuanceDate.from,
+                to: issuanceDate.to,
             },
             type: type,
             language,
@@ -194,7 +190,7 @@ export function FormDialog(props: FormDialogProps) {
                     duration: 3000,
                 });
             }
-        } catch (error: any) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to create document",
@@ -216,7 +212,7 @@ export function FormDialog(props: FormDialogProps) {
                     }
                 }
             }
-        } catch (error: any) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to upload files",
@@ -244,7 +240,6 @@ export function FormDialog(props: FormDialogProps) {
         setHideMap(false);
         setDescription(undefined);
         setDescriptionError(false);
-        setError("");
         setIsMapOpen(false);
         setShowConnectionsInfo(false);
         setShowGeoInfo(false);
@@ -396,17 +391,12 @@ export function FormDocumentInformation({
     title,
     setTitle,
     titleError,
-    setTitleError,
     stakeholders,
     setStakeholders,
     shError,
-    setShError,
-    issuanceDate,
-    setIssuanceDate,
     type,
     setType,
     typeError,
-    setTypeError,
     scale,
     setScale,
     language,
@@ -414,7 +404,6 @@ export function FormDocumentInformation({
     pages,
     setPages,
     pageRanges,
-    setPageRanges
 }: {
     title: string;
     setTitle: React.Dispatch<React.SetStateAction<string>>;
@@ -617,7 +606,6 @@ export function FormDocumentGeolocalization({
     showGeoInfo,
     setShowGeoInfo,
     docCoordinatesError,
-    setDocCoordinatesError,
     drawing,
     setDrawing,
     hideMap,
@@ -719,7 +707,6 @@ export function FormDocumentDescription({
     description,
     setDescription,
     descriptionError,
-    setDescriptionError,
 }: {
     description: string | undefined,
     setDescription: React.Dispatch<React.SetStateAction<string | undefined>>,

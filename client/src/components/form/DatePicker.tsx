@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 // Tremor Date Picker [v1.0.4]
 
 "use client"
@@ -280,6 +281,7 @@ interface DateRangePreset extends Preset {
 
 type PresetContainerProps<TPreset extends Preset, TValue> = {
     presets: TPreset[]
+    // eslint-disable-next-line no-unused-vars
     onSelect: (value: TValue) => void
     currentValue?: TValue
 }
@@ -467,6 +469,7 @@ interface SingleProps extends Omit<PickerProps, "translations"> {
     presets?: DatePreset[]
     defaultValue?: Date
     value?: Date
+    // eslint-disable-next-line no-unused-vars
     onChange?: (date: Date | undefined) => void
     translations?: Omit<Translations, "range">
 }
@@ -699,6 +702,7 @@ interface RangeProps extends PickerProps {
     presets?: DateRangePreset[]
     defaultValue?: DateRange
     value?: DateRange
+    // eslint-disable-next-line no-unused-vars
     onChange?: (dateRange: DateRange | undefined) => void
 }
 
@@ -899,6 +903,7 @@ const RangeDatePicker = ({
         const toDate = range.to ? formatDate(range.to, locale, showTimePicker) : ""
 
         return toDate ? `${fromDate} - ${toDate}` : fromDate
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [range, locale, showTimePicker])
 
     const onApply = () => {
@@ -1176,6 +1181,7 @@ type SingleDatePickerProps = {
     presets?: DatePreset[]
     defaultValue?: Date
     value?: Date
+    // eslint-disable-next-line no-unused-vars
     onChange?: (date: Date | undefined) => void
 } & PickerProps
 
@@ -1193,6 +1199,7 @@ type RangeDatePickerProps = {
     presets?: DateRangePreset[]
     defaultValue?: DateRange
     value?: DateRange
+    // eslint-disable-next-line no-unused-vars
     onChange?: (dateRange: DateRange | undefined) => void
 } & PickerProps
 

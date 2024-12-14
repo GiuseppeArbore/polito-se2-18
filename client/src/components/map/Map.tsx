@@ -1,7 +1,9 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable react-hooks/exhaustive-deps */
 
-import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
+import mapboxgl, { LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { AllGeoJSON, featureCollection, area, pointOnFeature, centroid, booleanPointInPolygon } from "@turf/turf";
+import { AllGeoJSON, featureCollection, area, pointOnFeature, booleanPointInPolygon } from "@turf/turf";
 import { documentAreaColorMapping, documentBorderColorMapping } from "./documentcolors";
 import { loadIcons } from "./imagesLoader";
 import Kiruna from "./KirunaMunicipality.json"
@@ -13,7 +15,6 @@ import {
     Tab,
     Divider,
     TextInput,
-    Icon,
     Dialog,
     DialogPanel,
 } from "@tremor/react";
@@ -23,8 +24,6 @@ import {
     RiCrosshair2Fill,
     RiDeleteBinFill,
     RiHand,
-    RiInfoI,
-    RiInformation2Line,
     RiMapPinLine,
     RiScissorsCutFill,
     RiShapeLine,
@@ -32,7 +31,7 @@ import {
     RiFileLine,
     RiEditBoxLine
 } from "@remixicon/react";
-import { PreviewMapDraw, DocumentMapDraw } from "./DrawBar";
+import { PreviewMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
 import { Feature, FeatureCollection, Position, Polygon, MultiPolygon, Geometry, Point, GeoJsonProperties } from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
@@ -264,12 +263,10 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                             data: sortedDrawing as FeatureCollection,
                         });
 
-                        props.drawing?.features.forEach((feature, index) => {
+                        props.drawing?.features.forEach((feature) => {
                             const id = feature.properties?.id;
-                            const pointId = `point-${id}`;
                             const layerId = `drawings-layer-${id}`;
                             const borderLayerId = `drawings-border-layer-${id}`;
-                            const circleLayerId = `drawings-circle-layer-${id}`;
 
                             // Add the main fill layer
                             mapRef.current?.addLayer({
@@ -383,7 +380,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                                 }).join('<br>');
                                 const coordinates: [number, number] = (features[0].geometry as Point).coordinates.slice(0, 2) as [number, number];
 
-                                const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
+                                new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
                                     .setLngLat(coordinates)
                                     .setHTML(descriptions)
                                     .addTo(mapRef.current!);
@@ -394,6 +391,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                             if (mapRef.current) {
                                 mapRef.current.getCanvas().style.cursor = '';
                             }
+                            // eslint-disable-next-line no-undef
                             const popups = document.getElementsByClassName('mapboxgl-popup');
                             while (popups[0]) {
                                 if (popups[0]?.parentNode) {
@@ -450,7 +448,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                                 }).join('<br>');
                                 const coordinates: [number, number] = (features[0].geometry as Point).coordinates.slice(0, 2) as [number, number];
 
-                                const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
+                                new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
                                     .setLngLat(coordinates)
                                     .setHTML(descriptions)
                                     .addTo(mapRef.current!);
@@ -461,6 +459,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                             if (mapRef.current) {
                                 mapRef.current.getCanvas().style.cursor = '';
                             }
+                            // eslint-disable-next-line no-undef
                             const popups = document.getElementsByClassName('mapboxgl-popup');
                             while (popups[0]) {
                                 if (popups[0]?.parentNode) {
@@ -500,7 +499,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                         //POINTS--------------------------------------------------------
                         if (mapRef.current) {
 
-                            pointsAndCentroids.features?.forEach((feature, index) => {
+                            pointsAndCentroids.features?.forEach((feature) => {
                                 const id = feature.properties?.id;
                                 const pointId = `point-${id}`;
                                 const layerId = `drawings-layer-${id}`;
@@ -574,6 +573,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
 
 
                                 mapRef.current?.on('click', pointId, () => {
+                                    // eslint-disable-next-line no-undef
                                     window.location.href = `/documents/${id}`;
                                 });
                             });
@@ -582,6 +582,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
 
 
                     }).catch(error => {
+                        // eslint-disable-next-line no-undef
                         console.error('Error loading icons:', error);
                     });
                 };
@@ -647,6 +648,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                         {props.entireMunicipalityDocuments?.map((doc, index) => (
                             <DropdownMenuItem
                                 key={index}
+                                // eslint-disable-next-line no-undef
                                 onClick={() => (window.location.href = `/documents/${doc._id}`)}
                             >
                                 {doc.title}
@@ -659,6 +661,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
     );
 };
 
+// eslint-disable-next-line no-unused-vars
 export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: FeatureCollection<Geometry, GeoJsonProperties> | undefined) => void }> = (props) => {
     const [isOpen, setIsOpen] = useState(false);
     const [drawing, setDrawing] = useState(props.drawing);
@@ -710,12 +713,10 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
                             data: props.drawing as FeatureCollection,
                         });
 
-                        props.drawing?.features.forEach((feature, index) => {
+                        props.drawing?.features.forEach((feature) => {
                             const id = feature.properties?.id;
-                            const pointId = `point-${id}`;
                             const layerId = `drawings-layer-${id}`;
                             const borderLayerId = `drawings-border-layer-${id}`;
-                            const circleLayerId = `drawings-circle-layer-${id}`;
 
                             // Add the main fill layer
                             mapRef.current?.addLayer({
@@ -754,12 +755,10 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
                             type: 'geojson',
                             data: pointsAndCentroids as FeatureCollection,
                         });
-                        pointsAndCentroids.features?.forEach((feature, index) => {
+                        pointsAndCentroids.features?.forEach((feature) => {
                             const id = feature.properties?.id;
                             const pointId = `point-${id}`;
-                            const layerId = `drawings-layer-${id}`;
                             const circleLayerId = `drawings-circle-layer-${id}`;
-                            const borderLayerId = `drawings-border-layer-${id}`;
 
                             if (!mapRef.current?.getLayer(pointId)) {
 
@@ -795,6 +794,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
                         });
 
                     }).catch(error => {
+                        // eslint-disable-next-line no-undef
                         console.error('Error loading icons:', error);
                     });
                 }
@@ -862,6 +862,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
 
 interface MapControlsProps {
     // path type is temporary
+    // eslint-disable-next-line no-unused-vars
     onDone: (path: FeatureCollection) => void;
     onCancel: () => void;
     drawing: FeatureCollection | undefined;
@@ -870,7 +871,9 @@ interface MapControlsProps {
 const MapControls: React.FC<
     MapControlsProps & {
         bounds: LngLatBounds | null;
+        // eslint-disable-next-line no-unused-vars
         flyTo: (coords: LngLatLike) => void;
+        // eslint-disable-next-line no-unused-vars
         setFeature: (_: Feature) => void;
     }
 > = (props) => {
@@ -890,6 +893,7 @@ const MapControls: React.FC<
         geometry: { type: "Point", coordinates: [] },
     };
     // structuredClone is necessary to avoid modifying the prop's original value.
+    // eslint-disable-next-line no-undef
     const feature = structuredClone(props?.drawing?.features?.at?.(0));
     const geometry = feature?.geometry;
     const pos = geometry?.type === "Point" ? geometry.coordinates : [NaN, NaN];

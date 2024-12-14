@@ -1,5 +1,6 @@
 import { Dialog, DialogPanel, Button } from "@tremor/react";
 
+// eslint-disable-next-line no-unused-vars
 export default function DeleteDialog(open: boolean, setOpen: (bool: boolean) => void, deleteFn: () => void, title: string) {
 
     return (

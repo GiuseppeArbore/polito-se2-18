@@ -1,11 +1,12 @@
+/* eslint-disable no-undef */
 import HeroSection from "./HeroSection";
 import FeaturesSection from "./FeaturesSection";
 import Footer from "./Footer";
 import Phases from "./Phases/Phases";
 import { Stakeholders } from "../../enum";
-import { Toaster } from "../toast/Toaster";
 
 interface HomeProps {
+    // eslint-disable-next-line no-unused-vars
     login: (credentials: { username: string; password: string }) => void;
     logout: () => void;
     setError: React.Dispatch<React.SetStateAction<boolean | undefined>>;

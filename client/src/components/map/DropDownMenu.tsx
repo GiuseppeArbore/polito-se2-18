@@ -348,6 +348,7 @@ DropdownMenuSeparator.displayName = "DropdownMenuSeparator"
 const DropdownMenuIconWrapper = ({
     className,
     ...props
+// eslint-disable-next-line no-undef
 }: React.HTMLAttributes<HTMLSpanElement>) => {
     return (
         <div

@@ -1,11 +1,12 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import "ag-grid-enterprise";
-import { AdvancedFilterModel, ColDef, GridApi, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
+import { AdvancedFilterModel, ColDef, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { KxDocument } from "../../model";
-import { Badge, Button, Flex, Card, Text } from "@tremor/react";
+import { Badge, Button, Flex } from "@tremor/react";
 import { useNavigate } from "react-router-dom";
 import { RiDeleteBinLine, RiInfoI } from "@remixicon/react";
 import { toast } from "../../utils/toaster";
@@ -19,7 +20,9 @@ LicenseManager.setLicenseKey("[TRIAL]_this_{AG_Charts_and_AG_Grid}_Enterprise_ke
 
 interface ListProps {
     documents: KxDocument[];
+    // eslint-disable-next-line no-unused-vars
     updateDocuments: (documents: KxDocument[]) => void;
+    // eslint-disable-next-line no-unused-vars
     updateFilterModel: (filterModel: AdvancedFilterModel | undefined) => void;
     filterModel: AdvancedFilterModel | undefined;
     quickFilter: string;
@@ -305,7 +308,7 @@ function List(props: ListProps) {
                             variant: "success",
                             duration: 3000,
                         });
-                    } catch (error) {
+                    } catch {
                         toast({
                             title: "Error",
                             description: "Failed to delete documents",

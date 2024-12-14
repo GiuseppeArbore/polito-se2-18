@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import {
     Card,
     Title,
@@ -84,7 +85,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                 const docs = await API.getAllKxDocuments();
                 setDocuments(docs);
                 setTmpDocuments(docs);
-            } catch (error) {
+            } catch {
                 toast({
                     title: "Error",
                     description: "Failed to retrieve documents",

@@ -1,5 +1,6 @@
 
 
+// eslint-disable-next-line no-undef
 export const loadIcons = (map: mapboxgl.Map): Promise<void[]> => {
     const icons = [
         { name: 'icon-InformativeDocument', path: '/InformativeDocument.png' },

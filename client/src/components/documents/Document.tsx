@@ -1,7 +1,10 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-undef */
 
-import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine, RiAddBoxLine, RiInfoI } from '@remixicon/react';
+import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiDeleteBinLine, RiAddBoxLine, RiInfoI } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
-import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
+import {FormDocumentDescription, FormDocumentInformation } from "../form/Form";
 import { FileUpload } from "../form/DragAndDrop";
 import DeleteResourceDialog from './DeleteResourcesDialog';
 import API from '../../API';
@@ -14,27 +17,22 @@ import {
 } from '@tremor/react';
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { DocumentPageMap, PreviewMap } from '../map/Map';
+import { DocumentPageMap } from '../map/Map';
 import { KxDocument, DocCoords } from "../../model";
 import { mongoose } from '@typegoose/typegoose';
 import "../../css/document.css";
 import PreviewDoc from './Preview';
-import { Toast } from '@radix-ui/react-toast';
 import { Toaster } from '../toast/Toaster';
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "../../enum";
-import {
-    parseLocalizedNumber,
-    PageRange,
-    validatePageRangeString,
-} from "../../utils";
+import { AreaType, Stakeholders } from "../../enum";
+import { PageRange } from "../../utils";
 import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
-import exp from 'constants';
 import { DateRange } from '../form/DatePicker';
 interface DocumentProps {
     user: { email: string; role: Stakeholders } | null;
 }
 
+// eslint-disable-next-line no-unused-vars, @typescript-eslint/no-unused-vars
 interface FormDialogProps {
     documents: KxDocument[];
     refresh: () => void;
@@ -67,8 +65,6 @@ export default function Document({ user }: DocumentProps) {
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(undefined);
     const [description, setDescription] = useState<string | undefined>(undefined);
     const [entireMunicipality, setEntireMunicipality] = useState(false);
-    const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
-    const [documents, setDocuments] = useState<KxDocument[]>([]);
     const [documentsForDirect, setDocumentsForDirect] = useState<KxDocument[]>([]);
     const [documentsForCollateral, setDocumentsForCollateral] = useState<KxDocument[]>([]);
     const [documentsForProjection, setDocumentsForProjection] = useState<KxDocument[]>([]);
@@ -94,7 +90,7 @@ export default function Document({ user }: DocumentProps) {
                 }
             }
 
-        } catch (error: any) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to upload files",
@@ -236,16 +232,21 @@ export default function Document({ user }: DocumentProps) {
                         duration: 3000,
                     })
                 }
-            } catch (error) {
+            } catch {
+                toast({
+                    title: "Error",
+                    description: "Failed to update document",
+                    variant: "error",
+                    duration: 3000,
 
-            }
+            });
+        }
             setSaveDrawing(false);
         }
     }, [saveDrawing]);
 
     const [showCheck, setShowCheck] = useState(false);
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
-    const [selectedResource, setSelectedResource] = useState<string>("");
     const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
 
     return (
@@ -345,7 +346,7 @@ export default function Document({ user }: DocumentProps) {
                         <i onClick={() => setShare(true)}><RiShareLine className="self-end text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
                         <Dialog open={share} onClose={() => setShare(false)} static={true}>
                             <DialogPanel>
-                                <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Share "{title}"</h3>
+                                <h3 className="text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Share &ldquot;{title}&ldquo;</h3>
                                 <p className="mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content">
                                     Share the link of the document.
                                 </p>
@@ -452,7 +453,7 @@ export default function Document({ user }: DocumentProps) {
                             try {
                                 await API.deleteAttachmentFromDocument(new mongoose.Types.ObjectId(id!), fileTitle!);
 
-                            } catch (error) {
+                            } catch {
                                 toast({
                                     title: "Error",
                                     description: "Failed to delete documents",
@@ -716,7 +717,6 @@ export function FormInfoDialog({
 }) {
 
     const [isOpen, setIsOpen] = useState(false);
-    const [error, setError] = useState("");
     const [typeError, setTypeError] = useState(false);
 
     const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
@@ -725,7 +725,6 @@ export function FormInfoDialog({
     const handleInfoSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (title === "" || stakeholders.length === 0 || type === undefined || scale === 0) {
-            setError("Please fill all the fields");
             return;
         }
         try {
@@ -746,7 +745,7 @@ export function FormInfoDialog({
                     duration: 3000,
                 })
             }
-        } catch (error: any) {
+        } catch {
             toast({
                 title: "Error",
                 description: "Failed to update document",
@@ -853,13 +852,11 @@ export function FormDescriptionDialog(
     }
 ) {
     const [isOpen, setIsOpen] = useState(false);
-    const [error, setError] = useState("");
     const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
 
     const handleDescriptionSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (description === undefined || description.length === 0) {
-            setError("Please fill the description field");
             return;
         }
         try {
@@ -880,7 +877,7 @@ export function FormDescriptionDialog(
                     duration: 3000,
                 })
             }
-        } catch (error: any) {
+        } catch  {
             toast({
                 title: "Error",
                 description: "Failed to update description",
@@ -917,6 +914,7 @@ export function FormDescriptionDialog(
                         <form action="" method="patch" className="mt-8">
                             <FormDocumentDescription
                                 description={description}
+                                // eslint-disable-next-line @typescript-eslint/no-unused-vars, no-unused-vars
                                 setDescription={setDescription} descriptionError={false} setDescriptionError={function (value: React.SetStateAction<boolean>): void {
                                     throw new Error('Function not implemented.');
                                 }} />
