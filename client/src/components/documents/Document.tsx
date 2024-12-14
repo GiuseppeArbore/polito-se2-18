@@ -727,7 +727,7 @@ export function FormInfoDialog({
 
     const handleInfoSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (title === "" || stakeholders.length === 0 || type === undefined || scale === null) {
+        if (title === "" || stakeholders.length === 0 || type === undefined || scale === undefined) {
             setError("Please fill all the fields");
             return;
         }
