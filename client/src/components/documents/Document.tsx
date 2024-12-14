@@ -1002,7 +1002,7 @@ export function FormConnectionsDialog({
     const handleConnectionsSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            const updatedDocument = null;//await API.updateKxDocumentConnections(id, documentsForDirect.map((d) => d._id), documentsForCollateral.map((d) => d._id), documentsForProjection.map((d) => d._id), documentsForUpdate.map((d) => d._id));
+            const updatedDocument = await API.updateKxDocumentConnections(id, documentsForDirect, documentsForCollateral, documentsForProjection, documentsForUpdate);
             if (updatedDocument) {
                 toast({
                     title: "Success",
