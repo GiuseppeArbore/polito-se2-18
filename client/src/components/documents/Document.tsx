@@ -423,7 +423,7 @@ export default function Document({ user }: DocumentProps) {
                                         </div>
                                     )) : <>
                                         <div className="flex items-center justify-between m-2">
-                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No original resources added</i>
+                                            <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No original resources added</i>
                                         </div>
                                     </>}
 
@@ -441,7 +441,7 @@ export default function Document({ user }: DocumentProps) {
                             <AccordionBody className="leading-6 flex flex-col">
                                 <AccordionList style={{ boxShadow: 'none' }}>
                                     <div className="flex items-center justify-between m-2">
-                                        <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No more documents added</i>
+                                        <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No more documents added</i>
                                     </div>
 
                                 </AccordionList>
