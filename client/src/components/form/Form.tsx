@@ -16,6 +16,8 @@ import {
     Callout,
     Switch,
     Icon,
+    Select,
+    SelectItem,
 } from "@tremor/react";
 import { DateRangePicker } from "./DatePicker"
 import { useState, useEffect } from "react";
@@ -24,7 +26,7 @@ import { PreviewMap, SatMap } from "../map/Map";
 import { FeatureCollection } from "geojson"
 import API from "../../API";
 import { AreaType, KxDocumentType, ScaleType, Stakeholders } from "../../enum";
-import { DocCoords, KxDocument, ScaleOneToN } from "../../model";
+import { DocCoords, KxDocument, ScaleOneToN, Scale } from "../../model";
 import { mongoose } from "@typegoose/typegoose";
 import {
     RiArrowDownCircleLine,
@@ -46,6 +48,7 @@ import { Toaster } from "../toast/Toaster";
 import { FileUpload } from "./DragAndDrop";
 import { DateRange } from "./DatePicker";
 import { se } from "date-fns/locale";
+import { set } from "date-fns";
 
 
 
@@ -70,7 +73,8 @@ export function FormDialog(props: FormDialogProps) {
     const [type, setType] = useState<string | undefined>(undefined);
 
     const [typeError, setTypeError] = useState(false);
-    const [scale, setScale] = useState(10000);
+
+    const [scale, setScale] = useState<Scale>({ type: ScaleType.TEXT });
     const [language, setLanguage] = useState<string | undefined>(undefined);
     const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
@@ -149,7 +153,7 @@ export function FormDialog(props: FormDialogProps) {
         const newDocument: KxDocument = {
             title,
             stakeholders,
-            scale: {type: ScaleType.ONE_TO_N, scale: scale} as ScaleOneToN,
+            scale,
             doc_coordinates: draw,
             issuance_date: {
                 from: issuanceDate?.from!,
@@ -179,7 +183,7 @@ export function FormDialog(props: FormDialogProps) {
                 });
 
                 setTitle("");
-                setScale(0);
+                setScale({ type: ScaleType.TEXT });
                 setIssuanceDate({ from: new Date() });
                 setType(undefined);
                 setLanguage(undefined);
@@ -238,7 +242,7 @@ export function FormDialog(props: FormDialogProps) {
         setIssuanceDateError(false);
         setType(undefined);
         setTypeError(false);
-        setScale(10000);
+        setScale({ type: ScaleType.TEXT });
         setLanguage(undefined);
         setPages(undefined);
         setPageRanges([]);
@@ -431,8 +435,8 @@ export function FormDocumentInformation({
     setType: React.Dispatch<React.SetStateAction<string | undefined>>;
     typeError: boolean;
     setTypeError: React.Dispatch<React.SetStateAction<boolean>>;
-    scale: number;
-    setScale: React.Dispatch<React.SetStateAction<number>>;
+    scale: Scale;
+    setScale: React.Dispatch<React.SetStateAction<Scale>>;
     language: string | undefined;
     setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
     pages: PageRange[] | undefined;
@@ -533,35 +537,57 @@ export function FormDocumentInformation({
                     Scale
                     <span className="text-red-500">*</span>
                 </label>
-                <TextInput
-                    id="scale"
-                    value={scale.toLocaleString()}
-                    onValueChange={(v) => {
-                        if (v === "") {
-                            setScale(0);
-                            return;
-                        }
-                        const num = parseLocalizedNumber(v);
-                        if (
-                            !Number.isNaN(num) &&
-                            Number.isInteger(num) &&
-                            num >= 0 &&
-                            num <= 10_000_000_000_000
-                        ) {
-                            setScale(num);
+                <Select
+                    value={scale.type}
+                    onValueChange={(value) => {
+                        const v = value as ScaleType;
+                        if (v === ScaleType.ONE_TO_N) {
+                            setScale({ type: ScaleType.ONE_TO_N, scale: 10000 });
+                        } else {
+                            setScale({ type: v });
                         }
                     }}
-                    name="scale"
-                    autoComplete="scale"
-                    placeholder="10.000"
                     className="mt-2"
-                    icon={() => (
-                        <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default text-end text-right tremor-TextInput-icon shrink-0 h-5 w-5 mx-2.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
-                            1:
-                        </p>
-                    )}
-                    required
-                />
+                >
+                    {Object.values(ScaleType).map((t) => {
+                        return (
+                            <SelectItem value={t} key={t}>
+                                {t}
+                            </SelectItem>
+                        );
+                    })}
+                </Select>
+                {scale.type === ScaleType.ONE_TO_N &&
+                    <TextInput
+                        id="scale"
+                        value={scale.scale.toLocaleString()}
+                        onValueChange={(v) => {
+                            if (v === "") {
+                                setScale({ type: ScaleType.ONE_TO_N, scale: 10000 });
+                                return;
+                            }
+                            const num = parseLocalizedNumber(v);
+                            if (
+                                !Number.isNaN(num) &&
+                                Number.isInteger(num) &&
+                                num >= 0 &&
+                                num <= 10_000_000_000_000
+                            ) {
+                                setScale({ type: ScaleType.ONE_TO_N, scale: num });
+                            }
+                        }}
+                        name="scale"
+                        autoComplete="scale"
+                        placeholder="10.000"
+                        className="mt-2"
+                        icon={() => (
+                            <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default text-end text-right tremor-TextInput-icon shrink-0 h-5 w-5 mx-2.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
+                                1:
+                            </p>
+                        )}
+                        required
+                    />
+                }
             </div>
 
             <div className="col-span-full sm:col-span-3">
@@ -581,7 +607,7 @@ export function FormDocumentInformation({
                     {locales.map((l) => {
                         return (
                             <SearchSelectItem value={l.code} key={`lang-${l.code}`}>
-                                 {l.name === "English" || l.name === "Swedish" ? <><Icon className="py-0" size="xs" icon={RiStarFill}/><strong>{l.name}</strong></> : l.name}
+                                {l.name === "English" || l.name === "Swedish" ? <><Icon className="py-0" size="xs" icon={RiStarFill} /><strong>{l.name}</strong></> : l.name}
                             </SearchSelectItem>
                         );
                     })}

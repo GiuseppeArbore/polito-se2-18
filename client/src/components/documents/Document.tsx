@@ -31,6 +31,7 @@ import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
 import exp from 'constants';
 import { DateRange } from '../form/DatePicker';
+import { set } from 'date-fns';
 interface DocumentProps {
     user: { email: string; role: Stakeholders } | null;
 }
@@ -59,7 +60,7 @@ export default function Document({ user }: DocumentProps) {
     const [drawings, setDrawings] = useState<any>();
     const [title, setTitle] = useState("");
     const [stakeholders, setStakeholders] = useState<string[]>([]);
-    const [scale, setScale] = useState<ScaleOneToN>({type: ScaleType.ONE_TO_N, scale: 10000});
+    const [scale, setScale] = useState<Scale>({ type: ScaleType.TEXT });
     const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(undefined);
     const [type, setType] = useState<string | undefined>(undefined);
     const [language, setLanguage] = useState<string | undefined>(undefined);
@@ -272,7 +273,9 @@ export default function Document({ user }: DocumentProps) {
 
                         <div className="flex items-center justify-between mb-2 space-x-2">
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Scale:</i>
-                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>1: {scale.scale}</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>
+                                {scale.type === ScaleType.ONE_TO_N ? `1: ${scale.scale}` : scale.type}
+                            </i>
                         </div>
 
                         <div className="flex items-center justify-between mb-2 space-x-2">
@@ -312,8 +315,8 @@ export default function Document({ user }: DocumentProps) {
                             setIssuanceDate={setIssuanceDate}
                             type={type}
                             setType={setType}
-                            scale={scale.scale}
-                            setScale={(n) => setScale({type: ScaleType.ONE_TO_N, scale: n} as ScaleOneToN)}
+                            scale={scale}
+                            setScale={setScale}
                             language={language}
                             setLanguage={setLanguage}
                             pages={pages}
@@ -703,8 +706,8 @@ export function FormInfoDialog({
     setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
     type: string | undefined;
     setType: React.Dispatch<React.SetStateAction<string | undefined>>;
-    scale: number;
-    setScale: React.Dispatch<React.SetStateAction<number>>;
+    scale: Scale;
+    setScale: React.Dispatch<React.SetStateAction<Scale>>;
     language: string | undefined;
     setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
     pages: PageRange[] | undefined;
@@ -724,7 +727,7 @@ export function FormInfoDialog({
 
     const handleInfoSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (title === "" || stakeholders.length === 0 || type === undefined || scale === 0) {
+        if (title === "" || stakeholders.length === 0 || type === undefined || scale === undefined) {
             setError("Please fill all the fields");
             return;
         }
@@ -763,7 +766,7 @@ export function FormInfoDialog({
         e.preventDefault();
         setTitle(document.title);
         setStakeholders(document.stakeholders);
-        setScale((document.scale as ScaleOneToN).scale);
+        setScale(document.scale as Scale);
         setType(document.type);
         setLanguage(document.language || undefined);
         setPages(document.pages || undefined);
