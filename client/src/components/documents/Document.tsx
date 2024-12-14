@@ -42,8 +42,6 @@ interface FormDialogProps {
 }
 
 
-
-
 export default function Document({ user }: DocumentProps) {
     const formatLocalDate = (date: Date) => {
         return date.toLocaleDateString('sv-SE'); // 'sv-SE' è un formato ISO-like
@@ -125,7 +123,9 @@ export default function Document({ user }: DocumentProps) {
         const fetchDocument = async () => {
             try {
                 const document = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
+                const docs = await API.getAllKxDocuments();
                 setDoc(document);
+                setDocuments(docs);
                 setTitle(document.title);
                 setStakeholders(document.stakeholders);
                 setScale(document.scale as ScaleOneToN);
