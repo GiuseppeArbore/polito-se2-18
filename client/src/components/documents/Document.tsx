@@ -68,14 +68,10 @@ export default function Document({ user }: DocumentProps) {
     const [entireMunicipality, setEntireMunicipality] = useState(false);
     const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
     const [documents, setDocuments] = useState<KxDocument[]>([]);
-    const [documentsForDirect, setDocumentsForDirect] = useState<KxDocument[]>([]);
-    const [documentsForCollateral, setDocumentsForCollateral] = useState<KxDocument[]>([]);
-    const [documentsForProjection, setDocumentsForProjection] = useState<KxDocument[]>([]);
-    const [documentsForUpdate, setDocumentsForUpdate] = useState<KxDocument[]>([]);
-    const [udocumentsForDirect, usetDocumentsForDirect] = useState<string[]>([]);
-    const [udocumentsForCollateral, usetDocumentsForCollateral] = useState<string[]>([]);
-    const [udocumentsForProjection, usetDocumentsForProjection] = useState<string[]>([]);
-    const [udocumentsForUpdate, usetDocumentsForUpdate] = useState<string[]>([]);
+    const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
+    const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
+    const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
+    const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
 
@@ -134,14 +130,10 @@ export default function Document({ user }: DocumentProps) {
                 setLanguage(document.language || undefined);
                 setPages(document.pages || undefined);
                 setDescription(document.description || undefined);
-                setDocumentsForDirect(await Promise.all(document.connections.direct.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
-                setDocumentsForCollateral(await Promise.all(document.connections.collateral.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
-                setDocumentsForProjection(await Promise.all(document.connections.projection.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
-                setDocumentsForUpdate(await Promise.all(document.connections.update.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
-                usetDocumentsForDirect(document.connections.direct.map((doc) => doc.toString()));
-                usetDocumentsForCollateral(document.connections.collateral.map((doc) => doc.toString()));
-                usetDocumentsForProjection(document.connections.projection.map((doc) => doc.toString()));
-                usetDocumentsForUpdate(document.connections.update.map((doc) => doc.toString()));
+                setDocumentsForDirect(document.connections.direct.map((doc) => doc.toString()));
+                setDocumentsForCollateral(document.connections.collateral.map((doc) => doc.toString()));
+                setDocumentsForProjection(document.connections.projection.map((doc) => doc.toString()));
+                setDocumentsForUpdate(document.connections.update.map((doc) => doc.toString()));
                 setPageRanges([]);
 
 
@@ -523,17 +515,17 @@ export default function Document({ user }: DocumentProps) {
                         <h3 className="text-l font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Connections</h3>
                         <FormConnectionsDialog
                             documents={documents}
-                            documentsForDirect = {udocumentsForDirect}
-                            documentsForCollateral = {udocumentsForCollateral}
-                            documentsForProjection = {udocumentsForProjection}
-                            documentsForUpdate = {udocumentsForUpdate}
-                            setDocumentsForDirect = {usetDocumentsForDirect}
-                            setDocumentsForCollateral = {usetDocumentsForCollateral}
-                            setDocumentsForProjection = {usetDocumentsForProjection}
-                            setDocumentsForUpdate = {usetDocumentsForUpdate}
-                            id = {id!}
+                            documentsForDirect={documentsForDirect}
+                            documentsForCollateral={documentsForCollateral}
+                            documentsForProjection={documentsForProjection}
+                            documentsForUpdate={documentsForUpdate}
+                            setDocumentsForDirect={setDocumentsForDirect}
+                            setDocumentsForCollateral={setDocumentsForCollateral}
+                            setDocumentsForProjection={setDocumentsForProjection}
+                            setDocumentsForUpdate={setDocumentsForUpdate}
+                            id={id!}
                             user={user}
-                            ></FormConnectionsDialog>
+                        ></FormConnectionsDialog>
                     </div>
 
                     <div className="flex flex-col lg:flex-row ">
@@ -543,7 +535,7 @@ export default function Document({ user }: DocumentProps) {
                                 <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Direct connections</AccordionHeader>
                                 <AccordionBody className="leading-6 flex flex-col">
                                     <AccordionList style={{ boxShadow: 'none' }}>
-                                        {documentsForDirect.length > 0 ? documentsForDirect.map((doc) => (
+                                        {documentsForDirect.length > 0 ? documents.filter((d) => documentsForDirect.includes(d._id!.toString())).map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                                 <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
                                                 <Button
@@ -552,11 +544,9 @@ export default function Document({ user }: DocumentProps) {
                                                     onClick={() => window.open("/documents/" + doc._id)}
                                                 />
                                             </div>
-                                        )) : <>
-                                            <div className="flex items-center justify-around m-2">
-                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No direct connections added</i>
-                                            </div>
-                                        </>}
+                                        )) : <div className="flex items-center justify-around m-2">
+                                            <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No direct connections added</i>
+                                        </div>}
                                     </AccordionList>
                                 </AccordionBody>
                             </Accordion>
@@ -566,7 +556,7 @@ export default function Document({ user }: DocumentProps) {
                                 <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Collateral connections</AccordionHeader>
                                 <AccordionBody className="leading-6 flex flex-col">
                                     <AccordionList style={{ boxShadow: 'none' }}>
-                                        {documentsForCollateral.length > 0 ? documentsForCollateral.map((doc) => (
+                                        {documentsForCollateral.length > 0 ? documents.filter((d) => documentsForCollateral.includes(d._id!.toString())).map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                                 <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
                                                 <Button
@@ -589,7 +579,7 @@ export default function Document({ user }: DocumentProps) {
                                 <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Projection connections</AccordionHeader>
                                 <AccordionBody className="leading-6 flex flex-col">
                                     <AccordionList style={{ boxShadow: 'none' }}>
-                                        {documentsForProjection.length > 0 ? documentsForProjection.map((doc) => (
+                                        {documentsForProjection.length > 0 ? documents.filter((d) => documentsForProjection.includes(d._id!.toString())).map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                                 <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
                                                 <Button
@@ -612,7 +602,7 @@ export default function Document({ user }: DocumentProps) {
                                 <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Update connections</AccordionHeader>
                                 <AccordionBody className="leading-6 flex flex-col">
                                     <AccordionList style={{ boxShadow: 'none' }}>
-                                        {documentsForUpdate.length > 0 ? documentsForUpdate.map((doc) => (
+                                        {documentsForUpdate.length > 0 ? documents.filter((d) => documentsForUpdate.includes(d._id!.toString())).map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                                 <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
 
@@ -1012,12 +1002,7 @@ export function FormConnectionsDialog({
                     duration: 3000,
                 })
             } else {
-                toast({
-                    title: "Error",
-                    description: "Failed to update connections",
-                    variant: "error",
-                    duration: 3000,
-                })
+                throw new Error("Failed to update connections");
             }
         } catch (error: any) {
             toast({
