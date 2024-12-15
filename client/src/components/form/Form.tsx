@@ -1057,7 +1057,7 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
                 presets={presets}
                 value={issuanceDate}
                 onChange={setIssuanceDate}
-                className="w-full"
+                className="w-full bg-white border-[#E5E7EB] dark:bg-[#121826] dark:text-white dark:border-[#212936]  dark:hover:bg-[#141A2A]"
             />
         </div>
     );
