@@ -793,7 +793,7 @@ export function FormInfoDialog({
     return (
         <>
             {canEdit && <i className="ml-auto self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-6" /></i>}
-            
+
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
                 <DialogPanel
                     className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
@@ -1032,7 +1032,14 @@ export function FormCoordinatesDialog(
 
     return (
         <>
-            {canEdit && <i style={{ marginTop: '2rem', marginBottom: '-2rem' }} className="w-full flex justify-start" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
+            {canEdit && (
+                <div className="flex items-center">
+                    <h3 className="text-l font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Map</h3>
+                    <i className="ml-2 flex justify-end" onClick={() => setIsOpen(true)}>
+                        <RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" />
+                    </i>
+                </div>
+            )}
 
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
                 <DialogPanel
