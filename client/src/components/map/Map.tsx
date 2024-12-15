@@ -7,6 +7,7 @@ import {
     pointOnFeature,
     centroid,
     booleanPointInPolygon,
+    points,
 } from "@turf/turf";
 import {
     documentAreaColorMapping,
@@ -774,13 +775,18 @@ export const DocumentPageMap: React.FC<
 
     useEffect(() => {
        
+        const offsetDistance = 0.0001; // offsetDistance
+        const pointsAndCentroids = getPointsAndCentroids(
+            props.drawing,
+            offsetDistance
+        );
         
             if (mapRef.current) return;
             if (props.drawing) {
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
                 style: "mapbox://styles/mapbox/satellite-streets-v12",
-                center: center,
+                center: pointsAndCentroids.features[0].geometry.type === "Point" ? pointsAndCentroids.features[0].geometry.coordinates as LngLatLike : center,
                 zoom: props.zoom || defaultZoom,
                 pitch: 40,
                 interactive: true,
@@ -791,11 +797,8 @@ export const DocumentPageMap: React.FC<
                     mapRef.current.addControl(PreviewMapDraw, "bottom-right");
                     loadIcons(mapRef.current)
                         .then(() => {
-                            const offsetDistance = 0.0001; // offsetDistance
-                            const pointsAndCentroids = getPointsAndCentroids(
-                                props.drawing,
-                                offsetDistance
-                            );
+                            
+                           
                             //AREA----------------------------------------------------------------
                             mapRef.current?.addSource("drawings", {
                                 type: "geojson",
