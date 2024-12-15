@@ -769,28 +769,14 @@ export const DocumentPageMap: React.FC<
     const mapRef = useRef<mapboxgl.Map | null>(null);
     const canEdit = props.user && props.user.role === Stakeholders.URBAN_PLANNER;
 
-    useMemo(() => {
-        setDrawing(props.drawing);
-    }, [props.drawing]);
+  
+   
 
     useEffect(() => {
-        if (mapRef.current) return;
-
-        mapRef.current = new mapboxgl.Map({
-            container: mapContainerRef.current,
-            style: "mapbox://styles/mapbox/satellite-streets-v12",
-            center: center,
-            zoom: props.zoom || defaultZoom,
-            pitch: 40,
-            interactive: true,
-        });
-        mapRef.current.addControl(PreviewMapDraw, "bottom-right");
-    }, [mapContainerRef.current]);
-
-    useEffect(() => {
-        if (props.drawing) {
-            mapRef.current?.remove();
-            mapRef.current = null;
+       
+        
+            if (mapRef.current) return;
+            if (props.drawing) {
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
                 style: "mapbox://styles/mapbox/satellite-streets-v12",
