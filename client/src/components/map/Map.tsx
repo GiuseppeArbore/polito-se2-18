@@ -603,8 +603,8 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                 <DropdownMenuContent >
                     <DropdownMenuLabel>Documents</DropdownMenuLabel>
                     <DropdownMenuSeparator />
-                    <div className='input-dropdown' style={{ padding: '0.2rem' }}>
-                        <input
+                    <div style={{ padding: '0.2rem' }}>
+                        <input className='input-dropdown'
                             type="text"
                             placeholder="Search documents..."
                             value={searchText}
@@ -621,7 +621,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                         />
                     </div>
                     <DropdownMenuSeparator />
-                    <DropdownMenuGroup style={{ maxHeight: '15rem', overflowY: 'auto' }}>
+                    <DropdownMenuGroup className="dropdown-menu-group light-scrollbar dark-scrollbar" style={{ maxHeight: '15rem', overflowY: 'auto' }}>
                         {filteredDocuments?.map((doc, index) => (
                             <DropdownMenuItem
                                 key={index}
