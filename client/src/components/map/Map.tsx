@@ -1247,6 +1247,7 @@ const MapControls: React.FC<
                                                 }}
                                             />
                                         </div>
+                                        <DropdownMenuSeparator />
 
                                         <DropdownMenuGroup className="dropdown-menu-group light-scrollbar dark-scrollbar" style={{ maxHeight: '15rem', overflowY: 'auto' }}>
                                             {filteredDocuments.map((doc, index) => (
