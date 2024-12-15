@@ -150,7 +150,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                             <FormDialog
                                 documents={documents}
                                 refresh={() => setRefreshNeeded(true)}
-                                user={user.current}
+                                user={user}
                             />
                         </div>
                     </div>
@@ -208,7 +208,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         borderRadius: 4,
                         display: selectedView === 0 ? 'block' : 'none',
                     }}
-                    user={user.current}
+                    user={user}
                     drawing={drawing}
                     entireMunicipalityDocuments={entireMunicipalityDocuments}
                     isVisible={selectedView === 0 ? true : false}

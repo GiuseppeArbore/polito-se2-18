@@ -130,6 +130,7 @@ export default function Document({ user }: DocumentProps) {
                 setScale(document.scale);
                 setIssuanceDate({ from: document.issuance_date.from, to: document.issuance_date.to });
                 setType(document.type);
+                setDocCoordinates(document.doc_coordinates as DocCoords);
                 setLanguage(document.language || undefined);
                 setPages(document.pages || undefined);
                 setDescription(document.description || undefined);
@@ -248,11 +249,12 @@ export default function Document({ user }: DocumentProps) {
     }, [saveDrawing]);
 
     const [showCheck, setShowCheck] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
+
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
     const [selectedResource, setSelectedResource] = useState<string>("");
     const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
-    const [docCoordinatesError, setDocCoordinatesError] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
+
 
     return (
         <div>
@@ -537,44 +539,13 @@ export default function Document({ user }: DocumentProps) {
                         </Card>
                     ) : (
                         <>
-                            {canEdit && (
-                                <div>
-                                    <Button
-                                        style={{
-                                            backgroundColor: "white",
-                                            color: "black",
-                                            borderColor: "transparent",
-                                        }}
-                                        className="ring-0"
-                                        icon={RiEditBoxLine}
-                                        onClick={() => setIsOpen(true)}
-                                    />
-                                </div>
-                            )}
-                            <Dialog
-                                open={isOpen}
-                                onClose={(val) => setIsOpen(val)}
-                                static={true}
-                            >
-                                <DialogPanel
-                                    className="p-0 overflow-hidden"
-                                    style={{ maxWidth: "100%" }}
-                                >
-                                    <FormDocumentGeolocalization
-                                        isMapOpen={isMapOpen}
-                                        setIsMapOpen={setIsMapOpen}
-                                        showGeoInfo={showGeoInfo}
-                                        setShowGeoInfo={setShowGeoInfo}
-                                        docCoordinatesError={docCoordinatesError}
-                                        setDocCoordinatesError={setDocCoordinatesError}
-                                        drawing={drawing}
-                                        setDrawing={setDrawing}
-                                        hideMap={hideMap}
-                                        setHideMap={setHideMap}
-                                        user={user}
-                                    />
-                                </DialogPanel>
-                            </Dialog>
+
+                            <FormCoordinatesDialog
+                                docCoordinates={docCoordinates}
+                                setDocCoordinates={setDocCoordinates}
+                                id={id}
+                                user={user}
+                            />
 
                             <div className="flex justify-center items-start pt-10">
                                 <div className='document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
@@ -866,6 +837,123 @@ export function FormDescriptionDialog(
                                 <Button
                                     className="w-full sm:w-auto primary"
                                     onClick={e => handleDescriptionSubmit(e)}
+                                >
+                                    Submit
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </DialogPanel>
+            </Dialog>
+            <Toaster />
+        </>
+    );
+}
+
+export function FormCoordinatesDialog(
+    {
+        docCoordinates,
+        setDocCoordinates,
+        id,
+        user
+    }: {
+        docCoordinates: any; // Replace 'any' with the appropriate type for doc_coordinates
+        setDocCoordinates: React.Dispatch<React.SetStateAction<any>>; // Replace 'any' with the appropriate type
+        id: string | undefined;
+        user: React.RefObject<{ email: string; role: Stakeholders } | null>;
+    }
+) {
+    const [isOpen, setIsOpen] = useState(false);
+    const [error, setError] = useState("");
+    const canEdit = user.current && user.current.role === Stakeholders.URBAN_PLANNER;
+    const [docCoordinatesError, setDocCoordinatesError] = useState(false);
+    const [drawing, setDrawing] = useState<any>(undefined);
+    const [hideMap, setHideMap] = useState<boolean>(false);
+    const [isMapOpen, setIsMapOpen] = useState(false);
+
+    const [showGeoInfo, setShowGeoInfo] = useState(false);
+
+    const handleCoordinatesSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!docCoordinates) {
+            setError("Please fill the coordinates field");
+            return;
+        }
+        try {
+            const updatedDocument = await API.updateKxDocumentCoordinates(id, docCoordinates);
+            if (updatedDocument) {
+                toast({
+                    title: "Success",
+                    description: "The coordinates have been updated successfully",
+                    variant: "success",
+                    duration: 3000,
+                });
+            } else {
+                toast({
+                    title: "Error",
+                    description: "Failed to update coordinates",
+                    variant: "error",
+                    duration: 3000,
+                });
+            }
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: "Failed to update coordinates",
+                variant: "error",
+                duration: 3000,
+            });
+        }
+        setIsOpen(false);
+    };
+
+    const handleCoordinatesCancel = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setDocCoordinates(docCoordinates as DocCoords);
+        setIsOpen(false);
+    };
+
+    return (
+        <>
+            {canEdit && <i className="mb-2 w-full flex justify-end" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
+
+            <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
+                <DialogPanel
+                    className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
+                    style={{ maxWidth: "80vw" }}
+                >
+                    <div className="sm:mx-auto sm:max-w-2xl">
+                        <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                            Update Coordinates
+                        </h3>
+                        <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                            Update the coordinates of the document
+                        </p>
+                        <form action="" method="patch" className="mt-8">
+                            <FormDocumentGeolocalization
+                                isMapOpen={isMapOpen}
+                                setIsMapOpen={setIsMapOpen}
+                                showGeoInfo={showGeoInfo}
+                                setShowGeoInfo={setShowGeoInfo}
+                                docCoordinatesError={docCoordinatesError}
+                                setDocCoordinatesError={setDocCoordinatesError}
+                                drawing={drawing}
+                                setDrawing={setDrawing}
+                                hideMap={hideMap}
+                                setHideMap={setHideMap}
+                                user={user}
+                            />
+                            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+                                <Button
+                                    className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                                    variant="light"
+                                    onClick={(e) => handleCoordinatesCancel(e)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="w-full sm:w-auto primary"
+                                    onClick={e => handleCoordinatesSubmit(e)}
                                 >
                                     Submit
                                 </Button>
