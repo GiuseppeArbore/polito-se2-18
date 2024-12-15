@@ -32,6 +32,8 @@ import locales from "../../locales.json"
 import exp from 'constants';
 import { DateRange } from '../form/DatePicker';
 import { set } from 'date-fns';
+import Kiruna from "../map/KirunaMunicipality.json";
+
 interface DocumentProps {
     user: { email: string; role: Stakeholders } | null;
 }
@@ -179,7 +181,7 @@ export default function Document({ user }: DocumentProps) {
                     };
                     setDrawings(geoJSON);
                 } else {
-                    setEntireMunicipality(true);
+                    setDrawings(Kiruna);
                 }
 
 
@@ -274,7 +276,7 @@ export default function Document({ user }: DocumentProps) {
                         <div className="flex items-center justify-between mb-2 space-x-2">
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Scale:</i>
                             <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-                                {scale.type === ScaleType.ONE_TO_N ? `1: ${scale.scale}` : scale.type}
+                            {scale?.type === ScaleType.ONE_TO_N ? `1: ${scale?.scale}` : scale?.type ?? 'Unknown Scale'}
                             </i>
                         </div>
 
@@ -632,8 +634,7 @@ export default function Document({ user }: DocumentProps) {
                 </Accordion>
 
 
-                {
-                    !entireMunicipality ? (
+
                         <Card
                             className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
                         >
@@ -644,18 +645,9 @@ export default function Document({ user }: DocumentProps) {
                                 user={user}
                             />
                         </Card>
-                    ) : (
-                        <div className="flex justify-center items-start pt-10">
-                            <div className=' document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
-                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                    <span>
-                                        The document covers the entire municipality
-                                    </span>
-                                </div>
-                            </div>
-                        </div>
-                    )
-                }
+                   
+                    
+                
                 {
                     PreviewDoc(showPdfPreview, () => setShowPdfPreview(false), doc?._id, fileTitle)
 
