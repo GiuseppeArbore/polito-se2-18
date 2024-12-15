@@ -716,15 +716,18 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
 
     useEffect(() => {
         if (props.drawing) {
+            const currentCenter = mapRef.current?.getCenter();
+            const currentZoom = mapRef.current?.getZoom();
             mapRef.current?.remove();
             mapRef.current = null;
+
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
                 style: mapStyle,
-                center: center,
-                zoom: props.zoom || defaultZoom,
+                center: currentCenter || center,
+                zoom: currentZoom || props.zoom || defaultZoom,
                 pitch: 40,
-                interactive: false,
+                //interactive: false,
             });
 
             mapRef.current?.on("load", function () {
