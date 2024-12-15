@@ -265,7 +265,7 @@ export function FormDialog(props: FormDialogProps) {
 
     function myform() {
         return (
-            <form action="#" method="post" className="mt-8">
+            <form action="{clearForm}" method="post" className="mt-8">
 
                 <FormDocumentInformation
                     title={title}
