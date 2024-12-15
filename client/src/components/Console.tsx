@@ -173,7 +173,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                                 padding: 0,
                                 minHeight: "300px",
                                 width: "100%",
-                                height: "89vh",
+                                height: "86vh",
                             }}
                         >
                             {renderCurrentSelection( setQuickFilterText, selectedView)}
@@ -204,7 +204,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         margin: 0,
                         minHeight: "300px",
                         width: "100%",
-                        height: "89vh",
+                        height: "100%",
                         borderRadius: 4,
                         display: selectedView === 0 ? 'block' : 'none',
                     }}
