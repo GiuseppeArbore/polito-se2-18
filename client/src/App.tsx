@@ -30,7 +30,7 @@ export default function App() {
                 duration: 3000,
             });
             user.current = usr;
-            navigate('/dashboard');
+            //navigate('/dashboard');
         } catch (err) {
             setError(true);
             if ((err as Error).message === 'Incorrect email and/or password')

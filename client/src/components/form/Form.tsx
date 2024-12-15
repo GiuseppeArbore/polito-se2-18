@@ -51,7 +51,7 @@ import { se } from "date-fns/locale";
 interface FormDialogProps {
     documents: KxDocument[];
     refresh: () => void;
-    user: { email: string; role: Stakeholders } | null;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }
 
 
@@ -366,7 +366,7 @@ export function FormDialog(props: FormDialogProps) {
 
     return (
         <>
-            {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
+            {props.user && props.user.current && props.user.current.role === Stakeholders.URBAN_PLANNER && (
                 <Button className="w-full primary flex items-center" style={{ borderRadius: '0.3rem', height: '2rem', width: '11rem', marginTop: '-0.2rem' }} onClick={() => { setIsOpen(true); clearForm() }}>
                     <span className="flex items-center">
                         <RiAddLine className="mr-2" /> Add new document
@@ -638,7 +638,7 @@ export function FormDocumentGeolocalization({
     setDrawing: React.Dispatch<React.SetStateAction<any>>,
     hideMap: boolean,
     setHideMap: React.Dispatch<React.SetStateAction<boolean>>
-    user: { email: string; role: Stakeholders } | null;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }) {
     return (
         <>

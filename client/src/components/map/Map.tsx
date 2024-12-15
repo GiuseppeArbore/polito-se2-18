@@ -61,7 +61,7 @@ export interface SatMapProps {
     style?: React.CSSProperties;
     className?: string;
     entireMunicipalityDocuments?: KxDocument[];
-    user: { email: string, role: Stakeholders } | null;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
     setQuickFilterText?: (text: string) => void;
 
 }
@@ -642,7 +642,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
     const [drawing, setDrawing] = useState(props.drawing);
     const mapContainerRef = useRef<any>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
-    const canEdit = props.user && props.user.role === Stakeholders.URBAN_PLANNER;
+    const canEdit = props.user.current && props.user.current.role === Stakeholders.URBAN_PLANNER;
 
     useMemo(() => {
         setDrawing(props.drawing);

@@ -6,6 +6,7 @@ import { FileUpload } from "../form/DragAndDrop";
 import DeleteResourceDialog from './DeleteResourcesDialog';
 import API from '../../API';
 import mime from 'mime';
+import { FormDocumentGeolocalization } from '../form/Form';
 import {
     Accordion,
     AccordionBody,
@@ -61,6 +62,9 @@ export default function Document({ user }: DocumentProps) {
     const [stakeholders, setStakeholders] = useState<string[]>([]);
     const [scale, setScale] = useState(10000);
     const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(undefined);
+    const [drawing, setDrawing] = useState<any>(undefined);
+    const [hideMap, setHideMap] = useState<boolean>(false);
+    const [isMapOpen, setIsMapOpen] = useState(false);
     const [type, setType] = useState<string | undefined>(undefined);
     const [language, setLanguage] = useState<string | undefined>(undefined);
     const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
@@ -75,6 +79,7 @@ export default function Document({ user }: DocumentProps) {
     const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
+    const [showGeoInfo, setShowGeoInfo] = useState(false);
 
 
     const handleSubmitDragAndDrop = async (e: React.FormEvent) => {
@@ -243,9 +248,11 @@ export default function Document({ user }: DocumentProps) {
     }, [saveDrawing]);
 
     const [showCheck, setShowCheck] = useState(false);
+    const [isOpen, setIsOpen] = useState(false);
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
     const [selectedResource, setSelectedResource] = useState<string>("");
     const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
+    const [docCoordinatesError, setDocCoordinatesError] = useState(false);
 
     return (
         <div>
@@ -524,20 +531,61 @@ export default function Document({ user }: DocumentProps) {
                             <DocumentPageMap
                                 setDrawing={(d) => { setDrawings(d); setSaveDrawing(true) }}
                                 drawing={drawings}
-                                style={{ minHeight: "300px", width: "100%", height: "80vh" }} 
-                                user={user.current}
+                                style={{ minHeight: "300px", width: "100%", height: "80vh" }}
+                                user={user}
                             />
                         </Card>
                     ) : (
-                        <div className="flex justify-center items-start pt-10">
-                            <div className=' document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
-                                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
-                                    <span>
-                                        The document covers the entire municipality
-                                    </span>
+                        <>
+                            {canEdit && (
+                                <div>
+                                    <Button
+                                        style={{
+                                            backgroundColor: "white",
+                                            color: "black",
+                                            borderColor: "transparent",
+                                        }}
+                                        className="ring-0"
+                                        icon={RiEditBoxLine}
+                                        onClick={() => setIsOpen(true)}
+                                    />
+                                </div>
+                            )}
+                            <Dialog
+                                open={isOpen}
+                                onClose={(val) => setIsOpen(val)}
+                                static={true}
+                            >
+                                <DialogPanel
+                                    className="p-0 overflow-hidden"
+                                    style={{ maxWidth: "100%" }}
+                                >
+                                    <FormDocumentGeolocalization
+                                        isMapOpen={isMapOpen}
+                                        setIsMapOpen={setIsMapOpen}
+                                        showGeoInfo={showGeoInfo}
+                                        setShowGeoInfo={setShowGeoInfo}
+                                        docCoordinatesError={docCoordinatesError}
+                                        setDocCoordinatesError={setDocCoordinatesError}
+                                        drawing={drawing}
+                                        setDrawing={setDrawing}
+                                        hideMap={hideMap}
+                                        setHideMap={setHideMap}
+                                        user={user}
+                                    />
+                                </DialogPanel>
+                            </Dialog>
+
+                            <div className="flex justify-center items-start pt-10">
+                                <div className='document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
+                                    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
+                                        <span>
+                                            The document covers the entire municipality
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
+                        </>
                     )
                 }
                 {
