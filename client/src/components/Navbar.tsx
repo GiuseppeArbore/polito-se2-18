@@ -60,11 +60,11 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
     const getTitleIcon = (title: string) => {
         switch (title) {
             case 'Home':
-                return <RiHome3Line style={{ marginRight: '0.5rem' }} />;
+                return <RiHome3Line/>;
             case 'Dashboard':
-                return <RiDashboardFill style={{ marginRight: '0.5rem' }} />;
+                return <RiDashboardFill  />;
             case 'Document Page':
-                return <RiFileList2Line style={{ marginRight: '0.5rem' }} />;
+                return <RiFileList2Line />;
             default:
                 return null;
         }
@@ -81,16 +81,16 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
         <>
             <nav style={{ position: 'relative', padding: '0.5rem', marginTop: '-1.8rem', marginBottom: isDashboard ? '1.8rem' : '0' }}>
                 <ul style={{ display: 'flex', listStyle: 'none', margin: 0, padding: 0, width: '100%', alignItems: 'center', justifyContent: 'space-between' }}>
-                    <li style={{ marginLeft: '0rem', marginRight: '0.5rem', display: 'flex', alignItems: 'center' }}>
+                    <li style={{ marginLeft: '0rem', display: 'flex', alignItems: 'center' }}>
                         <Link className="buttonStyle" to="/">
-                            <RiHome3Line style={{ marginRight: '0.5rem' }} />
+                            <RiHome3Line/>
                             <span className="button-text">Home</span>
                         </Link>
                     </li>
                     {!isDashboard && (
                         <li style={{ marginRight: '1rem', marginLeft: '0rem', display: 'flex', alignItems: 'center' }}>
                             <Link className="buttonStyle" to="/dashboard">
-                                <RiDashboardFill style={{ marginRight: '0.5rem' }} />
+                                <RiDashboardFill />
                                 <span className="button-text">Dashboard</span>
                             </Link>
                         </li>
@@ -101,16 +101,16 @@ const Navbar: React.FC<NavbarProps> = ({ login, logout, loginErrorMessage, error
                             {title}
                         </span>
                     </li>
-                    <li style={{ marginLeft: 'auto', marginRight: '-1.4rem', display: 'flex', alignItems: 'center' }}>
+                    <li style={{ marginLeft: 'auto', marginRight: '-0.7rem', display: 'flex', alignItems: 'right' }}>
                         <div style={{ display: 'flex', alignItems: 'center', padding: '0.5rem 1rem', borderRadius: '0.25rem', cursor: 'pointer', transition: 'background-color 0.3s', textDecoration: 'none' }}>
                             {user.current ? (
                                 <button className="buttonStyle" onClick={handleLogout}>
-                                    <RiLogoutBoxLine style={{ marginRight: '0.5rem' }} />
+                                    <RiLogoutBoxLine  />
                                     <span className="button-text">Logout</span>
                                 </button>
                             ) : (
                                 <button className="buttonStyle" onClick={() => setShowLogin(true)}>
-                                    <RiLoginBoxLine style={{ marginRight: '0.5rem' }} />
+                                    <RiLoginBoxLine />
                                     <span className="button-text">Login</span>
                                 </button>
                             )}

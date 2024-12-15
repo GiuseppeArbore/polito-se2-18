@@ -47,6 +47,10 @@
       padding: 0.5rem 0.75rem;
       font-size: 0.875rem;
       margin-right: 0rem; /* Reduce margin-right for smaller screens */
+      margin-top: 1rem; /* Add top margin */
+      display: flex;
+      justify-content: center;
+      align-items: center;
   }
   .button-text {
       display: none;
@@ -57,7 +61,10 @@
   .buttonStyle {
       padding: 0.5rem 0.5rem;
       font-size: 0.75rem;
-      margin-right: -1rem; /* Reduce margin-right for smaller screens */
+      margin-top: 1rem; /* Add top margin */
+      display: flex;
+      justify-content: center;
+      align-items: center;
   }
   .button-text {
       display: none;
@@ -73,7 +80,7 @@
   font-weight: bold;
   font-size: 1.5rem;
   color: #444444;
-  margin-top: 0.5rem;
+  margin-top: 1rem;
   display: flex;
   align-items: center;
 }
@@ -89,6 +96,7 @@
   .navbar-title {
       font-size: 1rem;
       margin-top: 0.5rem;
+      margin-bottom: -0.5rem
   }
 }
 
