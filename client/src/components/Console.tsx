@@ -169,11 +169,11 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         <Card
                             className="p-0 m-0"
                             style={{
-                                marginTop: '-1rem',
+                                marginTop: '-1.6rem',
                                 padding: 0,
                                 minHeight: "300px",
                                 width: "100%",
-                                height: "85vh",
+                                height: "89vh",
                             }}
                         >
                             {renderCurrentSelection( setQuickFilterText, selectedView)}
@@ -204,7 +204,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         margin: 0,
                         minHeight: "300px",
                         width: "100%",
-                        height: "85vh",
+                        height: "89vh",
                         borderRadius: 4,
                         display: selectedView === 0 ? 'block' : 'none',
                     }}

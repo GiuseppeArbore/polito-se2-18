@@ -367,7 +367,7 @@ export function FormDialog(props: FormDialogProps) {
     return (
         <>
             {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
-                <Button className="w-full primary flex items-center" style={{ borderRadius: ' 0.3rem',height:'2rem',width:"11rem" }} onClick={() => { setIsOpen(true); clearForm() }}>
+                <Button className="w-full primary flex items-center" style={{ borderRadius: '0.3rem', height: '2rem', width: '11rem', marginTop: '-0.2rem' }} onClick={() => { setIsOpen(true); clearForm() }}>
                     <span className="flex items-center">
                         <RiAddLine className="mr-2" /> Add new document
                     </span>
