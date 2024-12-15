@@ -32,6 +32,7 @@ import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
 import exp from 'constants';
 import { DateRange } from '../form/DatePicker';
+import { FeatureCollection, Geometry, GeoJsonProperties } from 'geojson';
 import { set } from 'date-fns';
 import Kiruna from "../map/KirunaMunicipality.json";
 
@@ -79,6 +80,7 @@ export default function Document({ user }: DocumentProps) {
     const [documentsForUpdate, setDocumentsForUpdate] = useState<KxDocument[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
+    const [updateHideMap, setUpdateHideMap] = useState(false);
 
 
 
@@ -133,6 +135,7 @@ export default function Document({ user }: DocumentProps) {
                 setLanguage(document.language || undefined);
                 setPages(document.pages || undefined);
                 setDescription(document.description || undefined);
+                setDocCoordinates(document.doc_coordinates as DocCoords);
                 setDocumentsForDirect(await Promise.all(document.connections.direct.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
                 setDocumentsForCollateral(await Promise.all(document.connections.collateral.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
                 setDocumentsForProjection(await Promise.all(document.connections.projection.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
@@ -195,58 +198,66 @@ export default function Document({ user }: DocumentProps) {
         fetchDocument();
     }, [id]);
 
-    useMemo(async () => {
-        if (drawings && saveDrawing) {
-            let draw: DocCoords;
-            if (
-                drawings &&
-                drawings.features.length === 1 &&
-                drawings.features[0].geometry.type === "Point"
-            ) {
-                draw = {
-                    type: AreaType.POINT,
-                    coordinates: drawings.features[0].geometry.coordinates,
-                };
-            } else if ((drawings && drawings.features.length >= 1) && drawings.features[0].geometry.type === "Polygon") {
-                let cord =
-                    drawings.features.map((f: any) => f.geometry.coordinates).length === 1
-                        ? drawings.features[0].geometry.coordinates
-                        : [];
+const handleSaveDrawing = async () => {
+    if (drawings && saveDrawing) {
+        let draw: DocCoords;
+        if (
+            !updateHideMap &&
+            drawings &&
+            drawings.features.length === 1 &&
+            drawings.features[0].geometry.type === "Point"
+        ) {
+            draw = {
+                type: AreaType.POINT,
+                coordinates: drawings.features[0].geometry.coordinates,
+            };
+        } else if ( !updateHideMap && (drawings && drawings.features.length >= 1) && drawings.features[0].geometry.type === "Polygon") {
+            let cord =
+                drawings.features.map((f: any) => f.geometry.coordinates).length === 1
+                    ? drawings.features[0].geometry.coordinates
+                    : [];
 
-                draw = {
-                    type: AreaType.AREA,
-                    coordinates: cord as number[][][],
-                };
-            } else {
-                draw = {
-                    type: AreaType.ENTIRE_MUNICIPALITY,
-                };
-            }
-            try {
-                const res = await API.updateKxDocumentInformation(id!, undefined, undefined, undefined, undefined, undefined, undefined, draw);
-                if (res) {
-                    toast({
-                        title: "Success",
-                        description:
-                            "The document has been updated successfully",
-                        variant: "success",
-                        duration: 3000,
-                    })
-                } else {
-                    toast({
-                        title: "Error",
-                        description: "Failed to update document",
-                        variant: "error",
-                        duration: 3000,
-                    })
-                }
-            } catch (error) {
-
-            }
-            setSaveDrawing(false);
+            draw = {
+                type: AreaType.AREA,
+                coordinates: cord as number[][][],
+            };
+        } else {
+            draw = {
+                type: AreaType.ENTIRE_MUNICIPALITY,
+            };
         }
-    }, [saveDrawing]);
-
+        try {
+            const res = await API.updateKxDocumentInformation(id!, undefined, undefined, undefined, undefined, undefined, undefined, draw);
+            if (res) {
+                console.log("Success toast should appear");
+                toast({
+                    title: "Success",
+                    description:
+                        "The document has been updated successfully",
+                    variant: "success",
+                    duration: 3000,
+                });
+            } else {
+                console.log("Error toast should appear");
+                toast({
+                    title: "Error",
+                    description: "Failed to update document",
+                    variant: "error",
+                    duration: 3000,
+                });
+            }
+        } catch (error) {
+            console.log("Error toast should appear in catch");
+            toast({
+                title: "Error",
+                description: "Failed to update document",
+                variant: "error",
+                duration: 3000,
+            });
+        }
+        setSaveDrawing(false);
+    }
+};
     const [showCheck, setShowCheck] = useState(false);
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
     const [selectedResource, setSelectedResource] = useState<string>("");
@@ -634,30 +645,39 @@ export default function Document({ user }: DocumentProps) {
                     </AccordionBody>
                 </Accordion>
 
-                {!entireMunicipality ? (
 
-                    <Card
-                        className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
-                    >
+
+                {!entireMunicipality ? (<>
+                    <FormCoordinatesDialog
+                        setDocCoordinates={setDocCoordinates}
+                        id={id}
+                        user={user}
+                        setDrawing={(d) => { setDrawings(d); setSaveDrawing(true); }}
+                        handleSaveDrawing={handleSaveDrawing}
+                        drawing={drawings}
+                        setUpdateHideMap={setUpdateHideMap}
+                    />
+                    <Card className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}>
                         <DocumentPageMap
-                            setDrawing={(d) => { setDrawings(d); setSaveDrawing(true) }}
                             drawing={drawings}
                             style={{ minHeight: "300px", width: "100%" }}
                             user={user}
                         />
                     </Card>
+                </>
                 ) : (
                     <>
                         <FormCoordinatesDialog
-                            docCoordinates={docCoordinates}
                             setDocCoordinates={setDocCoordinates}
                             id={id}
                             user={user}
+                            handleSaveDrawing={handleSaveDrawing}
+                            setDrawing={(d) => { setDrawings(d); setSaveDrawing(true); }}
+                            drawing={drawings}
+                            setUpdateHideMap={setUpdateHideMap}
                         />
-
-
                         <div className="flex justify-center items-start pt-10">
-                            <div className=' document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
+                            <div className='document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
                                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                                     <span>
                                         The document covers the entire municipality
@@ -665,10 +685,9 @@ export default function Document({ user }: DocumentProps) {
                                 </div>
                             </div>
                         </div>
-
                     </>
-                )
-                }
+                )}
+
 
 
                 {
@@ -969,64 +988,37 @@ export function FormDescriptionDialog(
 
 export function FormCoordinatesDialog(
     {
-        docCoordinates,
+        drawing,
+        setDrawing,
+        handleSaveDrawing,
         setDocCoordinates,
         id,
-        user
+        user,
+        setUpdateHideMap
     }: {
-        docCoordinates: any; // Replace 'any' with the appropriate type for doc_coordinates
-        setDocCoordinates: React.Dispatch<React.SetStateAction<any>>; // Replace 'any' with the appropriate type
+        setDrawing: React.Dispatch<React.SetStateAction<any>>; 
+        handleSaveDrawing: () => void;
+        setDocCoordinates: React.Dispatch<React.SetStateAction<any>>; 
         id: string | undefined;
         user: { email: string; role: Stakeholders } | null;
+        drawing: any;
+        setUpdateHideMap: React.Dispatch<React.SetStateAction<boolean>>;
     }
 ) {
+   
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState("");
     const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
     const [docCoordinatesError, setDocCoordinatesError] = useState(false);
-    const [drawing, setDrawing] = useState<any>(undefined);
     const [hideMap, setHideMap] = useState<boolean>(false);
     const [isMapOpen, setIsMapOpen] = useState(false);
 
     const [showGeoInfo, setShowGeoInfo] = useState(false);
 
-    const handleCoordinatesSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        if (!docCoordinates) {
-            setError("Please fill the coordinates field");
-            return;
-        }
-        try {
-            const updatedDocument = await API.updateKxDocumentCoordinates(id, docCoordinates);
-            if (updatedDocument) {
-                toast({
-                    title: "Success",
-                    description: "The coordinates have been updated successfully",
-                    variant: "success",
-                    duration: 3000,
-                });
-            } else {
-                toast({
-                    title: "Error",
-                    description: "Failed to update coordinates",
-                    variant: "error",
-                    duration: 3000,
-                });
-            }
-        } catch (error: any) {
-            toast({
-                title: "Error",
-                description: "Failed to update coordinates",
-                variant: "error",
-                duration: 3000,
-            });
-        }
-        setIsOpen(false);
-    };
+
 
     const handleCoordinatesCancel = async (e: React.FormEvent) => {
         e.preventDefault();
-        setDocCoordinates(docCoordinates as DocCoords);
         setIsOpen(false);
     };
 
@@ -1066,18 +1058,19 @@ export function FormCoordinatesDialog(
                                 hideMap={hideMap}
                                 setHideMap={setHideMap}
                                 user={user}
+                                setUpdateHideMap={setUpdateHideMap}
                             />
                             <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
                                 <Button
                                     className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
                                     variant="light"
-                                    onClick={(e) => handleCoordinatesCancel(e)}
+                                    onClick={handleCoordinatesCancel}
                                 >
                                     Cancel
                                 </Button>
                                 <Button
                                     className="w-full sm:w-auto primary"
-                                    onClick={e => handleCoordinatesSubmit(e)}
+                                    onClick={handleSaveDrawing}
                                 >
                                     Submit
                                 </Button>
@@ -1086,7 +1079,7 @@ export function FormCoordinatesDialog(
                     </div>
                 </DialogPanel>
             </Dialog>
-            <Toaster />
+            <Toaster/>
         </>
     );
 }

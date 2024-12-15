@@ -158,7 +158,7 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
         if (props.drawing) PreviewMapDraw.set(props.drawing);
     }, [mapContainerRef.current]);
 
-    useMemo(() => {
+    useEffect(() => {
         if (props.drawing) {
             mapRef.current?.remove();
             mapRef.current = null;
@@ -761,11 +761,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (
 };
 
 export const DocumentPageMap: React.FC<
-    SatMapProps & {
-        setDrawing: (
-            drawing: FeatureCollection<Geometry, GeoJsonProperties> | undefined
-        ) => void;
-    }
+    SatMapProps
 > = (props) => {
     const [isOpen, setIsOpen] = useState(false);
     const [drawing, setDrawing] = useState(props.drawing);
@@ -801,7 +797,7 @@ export const DocumentPageMap: React.FC<
                 center: center,
                 zoom: props.zoom || defaultZoom,
                 pitch: 40,
-                interactive: false,
+                interactive: true,
             });
 
             mapRef.current?.on("load", function () {
@@ -917,39 +913,6 @@ export const DocumentPageMap: React.FC<
 
     return (
         <>
-            {canEdit && (
-                <div
-                    style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }}
-                >
-                    <Button
-                        style={{
-                            backgroundColor: "white",
-                            color: "black",
-                            borderColor: "transparent",
-                        }}
-                        className="ring-0"
-                        icon={RiEditBoxLine}
-                        onClick={() => setIsOpen(true)}
-                    />
-                </div>
-            )}
-            <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
-                <DialogPanel
-                    className="p-0 overflow-hidden"
-                    style={{ maxWidth: "100%" }}
-                >
-                    <SatMap
-                        drawing={drawing}
-                        onCancel={() => setIsOpen(false)}
-                        onDone={(v) => {
-                            props.setDrawing(v);
-                            setIsOpen(false);
-                        }}
-                        style={{ minHeight: "95vh", width: "100%" }}
-                        user={props.user}
-                    ></SatMap>
-                </DialogPanel>
-            </Dialog>
             <div
                 className={props.className}
                 ref={mapContainerRef}

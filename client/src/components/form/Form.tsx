@@ -98,9 +98,10 @@ export function FormDialog(props: FormDialogProps) {
     const [error, setError] = useState("");
     const [message, setMessage] = useState("");
 
-    const [docCoordinates, _] = useState<DocCoords | undefined>(undefined);
+    const [docCoordinates,] = useState<DocCoords | undefined>(undefined);
     // Example usage
     //const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>({type: AreaType.ENTIRE_MUNICIPALITY});
+
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -127,7 +128,7 @@ export function FormDialog(props: FormDialogProps) {
                 type: AreaType.AREA,
                 coordinates: cord as number[][][],
             };
-        } else {
+        } else if (hideMap) {
             draw = {
                 type: AreaType.ENTIRE_MUNICIPALITY,
             };
@@ -649,7 +650,8 @@ export function FormDocumentGeolocalization({
     setDrawing,
     hideMap,
     setHideMap,
-    user
+    user,
+    setUpdateHideMap
 
 }: {
     isMapOpen: boolean,
@@ -660,10 +662,17 @@ export function FormDocumentGeolocalization({
     setDocCoordinatesError: React.Dispatch<React.SetStateAction<boolean>>,
     drawing: any,
     setDrawing: React.Dispatch<React.SetStateAction<any>>,
-    hideMap: boolean,
+    hideMap?: boolean,
     setHideMap: React.Dispatch<React.SetStateAction<boolean>>
     user: { email: string; role: Stakeholders } | null;
+    setUpdateHideMap?: React.Dispatch<React.SetStateAction<boolean>>
 }) {
+    const handleSwitchChange = (checked: boolean) => {
+        setHideMap(checked);
+        if (setUpdateHideMap) {
+            setUpdateHideMap(checked);
+        }
+    };
     return (
         <>
             <div className="col-span-full sm:col-span-3 flex flex-row">
@@ -701,7 +710,7 @@ export function FormDocumentGeolocalization({
                     id="switch"
                     name="switch"
                     checked={hideMap}
-                    onChange={setHideMap}
+                    onChange={handleSwitchChange}
                 />
             </div>
 
