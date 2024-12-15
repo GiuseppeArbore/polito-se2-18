@@ -651,7 +651,8 @@ export function FormDocumentGeolocalization({
     hideMap,
     setHideMap,
     user,
-    setUpdateHideMap
+    setUpdateHideMap,
+    updateHideMap
 
 }: {
     isMapOpen: boolean,
@@ -666,6 +667,7 @@ export function FormDocumentGeolocalization({
     setHideMap: React.Dispatch<React.SetStateAction<boolean>>
     user: { email: string; role: Stakeholders } | null;
     setUpdateHideMap?: React.Dispatch<React.SetStateAction<boolean>>
+    updateHideMap?: boolean
 }) {
     const handleSwitchChange = (checked: boolean) => {
         setHideMap(checked);
@@ -673,6 +675,7 @@ export function FormDocumentGeolocalization({
             setUpdateHideMap(checked);
         }
     };
+    hideMap = hideMap || updateHideMap;
     return (
         <>
             <div className="col-span-full sm:col-span-3 flex flex-row">

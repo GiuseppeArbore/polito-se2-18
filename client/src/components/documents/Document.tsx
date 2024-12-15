@@ -185,6 +185,7 @@ export default function Document({ user }: DocumentProps) {
                     };
                     setDrawings(geoJSON);
                 } else {
+                    setUpdateHideMap(true);
                     setEntireMunicipality(true);
                 }
 
@@ -199,7 +200,7 @@ export default function Document({ user }: DocumentProps) {
     }, [id]);
 
 const handleSaveDrawing = async () => {
-    if (drawings && saveDrawing) {
+    if (drawings || updateHideMap) {
         let draw: DocCoords;
         if (
             !updateHideMap &&
@@ -254,8 +255,7 @@ const handleSaveDrawing = async () => {
                 variant: "error",
                 duration: 3000,
             });
-        }
-        setSaveDrawing(false);
+        };
     }
 };
     const [showCheck, setShowCheck] = useState(false);
@@ -656,6 +656,7 @@ const handleSaveDrawing = async () => {
                         handleSaveDrawing={handleSaveDrawing}
                         drawing={drawings}
                         setUpdateHideMap={setUpdateHideMap}
+                        updateHideMap={updateHideMap}
                     />
                     <Card className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}>
                         <DocumentPageMap
@@ -675,6 +676,7 @@ const handleSaveDrawing = async () => {
                             setDrawing={(d) => { setDrawings(d); setSaveDrawing(true); }}
                             drawing={drawings}
                             setUpdateHideMap={setUpdateHideMap}
+                            updateHideMap={updateHideMap}
                         />
                         <div className="flex justify-center items-start pt-10">
                             <div className='document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
@@ -994,7 +996,8 @@ export function FormCoordinatesDialog(
         setDocCoordinates,
         id,
         user,
-        setUpdateHideMap
+        setUpdateHideMap,
+        updateHideMap
     }: {
         setDrawing: React.Dispatch<React.SetStateAction<any>>; 
         handleSaveDrawing: () => void;
@@ -1003,6 +1006,7 @@ export function FormCoordinatesDialog(
         user: { email: string; role: Stakeholders } | null;
         drawing: any;
         setUpdateHideMap: React.Dispatch<React.SetStateAction<boolean>>;
+        updateHideMap : boolean;
     }
 ) {
    
@@ -1059,6 +1063,7 @@ export function FormCoordinatesDialog(
                                 setHideMap={setHideMap}
                                 user={user}
                                 setUpdateHideMap={setUpdateHideMap}
+                                updateHideMap={updateHideMap}
                             />
                             <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
                                 <Button
