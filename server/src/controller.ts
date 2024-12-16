@@ -1,9 +1,10 @@
+/* eslint-disable no-undef */
 import { Request, Response, NextFunction } from 'express';
 import { db } from './db/dao';
 import { KxDocumentModel, KxDocument, DocInfo, KxDocumentAggregateData } from './models/model';
 import { mongoose } from '@typegoose/typegoose';
 import { getPresignedUrl, kxObjectStorageClient, KxObjectStorageCommands } from './object_storage/bucket';
-import { PutObjectCommandOutput, S3ServiceException } from '@aws-sdk/client-s3';
+import { PutObjectCommandOutput } from '@aws-sdk/client-s3';
 import { rm } from 'fs/promises';
 import { setTimeout } from 'timers/promises';
 import { KxDocumentType, Stakeholders } from './models/enum';
@@ -103,7 +104,7 @@ export const getPresignedUrlForAttachment = async (req: Request, res: Response, 
     }
 }
 
-export const handleFileUpload = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const handleFileUpload = async (req: Request, res: Response): Promise<void> => {
     interface JobResult {
         fileName: string,
         S3Output: PutObjectCommandOutput
@@ -163,7 +164,7 @@ export const handleFileUpload = async (req: Request, res: Response, next: NextFu
     }
 }
 
-export const removeAttachmentFromDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+export const removeAttachmentFromDocument = async (req: Request, res: Response): Promise<void> => {
     const id = new mongoose.Types.ObjectId(req.params.id);
     const fileName = req.params.fileName;
     const dbUpdate = await db.removeKxDocumentAttachments(id, [fileName]);

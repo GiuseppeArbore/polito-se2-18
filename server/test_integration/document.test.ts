@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-undef */
 import { describe, test } from "@jest/globals"
 import request from 'supertest';
 import { app } from "../index";

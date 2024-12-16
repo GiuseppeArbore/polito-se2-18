@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import passport from "passport";
 import LocalStrategy from "passport-local";
 import session from "express-session";
@@ -78,13 +80,13 @@ export function initAuthRoutes(app: Application) {
     app.get(
         "/api/sessions/current",
         isLoggedIn,
-        (req, res, _) => {
+        (req, res) => {
             res.status(200).json(req.user);
         }
     );
     app.delete("/api/sessions/current",
         isLoggedIn,
-        (req, res, _) => {
+        (req, res) => {
             req.logout(() => res.end());
         });
 }

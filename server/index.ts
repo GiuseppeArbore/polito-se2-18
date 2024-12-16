@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import cors, { CorsOptions } from "cors";
 import express from 'express';
 import initRoutes from './src/routes';

@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import * as Bucket from "../src/object_storage/bucket"
 import { app } from "../index";
 import request from 'supertest';

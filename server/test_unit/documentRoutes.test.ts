@@ -1,5 +1,6 @@
+/* eslint-disable no-undef */
 import request from 'supertest';
-import { NextFunction, Request, Response } from 'express';
+import { Request, Response } from 'express';
 import { createKxDocument } from '../src/controller';
 import * as cnt from "../src/controller";
 import { app } from "../index";
@@ -7,7 +8,6 @@ import { db } from '../src/db/dao'
 import { AreaType, KxDocumentType, Scale, Stakeholders } from '../src/models/enum';
 import { KIRUNA_COORDS } from '../src/utils';
 import { randomBytes } from 'crypto';
-import { isUrbanPlanner } from '../src/auth';
 
 const TEST_ID = "6738b18f8da44b335177509e";
 const TEST_FILENAME = "filename";
@@ -204,7 +204,7 @@ describe('Document Routes', () => {
 
     test('Test 7 - POST /api/documents/:id/attachments - nominal case', async () => {
         jest.spyOn(cnt, "handleFileUpload").mockImplementation(
-            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+            jest.fn(async (req: Request, res: Response) => {
                 res.status(201).send();
                 return;
             })
@@ -220,7 +220,7 @@ describe('Document Routes', () => {
 
     test('Test 8 - POST /api/documents/:id/attachments - invalid id', async () => {
         jest.spyOn(cnt, "handleFileUpload").mockImplementation(
-            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+            jest.fn(async (req: Request, res: Response) => {
                 res.status(201).send();
                 return;
             })
@@ -236,7 +236,7 @@ describe('Document Routes', () => {
 
     test('Test 9 - POST /api/documents/:id/attachments - file too big', async () => {
         jest.spyOn(cnt, "handleFileUpload").mockImplementation(
-            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+            jest.fn(async (req: Request, res: Response) => {
                 res.status(201).send();
                 return;
             })
@@ -252,7 +252,7 @@ describe('Document Routes', () => {
 
     test("Test 10 - DELETE /api/documents/:id/attachments/:fileName - nominal case", async () => {
         jest.spyOn(cnt, "removeAttachmentFromDocument").mockImplementation(
-            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+            jest.fn(async (req: Request, res: Response) => {
                 res.status(200).send();
                 return;
             })
@@ -266,7 +266,7 @@ describe('Document Routes', () => {
     });
     test('Test 11 - GET /api/documents/aggregateData - get aggregate data', async () => {
         jest.spyOn(cnt, "getKxDocumentAggregateData").mockImplementation(
-            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+            jest.fn(async (req: Request, res: Response) => {
                 res.status(200).send();
                 return;
             })

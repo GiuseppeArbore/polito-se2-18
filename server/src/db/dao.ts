@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable no-undef */
 import { DocInfo, KxDocument, KxDocumentAggregateData } from "../models/model";
 import { KxDocumentModel } from "../models/model";
 import { mongoose } from "@typegoose/typegoose";
-import dotenv from 'dotenv';
 import { User, UserModel } from "../models/user";
 
 
@@ -124,7 +125,7 @@ class DAO {
         }
         return null;
     }
-    async deleteKxDocument(id: mongoose.Types.ObjectId): Promise<Boolean> {
+    async deleteKxDocument(id: mongoose.Types.ObjectId): Promise<boolean> {
         const result = await KxDocumentModel.deleteOne({
             _id: id
         }).exec();

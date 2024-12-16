@@ -1,3 +1,5 @@
+/* eslint-disable no-undef */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { Request, Response, NextFunction, Application } from 'express';
 import { validationResult } from 'express-validator';
 
@@ -11,7 +13,7 @@ export const validateRequest = (req: Request, res: Response, next: NextFunction)
 };
 
 export function registerErrorHandler(app: Application) {
-    app.use((err: any, req: any, res: any, next: any) => {
+    app.use((err: any, req: any, res: any) => {
         // TODO: add logging functionality
         console.error(err);
         return res.status(err.customCode || 500).json({

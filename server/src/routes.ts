@@ -1,10 +1,10 @@
 
 import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription, handleFileUpload, removeAttachmentFromDocument, getKxDocumentAggregateData } from './controller';
 import { validateRequest } from './errorHandlers';
-import e, { Application, NextFunction, Request, Response } from 'express';
+import { Application } from 'express';
 import { body, param } from 'express-validator';
-import { AreaType, KxDocumentType, Stakeholders } from './models/enum';
-import { coordDistance, isDocCoords, KIRUNA_COORDS } from './utils';
+import { AreaType } from './models/enum';
+import { isDocCoords } from './utils';
 import multer from 'multer';
 import * as mime from 'mime-types';
 import { randomBytes } from 'crypto';

@@ -1,5 +1,5 @@
+/* eslint-disable no-undef */
 import { describe, test } from "@jest/globals"
-import e from "express";
 
 describe("Test group", () => {
     test("Test 1 description", () => {

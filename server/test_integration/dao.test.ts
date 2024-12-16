@@ -1,8 +1,9 @@
+/* eslint-disable no-undef */
 import { describe, test } from "@jest/globals"
 import { db } from "../src/db/dao";
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "../src/models/enum";
+import { AreaType, KxDocumentType, Stakeholders } from "../src/models/enum";
 import { Area, KxDocument, Point } from "../src/models/model";
-import { User, UserModel } from "../src/models/user";
+import { UserModel } from "../src/models/user";
 import { EJSON } from "bson";
 import { mongoose } from "@typegoose/typegoose";
 import { KIRUNA_COORDS } from "../src/utils";

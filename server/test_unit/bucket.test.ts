@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import * as ClientS3 from "@aws-sdk/client-s3";
 import * as ReqDes from "@aws-sdk/s3-request-presigner"
 import { getPresignedUrl, KxObjectStorageCommands, BUCKET_NAME, kxObjectStorageClient } from "../src/object_storage/bucket";

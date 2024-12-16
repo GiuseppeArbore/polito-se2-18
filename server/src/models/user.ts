@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { mongoose, prop, modelOptions, getModelForClass } from "@typegoose/typegoose";
 import { Stakeholders } from "./enum";
 

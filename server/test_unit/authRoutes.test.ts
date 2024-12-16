@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import { app } from "../index";
 import request from 'supertest';
 import { db } from '../src/db/dao'

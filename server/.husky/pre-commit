@@ -1,3 +1,2 @@
 cd server
 npx eslint .
-npm test

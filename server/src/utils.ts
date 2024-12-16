@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 import { DocCoords } from "./models/model";
 import { AreaType } from "./models/enum";
 
