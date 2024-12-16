@@ -41,41 +41,16 @@ function Flow(props: FlowProps) {
       });
     setNodes(node_list);
     let connections = props.documents.map((d) => {
-      let edges = d.connections.collateral.map((c, index) => {
-        return {
-          id: (index + 1000).toString(),
-          source: d._id!.toString(),
-          target: c.toString(),
-        };
+      let a = Object.values(d.connections).map((c, index) => {
+        return c.map((i: { toString: () => any; }, index_i: number) => {
+          return {
+            id: (index*1000 + index_i ).toString(),
+            source: d._id!.toString(),
+            target: i.toString(),
+          };
+        });
       });
-      edges = edges.concat(
-        d.connections.direct.map((c, index) => {
-          return {
-            id: (index + 2000).toString(),
-            source: d._id!.toString(),
-            target: c.toString(),
-          };
-        })
-      );
-      edges = edges.concat(
-        d.connections.projection.map((c, index) => {
-          return {
-            id: (index + 3000).toString(),
-            source: d._id!.toString(),
-            target: c.toString(),
-          };
-        })
-      );
-      edges = edges.concat(
-        d.connections.update.map((c, index) => {
-          return {
-            id: (index + 4000).toString(),
-            source: d._id!.toString(),
-            target: c.toString(),
-          };
-        })
-      );
-      return edges;
+      return a.flat();
     });
     setEdges(connections.flat());
 
