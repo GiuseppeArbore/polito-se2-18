@@ -559,7 +559,7 @@ export function FormDocumentInformation({
                                 type="text"
                                 name="newStakeholder"
                                 className="border p-0 mr-2 w-80"
-                                placeholder="Add new stakeholder..."
+                                placeholder="Add new Stakeholder..."
                                 value={newStakeholder}
                                 onChange={(e) => setNewStakeholder(e.target.value)}
                             />
@@ -700,7 +700,7 @@ export function FormDocumentInformation({
                                     type="text"
                                     name="newScale"
                                     className="border p-0 mr-2 w-80"
-                                    placeholder="Add new scale..."
+                                    placeholder="Add new Scale..."
                                     value={newScale}
                                     onChange={(e) => setNewScale(e.target.value)}
                                 />
