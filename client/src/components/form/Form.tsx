@@ -446,9 +446,11 @@ export function FormDocumentInformation({
 }) {
 
     const [aggregatedStakeholders, setAggregatedStakeholders] = useState<string[]>([]);
-    const [aggregateScale, setAggrgatedScale] = useState([]);
-    const [aggregatedType, setAggrgatedType] = useState([]);
+    const [aggregateScales, setAggregatedScales] = useState<string[]>([]);
+    const [aggregatedTypes, setAggregatedTypes] = useState<string[]>([]);
     const [newStakeholder, setNewStakeholder] = useState('');
+    const [newType, setNewType] = useState('');
+    const [newScale, setNewScale] = useState('');
 
     useEffect(() => {
         const fetchAggregateData = async () => {
@@ -456,15 +458,17 @@ export function FormDocumentInformation({
                 const aggregateData = await API.getAggregatedData();
                 if (aggregateData) {
                     setAggregatedStakeholders(aggregateData.stakeholders);
-                    setAggrgatedScale(aggregateData.scales);
-                    setAggrgatedType(aggregateData.types);
+                    setAggregatedScales(aggregateData.scales);
+                    setAggregatedTypes(aggregateData.types);
                 }
+
             } catch (error: any) {
                 console.error(error);
             }
         };
         fetchAggregateData();
     }, []);
+
 
     const handleAddNewStakeholder = (e: React.FormEvent) => {
         e.preventDefault();
@@ -474,6 +478,16 @@ export function FormDocumentInformation({
             setStakeholders([...stakeholders, newStakeholder]);
         }
         setNewStakeholder('');
+    };
+
+    const handleAddNewType = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newType && !aggregatedTypes.includes(newType)) {
+            const updatedTypes = [...aggregatedTypes, newType];
+            setAggregatedTypes(updatedTypes);
+            setType(newType);
+        }
+        setNewType('');
     };
 
 
@@ -520,25 +534,25 @@ export function FormDocumentInformation({
                     required
                 >
                     <div className="sticky top-0 bg-white dark:bg-[#121826] z-10 p-0">
-                    <form className="flex items-center p-2">
-                        <TextInput
-                            type="text"
-                            name="newStakeholder"
-                            className="border p-0 mr-2 w-80"
-                            placeholder="Add new stakeholder..."
-                            value={newStakeholder}
-                            onChange={(e) => setNewStakeholder(e.target.value)}
-                        />
-                        <Button
-                            type="submit"
-                            className="bg-blue-500 text-white p-1 rounded"
-                            onClick={(e) => {
-                                handleAddNewStakeholder(e);
-                            }}
-                        >
-                            Add new
-                        </Button>
-                    </form>
+                        <form className="flex items-center p-2">
+                            <TextInput
+                                type="text"
+                                name="newStakeholder"
+                                className="border p-0 mr-2 w-80"
+                                placeholder="Add new stakeholder..."
+                                value={newStakeholder}
+                                onChange={(e) => setNewStakeholder(e.target.value)}
+                            />
+                            <Button
+                                type="submit"
+                                className="bg-blue-500 text-white p-1 rounded"
+                                onClick={(e) => {
+                                    handleAddNewStakeholder(e);
+                                }}
+                            >
+                                Add new
+                            </Button>
+                        </form>
                     </div>
                     {
                         aggregatedStakeholders.map((stakeholder) => (
@@ -562,17 +576,38 @@ export function FormDocumentInformation({
                     id="doc_type"
                     name="doc_type"
                     className="mt-2"
-                    value={Object.keys(KxDocumentType).find(key => KxDocumentType[key as keyof typeof KxDocumentType] === type)}
-                    onValueChange={t => setType(KxDocumentType[t as keyof typeof KxDocumentType])}
+                    value={type}
+                    onValueChange={t => setType(t)}
                     error={typeError}
                     errorMessage="The type is mandatory"
                     required
                 >
+                    <div className="sticky top-0 bg-white dark:bg-[#121826] z-10 p-0">
+                        <form className="flex items-center p-2">
+                            <TextInput
+                                type="text"
+                                name="newStakeholder"
+                                className="border p-0 mr-2 w-80"
+                                placeholder="Add new stakeholder..."
+                                value={newType}
+                                onChange={(e) => setNewType(e.target.value)}
+                            />
+                            <Button
+                                type="submit"
+                                className="bg-blue-500 text-white p-1 rounded"
+                                onClick={(e) => {
+                                    handleAddNewType(e);
+                                }}
+                            >
+                                Add new
+                            </Button>
+                        </form>
+                    </div>
                     {
-                        Object.entries(KxDocumentType).map((dt) => {
+                        aggregatedTypes.map((dt) => {
                             return (
-                                <SearchSelectItem key={`type-${dt[0]}`} value={dt[0]}>
-                                    {dt[1]}
+                                <SearchSelectItem key={`type-${dt}`} value={dt}>
+                                    {dt}
                                 </SearchSelectItem>
                             );
                         })

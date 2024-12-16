@@ -10,7 +10,7 @@ export const loadIcons = (map: mapboxgl.Map): Promise<void[]> => {
         { name: 'icon-Agreement', path: '/Agreement.png' },
         { name: 'icon-ConflictResolution', path: '/ConflictResolution.png' },
         { name: 'icon-Consultation', path: '/Consultation.png' },
-        { name: 'defult-icon', path: '/Default.png' },
+        { name: 'default-icon', path: '/Default.png' },
     ];
 
     const promises = icons.map(icon => {
