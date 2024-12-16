@@ -545,7 +545,7 @@ export function FormDocumentInformation({
                             />
                             <Button
                                 type="submit"
-                                className="bg-blue-500 text-white p-1 rounded"
+                                className="bg-[#163C89] dark:bg-blue-500 text-white p-1 rounded"
                                 onClick={(e) => {
                                     handleAddNewStakeholder(e);
                                 }}
@@ -594,7 +594,7 @@ export function FormDocumentInformation({
                             />
                             <Button
                                 type="submit"
-                                className="bg-blue-500 text-white p-1 rounded"
+                                className="bg-[#163C89] dark:bg-blue-500 text-white p-1 rounded"
                                 onClick={(e) => {
                                     handleAddNewType(e);
                                 }}
