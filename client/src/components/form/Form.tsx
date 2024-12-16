@@ -494,7 +494,7 @@ export function FormDocumentInformation({
         const newScaleNum = parseLocalizedNumber(newScale);
         if (
             newScale &&
-            !aggregatedScales.includes(newScaleNum.toString()) &&
+            !aggregatedScales.includes(newScaleNum.toLocaleString()) &&
             !Number.isNaN(newScaleNum) &&
             Number.isInteger(newScaleNum) &&
             newScaleNum >= 0 &&
