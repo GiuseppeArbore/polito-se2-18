@@ -121,9 +121,6 @@ export function initRoutes(app: Application) {
 
     app.get(
         '/api/documents/aggregateData',
-        // This is a potentially onerous operation, so we only allow it for authenticated
-        // users (non authenticated users do not need to call this anyway)
-        isUrbanPlanner,
         getKxDocumentAggregateData
     );
 
