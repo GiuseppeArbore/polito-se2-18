@@ -458,7 +458,7 @@ export function FormDocumentInformation({
                 const aggregateData = await API.getAggregatedData();
                 if (aggregateData) {
                     setAggregatedStakeholders(aggregateData.stakeholders);
-                    setAggregatedScales(aggregateData.scales);
+                    setAggregatedScales(aggregateData.scales.map(scale => scale.toLocaleString()));
                     setAggregatedTypes(aggregateData.types);
                 }
 
@@ -468,10 +468,6 @@ export function FormDocumentInformation({
         };
         fetchAggregateData();
     }, []);
-
-    useEffect(() => {
-        console.log(aggregatedScales);
-    }, [aggregatedStakeholders, aggregatedScales, aggregatedTypes]);
 
     const handleAddNewStakeholder = (e: React.FormEvent) => {
         e.preventDefault();

@@ -1,5 +1,5 @@
 import { mongoose } from '@typegoose/typegoose';
-import { KxDocument, PageRange, Scale } from './model';
+import { KxDocument, PageRange, Scale, KxDocumentAggregateData } from './model';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -230,7 +230,7 @@ const deleteAttachmentFromDocument = async (id: mongoose.Types.ObjectId, fileNam
     }
 }
 
-const getAggregatedData = async () => {
+const getAggregatedData = async (): Promise<KxDocumentAggregateData> =>  {
     const response = await fetch(API_URL + '/documents/aggregateData', {
         method: 'GET',
         credentials: 'include'
