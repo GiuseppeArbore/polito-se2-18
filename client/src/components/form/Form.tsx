@@ -445,6 +445,38 @@ export function FormDocumentInformation({
     setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
 }) {
 
+    const [aggregatedStakeholders, setAggregatedStakeholders] = useState<string[]>([]);
+    const [aggregateScale, setAggrgatedScale] = useState([]);
+    const [aggregatedType, setAggrgatedType] = useState([]);
+    const [newStakeholder, setNewStakeholder] = useState('');
+
+    useEffect(() => {
+        const fetchAggregateData = async () => {
+            try {
+                const aggregateData = await API.getAggregatedData();
+                if (aggregateData) {
+                    setAggregatedStakeholders(aggregateData.stakeholders);
+                    setAggrgatedScale(aggregateData.scales);
+                    setAggrgatedType(aggregateData.types);
+                }
+            } catch (error: any) {
+                console.error(error);
+            }
+        };
+        fetchAggregateData();
+    }, []);
+
+    const handleAddNewStakeholder = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newStakeholder && !aggregatedStakeholders.includes(newStakeholder)) {
+            const updatedStakeholders = [...aggregatedStakeholders, newStakeholder];
+            setAggregatedStakeholders(updatedStakeholders);
+            setStakeholders([...stakeholders, newStakeholder]);
+        }
+        setNewStakeholder('');
+    };
+
+
     return (
         <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
             <div className="col-span-full">
@@ -481,20 +513,39 @@ export function FormDocumentInformation({
                     id="stakeholders"
                     name="stakeholders"
                     className="mt-2"
-                    value={stakeholders.map(sh => Object.keys(Stakeholders).find(key => Stakeholders[key as keyof typeof Stakeholders] === sh)).filter((sh): sh is string => sh !== undefined)}
-                    onValueChange={s => setStakeholders(s.map(sh => Stakeholders[sh as keyof typeof Stakeholders]))}
+                    value={stakeholders}
+                    onValueChange={s => setStakeholders(s)}
                     error={shError}
                     errorMessage="You must select at least one stakeholder."
                     required
                 >
+                    <div className="sticky top-0 bg-white dark:bg-[#121826] z-10 p-0">
+                    <form className="flex items-center p-2">
+                        <TextInput
+                            type="text"
+                            name="newStakeholder"
+                            className="border p-0 mr-2 w-80"
+                            placeholder="Add new stakeholder..."
+                            value={newStakeholder}
+                            onChange={(e) => setNewStakeholder(e.target.value)}
+                        />
+                        <Button
+                            type="submit"
+                            className="bg-blue-500 text-white p-1 rounded"
+                            onClick={(e) => {
+                                handleAddNewStakeholder(e);
+                            }}
+                        >
+                            Add new
+                        </Button>
+                    </form>
+                    </div>
                     {
-                        Object.entries(Stakeholders).map((dt) => {
-                            return (
-                                <MultiSelectItem key={`sh-${dt[0]}`} value={dt[0]}>
-                                    {dt[1]}
-                                </MultiSelectItem>
-                            );
-                        })
+                        aggregatedStakeholders.map((stakeholder) => (
+                            <MultiSelectItem key={`sh-${stakeholder}`} value={stakeholder}>
+                                {stakeholder}
+                            </MultiSelectItem>
+                        ))
                     }
                 </MultiSelect>
             </div>
