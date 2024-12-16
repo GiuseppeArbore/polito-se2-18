@@ -142,11 +142,7 @@ const center: LngLatLike = [20.26, 67.845];
 export const PreviewMap: React.FC<SatMapProps> = (props) => {
     const mapContainerRef = useRef<any>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
-    const offsetDistance = 0.0001; // offsetDistance
-    const pointsAndCentroids = getPointsAndCentroids(
-        props.drawing,
-        offsetDistance
-    );
+   
     useEffect(() => {
         if (mapRef.current) return;
 
@@ -165,12 +161,17 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
 
     useEffect(() => {
         if (props.drawing) {
+            const offsetDistance = 0.0001; // offsetDistance
+            const pointsAndCentroids = getPointsAndCentroids(
+                props.drawing,
+                offsetDistance
+            );
             mapRef.current?.remove();
             mapRef.current = null;
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
                 style: "mapbox://styles/mapbox/light-v11",
-                center: pointsAndCentroids.features[0].geometry.type === "Point" ? pointsAndCentroids.features[0].geometry.coordinates as LngLatLike : center,
+                center: pointsAndCentroids.features[0]?.geometry.type === "Point" ? pointsAndCentroids.features[0]?.geometry.coordinates as LngLatLike : center,
                 zoom: props.zoom || defaultZoom,
                 pitch: 40,
                 interactive: false,
@@ -1242,6 +1243,7 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         props.drawing
     );
     const [mapBounds, setMapBounds] = useState<LngLatBounds | null>(null);
+
     const offsetDistance = 0.0001; // offsetDistance
     const pointsAndCentroids = getPointsAndCentroids(
         props.drawing,
@@ -1253,7 +1255,9 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: "mapbox://styles/mapbox/satellite-streets-v12",
-            center: pointsAndCentroids.features[0].geometry.type === "Point" ? pointsAndCentroids.features[0].geometry.coordinates as LngLatLike : center,
+            center: pointsAndCentroids.features[0]?.geometry?.type === "Point"
+            ? pointsAndCentroids.features[0]?.geometry.coordinates as LngLatLike
+            : center,
             zoom: props.zoom || defaultZoom,
             pitch: 40,
         });
