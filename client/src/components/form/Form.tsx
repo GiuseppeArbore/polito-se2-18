@@ -446,7 +446,7 @@ export function FormDocumentInformation({
 }) {
 
     const [aggregatedStakeholders, setAggregatedStakeholders] = useState<string[]>([]);
-    const [aggregateScales, setAggregatedScales] = useState<string[]>([]);
+    const [aggregatedScales, setAggregatedScales] = useState<string[]>([]);
     const [aggregatedTypes, setAggregatedTypes] = useState<string[]>([]);
     const [newStakeholder, setNewStakeholder] = useState('');
     const [newType, setNewType] = useState('');
@@ -469,6 +469,9 @@ export function FormDocumentInformation({
         fetchAggregateData();
     }, []);
 
+    useEffect(() => {
+        console.log(aggregatedScales);
+    }, [aggregatedStakeholders, aggregatedScales, aggregatedTypes]);
 
     const handleAddNewStakeholder = (e: React.FormEvent) => {
         e.preventDefault();
@@ -490,6 +493,23 @@ export function FormDocumentInformation({
         setNewType('');
     };
 
+    const handleAddNewScale = (e: React.FormEvent) => {
+        e.preventDefault();
+        const newScaleNum = parseLocalizedNumber(newScale);
+        if (
+            newScale &&
+            !aggregatedScales.includes(newScaleNum.toString()) &&
+            !Number.isNaN(newScaleNum) &&
+            Number.isInteger(newScaleNum) &&
+            newScaleNum >= 0 &&
+            newScaleNum <= 10_000_000_000_000
+        ) {
+            const updatedScales = [...aggregatedScales, newScaleNum];
+            setAggregatedScales(updatedScales.map(scale => scale.toLocaleString()));
+            setScale({ type: ScaleType.ONE_TO_N, scale: newScaleNum });
+        }
+        setNewScale('');
+    };
 
     return (
         <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
@@ -586,9 +606,9 @@ export function FormDocumentInformation({
                         <form className="flex items-center p-2">
                             <TextInput
                                 type="text"
-                                name="newStakeholder"
+                                name="newType"
                                 className="border p-0 mr-2 w-80"
-                                placeholder="Add new stakeholder..."
+                                placeholder="Add new Type..."
                                 value={newType}
                                 onChange={(e) => setNewType(e.target.value)}
                             />
@@ -635,6 +655,7 @@ export function FormDocumentInformation({
                     }}
                     className="mt-2"
                 >
+
                     {Object.values(ScaleType).map((t) => {
                         return (
                             <SelectItem value={t} key={t}>
@@ -644,8 +665,10 @@ export function FormDocumentInformation({
                     })}
                 </Select>
                 {scale.type === ScaleType.ONE_TO_N &&
-                    <TextInput
+                    <SearchSelect
                         id="scale"
+                        name="scale"
+                        className="mt-2"
                         value={scale.scale.toLocaleString()}
                         onValueChange={(v) => {
                             if (v === "") {
@@ -662,17 +685,45 @@ export function FormDocumentInformation({
                                 setScale({ type: ScaleType.ONE_TO_N, scale: num });
                             }
                         }}
-                        name="scale"
-                        autoComplete="scale"
-                        placeholder="10.000"
-                        className="mt-2"
                         icon={() => (
                             <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default text-end text-right tremor-TextInput-icon shrink-0 h-5 w-5 mx-2.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
                                 1:
                             </p>
                         )}
+
+                        placeholder="10.000"
                         required
-                    />
+                    >
+                        <div className="sticky top-0 bg-white dark:bg-[#121826] z-10 p-0">
+                            <form className="flex items-center p-2">
+                                <TextInput
+                                    type="text"
+                                    name="newScale"
+                                    className="border p-0 mr-2 w-80"
+                                    placeholder="Add new scale..."
+                                    value={newScale}
+                                    onChange={(e) => setNewScale(e.target.value)}
+                                />
+                                <Button
+                                    type="submit"
+                                    className="bg-[#163C89] dark:bg-blue-500 text-white p-1 rounded"
+                                    onClick={(e) => {
+                                        handleAddNewScale(e);
+                                    }}
+                                >
+                                    Add new
+                                </Button>
+                            </form>
+                        </div>
+                        {aggregatedScales.map((scale) => {
+                            const scaleStr = scale.toLocaleString(); 
+                            return (
+                                <SearchSelectItem key={scaleStr} value={scaleStr}>
+                                    {scaleStr}
+                                </SearchSelectItem>
+                            );
+                        })}
+                    </SearchSelect>
                 }
             </div>
 
