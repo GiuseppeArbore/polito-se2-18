@@ -1,12 +1,11 @@
 
-import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine, RiAddBoxLine, RiInfoI } from '@remixicon/react';
+import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiEditBoxLine, RiDeleteBinLine, RiAddBoxLine, RiInfoI } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
-import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
+import { FormDialog, FormDocumentDescription, FormDocumentInformation} from "../form/Form";
 import { FileUpload } from "../form/DragAndDrop";
 import DeleteResourceDialog from './DeleteResourcesDialog';
 import API from '../../API';
 import mime from 'mime';
-import { FormDocumentGeolocalization } from '../form/Form';
 import {
     Accordion,
     AccordionBody,
@@ -63,9 +62,6 @@ export default function Document({ user }: DocumentProps) {
     const [stakeholders, setStakeholders] = useState<string[]>([]);
     const [scale, setScale] = useState<Scale>({ type: ScaleType.TEXT });
     const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(undefined);
-    const [drawing, setDrawing] = useState<any>(undefined);
-    const [hideMap, setHideMap] = useState<boolean>(false);
-    const [isMapOpen, setIsMapOpen] = useState(false);
     const [type, setType] = useState<string | undefined>(undefined);
     const [language, setLanguage] = useState<string | undefined>(undefined);
     const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
@@ -73,14 +69,12 @@ export default function Document({ user }: DocumentProps) {
     const [description, setDescription] = useState<string | undefined>(undefined);
     const [entireMunicipality, setEntireMunicipality] = useState(false);
     const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
-    const [documents, setDocuments] = useState<KxDocument[]>([]);
     const [documentsForDirect, setDocumentsForDirect] = useState<KxDocument[]>([]);
     const [documentsForCollateral, setDocumentsForCollateral] = useState<KxDocument[]>([]);
     const [documentsForProjection, setDocumentsForProjection] = useState<KxDocument[]>([]);
     const [documentsForUpdate, setDocumentsForUpdate] = useState<KxDocument[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
-    const [showGeoInfo, setShowGeoInfo] = useState(false);
 
 
 
@@ -647,7 +641,7 @@ export default function Document({ user }: DocumentProps) {
                             />
                         </Card>
                     ) : (
-                        <>
+                        
                             <div className="flex justify-center items-start pt-10">
                                 <div className='document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
                                     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
@@ -657,7 +651,7 @@ export default function Document({ user }: DocumentProps) {
                                     </div>
                                 </div>
                             </div>
-                        </>
+                        
                     )
                 }
                 {

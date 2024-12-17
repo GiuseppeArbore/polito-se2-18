@@ -628,7 +628,6 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (
                 id="quickFilter"
                 placeholder="Search..."
                 className="quickfilter w-full"
-                // value={props.quickFilterText}
                 onValueChange={(e) => {
                     props.setQuickFilterText?.(e);
 

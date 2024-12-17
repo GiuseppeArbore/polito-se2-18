@@ -1,8 +1,7 @@
-import "ag-grid-enterprise";
+
 import {
     AdvancedFilterModel,
     ColDef,
-    GridApi,
     GridOptions,
     SizeColumnsToContentStrategy,
     ValueGetterParams,
