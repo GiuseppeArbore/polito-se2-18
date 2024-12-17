@@ -1,4 +1,4 @@
-import { DocInfo, KxDocument, KxDocumentAggregateData } from "../models/model";
+import { Connections, DocInfo, KxDocument, KxDocumentAggregateData } from "../models/model";
 import { KxDocumentModel } from "../models/model";
 import { mongoose } from "@typegoose/typegoose";
 import dotenv from 'dotenv';
@@ -186,6 +186,21 @@ class DAO {
             { _id: id._id },
             {
                 $set: info
+            }
+        ).exec();
+
+        if (result.modifiedCount === 0)
+            return null;
+
+        return await this.getKxDocumentById(id);
+    }
+    async updateKxDocumentConnections(id: mongoose.Types.ObjectId, connections: Connections): Promise<KxDocument | null> {
+        const result = await KxDocumentModel.updateOne(
+            { _id: id._id },
+            {
+                $set: {
+                    connections: connections
+                }
             }
         ).exec();
 
