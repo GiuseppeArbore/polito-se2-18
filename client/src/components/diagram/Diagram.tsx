@@ -15,37 +15,31 @@ import {
 } from "@xyflow/react";
 import dagre from "@dagrejs/dagre";
 import "@xyflow/react/dist/style.css";
-import { KxDocument } from "../../model";
+import { KxDocument, Scale } from "../../model";
 import { Button } from "@tremor/react";
-import { on } from "events";
+import { YAxis, XAxis } from "./Axes";
+import API from "../../API";
+import { ScaleType } from "../../enum";
+import { da } from "date-fns/locale";
+
+const nodeTypes = {
+  yAxis: YAxis,
+  xAxis: XAxis,
+};
 
 interface FlowProps {
   documents: KxDocument[];
 }
 function Flow(props: FlowProps) {
-  const mapYearType: Map<number, Map<string, number>> = props.documents
-    .map((d) => ({
-      year: new Date(d.issuance_date.from).getFullYear(),
-      type: d.type,
-    }))
-    .reduce<Map<number, Map<string, number>>>((acc, val) => {
-      const yearMap = acc.get(val.year) || new Map<string, number>();
-      const count = yearMap.get(val.type) || 0;
-      yearMap.set(val.type, count + 1);
-      acc.set(val.year, yearMap);
-      return acc;
-    }, new Map<number, Map<string, number>>());
-
-  const mapYearMaxDocuments: Map<number, number> = new Map(
-    mapYearType.entries().map(([year, typeMap]) => {
-      return [year, Math.max(...typeMap.values())];
-    })
-  );
-
+  type TextualScale = Exclude<ScaleType, ScaleType.ONE_TO_N>;
   const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
 
   const nodeWidth = 172;
   const nodeHeight = 36;
+  const [scalesByYear, setScaleByYear] = useState<
+    Map<number, Map<TextualScale | number, number>>
+  >(new Map());
+  const [axes, setAxes] = useState<Node[]>([]);
   const [initialNodes] = useState<Node[]>([]);
   const [initialEdges] = useState<Edge[]>([]);
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
@@ -59,7 +53,7 @@ function Flow(props: FlowProps) {
     dagreGraph.setGraph({ rankdir: direction });
 
     nodes.forEach((node) => {
-      dagreGraph.setNode(node.id, { width: nodeWidth, height: nodeHeight });
+      dagreGraph.setNode(node.id, { width: 0, height: nodeHeight });
     });
 
     edges.forEach((edge) => {
@@ -69,7 +63,10 @@ function Flow(props: FlowProps) {
     dagre.layout(dagreGraph);
 
     const newNodes = nodes.map((node: Node) => {
+      const date = new Date((node.data as {date:Date}).date);  
+      const yearWidth = (nodeWidth * 2);
       const nodeWithPosition = dagreGraph.node(node.id);
+      const x = nodeWithPosition.x + yearWidth * (Math.abs(Math.min(...Array.from(scalesByYear.keys())) - date.getFullYear()) + ((date.getMonth()+1)*30 + date.getDay())/365);
       const newNode = {
         ...node,
         targetPosition: isHorizontal ? "left" : "top",
@@ -77,7 +74,7 @@ function Flow(props: FlowProps) {
         // We are shifting the dagre node position (anchor=center center) to the top left
         // so it matches the React Flow node anchor point (top left).
         position: {
-          x: nodeWithPosition.x - nodeWidth / 2,
+          x: x - nodeWidth,
           y: nodeWithPosition.y - nodeHeight / 2,
         },
       };
@@ -88,7 +85,72 @@ function Flow(props: FlowProps) {
     return { nodes: newNodes, edges } as { nodes: Node[]; edges: Edge[] };
   };
 
-  useMemo(() => {
+  useMemo(async () => {
+    const mapYearType: Map<
+      number,
+      Map<TextualScale | number, number>
+    > = props.documents
+      .map((d) => ({
+        year: new Date(d.issuance_date.from).getFullYear(),
+        scale: d.scale as Scale,
+      }))
+      .reduce<Map<number, Map<TextualScale | number, number>>>((acc, val) => {
+        const yearMap =
+          acc.get(val.year) || new Map<TextualScale | number, number>();
+        const key =
+          val.scale.type === ScaleType.ONE_TO_N
+            ? val.scale.scale
+            : val.scale.type;
+        const count = yearMap.get(key) || 0;
+        yearMap.set(key, count + 1);
+        acc.set(val.year, yearMap);
+        return acc;
+      }, new Map<number, Map<TextualScale | number, number>>());
+
+    setScaleByYear(mapYearType);
+    const mapYearMaxDocuments: Map<number, number> = new Map(
+      mapYearType.entries().map(([year, typeMap]) => {
+        return [year, Math.max(...typeMap.values())];
+      })
+    );
+
+    const minYear = Math.min(...mapYearMaxDocuments.keys());
+    const maxYear = Math.max(...mapYearMaxDocuments.keys());
+    const tmpYAxes = [...Array(maxYear - minYear + 1).keys()]
+      .map(
+        (v, i) =>
+          ({
+            id: `x_axis_${v + minYear}`,
+            type: "yAxis",
+            position: { x: i * nodeWidth * 2, y: 0 },
+            draggable: false,
+            selectable: false,
+            data: {
+              width: 100,
+              height: 500,
+              label: (v + minYear).toString(),
+            },
+          } as Node)
+      );
+    //const aggregateData = await API.getKxDocumentsAggregateData();
+    //const scales: []
+    //const tmpXAxes = aggregateData.scales.toSorted().map((s, i) => (
+    //  {
+    //    id: `y_axis_${s}`,
+    //    type: "xAxis",
+    //    position: { x: 0, y: i * nodeHeight * 1 },
+    //    draggable: false,
+    //    selectable: false,
+    //    data: {
+    //      width: 5000,
+    //      height: 100,
+    //      label: s.toString()
+    //    }
+    //  } as Node
+    //));
+    //setAxes([...tmpYAxes, ...tmpXAxes]);
+    setAxes(tmpYAxes);
+
     let node_list: Node[] = props.documents
       .filter((d) => d._id !== undefined)
       .map((d) => {
@@ -99,7 +161,8 @@ function Flow(props: FlowProps) {
             x: Math.floor(Math.random() * 300),
           },
           data: {
-            label: d.title,
+            label: d.issuance_date.from,
+            date: d.issuance_date.from
           },
         };
       });
@@ -107,10 +170,11 @@ function Flow(props: FlowProps) {
     let connections = props.documents.map((d, index_e) => {
       let a = Object.values(d.connections).map((c, index) => {
         return c.map((i: { toString: () => any }, index_i: number) => {
+          const iDoc = props.documents.find((doc) => doc._id === i);
           return {
             id: (index_e * 10000 + index * 1000 + index_i).toString(),
-            source: d._id!.toString(),
-            target: i.toString(),
+            source: d.issuance_date.from < iDoc!.issuance_date.from ? d._id!.toString() : i.toString(),
+            target: d.issuance_date.from > iDoc!.issuance_date.from ? d._id!.toString() : i.toString(),
             animated: true,
             type: ConnectionLineType.SmoothStep,
           };
@@ -148,12 +212,13 @@ function Flow(props: FlowProps) {
   );
   return (
     <ReactFlow
-      nodes={nodes}
+      nodes={nodes.concat(axes)}
       edges={edges}
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
       connectionLineType={ConnectionLineType.SmoothStep}
+      nodeTypes={nodeTypes}
       fitView
       style={{ backgroundColor: "#F7F9FB" }}
     >
