@@ -10,7 +10,7 @@ import {
     Tab,
     TextInput,
 } from "@tremor/react";
-import { RiFileFill, RiFileInfoFill, RiFileTransferFill, RiFileSettingsFill, RiDraftFill, RiShakeHandsFill, RiFileSearchFill,RiFileCheckFill,RiFileChartFill } from "@remixicon/react";
+import { RiFileFill, RiFileInfoFill, RiFileTransferFill, RiFileSettingsFill, RiDraftFill, RiShakeHandsFill, RiFileSearchFill,RiFileCheckFill,RiFileChartFill,RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine, RiSearchLine } from "@remixicon/react";
 import "../css/dashboard.css"
 import API from "../API";
 import { useState, useEffect, useMemo } from "react";
@@ -22,7 +22,6 @@ import { Toaster } from "./toast/Toaster";
 import { toast } from "../utils/toaster";
 import { FeatureCollection } from "geojson";
 import { Link } from "react-router-dom";
-import { RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine, RiSearchLine } from "@remixicon/react";
 import { AdvancedFilterModel } from "ag-grid-enterprise";
 import { Stakeholders } from "../enum";
 
@@ -248,19 +247,19 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                                             </div>
                                             <div className="flex items-center mb-2">
                                                 <div className="w-6 h-0.5 bg-black dark:bg-white mr-2"></div>
-                                                <span className="dark:text-white">Linea continua</span>
+                                                <span className="dark:text-white">Direct consequence</span>
                                             </div>
                                             <div className="flex items-center mb-2">
                                                 <div className="w-6 h-0.5 border-t-2 border-dashed border-black dark:border-white mr-2"></div>
-                                                <span className="dark:text-white">Linea tratteggiata</span>
+                                                <span className="dark:text-white">Collateral consequence</span>
                                             </div>
                                             <div className="flex items-center mb-2">
                                                 <div className="w-6 h-0.5 mr-2 linea-punti"></div>
-                                                <span className="dark:text-white">Linea punti</span>
+                                                <span className="dark:text-white">Projection</span>
                                             </div>
                                             <div className="flex items-center mb-2">
                                                 <div className="w-6 h-0.5 mr-2 linea-alternata"></div>
-                                                <span className="dark:text-white">Alternanza punto-linea</span>
+                                                <span className="dark:text-white">Update</span>
                                             </div>
 
                                         </div>
