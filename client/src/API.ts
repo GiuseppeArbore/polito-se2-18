@@ -1,5 +1,5 @@
 import { mongoose } from '@typegoose/typegoose';
-import { KxDocument, PageRange } from './model';
+import { KxDocument, PageRange, Scale } from './model';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -59,7 +59,7 @@ const updateKxDocumentInformation = async (
     title?: string,
     stakeholders?: string[],
     type?: string,
-    scale?: number,
+    scale?: Scale,
     language?: string,
     pages?: PageRange[],
     doc_coordinates?: any

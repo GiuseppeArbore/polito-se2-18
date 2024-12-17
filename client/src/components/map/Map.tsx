@@ -1,10 +1,19 @@
-
 import mapboxgl, { LngLat, LngLatBounds, LngLatLike } from "mapbox-gl";
 import React, { useEffect, useMemo, useRef, useState } from "react";
-import { AllGeoJSON, featureCollection, area, pointOnFeature, centroid, booleanPointInPolygon } from "@turf/turf";
-import { documentAreaColorMapping, documentBorderColorMapping } from "./documentcolors";
+import {
+    AllGeoJSON,
+    featureCollection,
+    area,
+    pointOnFeature,
+    centroid,
+    booleanPointInPolygon,
+} from "@turf/turf";
+import {
+    documentAreaColorMapping,
+    documentBorderColorMapping,
+} from "./documentcolors";
 import { loadIcons } from "./imagesLoader";
-import Kiruna from "./KirunaMunicipality.json"
+import Kiruna from "./KirunaMunicipality.json";
 import {
     Button,
     Card,
@@ -36,7 +45,16 @@ import {
 } from "@remixicon/react";
 import { PreviewMapDraw, DocumentMapDraw } from "./DrawBar";
 import "@mapbox/mapbox-gl-draw/dist/mapbox-gl-draw.css";
-import { Feature, FeatureCollection, Position, Polygon, MultiPolygon, Geometry, Point, GeoJsonProperties } from "geojson";
+import {
+    Feature,
+    FeatureCollection,
+    Position,
+    Polygon,
+    MultiPolygon,
+    Geometry,
+    Point,
+    GeoJsonProperties,
+} from "geojson";
 import { DrawCreateEvent, DrawUpdateEvent } from "@mapbox/mapbox-gl-draw";
 import { KxDocument } from "../../model";
 import {
@@ -52,7 +70,6 @@ import "../../index.css";
 import "../../css/map.css";
 import { Stakeholders } from "../../enum";
 
-
 mapboxgl.accessToken =
     "pk.eyJ1IjoiZGxzdGUiLCJhIjoiY20ydWhhNWV1MDE1ZDJrc2JkajhtZWk3cyJ9.ptoCifm6vPYahR3NN2Snmg";
 
@@ -62,38 +79,61 @@ export interface SatMapProps {
     style?: React.CSSProperties;
     className?: string;
     entireMunicipalityDocuments?: KxDocument[];
-    user: { email: string, role: Stakeholders } | null;
+    user: { email: string; role: Stakeholders } | null;
 }
 
-const getPointsAndCentroids = (drawing: FeatureCollection<Geometry, GeoJsonProperties> | undefined, offsetDistance: number): FeatureCollection<Geometry, GeoJsonProperties> => {
+const getPointsAndCentroids = (
+    drawing: FeatureCollection<Geometry, GeoJsonProperties> | undefined,
+    offsetDistance: number
+): FeatureCollection<Geometry, GeoJsonProperties> => {
     return {
-        type: 'FeatureCollection',
-        features: drawing?.features.flatMap<Feature<Geometry, GeoJsonProperties>>(feature => {
-            let updatedFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
+        type: "FeatureCollection",
+        features:
+            drawing?.features.flatMap<Feature<Geometry, GeoJsonProperties>>(
+                (feature) => {
+                    let updatedFeatures: Feature<Geometry, GeoJsonProperties>[] = [];
 
-            if (feature.geometry.type === 'Polygon' || feature.geometry.type === 'MultiPolygon') {
-                let centroid = pointOnFeature(feature as AllGeoJSON);
-                centroid.properties = { ...feature.properties, isCentroid: true }; // Add isCentroid property
+                    if (
+                        feature.geometry.type === "Polygon" ||
+                        feature.geometry.type === "MultiPolygon"
+                    ) {
+                        let centroid = pointOnFeature(feature as AllGeoJSON);
+                        centroid.properties = { ...feature.properties, isCentroid: true }; // Add isCentroid property
 
-                if (!centroid.geometry) return [];
-                const centroidCoordinates = centroid.geometry.coordinates as [number, number];
-                const centroidOffsetX = (Math.random() - 0.5) * offsetDistance;
-                const centroidOffsetY = (Math.random() - 0.5) * offsetDistance;
-                centroid.geometry.coordinates = [centroidCoordinates[0] + centroidOffsetX, centroidCoordinates[1] + centroidOffsetY];
+                        if (!centroid.geometry) return [];
+                        const centroidCoordinates = centroid.geometry.coordinates as [
+                            number,
+                            number,
+                        ];
+                        const centroidOffsetX = (Math.random() - 0.5) * offsetDistance;
+                        const centroidOffsetY = (Math.random() - 0.5) * offsetDistance;
+                        centroid.geometry.coordinates = [
+                            centroidCoordinates[0] + centroidOffsetX,
+                            centroidCoordinates[1] + centroidOffsetY,
+                        ];
 
-                updatedFeatures.push(centroid as Feature<Geometry, GeoJsonProperties>);
-            }
+                        updatedFeatures.push(
+                            centroid as Feature<Geometry, GeoJsonProperties>
+                        );
+                    }
 
-            if (feature.geometry.type === 'Point') {
-                const pointCoordinates = feature.geometry.coordinates as [number, number];
-                const pointOffsetX = (Math.random() - 0.5) * offsetDistance;
-                const pointOffsetY = (Math.random() - 0.5) * offsetDistance;
-                feature.geometry.coordinates = [pointCoordinates[0] + pointOffsetX, pointCoordinates[1] + pointOffsetY];
-                updatedFeatures.push(feature);
-            }
+                    if (feature.geometry.type === "Point") {
+                        const pointCoordinates = feature.geometry.coordinates as [
+                            number,
+                            number,
+                        ];
+                        const pointOffsetX = (Math.random() - 0.5) * offsetDistance;
+                        const pointOffsetY = (Math.random() - 0.5) * offsetDistance;
+                        feature.geometry.coordinates = [
+                            pointCoordinates[0] + pointOffsetX,
+                            pointCoordinates[1] + pointOffsetY,
+                        ];
+                        updatedFeatures.push(feature);
+                    }
 
-            return updatedFeatures;
-        }) || []
+                    return updatedFeatures;
+                }
+            ) || [],
     };
 };
 
@@ -133,7 +173,6 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
                 interactive: false,
             });
             mapRef.current.addControl(PreviewMapDraw, "bottom-right");
-
 
             if (props.drawing) PreviewMapDraw.set(props.drawing);
         }
@@ -466,8 +505,8 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
 
     const toggleKirunaVisibility = () => {
         if (mapRef.current) {
-            const visibility = isKirunaVisible ? 'none' : 'visible';
-            mapRef.current.setLayoutProperty('Kiruna-fill', 'visibility', visibility);
+            const visibility = isKirunaVisible ? "none" : "visible";
+            mapRef.current.setLayoutProperty("Kiruna-fill", "visibility", visibility);
             setIsKirunaVisible(!isKirunaVisible);
         }
     };
@@ -506,15 +545,11 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
 
 
 
-
             mapRef.current?.on("load", function () {
                 if (mapRef.current) {
                     initializeMapLayers(mapRef.current, props, isKirunaVisible);
                 };
-
             });
-
-
         }
     }, [props.drawing, mapStyle]);
 
@@ -537,6 +572,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                     touchAction: "auto",
                 }}
             />
+
 
             <Button className="Kiruna-map-style-button" style={{ display: props.isVisible ? "flex" : "none" }} onClick={toggleMapStyle}>
                 {mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? <RiRoadMapLine /> : <RiEarthLine />}
@@ -738,8 +774,6 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
                     }
                 }
             });
-
-
         }
     }, [props.drawing, mapStyle]);
 
@@ -752,9 +786,10 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
 
     return (
         <>
-
             {canEdit && (
-                <div style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }}>
+                <div
+                    style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }}
+                >
                     <Button
                         style={{
                             backgroundColor: "white",
@@ -767,11 +802,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
                     />
                 </div>
             )}
-            <Dialog
-                open={isOpen}
-                onClose={(val) => setIsOpen(val)}
-                static={true}
-            >
+            <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
                 <DialogPanel
                     className="p-0 overflow-hidden"
                     style={{ maxWidth: "100%" }}
@@ -779,7 +810,10 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
                     <SatMap
                         drawing={drawing}
                         onCancel={() => setIsOpen(false)}
-                        onDone={(v) => { props.setDrawing(v); setIsOpen(false); }}
+                        onDone={(v) => {
+                            props.setDrawing(v);
+                            setIsOpen(false);
+                        }}
                         style={{ minHeight: "95vh", width: "100%" }}
                         user={props.user}
                     ></SatMap>
@@ -835,7 +869,8 @@ const MapControls: React.FC<
     const feature = structuredClone(props?.drawing?.features?.at?.(0));
     const geometry = feature?.geometry;
     const pos = geometry?.type === "Point" ? geometry.coordinates : [NaN, NaN];
-    const area = geometry?.type === "Polygon" ? geometry.coordinates : [[[NaN, NaN]]];
+    const area =
+        geometry?.type === "Polygon" ? geometry.coordinates : [[[NaN, NaN]]];
     const kirunaArea = Kiruna.features[0] as Feature<Polygon | MultiPolygon>;
 
     useEffect(() => {
@@ -849,7 +884,13 @@ const MapControls: React.FC<
 
     useEffect(() => {
         if (geometry?.type !== "Point") return;
-        if (booleanPointInPolygon({ type: 'Point', coordinates: str2pos(pointCoords) }, kirunaArea) || pointCoords.find((c) => c === "") !== undefined) {
+        if (
+            booleanPointInPolygon(
+                { type: "Point", coordinates: str2pos(pointCoords) },
+                kirunaArea
+            ) ||
+            pointCoords.find((c) => c === "") !== undefined
+        ) {
             setCoordsError(false);
         } else {
             setCoordsError(true);
@@ -868,7 +909,7 @@ const MapControls: React.FC<
     useEffect(() => {
         if (geometry?.type !== "Polygon") return;
         const allPointsInside = area[0].every((coord) =>
-            booleanPointInPolygon({ type: 'Point', coordinates: coord }, kirunaArea)
+            booleanPointInPolygon({ type: "Point", coordinates: coord }, kirunaArea)
         );
 
         if (allPointsInside) {
@@ -1150,19 +1191,19 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
 
         mapRef.current?.on("load", function () {
             //KIRUNA-----------------------------------------------------
-            mapRef.current?.addSource('Kiruna', {
-                type: 'geojson',
+            mapRef.current?.addSource("Kiruna", {
+                type: "geojson",
                 data: Kiruna as FeatureCollection,
             });
 
             mapRef.current?.addLayer({
                 id: "Kiruna-line",
-                type: 'line',
+                type: "line",
                 source: "Kiruna",
                 paint: {
-                    'line-color': '#745296',
-                    'line-width': 4,
-                    'line-dasharray': [1, 1]
+                    "line-color": "#745296",
+                    "line-width": 4,
+                    "line-dasharray": [1, 1],
                 },
             });
         });
