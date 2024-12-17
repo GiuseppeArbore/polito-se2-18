@@ -10,6 +10,7 @@ import {
     Tab,
     TextInput,
 } from "@tremor/react";
+import { RiFileFill } from "@remixicon/react";
 import "../css/dashboard.css"
 import API from "../API";
 import { useState, useEffect, useMemo } from "react";
@@ -174,7 +175,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                             </Card>
                         </Col>
                         {!showSideBar &&
-                            <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring" role="Button">
+                            <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6" role="Button" style={{ backgroundColor: '#D1DDE6' }}>
                                 <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full" /></i>
                             </Col>
                         }
@@ -184,52 +185,85 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                 <Col numColSpanLg={1}>
                     <div className="flex flex-row ">
                         {showSideBar &&
-                            <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring" role="Button">
+                            <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6" role="Button" style={{ backgroundColor: '#D1DDE6', marginLeft: '-1.2rem' }}>
                                 <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full" /></i>
 
                             </Col>
                         }
                         {(showSideBar || windowWidth <= 1024) &&
-                            <Col className="w-full">
-                                <div className="space-y-6">
-                                    <TextInput
-                                        icon={RiSearchLine}
-                                        id="quickFilter"
-                                        placeholder="Search..."
-                                        className="w-full"
-                                        value={quickFilterText}
-                                        onValueChange={(e) => {
-                                            setQuickFilterText(e);
-
-                                        }}
-                                    ></TextInput>
-                                    <FormDialog
-                                        documents={documents}
-                                        refresh={() => setRefreshNeeded(true)}
-                                        user={user}
-                                    />
-                                    <Card>
-                                        <Metric>KIRUNA</Metric>
-                                        <Title>Quick facts</Title>
-                                        <Text>
-                                            <ul className="list-disc list-inside">
-                                                <li>20,000 inhabitants</li>
-                                                <li>Located 140 km north of the Arctic Circle</li>
-                                                <li>Lowest recorded temperature -42 °C</li>
-                                                <li>45 days of Midnight Sun each year</li>
-                                                <li>21 days of Polar Night</li>
-                                                <li>Covered in snow for 8 months each year</li>
-                                            </ul>
-                                        </Text>
+                            <Col className="w-full h-full">
+                                <Card className="p-4 h-full">
+                                    <div className="flex justify-center items-center mb-2">
+                                        <span >Legend</span>
+                                    </div>
+                                    <Card className="mb-4 p-4 h-1/2">
+                                        <div className="flex flex-col h-full">
+                                            <div className="flex justify-center items-center mb-2">
+                                                <span>Document Types</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span>Icon 1</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span>Icon 2</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span>Icon 3</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span>Icon 4</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span>Icon 5</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span>Icon 6</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span>Icon 7</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span>Icon 8</span>
+                                            </div>
+                                        </div>
                                     </Card>
-                                    <Card className="hidden lg:block w-full h-40">
-                                        <img
-                                            src="/kiruna.png"
-                                            alt="Kiruna"
-                                            className="w-full h-full object-contain"
-                                        />
+                                    <Card className="p-4 h-1/2">
+                                        <div className="flex flex-col h-full">
+                                            <div className="flex justify-center items-center mb-2">
+                                                <span>Connection Types</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <div className="w-6 h-0.5 bg-black mr-2"></div>
+                                                <span>Linea continua</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <div className="w-6 h-0.5 border-t-2 border-dashed border-black mr-2"></div>
+                                                <span>Linea tratteggiata</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <div className="w-6 h-0.5 mr-2" style={{ background: 'repeating-linear-gradient(to right, black 0, black 2px, transparent 2px, transparent 4px)' }}></div>
+                                                <span>Linea punti</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <div
+                                                    className="w-6 h-0.5 mr-2"
+                                                    style={{
+                                                        background: 'repeating-linear-gradient(to right, black 0, black 1px, transparent 1px, transparent 2px, black 2px, black 7px, transparent 7px, transparent 8px)'
+                                                    }}
+                                                ></div>
+                                                <span>Alternanza punto-linea</span>
+                                            </div>
+                                        </div>
                                     </Card>
-                                </div>
+                                </Card>
                             </Col>
                         }
 
