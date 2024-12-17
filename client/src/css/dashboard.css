@@ -14,22 +14,46 @@
 
 @media (max-width: 1024px) {
     .hide-on-small {
-      display: none;
+        display: none;
     }
-  }
+}
 
-  .bg-linea-punti {
+.linea-punti {
     background: repeating-linear-gradient(to right, black 0, black 2px, transparent 2px, transparent 4px);
 }
 
-.dark .bg-linea-punti {
-    background: repeating-linear-gradient(to right, white 0, white 2px, transparent 2px, transparent 4px);
+@media (prefers-color-scheme: dark) {
+    .linea-punti {
+        background: repeating-linear-gradient(to right, white 0, white 2px, transparent 2px, transparent 4px);
+    }
 }
 
-.bg-alternanza-punto-linea {
-    background: repeating-linear-gradient(to right, black 0, black 1px, transparent 1px, transparent 2px, black 2px, black 7px, transparent 7px, transparent 8px);
+.linea-alternata {
+    background: repeating-linear-gradient(to right,
+            black 0,
+            black 1px,
+            transparent 1px,
+            transparent 4px,
+            black 4px,
+            black 9px,
+            transparent 9px,
+            transparent 12px
+
+        );
 }
 
-.dark .bg-alternanza-punto-linea {
-    background: repeating-linear-gradient(to right, white 0, white 1px, transparent 1px, transparent 2px, white 2px, white 7px, transparent 7px, transparent 8px);
+@media (prefers-color-scheme: dark) {
+    .linea-alternata {
+        background: repeating-linear-gradient(to right,
+                white 0,
+                white 1px,
+                transparent 1px,
+                transparent 4px,
+                white 4px,
+                white 9px,
+                transparent 9px,
+                transparent 12px
+
+            );
+    }
 }

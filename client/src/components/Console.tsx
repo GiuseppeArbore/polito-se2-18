@@ -255,11 +255,11 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                                                 <span className="dark:text-white">Linea tratteggiata</span>
                                             </div>
                                             <div className="flex items-center mb-2">
-                                                <div className="w-6 h-0.5 mr-2 bg-linea-punti dark:bg-linea-punti"></div>
+                                                <div className="w-6 h-0.5 mr-2 linea-punti"></div>
                                                 <span className="dark:text-white">Linea punti</span>
                                             </div>
                                             <div className="flex items-center mb-2">
-                                                <div className="w-6 h-0.5 mr-2 bg-alternanza-punto-linea dark:bg-alternanza-punto-linea"></div>
+                                                <div className="w-6 h-0.5 mr-2 linea-alternata"></div>
                                                 <span className="dark:text-white">Alternanza punto-linea</span>
                                             </div>
 
