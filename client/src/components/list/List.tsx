@@ -1,4 +1,4 @@
-
+import "ag-grid-enterprise";
 import {
     AdvancedFilterModel,
     ColDef,
