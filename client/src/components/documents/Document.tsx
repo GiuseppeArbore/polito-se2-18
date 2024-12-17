@@ -1,5 +1,5 @@
 
-import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine, RiAddBoxLine } from '@remixicon/react';
+import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine, RiAddBoxLine, RiInfoI } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
 import { FileUpload } from "../form/DragAndDrop";
@@ -16,13 +16,13 @@ import {
 import React, { useState, useEffect, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DocumentPageMap, PreviewMap } from '../map/Map';
-import { KxDocument, DocCoords } from "../../model";
+import { KxDocument, DocCoords, Scale, ScaleOneToN } from "../../model";
 import { mongoose } from '@typegoose/typegoose';
 import "../../css/document.css";
 import PreviewDoc from './Preview';
 import { Toast } from '@radix-ui/react-toast';
 import { Toaster } from '../toast/Toaster';
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "../../enum";
+import { AreaType, KxDocumentType, ScaleType, Stakeholders } from "../../enum";
 import {
     parseLocalizedNumber,
     PageRange,
@@ -32,6 +32,7 @@ import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
 import exp from 'constants';
 import { DateRange } from '../form/DatePicker';
+import { set } from 'date-fns';
 interface DocumentProps {
     user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }
@@ -60,7 +61,7 @@ export default function Document({ user }: DocumentProps) {
     const [drawings, setDrawings] = useState<any>();
     const [title, setTitle] = useState("");
     const [stakeholders, setStakeholders] = useState<string[]>([]);
-    const [scale, setScale] = useState(10000);
+    const [scale, setScale] = useState<Scale>({ type: ScaleType.TEXT });
     const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(undefined);
     const [drawing, setDrawing] = useState<any>(undefined);
     const [hideMap, setHideMap] = useState<boolean>(false);
@@ -73,13 +74,14 @@ export default function Document({ user }: DocumentProps) {
     const [entireMunicipality, setEntireMunicipality] = useState(false);
     const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
     const [documents, setDocuments] = useState<KxDocument[]>([]);
-    const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
-    const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
-    const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
-    const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
+    const [documentsForDirect, setDocumentsForDirect] = useState<KxDocument[]>([]);
+    const [documentsForCollateral, setDocumentsForCollateral] = useState<KxDocument[]>([]);
+    const [documentsForProjection, setDocumentsForProjection] = useState<KxDocument[]>([]);
+    const [documentsForUpdate, setDocumentsForUpdate] = useState<KxDocument[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
     const [showGeoInfo, setShowGeoInfo] = useState(false);
+
 
 
     const handleSubmitDragAndDrop = async (e: React.FormEvent) => {
@@ -127,17 +129,17 @@ export default function Document({ user }: DocumentProps) {
                 setDoc(document);
                 setTitle(document.title);
                 setStakeholders(document.stakeholders);
-                setScale(document.scale);
+                setScale(document.scale as ScaleOneToN);
                 setIssuanceDate({ from: document.issuance_date.from, to: document.issuance_date.to });
                 setType(document.type);
                 setDocCoordinates(document.doc_coordinates as DocCoords);
                 setLanguage(document.language || undefined);
                 setPages(document.pages || undefined);
                 setDescription(document.description || undefined);
-                setDocumentsForDirect(document.connections.direct.map((doc) => doc._id?.toString()));
-                setDocumentsForCollateral(document.connections.collateral.map((doc) => doc._id?.toString()));
-                setDocumentsForProjection(document.connections.projection.map((doc) => doc._id?.toString()));
-                setDocumentsForUpdate(document.connections.update.map((doc) => doc._id?.toString()));
+                setDocumentsForDirect(await Promise.all(document.connections.direct.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
+                setDocumentsForCollateral(await Promise.all(document.connections.collateral.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
+                setDocumentsForProjection(await Promise.all(document.connections.projection.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
+                setDocumentsForUpdate(await Promise.all(document.connections.update.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
                 setPageRanges([]);
 
 
@@ -194,7 +196,7 @@ export default function Document({ user }: DocumentProps) {
         };
 
         fetchDocument();
-    }, []);
+    }, [id]);
 
     useMemo(async () => {
         if (drawings && saveDrawing) {
@@ -274,7 +276,9 @@ export default function Document({ user }: DocumentProps) {
 
                         <div className="flex items-center justify-between mb-2 space-x-2">
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Scale:</i>
-                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>1: {scale}</i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>
+                                {scale.type === ScaleType.ONE_TO_N ? `1: ${scale.scale}` : scale.type}
+                            </i>
                         </div>
 
                         <div className="flex items-center justify-between mb-2 space-x-2">
@@ -505,8 +509,113 @@ export default function Document({ user }: DocumentProps) {
                         </DialogPanel>
                     </Dialog>
 
-
                 </div>
+
+                <div className="flex flex-col space-y-2 ">
+                    <div className="flex flex-row">
+                        <h3 className="text-l font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Connections</h3>
+                        {canEdit && <i className="ml-2" /*onClick={() => setIsOpen(true)}*/><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong " /></i>}
+                    </div>
+
+                    <div className="flex flex-col lg:flex-row ">
+
+                        <div className="flex w-full h-full items-center justify-between mb-2">
+                            <Accordion className="w-full mr-6 mb-6">
+                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Direct connections</AccordionHeader>
+                                <AccordionBody className="leading-6 flex flex-col">
+                                    <AccordionList style={{ boxShadow: 'none' }}>
+                                        {documentsForDirect.length > 0 ? documentsForDirect.map((doc) => (
+                                            <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
+                                                <Button
+                                                    size="xs"
+                                                    icon={RiInfoI}
+                                                    onClick={() => window.open("/documents/" + doc._id)}
+                                                />
+                                            </div>
+                                        )) : <>
+                                            <div className="flex items-center justify-around m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No direct connections added</i>
+                                            </div>
+                                        </>}
+                                    </AccordionList>
+                                </AccordionBody>
+                            </Accordion>
+                        </div>
+                        <div className="flex w-full h-full items-center justify-between mb-2">
+                            <Accordion className="w-full mr-6 mb-6">
+                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Collateral connections</AccordionHeader>
+                                <AccordionBody className="leading-6 flex flex-col">
+                                    <AccordionList style={{ boxShadow: 'none' }}>
+                                        {documentsForCollateral.length > 0 ? documentsForCollateral.map((doc) => (
+                                            <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
+                                                <Button
+                                                    size="xs"
+                                                    icon={RiInfoI}
+                                                    onClick={() => window.open("/documents/" + doc._id)}
+                                                />
+                                            </div>
+                                        )) : <>
+                                            <div className="flex items-center justify-around m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No collateral connections added</i>
+                                            </div>
+                                        </>}
+                                    </AccordionList>
+                                </AccordionBody>
+                            </Accordion>
+                        </div>
+                        <div className="flex w-full h-full items-center justify-between mb-2">
+                            <Accordion className="w-full mr-6 mb-6">
+                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Projection connections</AccordionHeader>
+                                <AccordionBody className="leading-6 flex flex-col">
+                                    <AccordionList style={{ boxShadow: 'none' }}>
+                                        {documentsForProjection.length > 0 ? documentsForProjection.map((doc) => (
+                                            <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
+                                                <Button
+                                                    size="xs"
+                                                    icon={RiInfoI}
+                                                    onClick={() => window.open("/documents/" + doc._id)}
+                                                />
+                                            </div>
+                                        )) : <>
+                                            <div className="flex items-center justify-around m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No projection connections added</i>
+                                            </div>
+                                        </>}
+                                    </AccordionList>
+                                </AccordionBody>
+                            </Accordion>
+                        </div>
+                        <div className="flex w-full h-full items-center justify-between mb-2">
+                            <Accordion className="w-full mr-6 mb-6">
+                                <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Update connections</AccordionHeader>
+                                <AccordionBody className="leading-6 flex flex-col">
+                                    <AccordionList style={{ boxShadow: 'none' }}>
+                                        {documentsForUpdate.length > 0 ? documentsForUpdate.map((doc) => (
+                                            <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
+
+                                                <Button
+                                                    size="xs"
+                                                    icon={RiInfoI}
+                                                    onClick={() => window.open("/documents/" + doc._id)}
+                                                />
+                                            </div>
+                                        )) : <>
+                                            <div className="flex items-center justify-around m-2">
+                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No update connections added</i>
+                                            </div>
+                                        </>}
+                                    </AccordionList>
+                                </AccordionBody>
+                            </Accordion>
+                        </div>
+                    </div>
+                </div>
+
+
 
 
 
@@ -601,8 +710,8 @@ export function FormInfoDialog({
     setIssuanceDate: React.Dispatch<React.SetStateAction<DateRange | undefined>>;
     type: string | undefined;
     setType: React.Dispatch<React.SetStateAction<string | undefined>>;
-    scale: number;
-    setScale: React.Dispatch<React.SetStateAction<number>>;
+    scale: Scale;
+    setScale: React.Dispatch<React.SetStateAction<Scale>>;
     language: string | undefined;
     setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
     pages: PageRange[] | undefined;
@@ -622,7 +731,7 @@ export function FormInfoDialog({
 
     const handleInfoSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (title === "" || stakeholders.length === 0 || type === undefined || scale === 0) {
+        if (title === "" || stakeholders.length === 0 || type === undefined || scale === undefined) {
             setError("Please fill all the fields");
             return;
         }
@@ -661,7 +770,7 @@ export function FormInfoDialog({
         e.preventDefault();
         setTitle(document.title);
         setStakeholders(document.stakeholders);
-        setScale(document.scale);
+        setScale(document.scale as Scale);
         setType(document.type);
         setLanguage(document.language || undefined);
         setPages(document.pages || undefined);
