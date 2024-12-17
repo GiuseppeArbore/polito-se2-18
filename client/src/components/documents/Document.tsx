@@ -247,9 +247,8 @@ export default function Document({ user }: DocumentProps) {
     const [showCheck, setShowCheck] = useState(false);
 
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
-    const [selectedResource, setSelectedResource] = useState<string>("");
     const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
-    const [isOpen, setIsOpen] = useState(false);
+
 
 
     return (
