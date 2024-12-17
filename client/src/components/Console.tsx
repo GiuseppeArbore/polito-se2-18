@@ -173,7 +173,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                                 padding: 0,
                                 minHeight: "300px",
                                 width: "100%",
-                                height: "86vh",
+                                height: "85vh",
                             }}
                         >
                             {renderCurrentSelection( setQuickFilterText, selectedView)}
@@ -181,18 +181,6 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                     </div>
                 </Col>
             </Grid>
-            <Card className="mt-6">
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "100%",
-                    }}
-                >
-                    <div>Diagram Coming soon...</div>
-                </div>
-            </Card>
             <Toaster />
         </main>
     );
