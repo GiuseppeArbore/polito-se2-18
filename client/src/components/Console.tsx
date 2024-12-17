@@ -10,7 +10,7 @@ import {
     Tab,
     TextInput,
 } from "@tremor/react";
-import { RiFileFill, RiFileInfoFill, RiFileTransferFill, RiFileSettingsFill, RiDraftFill, RiShakeHandsFill, RiFileSearchFill,RiFileCheckFill,RiFileChartFill,RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine, RiSearchLine } from "@remixicon/react";
+import { RiFileFill, RiFileInfoFill, RiFileTransferFill, RiFileSettingsFill, RiDraftFill, RiShakeHandsFill, RiFileSearchFill,RiFileCheckFill,RiFileChartFill,RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine} from "@remixicon/react";
 import "../css/dashboard.css"
 import API from "../API";
 import { useState, useEffect, useMemo } from "react";
