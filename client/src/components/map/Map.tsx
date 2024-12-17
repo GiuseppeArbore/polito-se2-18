@@ -169,11 +169,11 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
         doc.title.toLowerCase().includes(searchText.toLowerCase())
     );
 
-    const toggleKirunaVisibility = (bolean: boolean) => {
+    const toggleKirunaVisibility = (isKirunaVisible: boolean) => {
         if (mapRef.current) {
-            const visibility = bolean ? 'visible' : 'none';
+            const visibility = isKirunaVisible ? 'visible' : 'none';
             mapRef.current.setLayoutProperty('Kiruna-fill', 'visibility', visibility);
-            setIsKirunaVisible(bolean);
+            setIsKirunaVisible(isKirunaVisible);
         }
     };
 
