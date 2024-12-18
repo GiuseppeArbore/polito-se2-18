@@ -94,15 +94,12 @@ const ProcessCarousel = () => {
                             ) : slide.cards ? (
                                 <div style={{ gap: '2rem', maxWidth: '100%', maxHeight: '100%' }}>
                                     {slide.cards.map((card, cardIndex) => (
-                                        <Card
-                                            key={cardIndex}
-                                        >
+                                       
                                             <img
-
                                                 src={card.image}
                                                 className=" images w-full h-auto h-40 md:h-50 lg:h-60 object-cover rounded-lg"
                                             />
-                                        </Card>
+                                        
                                     ))}
                                 </div>
                             ) : null}
