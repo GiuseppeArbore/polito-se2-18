@@ -445,6 +445,68 @@ export function FormDocumentInformation({
     setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
 }) {
 
+    const [aggregatedStakeholders, setAggregatedStakeholders] = useState<string[]>([]);
+    const [aggregatedScales, setAggregatedScales] = useState<string[]>([]);
+    const [aggregatedTypes, setAggregatedTypes] = useState<string[]>([]);
+    const [newStakeholder, setNewStakeholder] = useState('');
+    const [newType, setNewType] = useState('');
+    const [newScale, setNewScale] = useState('');
+
+    useEffect(() => {
+        const fetchAggregateData = async () => {
+            try {
+                const aggregateData = await API.getAggregatedData();
+                if (aggregateData) {
+                    setAggregatedStakeholders(aggregateData.stakeholders);
+                    setAggregatedScales(aggregateData.scales.map(scale => scale.toLocaleString()));
+                    setAggregatedTypes(aggregateData.types);
+                }
+
+            } catch (error: any) {
+                console.error(error);
+            }
+        };
+        fetchAggregateData();
+    }, []);
+
+    const handleAddNewStakeholder = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newStakeholder && !aggregatedStakeholders.includes(newStakeholder)) {
+            const updatedStakeholders = [...aggregatedStakeholders, newStakeholder];
+            setAggregatedStakeholders(updatedStakeholders);
+            setStakeholders([...stakeholders, newStakeholder]);
+        }
+        setNewStakeholder('');
+    };
+
+    const handleAddNewType = (e: React.FormEvent) => {
+        e.preventDefault();
+        if (newType && !aggregatedTypes.includes(newType)) {
+            const updatedTypes = [...aggregatedTypes, newType];
+            setAggregatedTypes(updatedTypes);
+            setType(newType);
+        }
+        setNewType('');
+    };
+
+    const handleAddNewScale = (e: React.FormEvent) => {
+        e.preventDefault();
+        const newScaleNum = parseLocalizedNumber(newScale);
+        if (
+            newScale &&
+            !aggregatedScales.includes(newScaleNum.toLocaleString()) &&
+            !Number.isNaN(newScaleNum) &&
+            Number.isInteger(newScaleNum) &&
+            newScaleNum >= 0 &&
+            newScaleNum <= 10_000_000_000_000
+        ) {
+            const updatedScales = [...aggregatedScales, newScaleNum];
+            setAggregatedScales(updatedScales.map(scale => scale.toLocaleString()));
+            setScale({ type: ScaleType.ONE_TO_N, scale: newScaleNum });
+        }
+        setNewScale('');
+    };
+
     return (
         <div className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-6">
             <div className="col-span-full">
@@ -481,20 +543,39 @@ export function FormDocumentInformation({
                     id="stakeholders"
                     name="stakeholders"
                     className="mt-2"
-                    value={stakeholders.map(sh => Object.keys(Stakeholders).find(key => Stakeholders[key as keyof typeof Stakeholders] === sh)).filter((sh): sh is string => sh !== undefined)}
-                    onValueChange={s => setStakeholders(s.map(sh => Stakeholders[sh as keyof typeof Stakeholders]))}
+                    value={stakeholders}
+                    onValueChange={s => setStakeholders(s)}
                     error={shError}
                     errorMessage="You must select at least one stakeholder."
                     required
                 >
+                    <div className="sticky top-0 bg-white dark:bg-[#121826] z-10 p-0">
+                        <form className="flex items-center p-2">
+                            <TextInput
+                                type="text"
+                                name="newStakeholder"
+                                className="border p-0 mr-2 w-80"
+                                placeholder="Add new Stakeholder..."
+                                value={newStakeholder}
+                                onChange={(e) => setNewStakeholder(e.target.value)}
+                            />
+                            <Button
+                                type="submit"
+                                className="bg-[#163C89] dark:bg-blue-500 text-white p-1 rounded"
+                                onClick={(e) => {
+                                    handleAddNewStakeholder(e);
+                                }}
+                            >
+                                Add new
+                            </Button>
+                        </form>
+                    </div>
                     {
-                        Object.entries(Stakeholders).map((dt) => {
-                            return (
-                                <MultiSelectItem key={`sh-${dt[0]}`} value={dt[0]}>
-                                    {dt[1]}
-                                </MultiSelectItem>
-                            );
-                        })
+                        aggregatedStakeholders.map((stakeholder) => (
+                            <MultiSelectItem key={`sh-${stakeholder}`} value={stakeholder}>
+                                {stakeholder}
+                            </MultiSelectItem>
+                        ))
                     }
                 </MultiSelect>
             </div>
@@ -511,17 +592,38 @@ export function FormDocumentInformation({
                     id="doc_type"
                     name="doc_type"
                     className="mt-2"
-                    value={Object.keys(KxDocumentType).find(key => KxDocumentType[key as keyof typeof KxDocumentType] === type)}
-                    onValueChange={t => setType(KxDocumentType[t as keyof typeof KxDocumentType])}
+                    value={type}
+                    onValueChange={t => setType(t)}
                     error={typeError}
                     errorMessage="The type is mandatory"
                     required
                 >
+                    <div className="sticky top-0 bg-white dark:bg-[#121826] z-10 p-0">
+                        <form className="flex items-center p-2">
+                            <TextInput
+                                type="text"
+                                name="newType"
+                                className="border p-0 mr-2 w-80"
+                                placeholder="Add new Type..."
+                                value={newType}
+                                onChange={(e) => setNewType(e.target.value)}
+                            />
+                            <Button
+                                type="submit"
+                                className="bg-[#163C89] dark:bg-blue-500 text-white p-1 rounded"
+                                onClick={(e) => {
+                                    handleAddNewType(e);
+                                }}
+                            >
+                                Add new
+                            </Button>
+                        </form>
+                    </div>
                     {
-                        Object.entries(KxDocumentType).map((dt) => {
+                        aggregatedTypes.map((dt) => {
                             return (
-                                <SearchSelectItem key={`type-${dt[0]}`} value={dt[0]}>
-                                    {dt[1]}
+                                <SearchSelectItem key={`type-${dt}`} value={dt}>
+                                    {dt}
                                 </SearchSelectItem>
                             );
                         })
@@ -549,6 +651,7 @@ export function FormDocumentInformation({
                     }}
                     className="mt-2"
                 >
+
                     {Object.values(ScaleType).map((t) => {
                         return (
                             <SelectItem value={t} key={t}>
@@ -558,8 +661,10 @@ export function FormDocumentInformation({
                     })}
                 </Select>
                 {scale.type === ScaleType.ONE_TO_N &&
-                    <TextInput
+                    <SearchSelect
                         id="scale"
+                        name="scale"
+                        className="mt-2"
                         value={scale.scale.toLocaleString()}
                         onValueChange={(v) => {
                             if (v === "") {
@@ -576,17 +681,45 @@ export function FormDocumentInformation({
                                 setScale({ type: ScaleType.ONE_TO_N, scale: num });
                             }
                         }}
-                        name="scale"
-                        autoComplete="scale"
-                        placeholder="10.000"
-                        className="mt-2"
                         icon={() => (
                             <p className="dark:border-dark-tremor-border border-r h-full text-tremor-default text-end text-right tremor-TextInput-icon shrink-0 h-5 w-5 mx-2.5 absolute left-0 flex items-center text-tremor-content-subtle dark:text-dark-tremor-content-subtle">
                                 1:
                             </p>
                         )}
+
+                        placeholder="10.000"
                         required
-                    />
+                    >
+                        <div className="sticky top-0 bg-white dark:bg-[#121826] z-10 p-0">
+                            <form className="flex items-center p-2">
+                                <TextInput
+                                    type="text"
+                                    name="newScale"
+                                    className="border p-0 mr-2 w-80"
+                                    placeholder="Add new Scale..."
+                                    value={newScale}
+                                    onChange={(e) => setNewScale(e.target.value)}
+                                />
+                                <Button
+                                    type="submit"
+                                    className="bg-[#163C89] dark:bg-blue-500 text-white p-1 rounded"
+                                    onClick={(e) => {
+                                        handleAddNewScale(e);
+                                    }}
+                                >
+                                    Add new
+                                </Button>
+                            </form>
+                        </div>
+                        {aggregatedScales.map((scale) => {
+                            const scaleStr = scale.toLocaleString(); 
+                            return (
+                                <SearchSelectItem key={scaleStr} value={scaleStr}>
+                                    {scaleStr}
+                                </SearchSelectItem>
+                            );
+                        })}
+                    </SearchSelect>
                 }
             </div>
 
@@ -1084,7 +1217,7 @@ export const DateRangePickerPresets: React.FC<DateRangePickerPresetsProps> = ({
                 presets={presets}
                 value={issuanceDate}
                 onChange={setIssuanceDate}
-                className="w-full"
+                className="w-full bg-white border-[#E5E7EB] dark:bg-[#121826] dark:text-white dark:border-[#212936]  dark:hover:bg-[#141A2A]"
             />
         </div>
     );
