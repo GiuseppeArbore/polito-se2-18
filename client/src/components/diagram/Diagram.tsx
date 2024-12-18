@@ -18,11 +18,13 @@ import { Button } from "@tremor/react";
 import { YAxis, XAxis } from "./Axes";
 import API from "../../API";
 import { ScaleType } from "../../enum";
-import { deepEqual } from "assert";
+import {CustomNode } from "./CustomNode";
+import { da } from "date-fns/locale";
 
 const nodeTypes = {
   yAxis: YAxis,
   xAxis: XAxis,
+  custom: CustomNode,
 };
 
 interface FlowProps {
@@ -38,8 +40,8 @@ function Flow(props: FlowProps) {
   });
   const scales_const = [{type: ScaleType.BLUEPRINT_EFFECTS} as Scale, {type: ScaleType.TEXT} as Scale];
   const [scales, setScales] = useState<Scale[]>(scales_const);
-  const nodeWidth = 150;
-  const nodeHeight = 36;
+  const nodeWidth = 75;
+  const nodeHeight = 18;
   const [scalesByYear, setScaleByYear] = useState<
     Map<number, Map<TextualScale | number, number>>
   >(new Map());
@@ -76,9 +78,10 @@ function Flow(props: FlowProps) {
       const y = scaleHeight * (scales.findIndex((s)=> JSON.stringify(s) === JSON.stringify((node.data as {scale:Scale}).scale)));
       const y_random = y + n * nodeHeight; 
       
-      console.log(node.data.scale, y, ( scales.findIndex((s)=> JSON.stringify(s) === JSON.stringify((node.data as {scale:Scale}).scale))), scales);
+      console.log(node)
       const newNode = {
         ...node,
+        type: "custom",
         targetPosition: isHorizontal ? "left" : "top",
         sourcePosition: isHorizontal ? "right" : "bottom",
         // We are shifting the dagre node position (anchor=center center) to the top left
@@ -156,7 +159,6 @@ function Flow(props: FlowProps) {
       }
     }).map((s, i) => (
       {
-
         id: `y_axis_${s}`,
         type: "xAxis",
         position: { x: 0, y: i * nodeHeight * 4  + 30 },
@@ -174,15 +176,18 @@ function Flow(props: FlowProps) {
       .filter((d) => d._id !== undefined)
       .map((d) => {
         return {
+          type: "custom",
           id: d._id!.toString(),
           position: {
             y: Math.floor(Math.random() * 300),
             x: Math.floor(Math.random() * 300),
           },
           data: {
+            id: d._id!.toString(),
             label: d.scale.type,
             date: d.issuance_date.from,
             scale: d.scale,
+            type: d.type,
           },
         };
       });
