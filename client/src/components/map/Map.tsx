@@ -7,6 +7,7 @@ import {
     pointOnFeature,
     centroid,
     booleanPointInPolygon,
+    points,
 } from "@turf/turf";
 import {
     documentAreaColorMapping,
@@ -146,7 +147,7 @@ const center: LngLatLike = [20.26, 67.845];
 export const PreviewMap: React.FC<SatMapProps> = (props) => {
     const mapContainerRef = useRef<any>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
-
+   
     useEffect(() => {
         if (mapRef.current) return;
 
@@ -163,14 +164,19 @@ export const PreviewMap: React.FC<SatMapProps> = (props) => {
         if (props.drawing) PreviewMapDraw.set(props.drawing);
     }, [mapContainerRef.current]);
 
-    useMemo(() => {
+    useEffect(() => {
         if (props.drawing) {
+            const offsetDistance = 0.0001; // offsetDistance
+            const pointsAndCentroids = getPointsAndCentroids(
+                props.drawing,
+                offsetDistance
+            );
             mapRef.current?.remove();
             mapRef.current = null;
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
                 style: "mapbox://styles/mapbox/light-v11",
-                center: center,
+                center: pointsAndCentroids.features[0]?.geometry.type === "Point" ? pointsAndCentroids.features[0]?.geometry.coordinates as LngLatLike : center,
                 zoom: props.zoom || defaultZoom,
                 pitch: 40,
                 interactive: false,
@@ -623,6 +629,7 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
     );
 };
 
+
 const loadMapData = async (map: mapboxgl.Map, drawing: FeatureCollection<Geometry, GeoJsonProperties>) => {
     try {
         await loadIcons(map);
@@ -735,25 +742,38 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
         setMapStyle(mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? "mapbox://styles/mapbox/streets-v12" : "mapbox://styles/mapbox/satellite-streets-v12");
     }
 
-    useMemo(() => {
-        setDrawing(props.drawing);
+    const offsetDistance = 0.0001; // offsetDistance
+    const pointsAndCentroids = getPointsAndCentroids(props.drawing, offsetDistance);
+
+
+    useEffect(() => {
+
+        if (mapRef.current) return;
+        if (props.drawing) {
+            mapRef.current = new mapboxgl.Map({
+                container: mapContainerRef.current,
+                style: mapStyle,
+                 center: pointsAndCentroids.features[0]?.geometry?.type === "Point"
+                ? pointsAndCentroids.features[0]?.geometry.coordinates as LngLatLike
+                : center,
+                zoom: defaultZoom,
+                pitch: 40,
+                interactive: true,
+            });
+
+            mapRef.current?.on("load", function () {
+                if (mapRef.current) {
+                    mapRef.current.addControl(PreviewMapDraw, "bottom-right");
+                    if (props.drawing) {
+                        loadMapData(mapRef.current, props.drawing);
+                    }
+                }
+            });
+        }
     }, [props.drawing]);
 
     useEffect(() => {
-        if (mapRef.current) return;
 
-        mapRef.current = new mapboxgl.Map({
-            container: mapContainerRef.current,
-            style: "mapbox://styles/mapbox/satellite-streets-v12",
-            center: center,
-            zoom: props.zoom || defaultZoom,
-            pitch: 40,
-            interactive: true,
-        });
-        mapRef.current.addControl(PreviewMapDraw, "bottom-right");
-    }, [mapContainerRef.current]);
-
-    useEffect(() => {
         if (props.drawing) {
             const currentCenter = mapRef.current?.getCenter();
             const currentZoom = mapRef.current?.getZoom();
@@ -766,7 +786,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
                 center: currentCenter || center,
                 zoom: currentZoom || props.zoom || defaultZoom,
                 pitch: 40,
-                //interactive: false,
+                interactive: true,
             });
 
             mapRef.current?.on("load", function () {
@@ -778,7 +798,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
                 }
             });
         }
-    }, [props.drawing, mapStyle]);
+    }, [mapStyle]);
 
     useEffect(() => {
         if (!mapRef.current) return;
@@ -789,22 +809,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
 
     return (
         <>
-            {canEdit && (
-                <div
-                    style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }}
-                >
-                    <Button
-                        style={{
-                            backgroundColor: "white",
-                            color: "black",
-                            borderColor: "transparent",
-                        }}
-                        className="ring-0"
-                        icon={RiEditBoxLine}
-                        onClick={() => setIsOpen(true)}
-                    />
-                </div>
-            )}
+           
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
                 <DialogPanel
                     className="p-0 overflow-hidden"
@@ -825,6 +830,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
             <Button className="Kiruna-map-style-button" onClick={toggleMapStyle}>
                 {mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? <RiRoadMapLine /> : <RiEarthLine />}
             </Button>
+        
             <div
                 className={props.className}
                 ref={mapContainerRef}
@@ -1293,6 +1299,13 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         props.drawing
     );
     const [mapBounds, setMapBounds] = useState<LngLatBounds | null>(null);
+    const offsetDistance = 0.0001; // offsetDistance
+    const pointsAndCentroids = getPointsAndCentroids(
+        props.drawing,
+        offsetDistance
+    );
+
+
     const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-streets-v12");
     const toggleMapStyle = () => {
         setMapStyle(mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? "mapbox://styles/mapbox/streets-v12" : "mapbox://styles/mapbox/satellite-streets-v12");
@@ -1302,7 +1315,9 @@ export const SatMap: React.FC<SatMapProps & MapControlsProps> = (props) => {
         mapRef.current = new mapboxgl.Map({
             container: mapContainerRef.current,
             style: "mapbox://styles/mapbox/satellite-streets-v12",
-            center: center,
+            center: pointsAndCentroids.features[0]?.geometry?.type === "Point"
+            ? pointsAndCentroids.features[0]?.geometry.coordinates as LngLatLike
+            : center,
             zoom: props.zoom || defaultZoom,
             pitch: 40,
         });

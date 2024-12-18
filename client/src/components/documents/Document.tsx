@@ -6,6 +6,7 @@ import { FileUpload } from "../form/DragAndDrop";
 import DeleteResourceDialog from './DeleteResourcesDialog';
 import API from '../../API';
 import mime from 'mime';
+import { FormDocumentGeolocalization } from '../form/Form';
 import {
     Accordion,
     AccordionBody,
@@ -31,7 +32,10 @@ import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
 import exp from 'constants';
 import { DateRange } from '../form/DatePicker';
+import { FeatureCollection, Geometry, GeoJsonProperties } from 'geojson';
 import { set } from 'date-fns';
+import Kiruna from "../map/KirunaMunicipality.json";
+
 interface DocumentProps {
     user: { email: string; role: Stakeholders } | null;
 }
@@ -74,6 +78,7 @@ export default function Document({ user }: DocumentProps) {
     const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
+    const [updateHideMap, setUpdateHideMap] = useState(false);
 
 
 
@@ -130,6 +135,7 @@ export default function Document({ user }: DocumentProps) {
                 setLanguage(document.language || undefined);
                 setPages(document.pages || undefined);
                 setDescription(document.description || undefined);
+                setDocCoordinates(document.doc_coordinates as DocCoords);
                 setDocumentsForDirect(document.connections.direct.map((doc) => doc.toString()));
                 setDocumentsForCollateral(document.connections.collateral.map((doc) => doc.toString()));
                 setDocumentsForProjection(document.connections.projection.map((doc) => doc.toString()));
@@ -179,6 +185,7 @@ export default function Document({ user }: DocumentProps) {
                     };
                     setDrawings(geoJSON);
                 } else {
+                    setUpdateHideMap(true);
                     setEntireMunicipality(true);
                 }
 
@@ -192,10 +199,11 @@ export default function Document({ user }: DocumentProps) {
         fetchDocument();
     }, [id]);
 
-    useMemo(async () => {
-        if (drawings && saveDrawing) {
+    const handleSaveDrawing = async () => {
+        if (drawings || updateHideMap) {
             let draw: DocCoords;
             if (
+                !updateHideMap &&
                 drawings &&
                 drawings.features.length === 1 &&
                 drawings.features[0].geometry.type === "Point"
@@ -204,7 +212,7 @@ export default function Document({ user }: DocumentProps) {
                     type: AreaType.POINT,
                     coordinates: drawings.features[0].geometry.coordinates,
                 };
-            } else if ((drawings && drawings.features.length >= 1) && drawings.features[0].geometry.type === "Polygon") {
+            } else if (!updateHideMap && (drawings && drawings.features.length >= 1) && drawings.features[0].geometry.type === "Polygon") {
                 let cord =
                     drawings.features.map((f: any) => f.geometry.coordinates).length === 1
                         ? drawings.features[0].geometry.coordinates
@@ -222,28 +230,35 @@ export default function Document({ user }: DocumentProps) {
             try {
                 const res = await API.updateKxDocumentInformation(id!, undefined, undefined, undefined, undefined, undefined, undefined, draw);
                 if (res) {
+                    console.log("Success toast should appear");
                     toast({
                         title: "Success",
                         description:
                             "The document has been updated successfully",
                         variant: "success",
                         duration: 3000,
-                    })
+                    });
+                    window.location.reload();
                 } else {
+                    console.log("Error toast should appear");
                     toast({
                         title: "Error",
                         description: "Failed to update document",
                         variant: "error",
                         duration: 3000,
-                    })
+                    });
                 }
             } catch (error) {
-
-            }
-            setSaveDrawing(false);
+                console.log("Error toast should appear in catch");
+                toast({
+                    title: "Error",
+                    description: "Failed to update document",
+                    variant: "error",
+                    duration: 3000,
+                });
+            };
         }
-    }, [saveDrawing]);
-
+    };
     const [showCheck, setShowCheck] = useState(false);
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
     const [selectedResource, setSelectedResource] = useState<string>("");
@@ -275,7 +290,7 @@ export default function Document({ user }: DocumentProps) {
                         <div className="flex items-center justify-between mb-2 space-x-2">
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Scale:</i>
                             <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-                                {scale.type === ScaleType.ONE_TO_N ? `1: ${scale.scale}` : scale.type}
+                            {scale.type === ScaleType.ONE_TO_N ? `1: ${scale.scale}` : scale.type}
                             </i>
                         </div>
 
@@ -643,21 +658,31 @@ export default function Document({ user }: DocumentProps) {
                 </Accordion>
 
 
-                {
-                    !entireMunicipality ? (
-                        <Card
-                            className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}
-                        >
+                <>
+                    <FormCoordinatesDialog
+                        setDocCoordinates={setDocCoordinates}
+                        id={id}
+                        user={user}
+                        handleSaveDrawing={handleSaveDrawing}
+                        setDrawing={(d) => { setDrawings(d); setSaveDrawing(true); }}
+                        drawing={drawings}
+                        setUpdateHideMap={setUpdateHideMap}
+                        updateHideMap={updateHideMap}
+                    />
+                    {!entireMunicipality ? (
+                        <Card className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}>
                             <DocumentPageMap
-                                setDrawing={(d) => { setDrawings(d); setSaveDrawing(true) }}
                                 drawing={drawings}
+                                setDrawing={setDrawings}
                                 style={{ minHeight: "300px", width: "100%" }}
                                 user={user}
                             />
                         </Card>
+
                     ) : (
-                        <div className="flex justify-center items-start pt-10">
-                            <div className=' document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
+
+                        <div className="flex justify-center items-start pt-2">
+                            <div className='document-whole-municipality-style w-full sm:w-2/3 md:w-1/2 lg:w-1/3'>
                                 <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100%' }}>
                                     <span>
                                         The document covers the entire municipality
@@ -665,8 +690,12 @@ export default function Document({ user }: DocumentProps) {
                                 </div>
                             </div>
                         </div>
-                    )
-                }
+
+                    )}
+                </>
+
+
+
                 {
                     PreviewDoc(showPdfPreview, () => setShowPdfPreview(false), doc?._id, fileTitle)
 
@@ -788,7 +817,12 @@ export function FormInfoDialog({
 
     return (
         <>
-            {canEdit && <i className="ml-auto self-end mb-2" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-6" /></i>}
+            {canEdit && (
+                <i className="ml-auto self-end mb-2 mt-4 lg:mb-0 lg:ml-4 lg:mt-0" onClick={() => setIsOpen(true)}>
+                    <RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-6" />
+                </i>
+            )}
+
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
                 <DialogPanel
                     className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
@@ -1078,3 +1112,128 @@ export function FormConnectionsDialog({
 
 }
 
+
+
+
+
+
+
+export function FormCoordinatesDialog(
+    {
+        drawing,
+        setDrawing,
+        handleSaveDrawing,
+        setDocCoordinates,
+        id,
+        user,
+        setUpdateHideMap,
+        updateHideMap
+    }: {
+        setDrawing: React.Dispatch<React.SetStateAction<any>>;
+        handleSaveDrawing: () => void;
+        setDocCoordinates: React.Dispatch<React.SetStateAction<any>>;
+        id: string | undefined;
+        user: { email: string; role: Stakeholders } | null;
+        drawing: any;
+        setUpdateHideMap: React.Dispatch<React.SetStateAction<boolean>>;
+        updateHideMap: boolean;
+    }
+) {
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [error, setError] = useState("");
+    const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
+    const [docCoordinatesError, setDocCoordinatesError] = useState(false);
+    const [hideMap, setHideMap] = useState<boolean>(false);
+    const [isMapOpen, setIsMapOpen] = useState(false);
+    const [entireMunicipality, setEntireMunicipality] = useState(false);
+
+    const [showGeoInfo, setShowGeoInfo] = useState(false);
+
+    useEffect(() => {
+
+        if (updateHideMap) {
+            setEntireMunicipality(true);
+
+        }
+    }, [isOpen])
+
+
+    const handleCoordinatesCancel = async (val: boolean) => {
+        setIsOpen(val);
+        if (entireMunicipality) {
+            setUpdateHideMap(true);
+        }
+    };
+
+    return (
+        <>
+            
+                <div className="flex items-center pt-3">
+                    <h3 className="text-l font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Geolocalization</h3>
+                    {canEdit && (
+                    <i className="ml-2 flex justify-end" onClick={() => setIsOpen(true)}>
+                        <RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" />
+                    </i>
+                    )}
+                </div>
+            
+
+            <Dialog open={isOpen} onClose={() => handleCoordinatesCancel(false)} static={true}>
+                <DialogPanel
+                    className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
+                    style={{ maxWidth: "80vw" }}
+                >
+                    <div className="sm:mx-auto sm:max-w-2xl">
+                        <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                            Update Coordinates
+                        </h3>
+                        <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                            Update the coordinates of the document
+                        </p>
+                        <form action="" method="patch" className="mt-8">
+                            <FormDocumentGeolocalization
+                                isMapOpen={isMapOpen}
+                                setIsMapOpen={setIsMapOpen}
+                                showGeoInfo={showGeoInfo}
+                                setShowGeoInfo={setShowGeoInfo}
+                                docCoordinatesError={docCoordinatesError}
+                                setDocCoordinatesError={setDocCoordinatesError}
+                                drawing={drawing}
+                                setDrawing={setDrawing}
+                                hideMap={hideMap}
+                                setHideMap={setHideMap}
+                                user={user}
+                                setUpdateHideMap={setUpdateHideMap}
+                                updateHideMap={updateHideMap}
+                            />
+                            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+                                <Button
+                                    className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                                    variant="light"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleCoordinatesCancel(false);
+                                    }}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="w-full sm:w-auto primary"
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleSaveDrawing();
+                                    }}
+                                    disabled={!drawing || !drawing.features[0] && !updateHideMap}
+                                >
+                                    Submit
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </DialogPanel>
+            </Dialog>
+            <Toaster />
+        </>
+    );
+}
