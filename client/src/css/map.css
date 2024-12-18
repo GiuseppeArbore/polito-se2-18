@@ -1,21 +1,39 @@
+/* Default light theme styles */
 .button-whole-Kiruna {
     background-color: white;
     color: #4A4A4A;
-    border: 1px solid #ccc;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Add shadow for floating effect */
     position: absolute;
     top: 0.625rem;
-    left: 0.625rem;
+    left: 1.2rem;
     z-index: 1;
     padding: 0.5rem 0.75rem;
     font-size: 0.875rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    height: 2rem;
+    width: 11rem;
+    border: none;
+    /* Remove border */
+    border-radius: 0.5rem;
+    /* Optional: Add border-radius for rounded corners */
 }
 
+.button-select-area {
+    background-color: white;
+    color: #4A4A4A;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 0.5rem;
+
+}
+.button-select-area:hover {
+    background-color: #f0f0f0;
+}
 .button-whole-Kiruna:hover {
     background-color: #f0f0f0;
-    border-color: #b0b0b0; 
 }
 
 .popup-content {
@@ -24,13 +42,41 @@
     min-width: 100px;
     max-width: 100%;
     word-wrap: break-word;
-  }
+}
 
-
-  .Kiruna-area-button {
+.Kiruna-area-button {
     background-color: white;
     color: #4A4A4A;
-    border: 1px solid #ccc;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Add shadow for floating effect */
+    position: absolute;
+    top: 0.625rem;
+    left: 13rem;
+    z-index: 1;
+    padding: 0.5rem 0.75rem;
+    font-size: 0.875rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 2rem;
+    width: 9rem;
+    border: none;
+    /* Remove border */
+    border-radius: 0.5rem;
+    /* Optional: Add border-radius for rounded corners */
+}
+
+.Kiruna-area-button:hover {
+    background-color: #f0f0f0;
+}
+
+.quickfilter {
+    background-color: white;
+    color: #4A4A4A;
+    border: none;
+    /* Remove border */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    /* Add shadow for floating effect */
     position: absolute;
     top: 0.625rem;
     right: 0.625rem;
@@ -40,9 +86,167 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
+    border-radius: 0.5rem;
+    /* Rounded corners */
+    width: 8rem;
+    /* Adjust the width as needed */
+    height: 2.5rem;
+    /* Adjust the height as needed */
+    cursor: pointer;
+    /* Change cursor to pointer */
+}
+/* Light theme styles */
+.input-dropdown {
+    width: 100%;
+    height: 1.5rem;
+    padding: 0.5rem;
+    box-sizing: border-box;
+    border-radius: 0.5rem;
+    font-size: 0.75rem;
+    background-color: white;
+    color: #4A4A4A;
+    display: flex;
+    align-items: center; /* Center content vertically */
+    justify-content: center; /* Center content horizontally */
+
 }
 
-.Kiruna-area-button:hover {
-    background-color: #f0f0f0;
-    border-color: #b0b0b0; 
+/* Dark theme styles */
+@media (prefers-color-scheme: dark) {
+    .input-dropdown {
+        background-color: #040711;
+        color: #000000; /* Corrected color for better contrast */
+    }
+    .input-dropdown-area-item {
+        background-color: #121826;
+        color: #3F67BD; /* Corrected color for better contrast */
+    }
+    .input-dropdown-area-item:hover {
+        background-color: #031130;
+        color: #93b3f7;/* Corrected color for better contrast */
+    }
+    .input-dropdown-area {
+        background-color: #121826;
+        color: #3F67BD; /* Corrected color for better contrast */
+    }
+}
+
+@media (prefers-color-scheme: dark) {
+    .popup-content {
+        color: #000000; /* Light text color */
+    }
+}
+/* Dark theme styles */
+@media (prefers-color-scheme: dark) {
+    body {
+        background-color: #040711;
+        color: #E0E0E0;
+    }
+
+    .button-whole-Kiruna,
+    .Kiruna-area-button,
+    .quickfilter {
+        background-color: #040711;
+        /* Shinier black */
+        color: #E0E0E0;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+        /* Darker shadow */
+    }
+
+    .button-select-area{
+        background-color: #121826;
+        border : 1px solid #3F67BD;
+        color: #3F67BD;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    }
+
+    .button-whole-Kiruna:hover,
+    .Kiruna-area-button:hover,
+    .quickfilter:hover {
+        background-color: #333;
+        /* Slightly lighter black on hover */
+    }
+
+    .button-select-area:hover {
+        background-color: #031130;
+        color: #93b3f7; 
+    }
+}
+
+.tab-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 25rem;
+    margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+    .tab-group {
+        width: 100%;
+        max-width: 25rem;
+    }
+
+    .tab-group .tab {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .tab {
+        padding: 0.5rem; /* Reduced padding */
+    }
+
+    .tab svg {
+        margin-bottom: 0.1rem; /* Reduced margin */
+        margin-left: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+}
+
+/* Light mode scrollbar */
+.light-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: #888 #f1f1f1;
+}
+
+.light-scrollbar::-webkit-scrollbar {
+    width: 8px;
+}
+
+.light-scrollbar::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+.light-scrollbar::-webkit-scrollbar-thumb {
+    background-color: #888;
+    border-radius: 10px;
+    border: 2px solid #f1f1f1;
+}
+
+/* Dark mode scrollbar */
+@media (prefers-color-scheme: dark) {
+    .dark-scrollbar {
+        scrollbar-width: thin;
+        scrollbar-color: #4A4A4A #1E1E1E;
+    }
+
+    .dark-scrollbar::-webkit-scrollbar {
+        width: 8px;
+    }
+
+    .dark-scrollbar::-webkit-scrollbar-track {
+        background: #1E1E1E;
+    }
+
+    .dark-scrollbar::-webkit-scrollbar-thumb {
+        background-color: #4A4A4A;
+        border-radius: 10px;
+        border: 2px solid #1E1E1E;
+    }
 }
