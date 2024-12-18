@@ -72,12 +72,14 @@ function Flow(props: FlowProps) {
       const date = new Date((node.data as {date:Date}).date);  
       const yearWidth = (nodeWidth * 2);
       const scaleHeight = nodeHeight * 4;
+      const margin = 20;
+      const scaleHeightWithMargin = scaleHeight - margin;
       const nodeWithPosition = dagreGraph.node(node.id);
-      const n = Math.random() * 2 - 1;
+      const n = Math.random() * scaleHeightWithMargin;
       const x = nodeWithPosition.x + yearWidth * (Math.abs(Math.min(...Array.from(scalesByYear.keys())) - date.getFullYear()) + ((date.getMonth()+1)*30 + date.getDay())/365);
       const y = scaleHeight * (scales.findIndex((s)=> JSON.stringify(s) === JSON.stringify((node.data as {scale:Scale}).scale)));
-      const y_random = y + n * nodeHeight; 
-      
+      const y_random = y + nodeHeight + n + margin / 2;
+
       console.log(node)
       const newNode = {
         ...node,
@@ -88,7 +90,7 @@ function Flow(props: FlowProps) {
         // so it matches the React Flow node anchor point (top left).
         position: {
           x: x - nodeWidth,
-          y: y_random + 100,
+          y: y_random,
         },
       };
 
