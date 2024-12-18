@@ -163,12 +163,12 @@ function Flow(props: FlowProps) {
       {
         id: `y_axis_${s}`,
         type: "xAxis",
-        position: { x: 0, y: i * nodeHeight * 4  + 30 },
+        position: { x: -100, y: i * nodeHeight * 4  + 30 },
         draggable: false,
         selectable: false,
         data: {
-          width: nodeWidth * 2.1 *  (maxYear - minYear + 1) ,
-          height: 500,
+          width: nodeWidth * 2.2 *  (maxYear - minYear + 1),
+          height: 50,
           label: s.toString()
         }
       } as Node

@@ -36,9 +36,8 @@ export function XAxis({ data }: NodeProps<Axes>) {
     return (
         <div
             style={{
-            width: data.width,
-            height: data.height,
-            marginLeft: -100,
+                width: data.width,
+                height: data.height,
             }}
         >
             
