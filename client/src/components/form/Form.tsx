@@ -265,7 +265,7 @@ export function FormDialog(props: FormDialogProps) {
 
     function myform() {
         return (
-            <form action="{clearForm}" method="post" className="mt-8">
+            <div className="mt-8">
 
                 <FormDocumentInformation
                     title={title}
@@ -364,7 +364,7 @@ export function FormDialog(props: FormDialogProps) {
                     </Button>
                 </div>
 
-            </form>
+            </div>
         )
     }
 
