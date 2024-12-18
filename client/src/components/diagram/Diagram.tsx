@@ -203,7 +203,7 @@ function Flow(props: FlowProps) {
             source: d.issuance_date.from < iDoc!.issuance_date.from ? d._id!.toString() : i.toString(),
             target: d.issuance_date.from > iDoc!.issuance_date.from ? d._id!.toString() : i.toString(),
             animated: true,
-            type: ConnectionLineType.SmoothStep,
+            type: ConnectionLineType.Bezier,
           };
         });
       });
@@ -220,7 +220,7 @@ function Flow(props: FlowProps) {
     (params: any) =>
       setEdges((eds) =>
         addEdge(
-          { ...params, type: ConnectionLineType.SmoothStep, animated: true },
+          { ...params, type: ConnectionLineType.Bezier, animated: true },
           eds
         )
       ),
@@ -246,7 +246,7 @@ function Flow(props: FlowProps) {
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
-      connectionLineType={ConnectionLineType.SmoothStep}
+      connectionLineType={ConnectionLineType.Bezier}
       nodeTypes={nodeTypes}
       fitView
       style={{ backgroundColor: "#F7F9FB" }}

@@ -1,7 +1,5 @@
-import { Icon } from "@tremor/react";
 import { Handle, Node, NodeProps, Position } from "@xyflow/react"
 import { KxDocumentType } from "../../enum";
-import { KxDocument } from "../../model";
 import { useNavigate } from "react-router-dom";
  type CustomNode = Node<{
     id: string,
@@ -14,14 +12,18 @@ import { useNavigate } from "react-router-dom";
 export function CustomNode({ data }: NodeProps<CustomNode>) {
     const navigator = useNavigate();
     return (<>
-      <Handle type="target" position={Position.Left} />
-      <div title={data.label} onClick={() => navigator(`/documents/${data.id}`)} className="flex items-center">
+        <Handle type="target" position={Position.Left} style={{background: "#033c8d"}} />
+        <div
+            title={data.label}
+            onClick={() => navigator(`/documents/${data.id}`)}
+            className="flex items-center p-1 border-2 rounded-full"
+            style={{borderColor: "#033c8d"}}
+        >
             <img src={getIconFromType(data.type)} alt={data.label} />
         </div>
-      <Handle type="source" position={Position.Right} />
-        
-         </>
-      
+        <Handle type="source" position={Position.Right} style={{background: "#033c8d"}} />
+    </>
+
     );
 }
 
