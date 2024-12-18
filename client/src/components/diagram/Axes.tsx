@@ -41,7 +41,7 @@ export function XAxis({ data }: NodeProps<Axes>) {
             marginLeft: -100,
             }}
         >
-            <p className='ml-2'>{data.label}</p>
+            
             <div
                 style={{
                     height: 2.5,
@@ -50,6 +50,7 @@ export function XAxis({ data }: NodeProps<Axes>) {
                     borderTop: "2.5px dashed #c0c8d2"
                 }}
             >
+                <p className='ml-2'>{data.label}</p>
             </div>
         </div>
     );

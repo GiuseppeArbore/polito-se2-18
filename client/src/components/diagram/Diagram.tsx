@@ -38,7 +38,7 @@ function Flow(props: FlowProps) {
   });
   const scales_const = [{type: ScaleType.BLUEPRINT_EFFECTS} as Scale, {type: ScaleType.TEXT} as Scale];
   const [scales, setScales] = useState<Scale[]>(scales_const);
-  const nodeWidth = 172;
+  const nodeWidth = 150;
   const nodeHeight = 36;
   const [scalesByYear, setScaleByYear] = useState<
     Map<number, Map<TextualScale | number, number>>
@@ -137,16 +137,16 @@ function Flow(props: FlowProps) {
             selectable: false,
             data: {
               width: 100,
-              height: 500,
+              height: nodeHeight * 4.4 * scales.length,
               label: (v + minYear).toString(),
             },
           } as Node)
       );
     const aggregateData = await API.getKxDocumentsAggregateData();
     setAggregateData(aggregateData);
-    const tmpXAxes = scales.map((s)=> {
+    const tmpXAxes = [...scales,{type: ScaleType.ONE_TO_N, scale: -1}].map((s)=> {
       if(s.type === ScaleType.ONE_TO_N){
-        return s.scale.toString();
+        return s.scale === -1? '' : s.scale.toString();
       } else if (s.type === ScaleType.TEXT){
         return "Text";
       } else if (s.type === ScaleType.BLUEPRINT_EFFECTS){
@@ -156,14 +156,15 @@ function Flow(props: FlowProps) {
       }
     }).map((s, i) => (
       {
+
         id: `y_axis_${s}`,
         type: "xAxis",
         position: { x: 0, y: i * nodeHeight * 4  + 30 },
         draggable: false,
         selectable: false,
         data: {
-          width: 3100,
-          height: 900,
+          width: nodeWidth * 2.1 *  (maxYear - minYear + 1) ,
+          height: 500,
           label: s.toString()
         }
       } as Node
