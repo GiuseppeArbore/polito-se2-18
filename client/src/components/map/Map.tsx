@@ -742,16 +742,20 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
         setMapStyle(mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? "mapbox://styles/mapbox/streets-v12" : "mapbox://styles/mapbox/satellite-streets-v12");
     }
 
-
+    const offsetDistance = 0.0001; // offsetDistance
+    const pointsAndCentroids = getPointsAndCentroids(props.drawing, offsetDistance);
 
 
     useEffect(() => {
+
         if (mapRef.current) return;
         if (props.drawing) {
             mapRef.current = new mapboxgl.Map({
                 container: mapContainerRef.current,
                 style: mapStyle,
-                center: center,
+                 center: pointsAndCentroids.features[0]?.geometry?.type === "Point"
+                ? pointsAndCentroids.features[0]?.geometry.coordinates as LngLatLike
+                : center,
                 zoom: defaultZoom,
                 pitch: 40,
                 interactive: true,
