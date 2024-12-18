@@ -1,16 +1,36 @@
-.custom-slide-content {
-  width: 40%; /* Adjust the width as needed */
-  padding: 0.5rem 1rem; /* Adjust the padding as needed */
-  margin-left: 3rem; /* Move the element to the right */
+.process-carousel {
+  width: 100%;
+  max-width: 800px; 
+  margin: auto;
+}
+
+.swiper-container {
+  padding: 20px 0;
+}
+
+.swiper-slide {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-}
-.custom-card {
-  width: 80%; /* Adjust the width as needed */
-  
-
+  padding: 20px;
 }
 
-.custom-video-container {
-  border-radius: 0.5rem; /* Equivalent to rounded-lg */
-  overflow: hidden;
+.swiper-slide h3 {
+  font-size: 1.5em;
 }
+
+.swiper-slide p {
+  font-size: 1em;
+  color: #b6aeae;
+}
+
+.swiper-pagination {
+  margin-top: 10px;
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: #726e6e; 
+}
+

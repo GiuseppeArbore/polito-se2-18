@@ -16,25 +16,34 @@ const ProcessCarousel = () => {
         {
             title: "Where is Kiruna?",
             description: "Kiruna is the northernmost city in Sweden, situated in the province of Lapland, was founded in 1900. The city was originally built in the 1890s to serve the Kiruna Mine.",
-            video: <ReactPlayer url="https://youtu.be/tBeTpJUX_DI" width='40rem' height='20rem' />,
+            video: <ReactPlayer url="https://youtu.be/tBeTpJUX_DI" width='100%' height='100%' />,
         },
         {
-            title: "Kiruna Attractions",
-            description: "Northern lights, Midnight Sun, and more",
+            title: "Northern Lights (Aurora Borealis)",
+            description: "Aurora hunting with reindeer sledding",
             cards: [
                 {
-                    title: "Northern Lights (Aurora Borealis)",
-                    description: "Aurora hunting with reindeer sledding",
                     image: "/home/northern-lights.png",
                 },
+            ],
+        },
+        {
+            title: "Abisko National Park",
+            description: "A beautiful national park known for its natural beauty",
+            cards: [
+
                 {
-                    title: "Abisko National Park",
-                    description: "A beautiful national park known for its natural beauty",
+
                     image: "/home/abisko-national-park.png",
                 },
+            ],
+        },
+        {
+            title: "Lake Torneträsk",
+            description: "One of the largest lakes in Sweden, located in the Lapland province",
+            cards: [
                 {
-                    title: "Lake Torneträsk",
-                    description: "One of the largest lakes in Sweden, located in the Lapland province",
+
                     image: "/home/lake-tornetrask.png",
                 },
             ],
@@ -42,7 +51,7 @@ const ProcessCarousel = () => {
         {
             title: "Kiruna Movement (Why? Plan and Future)",
             description: "The Swedish town of Kiruna will be moved building by building to a new location in the country due to years of mining that have caused it to sink into the ground.Valuable minerals have also been found in and around it, including Europe's largest deposit of rare earth minerals, used to make green technologies.",
-            video: <ReactPlayer url="https://youtu.be/XMJWFfebEF4" width='40rem' height='20rem' />,
+            video: <ReactPlayer url="https://youtu.be/XMJWFfebEF4" width='100%' height='100%' />,
         },
 
     ];
@@ -52,20 +61,19 @@ const ProcessCarousel = () => {
     };
 
     return (
-        <div className="process-carousel text-white max-w-screen-xl mx-auto">
+        <div className="process-carousel text-white max-w-screen-xl mx-auto flex-grow">
             <Swiper
                 modules={[Navigation, Pagination]}
                 slidesPerView={1}
                 navigation
                 pagination={{ clickable: true }}
-                style={{ marginTop: '1rem' }}
             >
                 {slides.map((slide, index) => (
                     <SwiperSlide
                         key={index}
-                        className="flex flex-col lg:flex-row items-center"
+                        className="flex flex-col lg:flex-row items-center justify-between gap-2 p-2"
                     >
-                        <div className="custom-slide-content">
+                        <div className="w-full lg:w-1/3 text-center lg:text-center p-2 lg:p-4 desc-container" style={{ marginLeft: 'auto' }}>
                             <h4 className="mb-1 text-lg md:text-xl lg:text-2xl font-bold">
                                 {slide.title}
                             </h4>
@@ -76,25 +84,24 @@ const ProcessCarousel = () => {
                             )}
                         </div>
 
-                        <div className="w-full lg:w-1/2 flex justify-center">
+                        <div className="w-full lg:w-1/2 flex justify-center items-center" style={{ marginRight: 'auto', minHeight: '50vh', height: 'auto' }}>
                             {slide.video ? (
-                                <div className="w-full h-auto custom-video-container " style={{ marginBottom: '3rem' }} >
-                                    {slide.video}
+                                <div className="w-1/2 xl:w-[35vw] 2xl:w-[40vw] h-[35vh] rounded-lg" style={{ marginBottom: '3rem', borderRadius: '0.5rem', overflow: 'hidden' }}>
+                                    <div className="w-full h-full object-cover">
+                                        {slide.video}
+                                    </div>
                                 </div>
                             ) : slide.cards ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 card-container" style={{ gap: '1rem' }}>
+                                <div style={{ gap: '2rem', maxWidth: '100%', maxHeight: '100%' }}>
                                     {slide.cards.map((card, cardIndex) => (
                                         <Card
                                             key={cardIndex}
-                                            className="custom-card bg-white dark:bg-white text-black rounded-lg shadow-md p-4"
                                         >
                                             <img
+
                                                 src={card.image}
-                                                alt={card.title}
-                                                className="w-full h-40 object-cover rounded-lg"
+                                                className=" images w-full h-auto h-40 md:h-50 lg:h-60 object-cover rounded-lg"
                                             />
-                                            <h5 className="mt-2 text-lg font-bold">{card.title}</h5>
-                                            <p>{card.description}</p>
                                         </Card>
                                     ))}
                                 </div>
