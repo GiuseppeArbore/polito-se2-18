@@ -195,7 +195,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                                     <TextInput
                                         icon={RiSearchLine}
                                         id="quickFilter"
-                                        placeholder="Search..."
+                                        placeholder="Search by title"
                                         className="w-full"
                                         value={quickFilterText}
                                         onValueChange={(e) => {
