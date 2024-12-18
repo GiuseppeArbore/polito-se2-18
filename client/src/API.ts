@@ -1,5 +1,5 @@
 import { mongoose } from '@typegoose/typegoose';
-import { KxDocument, PageRange, Scale, Connections } from './model';
+import { KxDocument, PageRange, Scale, Connections, KxDocumentAggregateData } from './model';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -263,6 +263,19 @@ const deleteAttachmentFromDocument = async (id: mongoose.Types.ObjectId, fileNam
     }
 }
 
+const getAggregatedData = async (): Promise<KxDocumentAggregateData> =>  {
+    const response = await fetch(API_URL + '/documents/aggregateData', {
+        method: 'GET',
+        credentials: 'include'
+    });
+    if (!response.ok) {
+        const errMessage = await response.json();
+        throw errMessage;
+    } else {
+        return response.json();
+    }
+};
+
 
 interface Credentials {
     username: string;
@@ -313,5 +326,7 @@ const logout = async () => {
     }
 };
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, updateKxDocumentConnections, getKxFileByID, addAttachmentToDocument, deleteAttachmentFromDocument, login, getUserInfo, logout };
+
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, updateKxDocumentConnections, getKxFileByID, addAttachmentToDocument, deleteAttachmentFromDocument, login, getUserInfo, logout, getAggregatedData };
+
 export default API;
