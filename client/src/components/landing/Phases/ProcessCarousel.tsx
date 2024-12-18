@@ -1,4 +1,6 @@
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useState } from "react";
+import ReactPlayer from "react-player";
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/swiper-bundle.css";
 import "swiper/css/navigation";
@@ -6,34 +8,46 @@ import "swiper/css/pagination";
 import "./ProcessCarousel.css";
 
 const ProcessCarousel = () => {
+    const [enlargedCard, setEnlargedCard] = useState<number | null>(null);
+
     const slides = [
         {
-            title: "Research and analysis of the documents",
-            description: "",
-            image: "/home/phase1.png",
+            title: "Where is Kiruna?",
+            description: "Kiruna is the northernmost city in Sweden, situated in the province of Lapland, was founded in 1900. The city was originally built in the 1890s to serve the Kiruna Mine.",
+            video: <ReactPlayer url="https://youtu.be/tBeTpJUX_DI" width="100%" height="100%" />,
         },
         {
-            title: "Trip to Kiruna",
-            description:
-                "Including Reorganization of documents through interviews and site visits",
-            image: "/home/phase2-1.png",
+            title: "Kiruna Attractions",
+            description: "Northern lights, Midnight Sun, and more",
+            cards: [
+                {
+                    title: "Northern Lights (Aurora Borealis)",
+                    description: "Aurora hunting with reindeer sledding",
+                    image: "/home/northern-lights.png",
+                },
+                {
+                    title: "Abisko National Park",
+                    description: "A beautiful national park known for its natural beauty",
+                    image: "/home/abisko-national-park.png",
+                },
+                {
+                    title: "Lake Torneträsk",
+                    description: "One of the largest lakes in Sweden, located in the Lapland province",
+                    image: "/home/lake-tornetrask.png",
+                },
+            ],
         },
         {
-            title: "Trip to Kiruna",
-            description: "Drafting the tales",
-            image: "/home/phase2-2.png",
+            title: "Kiruna Movement (Why? Plan and Future)",
+            description: "The Swedish town of Kiruna will be moved building by building to a new location in the country due to years of mining that have caused it to sink into the ground.Valuable minerals have also been found in and around it, including Europe's largest deposit of rare earth minerals, used to make green technologies.",
+            video: <ReactPlayer url="https://youtu.be/XMJWFfebEF4" width="100%" height="100%" />,
         },
-        {
-            title: "Trip to Kiruna",
-            description: "Reorganizing the stories into a hypertext",
-            image: "/home/phase2-3.png",
-        },
-        {
-            title: "Design a web app for Kiruna kommun",
-            description: "",
-            image: "/home/phase3.png",
-        },
+
     ];
+
+    const handleCardClick = (index: number) => {
+        setEnlargedCard(enlargedCard === index ? null : index);
+    };
 
     return (
         <div className="process-carousel text-white max-w-screen-xl mx-auto">
@@ -60,11 +74,30 @@ const ProcessCarousel = () => {
                         </div>
 
                         <div className="w-full lg:w-1/2 flex justify-center">
-                            <img
-                                src={slide.image}
-                                alt={slide.title}
-                                className="w-3/4 xl:w-[14vw] 2xl:w-[20vw] h-auto object-cover rounded-lg"
-                            />
+                            {slide.video ? (
+                                <div className="w-full h-auto rounded-lg overflow-hidden" style={{ height: '20rem', width: '40rem' }}>
+                                    {slide.video}
+                                </div>
+                            ) : slide.cards ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                                    {slide.cards.map((card, cardIndex) => (
+                                        <div
+                                            key={cardIndex}
+                                            className={`bg-white text-black rounded-lg shadow-md p-6 cursor-pointer transition-transform duration-300 ${enlargedCard === cardIndex ? 'transform scale-110' : ''}`}
+                                            onClick={() => handleCardClick(cardIndex)}
+                                            style={{ width: '20rem', height: '20rem', margin: '2rem' }} 
+                                        >
+                                            <img
+                                                src={card.image}
+                                                alt={card.title}
+                                                className="w-full h-40 object-cover rounded-t-lg"
+                                            />
+                                            <h5 className="mt-2 text-lg font-bold">{card.title}</h5>
+                                            <p className="text-xxs">{card.description}</p>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : null}
                         </div>
                     </SwiperSlide>
                 ))}

@@ -39,4 +39,6 @@
       height: 50px;
   }
 }
-  
+.text-xxs {
+  font-size: 0.1rem; /* 10px */
+}
