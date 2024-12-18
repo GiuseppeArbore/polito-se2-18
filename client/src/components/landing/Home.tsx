@@ -11,8 +11,10 @@ interface HomeProps {
 }
 const Home: React.FC<HomeProps> = ({ user }) => {
     return (
-        <div className="App" style={{ background: 'url(../../../public/home/KirunaWhiteMap.png) no-repeat center center fixed', backgroundSize: 'cover', height: '93vh', width: '98vw', display: 'flex', flexDirection: 'column', margin: '0', borderRadius: '0.5rem' }}>
-            <HeroSection user={user} />
+        <div className="App" style={{ background: 'url(../../../public/home/KirunaWhiteMap.png) no-repeat center center fixed', backgroundSize: 'cover', height: '96vh', width: '98vw', display: 'flex', flexDirection: 'column', margin: '0', borderRadius: '0.5rem' }}>
+            <div style={{ marginTop: '-2rem' }}>
+                <HeroSection user={user} />
+            </div>
             <Phases />
             <Footer />
         </div>

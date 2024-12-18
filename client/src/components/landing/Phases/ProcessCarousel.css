@@ -1,44 +1,16 @@
-.swiper-slide p {
-  font-size: 1em;
-  color: #b6aeae;
+.custom-slide-content {
+  width: 40%; /* Adjust the width as needed */
+  padding: 0.5rem 1rem; /* Adjust the padding as needed */
+  margin-left: 3rem; /* Move the element to the right */
+  text-align: center;
+}
+.custom-card {
+  width: 80%; /* Adjust the width as needed */
+  
+
 }
 
-@media (min-width: 768px) {
-  .swiper-slide p {
-      font-size: 1.125em; /* 18px */
-  }
-}
-
-@media (min-width: 1024px) {
-  .swiper-slide p {
-      font-size: 1.25em; /* 20px */
-  }
-}
-
-.swiper-pagination {
-  margin-top: 10px;
-}
-
-.swiper-button-next,
-.swiper-button-prev {
-  color: #726e6e;
-}
-
-@media (min-width: 768px) {
-  .swiper-button-next,
-  .swiper-button-prev {
-      width: 40px;
-      height: 40px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .swiper-button-next,
-  .swiper-button-prev {
-      width: 50px;
-      height: 50px;
-  }
-}
-.text-xxs {
-  font-size: 0.1rem; /* 10px */
+.custom-video-container {
+  border-radius: 0.5rem; /* Equivalent to rounded-lg */
+  overflow: hidden;
 }

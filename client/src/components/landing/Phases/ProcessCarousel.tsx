@@ -1,11 +1,13 @@
 import { Swiper, SwiperSlide } from "swiper/react";
 import { useState } from "react";
 import ReactPlayer from "react-player";
+import { Card } from '@tremor/react';
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/swiper-bundle.css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./ProcessCarousel.css";
+// Adjust the import path as necessary
 
 const ProcessCarousel = () => {
     const [enlargedCard, setEnlargedCard] = useState<number | null>(null);
@@ -14,7 +16,7 @@ const ProcessCarousel = () => {
         {
             title: "Where is Kiruna?",
             description: "Kiruna is the northernmost city in Sweden, situated in the province of Lapland, was founded in 1900. The city was originally built in the 1890s to serve the Kiruna Mine.",
-            video: <ReactPlayer url="https://youtu.be/tBeTpJUX_DI" width="100%" height="100%" />,
+            video: <ReactPlayer url="https://youtu.be/tBeTpJUX_DI" width='40rem' height='20rem' />,
         },
         {
             title: "Kiruna Attractions",
@@ -40,7 +42,7 @@ const ProcessCarousel = () => {
         {
             title: "Kiruna Movement (Why? Plan and Future)",
             description: "The Swedish town of Kiruna will be moved building by building to a new location in the country due to years of mining that have caused it to sink into the ground.Valuable minerals have also been found in and around it, including Europe's largest deposit of rare earth minerals, used to make green technologies.",
-            video: <ReactPlayer url="https://youtu.be/XMJWFfebEF4" width="100%" height="100%" />,
+            video: <ReactPlayer url="https://youtu.be/XMJWFfebEF4" width='40rem' height='20rem' />,
         },
 
     ];
@@ -56,13 +58,14 @@ const ProcessCarousel = () => {
                 slidesPerView={1}
                 navigation
                 pagination={{ clickable: true }}
+                style={{ marginTop: '1rem' }}
             >
                 {slides.map((slide, index) => (
                     <SwiperSlide
                         key={index}
-                        className="flex flex-col lg:flex-row items-center justify-between gap-2 p-2"
+                        className="flex flex-col lg:flex-row items-center"
                     >
-                        <div className="w-full lg:w-1/2 text-center lg:text-center p-2 lg:p-4 ">
+                        <div className="custom-slide-content">
                             <h4 className="mb-1 text-lg md:text-xl lg:text-2xl font-bold">
                                 {slide.title}
                             </h4>
@@ -75,26 +78,24 @@ const ProcessCarousel = () => {
 
                         <div className="w-full lg:w-1/2 flex justify-center">
                             {slide.video ? (
-                                <div className="w-full h-auto rounded-lg overflow-hidden" style={{ height: '20rem', width: '40rem' }}>
+                                <div className="w-full h-auto custom-video-container " style={{ marginBottom: '3rem' }} >
                                     {slide.video}
                                 </div>
                             ) : slide.cards ? (
-                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 p-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 card-container" style={{ gap: '1rem' }}>
                                     {slide.cards.map((card, cardIndex) => (
-                                        <div
+                                        <Card
                                             key={cardIndex}
-                                            className={`bg-white text-black rounded-lg shadow-md p-6 cursor-pointer transition-transform duration-300 ${enlargedCard === cardIndex ? 'transform scale-110' : ''}`}
-                                            onClick={() => handleCardClick(cardIndex)}
-                                            style={{ width: '20rem', height: '20rem', margin: '2rem' }} 
+                                            className="custom-card bg-white dark:bg-white text-black rounded-lg shadow-md p-4"
                                         >
                                             <img
                                                 src={card.image}
                                                 alt={card.title}
-                                                className="w-full h-40 object-cover rounded-t-lg"
+                                                className="w-full h-40 object-cover rounded-lg"
                                             />
                                             <h5 className="mt-2 text-lg font-bold">{card.title}</h5>
-                                            <p className="text-xxs">{card.description}</p>
-                                        </div>
+                                            <p>{card.description}</p>
+                                        </Card>
                                     ))}
                                 </div>
                             ) : null}
