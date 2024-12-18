@@ -1,7 +1,6 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useMemo, useState } from "react";
 import {
   ReactFlow,
-  MiniMap,
   Controls,
   Background,
   useNodesState,
@@ -9,18 +8,17 @@ import {
   addEdge,
   Node,
   Edge,
-  Position,
   ConnectionLineType,
   Panel,
 } from "@xyflow/react";
 import dagre from "@dagrejs/dagre";
 import "@xyflow/react/dist/style.css";
-import { KxDocument, Scale } from "../../model";
+import { KxDocument, KxDocumentAggregateData, Scale, ScaleOneToN } from "../../model";
 import { Button } from "@tremor/react";
 import { YAxis, XAxis } from "./Axes";
 import API from "../../API";
 import { ScaleType } from "../../enum";
-import { da } from "date-fns/locale";
+import { deepEqual } from "assert";
 
 const nodeTypes = {
   yAxis: YAxis,
@@ -33,7 +31,13 @@ interface FlowProps {
 function Flow(props: FlowProps) {
   type TextualScale = Exclude<ScaleType, ScaleType.ONE_TO_N>;
   const dagreGraph = new dagre.graphlib.Graph().setDefaultEdgeLabel(() => ({}));
-
+  const [aggregateData, setAggregateData] = useState<KxDocumentAggregateData>( {
+    scales: [],
+    stakeholders: [],
+    types: [],
+  });
+  const scales_const = [{type: ScaleType.BLUEPRINT_EFFECTS} as Scale, {type: ScaleType.TEXT} as Scale];
+  const [scales, setScales] = useState<Scale[]>(scales_const);
   const nodeWidth = 172;
   const nodeHeight = 36;
   const [scalesByYear, setScaleByYear] = useState<
@@ -65,8 +69,14 @@ function Flow(props: FlowProps) {
     const newNodes = nodes.map((node: Node) => {
       const date = new Date((node.data as {date:Date}).date);  
       const yearWidth = (nodeWidth * 2);
+      const scaleHeight = nodeHeight * 4;
       const nodeWithPosition = dagreGraph.node(node.id);
+      const n = Math.random() * 2 - 1;
       const x = nodeWithPosition.x + yearWidth * (Math.abs(Math.min(...Array.from(scalesByYear.keys())) - date.getFullYear()) + ((date.getMonth()+1)*30 + date.getDay())/365);
+      const y = scaleHeight * (scales.findIndex((s)=> JSON.stringify(s) === JSON.stringify((node.data as {scale:Scale}).scale)));
+      const y_random = y + n * nodeHeight; 
+      
+      console.log(node.data.scale, y, ( scales.findIndex((s)=> JSON.stringify(s) === JSON.stringify((node.data as {scale:Scale}).scale))), scales);
       const newNode = {
         ...node,
         targetPosition: isHorizontal ? "left" : "top",
@@ -75,7 +85,7 @@ function Flow(props: FlowProps) {
         // so it matches the React Flow node anchor point (top left).
         position: {
           x: x - nodeWidth,
-          y: nodeWithPosition.y - nodeHeight / 2,
+          y: y_random + 100,
         },
       };
 
@@ -116,7 +126,7 @@ function Flow(props: FlowProps) {
 
     const minYear = Math.min(...mapYearMaxDocuments.keys());
     const maxYear = Math.max(...mapYearMaxDocuments.keys());
-    const tmpYAxes = [...Array(maxYear - minYear + 1).keys()]
+    const tmpYAxes = [...Array(Math.max(0, maxYear - minYear + 1)).keys()]
       .map(
         (v, i) =>
           ({
@@ -132,25 +142,33 @@ function Flow(props: FlowProps) {
             },
           } as Node)
       );
-    //const aggregateData = await API.getKxDocumentsAggregateData();
-    //const scales: []
-    //const tmpXAxes = aggregateData.scales.toSorted().map((s, i) => (
-    //  {
-    //    id: `y_axis_${s}`,
-    //    type: "xAxis",
-    //    position: { x: 0, y: i * nodeHeight * 1 },
-    //    draggable: false,
-    //    selectable: false,
-    //    data: {
-    //      width: 5000,
-    //      height: 100,
-    //      label: s.toString()
-    //    }
-    //  } as Node
-    //));
-    //setAxes([...tmpYAxes, ...tmpXAxes]);
-    setAxes(tmpYAxes);
-
+    const aggregateData = await API.getKxDocumentsAggregateData();
+    setAggregateData(aggregateData);
+    const tmpXAxes = scales.map((s)=> {
+      if(s.type === ScaleType.ONE_TO_N){
+        return s.scale.toString();
+      } else if (s.type === ScaleType.TEXT){
+        return "Text";
+      } else if (s.type === ScaleType.BLUEPRINT_EFFECTS){
+        return "Blueprint";
+      } else {
+        return "Unknown";
+      }
+    }).map((s, i) => (
+      {
+        id: `y_axis_${s}`,
+        type: "xAxis",
+        position: { x: 0, y: i * nodeHeight * 4  + 30 },
+        draggable: false,
+        selectable: false,
+        data: {
+          width: 3100,
+          height: 900,
+          label: s.toString()
+        }
+      } as Node
+    ));
+    setAxes([...tmpYAxes, ...tmpXAxes]);
     let node_list: Node[] = props.documents
       .filter((d) => d._id !== undefined)
       .map((d) => {
@@ -161,8 +179,9 @@ function Flow(props: FlowProps) {
             x: Math.floor(Math.random() * 300),
           },
           data: {
-            label: d.issuance_date.from,
-            date: d.issuance_date.from
+            label: d.scale.type,
+            date: d.issuance_date.from,
+            scale: d.scale,
           },
         };
       });
@@ -189,7 +208,6 @@ function Flow(props: FlowProps) {
     setNodes(layoutedNodes);
     setEdges(layoutedEdges);
   }, [props.documents]);
-
   const onConnect = useCallback(
     (params: any) =>
       setEdges((eds) =>
@@ -210,6 +228,9 @@ function Flow(props: FlowProps) {
     },
     [nodes, edges]
   );
+  useMemo(() => {
+    setScales([...scales_const, ...aggregateData.scales.map((s) => {return {type: ScaleType.ONE_TO_N, scale: s} as Scale})]);
+  }, [aggregateData]);
   return (
     <ReactFlow
       nodes={nodes.concat(axes)}

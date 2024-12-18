@@ -36,21 +36,21 @@ export function XAxis({ data }: NodeProps<Axes>) {
     return (
         <div
             style={{
-                width: data.width,
-                height: data.height,
+            width: data.width,
+            height: data.height,
+            marginLeft: -100,
             }}
         >
-            <p>{data.label}</p>
+            <p className='ml-2'>{data.label}</p>
             <div
                 style={{
-                    background: "#c0c8d2",
                     height: 2.5,
                     width: data.width,
-                    borderRadius: 999
+                    borderRadius: 999,
+                    borderTop: "2.5px dashed #c0c8d2"
                 }}
             >
             </div>
         </div>
     );
 }
- 
