@@ -1,7 +1,7 @@
 
 import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine, RiAddBoxLine, RiInfoI } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
-import { FormDialog, FormDocumentDescription, FormDocumentInformation } from "../form/Form";
+import { FormDialog, FormDocumentDescription, FormDocumentInformation, FormDocumentConnections } from "../form/Form";
 import { FileUpload } from "../form/DragAndDrop";
 import DeleteResourceDialog from './DeleteResourcesDialog';
 import API from '../../API';
@@ -46,8 +46,6 @@ interface FormDialogProps {
 }
 
 
-
-
 export default function Document({ user }: DocumentProps) {
     const formatLocalDate = (date: Date) => {
         return date.toLocaleDateString('sv-SE'); // 'sv-SE' è un formato ISO-like
@@ -74,10 +72,10 @@ export default function Document({ user }: DocumentProps) {
     const [entireMunicipality, setEntireMunicipality] = useState(false);
     const [docCoordinates, setDocCoordinates] = useState<DocCoords | undefined>(undefined);
     const [documents, setDocuments] = useState<KxDocument[]>([]);
-    const [documentsForDirect, setDocumentsForDirect] = useState<KxDocument[]>([]);
-    const [documentsForCollateral, setDocumentsForCollateral] = useState<KxDocument[]>([]);
-    const [documentsForProjection, setDocumentsForProjection] = useState<KxDocument[]>([]);
-    const [documentsForUpdate, setDocumentsForUpdate] = useState<KxDocument[]>([]);
+    const [documentsForDirect, setDocumentsForDirect] = useState<string[]>([]);
+    const [documentsForCollateral, setDocumentsForCollateral] = useState<string[]>([]);
+    const [documentsForProjection, setDocumentsForProjection] = useState<string[]>([]);
+    const [documentsForUpdate, setDocumentsForUpdate] = useState<string[]>([]);
     const [saveDrawing, setSaveDrawing] = useState(false);
     const [files, setFiles] = useState<File[]>([]);
     const [updateHideMap, setUpdateHideMap] = useState(false);
@@ -126,7 +124,9 @@ export default function Document({ user }: DocumentProps) {
         const fetchDocument = async () => {
             try {
                 const document = await API.getKxDocumentById(new mongoose.Types.ObjectId(id!));
+                const docs = await API.getAllKxDocuments();
                 setDoc(document);
+                setDocuments(docs);
                 setTitle(document.title);
                 setStakeholders(document.stakeholders);
                 setScale(document.scale as ScaleOneToN);
@@ -136,10 +136,10 @@ export default function Document({ user }: DocumentProps) {
                 setPages(document.pages || undefined);
                 setDescription(document.description || undefined);
                 setDocCoordinates(document.doc_coordinates as DocCoords);
-                setDocumentsForDirect(await Promise.all(document.connections.direct.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
-                setDocumentsForCollateral(await Promise.all(document.connections.collateral.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
-                setDocumentsForProjection(await Promise.all(document.connections.projection.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
-                setDocumentsForUpdate(await Promise.all(document.connections.update.map(async (doc) => await API.getKxDocumentById(new mongoose.Types.ObjectId(doc.toString())))));
+                setDocumentsForDirect(document.connections.direct.map((doc) => doc.toString()));
+                setDocumentsForCollateral(document.connections.collateral.map((doc) => doc.toString()));
+                setDocumentsForProjection(document.connections.projection.map((doc) => doc.toString()));
+                setDocumentsForUpdate(document.connections.update.map((doc) => doc.toString()));
                 setPageRanges([]);
 
 
@@ -262,6 +262,7 @@ export default function Document({ user }: DocumentProps) {
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
     const [selectedResource, setSelectedResource] = useState<string>("");
     const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
+    const [isUpdateConnectionsOpen, setIsUpdateConnectionsOpen] = useState(false);
 
     return (
         <div>
@@ -428,7 +429,7 @@ export default function Document({ user }: DocumentProps) {
                                         </div>
                                     )) : <>
                                         <div className="flex items-center justify-between m-2">
-                                            <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No original resources added</i>
+                                            <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No original resources added</i>
                                         </div>
                                     </>}
 
@@ -446,7 +447,7 @@ export default function Document({ user }: DocumentProps) {
                             <AccordionBody className="leading-6 flex flex-col">
                                 <AccordionList style={{ boxShadow: 'none' }}>
                                     <div className="flex items-center justify-between m-2">
-                                        <i className='font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>No more documents added</i>
+                                        <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No more documents added</i>
                                     </div>
 
                                 </AccordionList>
@@ -526,7 +527,19 @@ export default function Document({ user }: DocumentProps) {
                 <div className="flex flex-col space-y-2 ">
                     <div className="flex flex-row">
                         <h3 className="text-l font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Connections</h3>
-                        {canEdit && <i className="ml-2" /*onClick={() => setIsOpen(true)}*/><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong " /></i>}
+                        <FormConnectionsDialog
+                            documents={documents}
+                            documentsForDirect={documentsForDirect}
+                            documentsForCollateral={documentsForCollateral}
+                            documentsForProjection={documentsForProjection}
+                            documentsForUpdate={documentsForUpdate}
+                            setDocumentsForDirect={setDocumentsForDirect}
+                            setDocumentsForCollateral={setDocumentsForCollateral}
+                            setDocumentsForProjection={setDocumentsForProjection}
+                            setDocumentsForUpdate={setDocumentsForUpdate}
+                            id={id!}
+                            user={user}
+                        ></FormConnectionsDialog>
                     </div>
 
                     <div className="flex flex-col lg:flex-row ">
@@ -536,7 +549,7 @@ export default function Document({ user }: DocumentProps) {
                                 <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Direct connections</AccordionHeader>
                                 <AccordionBody className="leading-6 flex flex-col">
                                     <AccordionList style={{ boxShadow: 'none' }}>
-                                        {documentsForDirect.length > 0 ? documentsForDirect.map((doc) => (
+                                        {documentsForDirect.length > 0 ? documents.filter((d) => documentsForDirect.includes(d._id!.toString())).map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                                 <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
                                                 <Button
@@ -545,11 +558,9 @@ export default function Document({ user }: DocumentProps) {
                                                     onClick={() => window.open("/documents/" + doc._id)}
                                                 />
                                             </div>
-                                        )) : <>
-                                            <div className="flex items-center justify-around m-2">
-                                                <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No direct connections added</i>
-                                            </div>
-                                        </>}
+                                        )) : <div className="flex items-center justify-around m-2">
+                                            <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>No direct connections added</i>
+                                        </div>}
                                     </AccordionList>
                                 </AccordionBody>
                             </Accordion>
@@ -559,7 +570,7 @@ export default function Document({ user }: DocumentProps) {
                                 <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Collateral connections</AccordionHeader>
                                 <AccordionBody className="leading-6 flex flex-col">
                                     <AccordionList style={{ boxShadow: 'none' }}>
-                                        {documentsForCollateral.length > 0 ? documentsForCollateral.map((doc) => (
+                                        {documentsForCollateral.length > 0 ? documents.filter((d) => documentsForCollateral.includes(d._id!.toString())).map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                                 <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
                                                 <Button
@@ -582,7 +593,7 @@ export default function Document({ user }: DocumentProps) {
                                 <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Projection connections</AccordionHeader>
                                 <AccordionBody className="leading-6 flex flex-col">
                                     <AccordionList style={{ boxShadow: 'none' }}>
-                                        {documentsForProjection.length > 0 ? documentsForProjection.map((doc) => (
+                                        {documentsForProjection.length > 0 ? documents.filter((d) => documentsForProjection.includes(d._id!.toString())).map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                                 <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
                                                 <Button
@@ -605,7 +616,7 @@ export default function Document({ user }: DocumentProps) {
                                 <AccordionHeader className="text-sm font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong">Update connections</AccordionHeader>
                                 <AccordionBody className="leading-6 flex flex-col">
                                     <AccordionList style={{ boxShadow: 'none' }}>
-                                        {documentsForUpdate.length > 0 ? documentsForUpdate.map((doc) => (
+                                        {documentsForUpdate.length > 0 ? documents.filter((d) => documentsForUpdate.includes(d._id!.toString())).map((doc) => (
                                             <div key={doc._id?.toString()} className="flex items-center justify-between m-2">
                                                 <i className='font-medium text-tremor-content dark:text-dark-tremor-content'>{doc.title} </i>
 
@@ -978,6 +989,128 @@ export function FormDescriptionDialog(
         </>
     );
 }
+
+export function FormConnectionsDialog({
+    documents,
+    documentsForDirect,
+    documentsForCollateral,
+    documentsForProjection,
+    documentsForUpdate,
+    setDocumentsForDirect,
+    setDocumentsForCollateral,
+    setDocumentsForProjection,
+    setDocumentsForUpdate,
+    id,
+    user
+}: {
+    documents: KxDocument[];
+    documentsForDirect: string[];
+    documentsForCollateral: string[];
+    documentsForProjection: string[];
+    documentsForUpdate: string[];
+    setDocumentsForDirect: React.Dispatch<React.SetStateAction<string[]>>;
+    setDocumentsForCollateral: React.Dispatch<React.SetStateAction<string[]>>;
+    setDocumentsForProjection: React.Dispatch<React.SetStateAction<string[]>>;
+    setDocumentsForUpdate: React.Dispatch<React.SetStateAction<string[]>>;
+    id: string;
+    user: { email: string; role: Stakeholders } | null;
+}) {
+
+    const [isOpen, setIsOpen] = useState(false);
+    const [error, setError] = useState("");
+    const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
+    const [showConnectionsInfo, setShowConnectionsInfo] = useState(false);
+
+    const handleConnectionsSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        try {
+            const updatedDocument = await API.updateKxDocumentConnections(id, documentsForDirect, documentsForCollateral, documentsForProjection, documentsForUpdate);
+            if (updatedDocument) {
+                toast({
+                    title: "Success",
+                    description:
+                        "The connections have been updated successfully",
+                    variant: "success",
+                    duration: 3000,
+                })
+            } else {
+                throw new Error("Failed to update connections");
+            }
+        } catch (error: any) {
+            toast({
+                title: "Error",
+                description: "Failed to update connections",
+                variant: "error",
+                duration: 3000,
+            })
+        }
+        setIsOpen(false);
+    };
+
+    const handleConnectionsCancel = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+
+        setIsOpen(false);
+    }
+
+    return (
+        <>
+            {canEdit && <i className="ml-2 mb-2 w-full flex justify-start" onClick={() => setIsOpen(true)}><RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>}
+            <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
+                <DialogPanel
+                    className="w-80vm sm:w-4/5 md:w-4/5 lg:w-3/3 xl:w-1/2"
+                    style={{ maxWidth: "80vw" }}
+                >
+                    <div className="sm:mx-auto sm:max-w-2xl">
+                        <h3 className="text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">
+                            Update connections
+                        </h3>
+                        <p className="mt-1 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content">
+                            Update the connections of the document
+                        </p>
+                        <form action="" method="patch" className="mt-8">
+                            <FormDocumentConnections
+                                documents={documents}
+                                documentsForDirect={documentsForDirect}
+                                setDocumentsForDirect={setDocumentsForDirect}
+                                documentsForCollateral={documentsForCollateral}
+                                setDocumentsForCollateral={setDocumentsForCollateral}
+                                documentsForProjection={documentsForProjection}
+                                setDocumentsForProjection={setDocumentsForProjection}
+                                documentsForUpdate={documentsForUpdate}
+                                setDocumentsForUpdate={setDocumentsForUpdate}
+                                showConnectionsInfo={showConnectionsInfo}
+                                setShowConnectionsInfo={setShowConnectionsInfo}
+                            />
+                            <div className="mt-8 flex flex-col-reverse sm:flex-row sm:space-x-4 sm:justify-end">
+                                <Button
+                                    className="w-full sm:w-auto mt-4 sm:mt-0 secondary"
+                                    variant="light"
+                                    onClick={(e) => handleConnectionsCancel(e)}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    className="w-full sm:w-auto primary"
+                                    onClick={e => handleConnectionsSubmit(e)}
+                                >
+                                    Submit
+                                </Button>
+                            </div>
+                        </form>
+                    </div>
+                </DialogPanel>
+            </Dialog>
+            <Toaster />
+        </>
+    );
+
+
+
+}
+
+
 
 
 
