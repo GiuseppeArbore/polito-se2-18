@@ -2,7 +2,7 @@ import { describe, test } from "@jest/globals"
 import request from 'supertest';
 import { app } from "../index";
 import { AreaType, KxDocumentType, ScaleType, Stakeholders } from "../src/models/enum";
-import { KxDocument, ScaleOneToN } from "../src/models/model";
+import { Connections, KxDocument, ScaleOneToN } from "../src/models/model";
 import { db } from "../src/db/dao";
 import { KIRUNA_COORDS } from "../src/utils";
 import { mongoose } from "@typegoose/typegoose";
@@ -513,6 +513,19 @@ describe("Integration Tests for Document API", () => {
             .send();
 
         expect(response.status).toBe(404);
+    });
+    test('Test 20 - update document connections', async () => {
+        const response = await request(app)
+            .put(`/api/documents/${documentIds[0]}/connections`)
+            .set("Cookie", urbanPlannerCookie)
+            .send({
+                direct: [documentIds[1]],
+                collateral: [],
+                projection: [],
+                update: []
+            } as Connections);
+
+        expect(response.status).toBe(200);
     });
 });
 
