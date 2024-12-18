@@ -746,14 +746,30 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
 
 
     useEffect(() => {
-
-        const offsetDistance = 0.0001; // offsetDistance
-        const pointsAndCentroids = getPointsAndCentroids(
-            props.drawing,
-            offsetDistance
-        );
-
         if (mapRef.current) return;
+        if (props.drawing) {
+            mapRef.current = new mapboxgl.Map({
+                container: mapContainerRef.current,
+                style: mapStyle,
+                center: center,
+                zoom: defaultZoom,
+                pitch: 40,
+                interactive: true,
+            });
+
+            mapRef.current?.on("load", function () {
+                if (mapRef.current) {
+                    mapRef.current.addControl(PreviewMapDraw, "bottom-right");
+                    if (props.drawing) {
+                        loadMapData(mapRef.current, props.drawing);
+                    }
+                }
+            });
+        }
+    }, [props.drawing]);
+
+    useEffect(() => {
+
         if (props.drawing) {
             const currentCenter = mapRef.current?.getCenter();
             const currentZoom = mapRef.current?.getZoom();
@@ -778,7 +794,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
                 }
             });
         }
-    }, [props.drawing, mapStyle]);
+    }, [mapStyle]);
 
     useEffect(() => {
         if (!mapRef.current) return;
@@ -789,22 +805,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
 
     return (
         <>
-            {canEdit && (
-                <div
-                    style={{ position: "absolute", top: "10px", left: "10px", zIndex: 1 }}
-                >
-                    <Button
-                        style={{
-                            backgroundColor: "white",
-                            color: "black",
-                            borderColor: "transparent",
-                        }}
-                        className="ring-0"
-                        icon={RiEditBoxLine}
-                        onClick={() => setIsOpen(true)}
-                    />
-                </div>
-            )}
+           
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
                 <DialogPanel
                     className="p-0 overflow-hidden"
