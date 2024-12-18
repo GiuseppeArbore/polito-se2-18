@@ -672,6 +672,7 @@ export default function Document({ user }: DocumentProps) {
                         <Card className={`my-4 p-0 overflow-hidden cursor-pointer ${"ring-tremor-ring"}`}>
                             <DocumentPageMap
                                 drawing={drawings}
+                                setDrawing={setDrawings}
                                 style={{ minHeight: "300px", width: "100%" }}
                                 user={user}
                             />
