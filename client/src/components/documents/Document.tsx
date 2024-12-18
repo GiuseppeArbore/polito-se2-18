@@ -238,6 +238,7 @@ export default function Document({ user }: DocumentProps) {
                         variant: "success",
                         duration: 3000,
                     });
+                    window.location.reload();
                 } else {
                     console.log("Error toast should appear");
                     toast({
@@ -817,7 +818,7 @@ export function FormInfoDialog({
     return (
         <>
             {canEdit && (
-                <i className="ml-auto self-end mb-2 mt-4 lg:mb-0 lg:ml-4 lg:self-center lg:mt-0" onClick={() => setIsOpen(true)}>
+                <i className="ml-auto self-end mb-2 mt-4 lg:mb-0 lg:ml-4 lg:mt-0" onClick={() => setIsOpen(true)}>
                     <RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong lg:me-6" />
                 </i>
             )}
@@ -1219,7 +1220,10 @@ export function FormCoordinatesDialog(
                                 </Button>
                                 <Button
                                     className="w-full sm:w-auto primary"
-                                    onClick={handleSaveDrawing}
+                                    onClick={(e) => {
+                                        e.preventDefault();
+                                        handleSaveDrawing();
+                                    }}
                                     disabled={!drawing || !drawing.features[0] && !updateHideMap}
                                 >
                                     Submit
