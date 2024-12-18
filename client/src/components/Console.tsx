@@ -191,7 +191,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
 
                             </Col>
                         }
-                        {(showSideBar || windowWidth <= 1024) &&
+                        {((showSideBar &&  selectedView === 2)) &&
                             <Col className="w-full h-full">
                                 <Card className="p-4 h-full">
                                     <div className="flex justify-center items-center mb-2">
