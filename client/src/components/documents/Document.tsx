@@ -288,7 +288,7 @@ export default function Document({ user }: DocumentProps) {
                         <div className="flex items-center justify-between mb-2 space-x-2">
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Scale:</i>
                             <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-                                {scale?.type === ScaleType.ONE_TO_N ? `1: ${scale?.scale}` : scale?.type ?? 'Unknown Scale'}
+                            {scale.type === ScaleType.ONE_TO_N ? `1: ${scale.scale}` : scale.type}
                             </i>
                         </div>
 
@@ -1033,14 +1033,16 @@ export function FormCoordinatesDialog(
 
     return (
         <>
-            {canEdit && (
+            
                 <div className="flex items-center pt-3">
-                    <h3 className="text-l font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Map</h3>
+                    <h3 className="text-l font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Geolocalization</h3>
+                    {canEdit && (
                     <i className="ml-2 flex justify-end" onClick={() => setIsOpen(true)}>
                         <RiEditBoxLine className="text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" />
                     </i>
+                    )}
                 </div>
-            )}
+            
 
             <Dialog open={isOpen} onClose={() => handleCoordinatesCancel(false)} static={true}>
                 <DialogPanel
