@@ -1254,7 +1254,11 @@ const MapControls: React.FC<
                                                 <DropdownMenuItem
 
                                                     key={index}
-                                                    onMouseEnter={() => setSelectedTitle(doc.title)}
+                                                    onMouseEnter={() => {
+                                                        const coordinates = (doc.doc_coordinates as Polygon).coordinates.flat(2);
+                                                        props.flyTo(str2pos([coordinates[0].toString(), coordinates[1].toString()]) as LngLatLike);
+                                                        setSelectedTitle(doc.title)
+                                                    } }
                                                     className='input-dropdown-area-item'
                                                 >
                                                     {doc.title}
