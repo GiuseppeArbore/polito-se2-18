@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/tailwindcss": "^0.2.1",
     "@heroicons/react": "1.0.6",
     "@internationalized/date": "^3.6.0",
     "@mapbox/mapbox-gl-draw": "^1.4.3",

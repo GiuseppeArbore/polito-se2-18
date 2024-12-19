@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { db } from './db/dao';
-import { KxDocumentModel, KxDocument, DocInfo, KxDocumentAggregateData } from './models/model';
+import { KxDocumentModel, KxDocument, DocInfo, KxDocumentAggregateData, Connections } from './models/model';
 import { mongoose } from '@typegoose/typegoose';
 import { getPresignedUrl, kxObjectStorageClient, KxObjectStorageCommands } from './object_storage/bucket';
 import { PutObjectCommandOutput, S3ServiceException } from '@aws-sdk/client-s3';
@@ -11,6 +11,7 @@ import { KxDocumentType, Stakeholders } from './models/enum';
 export const createKxDocument = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {
         const document = await KxDocumentModel.create(req.body);
+        //const document = req.body as KxDocument;
         const createdDocument = await db.createKxDocument(document);
 
         if (createdDocument) {
@@ -197,6 +198,21 @@ export const updateKxDocumentInfo = async (req: Request, res: Response, next: Ne
         const id = new mongoose.Types.ObjectId(req.params.id);
         const info = req.body as DocInfo;
         const updatedDocument = await db.updateKxDocumentInfo(id, info);
+        if (updatedDocument) {
+            res.status(200).json(updatedDocument);
+        } else {
+            res.status(404).json("Document not found");
+        }
+    } catch (error) {
+        next(error);
+    }
+}
+
+export const updateKxDocumentConnections = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+    try {
+        const id = new mongoose.Types.ObjectId(req.params.id);
+        const connections = req.body as Connections;
+        const updatedDocument = await db.updateKxDocumentConnections(id, connections);
         if (updatedDocument) {
             res.status(200).json(updatedDocument);
         } else {

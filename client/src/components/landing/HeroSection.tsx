@@ -9,7 +9,7 @@ import "../../css/herosection.css"
 
 
 
-const HeroSection: React.FC<{ user: { email: string; role: Stakeholders } | null }> = ({ user }) => {
+function HeroSection() {
     return (
         <section className="hero-section">
             <div className="hero-section-content">
