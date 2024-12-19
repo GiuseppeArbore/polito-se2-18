@@ -1,5 +1,5 @@
 import { mongoose } from '@typegoose/typegoose';
-import { KxDocument, KxDocumentAggregateData, PageRange, Scale } from './model';
+import { KxDocument, KxDocumentAggregateData, PageRange, Scale, Connections } from './model';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -148,6 +148,39 @@ const updateKxDocumentDescription = async (documentId: string, description: stri
         }
     }
 };
+
+const updateKxDocumentConnections = async (documentId: string, documentsForDirect: string[], documentsForCollateral: string[], documentsForProjection: string[], documentsForUpdate: string[]): Promise<KxDocument | null> => {
+    try {
+        const connections: Connections = {
+            direct: documentsForDirect.map(id => new mongoose.Types.ObjectId(id)),
+            collateral: documentsForCollateral.map(id => new mongoose.Types.ObjectId(id)),
+            projection: documentsForProjection.map(id => new mongoose.Types.ObjectId(id)),
+            update: documentsForUpdate.map(id => new mongoose.Types.ObjectId(id)),
+        };
+        const response = await fetch(API_URL + `/documents/${documentId}/connections`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify({ connections }),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+
+        const data: KxDocument = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to update document: ${error.message}`);
+        } else {
+            throw new Error('Failed to update document: Unknown error');
+        }
+    }
+};
+
 const getKxFileByID = async (id: mongoose.Types.ObjectId, fileName: string): Promise<{ presignedUrl: string }> => {
     try {
         const response = await fetch(API_URL + `/documents/${id}/presignedUrl/${fileName}`, {
@@ -254,7 +287,6 @@ const deleteAttachmentFromDocument = async (id: mongoose.Types.ObjectId, fileNam
     }
 }
 
-
 interface Credentials {
     username: string;
     password: string;
@@ -304,5 +336,6 @@ const logout = async () => {
     }
 };
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument, deleteAttachmentFromDocument, login, getUserInfo, logout, getKxDocumentsAggregateData };
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, updateKxDocumentConnections, getKxFileByID, addAttachmentToDocument, deleteAttachmentFromDocument, login, getUserInfo, logout, getKxDocumentsAggregateData };
+
 export default API;

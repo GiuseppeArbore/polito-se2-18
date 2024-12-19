@@ -1,5 +1,11 @@
 import "ag-grid-enterprise";
-import { AdvancedFilterModel, ColDef, GridApi, GridOptions, ValueGetterParams } from "ag-grid-enterprise";
+import {
+    AdvancedFilterModel,
+    ColDef,
+    GridOptions,
+    SizeColumnsToContentStrategy,
+    ValueGetterParams,
+} from "ag-grid-enterprise";
 import { AgGridReact } from "ag-grid-react";
 import "ag-grid-community/styles/ag-grid.css";
 import "ag-grid-community/styles/ag-theme-quartz.css";
@@ -22,9 +28,8 @@ interface ListProps {
     updateFilterModel: (filterModel: AdvancedFilterModel | undefined) => void;
     filterModel: AdvancedFilterModel | undefined;
     quickFilter: string;
-    user: { email: string; role: Stakeholders } | null;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }
-
 
 function List(props: ListProps) {
     const navigator = useNavigate();
@@ -36,7 +41,7 @@ function List(props: ListProps) {
     }, []);
     const [deleteConfirm, setDeleteConfirm] = useState(false);
     const rowNode = useRef<any>();
-    const infoButton = (params: any) => {
+    const infoButton = (params: any, user: any) => {
         return (
             <Flex justifyContent="evenly" className="mt-1">
                 <Button
@@ -44,7 +49,7 @@ function List(props: ListProps) {
                     icon={RiInfoI}
                     onClick={() => navigator("/documents/" + params.value)}
                 />
-                {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
+                {user && user.role === Stakeholders.URBAN_PLANNER && (
                     <Button
                         style={{ backgroundColor: "red" }}
                         color="red"
@@ -73,6 +78,7 @@ function List(props: ListProps) {
             </div>
         );
     };
+
     const KxColDefs: ColDef<KxDocument>[] = [
         {
             headerName: "Title",
@@ -80,14 +86,22 @@ function List(props: ListProps) {
             enableRowGroup: false,
             filter: true,
             sortable: true,
+            getQuickFilterText: param => {
+              return param.value;
+            },
         },
-        { headerName: "Type", field: "type", enableRowGroup: true, filter: true },
+        { headerName: "Type", field: "type", enableRowGroup: true, filter: true, getQuickFilterText: () => {
+          return "";
+        }, },
         {
             headerName: "Stakeholders",
             field: "stakeholders",
             enableRowGroup: false,
             filter: true,
             cellRenderer: (params: any) => StakeholdersRenderer(params),
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Scale",
@@ -105,12 +119,14 @@ function List(props: ListProps) {
                 }
             },
             hide: true,
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Issuance Date",
             field: "issuance_date",
             filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
-
                 if (params.data && params.data.issuance_date) {
                     const { from, to } = params.data.issuance_date;
                     if (from && to) {
@@ -121,7 +137,9 @@ function List(props: ListProps) {
                 }
                 return "";
             },
-            valueFormatter: (params: { value: { from: string | number, to?: string | number } }) => {
+            valueFormatter: (params: {
+                value: { from: string | number; to?: string | number };
+            }) => {
                 if (params.value) {
                     const { from, to } = params.value;
                     if (from && to) {
@@ -133,6 +151,9 @@ function List(props: ListProps) {
                 return "";
             },
             hide: true,
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Area Type",
@@ -151,6 +172,9 @@ function List(props: ListProps) {
                 }
                 return "";
             },
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Language",
@@ -158,12 +182,17 @@ function List(props: ListProps) {
             enableRowGroup: true,
             filter: true,
             filterValueGetter: (params: ValueGetterParams<KxDocument, any>) => {
-                return locales.find((l) => params.data && l.code === params.data.language)?.name;
+                return locales.find(
+                    (l) => params.data && l.code === params.data.language
+                )?.name;
             },
             valueFormatter: (params: { value: string | number }) => {
                 return locales.find((l) => l.code === params.value)?.name || "";
             },
             hide: true,
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Pages",
@@ -171,17 +200,25 @@ function List(props: ListProps) {
             enableRowGroup: false,
             filter: true,
             hide: true,
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Controls",
             field: "_id",
             minWidth: 30,
             enableRowGroup: false,
-            cellRenderer: (params: any) => infoButton(params),
+            cellRenderer: (params: any) => infoButton(params, props.user.current),
             filter: false,
+            getQuickFilterText: () => {
+              return "";
+            }
         },
     ];
-
+    useMemo(() => {
+        gridRef.current?.api.setGridOption('columnDefs', KxColDefs);
+    }, [props.user.current]);
     const autoGroupColumnDef = {
         sortable: false,
         headerName: "Group",
@@ -198,16 +235,16 @@ function List(props: ListProps) {
             resizable: true,
             sortable: true,
             enableRowGroup: true,
-            filterParams: { newRowsAction: 'keep' }
+            filterParams: { newRowsAction: "keep" },
         },
         statusBar: {
             statusPanels: [
-                { statusPanel: 'agTotalAndFilteredRowCountComponent' },
-                { statusPanel: 'agTotalRowCountComponent' },
-                { statusPanel: 'agFilteredRowCountComponent' },
-                { statusPanel: 'agSelectedRowCountComponent' },
-                { statusPanel: 'agAggregationComponent' }
-            ]
+                { statusPanel: "agTotalAndFilteredRowCountComponent" },
+                { statusPanel: "agTotalRowCountComponent" },
+                { statusPanel: "agFilteredRowCountComponent" },
+                { statusPanel: "agSelectedRowCountComponent" },
+                { statusPanel: "agAggregationComponent" },
+            ],
         },
         sideBar: {
             toolPanels: [
@@ -249,10 +286,14 @@ function List(props: ListProps) {
     function onFilterChanged() {
         let rowData: (KxDocument | undefined)[] = [];
         gridRef.current?.api?.forEachNodeAfterFilter((node) => {
-            rowData.push(node.data)
+            rowData.push(node.data);
         });
-        props.updateDocuments(rowData.filter((doc): doc is KxDocument => doc !== undefined));
-        props.updateFilterModel(gridRef.current?.api?.getAdvancedFilterModel() || undefined);
+        props.updateDocuments(
+            rowData.filter((doc): doc is KxDocument => doc !== undefined)
+        );
+        props.updateFilterModel(
+            gridRef.current?.api?.getAdvancedFilterModel() || undefined
+        );
         gridRef.current?.api?.sizeColumnsToFit();
     }
 
@@ -268,11 +309,20 @@ function List(props: ListProps) {
         params.api.sizeColumnsToFit();
     }
 
+    const autoSizeStrategy: SizeColumnsToContentStrategy = {
+        type: "fitCellContents",
+    };
+
     return (
         <>
             <div
                 className={"ag-theme-quartz-auto-dark right-0 left-0 ring-0"}
-                style={{ width: "100%", height: "100%", minHeight: "70vh", overflow: "auto" }}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    minHeight: "70vh",
+                    overflow: "auto",
+                }}
             >
                 <AgGridReact
                     onViewportChanged={addFilterModel}
@@ -288,9 +338,7 @@ function List(props: ListProps) {
                     quickFilterText={props.quickFilter}
                     onRowDataUpdated={onFilterChanged}
                     onModelUpdated={onFilterChanged}
-
-
-
+                    autoSizeStrategy={autoSizeStrategy}
                 />
             </div>
 

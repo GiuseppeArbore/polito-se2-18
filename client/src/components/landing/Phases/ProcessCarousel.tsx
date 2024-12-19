@@ -1,42 +1,67 @@
 import { Swiper, SwiperSlide } from "swiper/react";
+import { useState } from "react";
+import ReactPlayer from "react-player";
+import { Card } from '@tremor/react';
 import { Navigation, Pagination } from "swiper/modules";
 import "swiper/swiper-bundle.css";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
 import "./ProcessCarousel.css";
+// Adjust the import path as necessary
 
 const ProcessCarousel = () => {
+    const [enlargedCard, setEnlargedCard] = useState<number | null>(null);
+
     const slides = [
         {
-            title: "Research and analysis of the documents",
-            description: "",
-            image: "/home/phase1.png",
+            title: "Where is Kiruna?",
+            description: "Kiruna is the northernmost city in Sweden, situated in the province of Lapland, was founded in 1900. The city was originally built in the 1890s to serve the Kiruna Mine.",
+            video: <ReactPlayer url="https://youtu.be/tBeTpJUX_DI" width='100%' height='100%' />,
         },
         {
-            title: "Trip to Kiruna",
-            description:
-                "Including Reorganization of documents through interviews and site visits",
-            image: "/home/phase2-1.png",
+            title: "Northern Lights (Aurora Borealis)",
+            description: "Aurora hunting with reindeer sledding",
+            cards: [
+                {
+                    image: "/home/northern-lights.png",
+                },
+            ],
         },
         {
-            title: "Trip to Kiruna",
-            description: "Drafting the tales",
-            image: "/home/phase2-2.png",
+            title: "Abisko National Park",
+            description: "A beautiful national park known for its natural beauty",
+            cards: [
+
+                {
+
+                    image: "/home/abisko-national-park.png",
+                },
+            ],
         },
         {
-            title: "Trip to Kiruna",
-            description: "Reorganizing the stories into a hypertext",
-            image: "/home/phase2-3.png",
+            title: "Lake Torneträsk",
+            description: "One of the largest lakes in Sweden, located in the Lapland province",
+            cards: [
+                {
+
+                    image: "/home/lake-tornetrask.png",
+                },
+            ],
         },
         {
-            title: "Design a web app for Kiruna kommun",
-            description: "",
-            image: "/home/phase3.png",
+            title: "Kiruna Movement (Why? Plan and Future)",
+            description: "The Swedish town of Kiruna will be moved building by building to a new location in the country due to years of mining that have caused it to sink into the ground.Valuable minerals have also been found in and around it, including Europe's largest deposit of rare earth minerals, used to make green technologies.",
+            video: <ReactPlayer url="https://youtu.be/XMJWFfebEF4" width='100%' height='100%' />,
         },
+
     ];
 
+    const handleCardClick = (index: number) => {
+        setEnlargedCard(enlargedCard === index ? null : index);
+    };
+
     return (
-        <div className="process-carousel text-white max-w-screen-xl mx-auto">
+        <div className="process-carousel text-white max-w-screen-xl mx-auto flex-grow">
             <Swiper
                 modules={[Navigation, Pagination]}
                 slidesPerView={1}
@@ -48,7 +73,7 @@ const ProcessCarousel = () => {
                         key={index}
                         className="flex flex-col lg:flex-row items-center justify-between gap-2 p-2"
                     >
-                        <div className="w-full lg:w-1/2 text-center lg:text-center p-2 lg:p-4 ">
+                        <div className="w-full lg:w-1/3 text-center lg:text-center p-2 lg:p-4 desc-container" style={{ marginLeft: 'auto' }}>
                             <h4 className="mb-1 text-lg md:text-xl lg:text-2xl font-bold">
                                 {slide.title}
                             </h4>
@@ -59,12 +84,25 @@ const ProcessCarousel = () => {
                             )}
                         </div>
 
-                        <div className="w-full lg:w-1/2 flex justify-center">
-                            <img
-                                src={slide.image}
-                                alt={slide.title}
-                                className="w-3/4 xl:w-[14vw] 2xl:w-[20vw] h-auto object-cover rounded-lg"
-                            />
+                        <div className="w-full lg:w-1/2 flex justify-center items-center" style={{ marginRight: 'auto', minHeight: '50vh', height: 'auto' }}>
+                            {slide.video ? (
+                                <div className="w-1/2 xl:w-[35vw] 2xl:w-[40vw] h-[35vh] rounded-lg" style={{ marginBottom: '3rem', borderRadius: '0.5rem', overflow: 'hidden' }}>
+                                    <div className="w-full h-full object-cover">
+                                        {slide.video}
+                                    </div>
+                                </div>
+                            ) : slide.cards ? (
+                                <div style={{ gap: '2rem', maxWidth: '100%', maxHeight: '100%' }}>
+                                    {slide.cards.map((card, cardIndex) => (
+                                       
+                                            <img
+                                                src={card.image}
+                                                className=" images w-full h-auto h-40 md:h-50 lg:h-60 object-cover rounded-lg"
+                                            />
+                                        
+                                    ))}
+                                </div>
+                            ) : null}
                         </div>
                     </SwiperSlide>
                 ))}

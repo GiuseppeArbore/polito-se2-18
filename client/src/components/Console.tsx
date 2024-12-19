@@ -26,7 +26,7 @@ import { AdvancedFilterModel } from "ag-grid-enterprise";
 import { Stakeholders } from "../enum";
 import Flow from "./diagram/Diagram"
 interface ConsoleProps {
-    user: { email: string; role: Stakeholders } | null;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }
 
 const Console: React.FC<ConsoleProps> = ({ user }) => {
@@ -137,27 +137,25 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
 
     return (
         <main>
-            <Title className="flex items-center">
-                <Link to="/">
-                    {" "}
-                    <span title="Return to Home">
-                        <RiHome2Fill
-                            className="text-black dark:text-white animate-pulse hover:scale-110 hover:shadow-lg transition-transform duration-300 pr-3"
-                            size="32"
-                        />
-                    </span>
-                </Link>
-                Dashboard
-            </Title>
-            <Text>Explore Kiruna</Text>
-            <div className="flex items-stretch mt-6">
+            <div className="flex items-stretch mt-7">
                 <TabGroup
                     className="flex-1"
                     onIndexChange={(index) => {
                         setSelectedView(index);
                     }}
                 >
-                    <TabList>
+
+                    <div style={{ position: 'relative' }}>
+                        <div style={{ gridColumn: '11 / span 2', position: 'absolute', right: '0', marginTop: '-2.5rem' }}>
+                            <FormDialog
+                                documents={documents}
+                                refresh={() => setRefreshNeeded(true)}
+                                user={user}
+                            />
+                        </div>
+                    </div>
+
+                    <TabList style={{ marginTop: '-2.8rem' }}>
                         <Tab>Map</Tab>
                         <Tab>List</Tab>
                         <Tab>Timeline</Tab>
@@ -165,21 +163,22 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                 </TabGroup>
             </div>
 
-            <Grid numItemsLg={6} className="gap-6 mt-6">
-                <Col numColSpanLg={showSideBar ? 5 : 6}>
-                    <div className="h-full" style={{ display: 'flex', flexDirection: 'row' }}>
-                        <Col className="h-full w-full">
-                            <Card className="h-full p-0 m-0" style={{ margin: 0, padding: 0, minHeight: "500px" }}>
-                                {renderCurrentSelection(selectedView)}
-                            </Card>
-                        </Col>
-                        {!showSideBar &&
-                            <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring" role="Button">
-                                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full" /></i>
-                            </Col>
-                        }
+            <Grid numItemsLg={12} className="gap-6 mt-6">
+                <Col numColSpanLg={12}>
+                    <div className="h-full w-full" style={{ display: 'flex', flexDirection: 'row' }}>
+                        <Card
+                            className="p-0 m-0"
+                            style={{
+                                marginTop: '-1.6rem',
+                                padding: 0,
+                                minHeight: "300px",
+                                width: "100%",
+                                height: "85vh",
+                            }}
+                        >
+                            {renderCurrentSelection( setQuickFilterText, selectedView)}
+                        </Card>
                     </div>
-
                 </Col>
                 <Col numColSpanLg={1}>
                     <div className="flex flex-row ">
@@ -195,7 +194,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                                     <TextInput
                                         icon={RiSearchLine}
                                         id="quickFilter"
-                                        placeholder="Search..."
+                                        placeholder="Search by title"
                                         className="w-full"
                                         value={quickFilterText}
                                         onValueChange={(e) => {
@@ -239,22 +238,10 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                 </Col>
 
             </Grid>
-            <Card className="mt-6">
-                <div
-                    style={{
-                        display: "flex",
-                        justifyContent: "center",
-                        alignItems: "center",
-                        height: "100%",
-                    }}
-                >
-                    <div>Diagram Coming soon...</div>
-                </div>
-            </Card>
             <Toaster />
         </main>
     );
-    function renderCurrentSelection(selectedView: number = 0) {
+    function renderCurrentSelection(setQuickFilterText: (_: string) => void, selectedView: number = 0) {
         return (
             <>
                 <DashboardMap
@@ -263,15 +250,15 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         minHeight: "300px",
                         width: "100%",
                         height: "100%",
-                        borderRadius: 8,
+                        borderRadius: 4,
                         display: selectedView === 0 ? 'block' : 'none',
                     }}
                     user={user}
                     drawing={drawing}
                     entireMunicipalityDocuments={entireMunicipalityDocuments}
-                    isVisible={selectedView === 0 ? true : false}>
-
-                </DashboardMap>
+                    isVisible={selectedView === 0 ? true : false}
+                    setQuickFilterText={setQuickFilterText}
+                />
                 <div
                     className="ring-0 shadow-none"
                     style={{
