@@ -10,7 +10,7 @@ import {
     Tab,
     TextInput,
 } from "@tremor/react";
-import { RiFileFill, RiFileInfoFill, RiFileTransferFill, RiFileSettingsFill, RiDraftFill, RiShakeHandsFill, RiFileSearchFill,RiFileCheckFill,RiFileChartFill,RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine} from "@remixicon/react";
+import { RiFileFill, RiFileInfoFill, RiFileTransferFill, RiFileSettingsFill, RiDraftFill, RiShakeHandsFill, RiFileSearchFill, RiFileCheckFill, RiFileChartFill, RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine } from "@remixicon/react";
 import "../css/dashboard.css"
 import API from "../API";
 import { useState, useEffect, useMemo } from "react";
@@ -164,110 +164,117 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
             </div>
 
             <Grid numItemsLg={6} className="gap-6 mt-6">
-                <Col numColSpanLg={showSideBar ? 5 : 6}>
+                <Col numColSpanLg={showSideBar ? 5: 6}>
                     <div className="h-full" style={{ display: 'flex', flexDirection: 'row' }}>
                         <Col className="h-full w-full">
-                            <Card className="h-full p-0 m-0" style={{ margin: 0, padding: 0, minHeight: "500px" }}>
+                            <Card className="h-full p-0 m-0" style={{
+                                marginTop: '-1.5rem',
+                                padding: 0,
+                                minHeight: "300px",
+                                width: "100%",
+                                height: "83vh",
+                            }}>
                                 {renderCurrentSelection(selectedView)}
                             </Card>
                         </Col>
-                        {!showSideBar && 
-                        selectedView === 2 &&
-                            <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6 bg-[#D1DDE6] dark:bg-[#2D3748]" role="Button" >
+                        {!showSideBar &&
+                            selectedView === 2 &&
+                            <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6 bg-[#D1DDE6] dark:bg-[#2D3748]" role="Button" style={{ height: '83vh', marginTop: '-1.5rem' }} >
                                 <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full" /></i>
                             </Col>
                         }
                     </div>
                 </Col>
                 <Col numColSpanLg={1}>
-                    <div className="flex flex-row ">
+                    <div className="flex flex-row justify-center items-center" style={{
+                        marginTop: '-1.5rem',
+                        padding: 0,
+                        minHeight: "300px",
+                        width: "100%",
+                        height: "83vh",
+                    }}>
                         {showSideBar &&
-                        selectedView === 2 &&
-                            <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6 bg-[#D1DDE6] dark:bg-[#2D3748]" role="Button" style={{ marginLeft: '-1.2rem' }}>
+                            selectedView === 2 &&
+                            <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6 bg-[#D1DDE6] dark:bg-[#2D3748]" role="Button" style={{ height: '83vh',marginLeft: '-1.2rem' }}>
                                 <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full" /></i>
-
                             </Col>
                         }
-                        {((showSideBar &&  selectedView === 2)) &&
-                            <Col className="w-full h-full">
-                                <Card className="p-4 h-full">
+                        {((showSideBar && selectedView === 2)) &&
+                            <Col className="w-full h-full flex justify-center items-center">
+                                <div className="flex flex-col items-center">
                                     <div className="flex justify-center items-center mb-2">
-                                        <span className="font-semibold dark:text-white" >Legend</span>
+                                        <span className="font-semibold dark:text-white">Legend</span>
                                     </div>
-                                    <Card className="mb-4 p-4 h-1/2">
+                                    <Card className="mb-4 p-4 flex-1" style={{ width: '13rem', height: '48vh' }}>
                                         <div className="flex flex-col h-full">
                                             <div className="flex justify-center items-center mb-2">
-                                                <span className="font-semibold dark:text-white">Document Types</span>
+                                                <span className="font-semibold dark:text-white text-sm">Document Types</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <RiFileInfoFill className="mr-2" style={{ color: '#163C89' }} />
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <RiFileInfoFill className="mr-2" style={{ color: '#163C89', fontSize: '1rem' }} />
                                                 <span className="dark:text-white">Informative Document</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <RiFileTransferFill className="mr-2" style={{ color: '#163C89' }} />
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <RiFileTransferFill className="mr-2" style={{ color: '#163C89', fontSize: '1rem' }} />
                                                 <span className="dark:text-white">Prescriptive Document</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <RiFileSettingsFill className="mr-2" style={{ color: '#163C89' }} />
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <RiFileSettingsFill className="mr-2" style={{ color: '#163C89', fontSize: '1rem' }} />
                                                 <span className="dark:text-white">Technical Document</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <RiDraftFill className="mr-2" style={{ color: '#163C89' }} />
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <RiDraftFill className="mr-2" style={{ color: '#163C89', fontSize: '1rem' }} />
                                                 <span className="dark:text-white">Design Document</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <RiShakeHandsFill className="mr-2" style={{ color: '#163C89' }} />
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <RiShakeHandsFill className="mr-2" style={{ color: '#163C89', fontSize: '1rem' }} />
                                                 <span className="dark:text-white">Agreement</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <RiFileSearchFill className="mr-2" style={{ color: '#163C89' }} />
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <RiFileSearchFill className="mr-2" style={{ color: '#163C89', fontSize: '1rem' }} />
                                                 <span className="dark:text-white">Consultation</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <RiFileCheckFill className="mr-2" style={{ color: '#163C89' }} />
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <RiFileCheckFill className="mr-2" style={{ color: '#163C89', fontSize: '1rem' }} />
                                                 <span className="dark:text-white">Conflict Resolution</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <RiFileChartFill className="mr-2" style={{ color: '#163C89' }} />
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <RiFileChartFill className="mr-2" style={{ color: '#163C89', fontSize: '1rem' }} />
                                                 <span className="dark:text-white">Strategy</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <RiFileFill className="mr-2" style={{ color: '#163C89' }} />
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <RiFileFill className="mr-2" style={{ color: '#163C89', fontSize: '1rem' }} />
                                                 <span className="dark:text-white">Custom Document</span>
                                             </div>
                                         </div>
                                     </Card>
-                                    <Card className="p-4 h-1/2">
+                                    <Card className="p-4 flex-1" style={{ width: '13rem', height: '25vh' }}>
                                         <div className="flex flex-col h-full">
                                             <div className="flex justify-center items-center mb-2">
-                                                <span className="font-semibold dark:text-white">Connection Types</span>
+                                                <span className="font-semibold dark:text-white text-sm">Connection Types</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <div className="w-6 h-0.5 bg-black dark:bg-white mr-2"></div>
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <div className="w-5 h-0.5 bg-black dark:bg-white mr-2"></div>
                                                 <span className="dark:text-white">Direct consequence</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <div className="w-6 h-0.5 border-t-2 border-dashed border-black dark:border-white mr-2"></div>
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <div className="w-5 h-0.5 border-t-2 border-dashed border-black dark:border-white mr-2"></div>
                                                 <span className="dark:text-white">Collateral consequence</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <div className="w-6 h-0.5 mr-2 linea-punti"></div>
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <div className="w-5 h-0.5 mr-2 linea-punti"></div>
                                                 <span className="dark:text-white">Projection</span>
                                             </div>
-                                            <div className="flex items-center mb-2">
-                                                <div className="w-6 h-0.5 mr-2 linea-alternata"></div>
+                                            <div className="flex items-center mb-2 text-sm">
+                                                <div className="w-5 h-0.5 mr-2 linea-alternata"></div>
                                                 <span className="dark:text-white">Update</span>
                                             </div>
-
                                         </div>
                                     </Card>
-                                </Card>
+                                </div>
                             </Col>
                         }
-
                     </div>
-
-
                 </Col>
 
             </Grid>
@@ -309,9 +316,10 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         justifyContent: "center",
                         alignItems: "center",
                         height: "100%",
+                        width: 'auto'
                     }}
                 >
-                   <Flow documents={tmpDocuments}/>
+                    <Flow documents={tmpDocuments} />
                 </div>
             </>
         );
