@@ -468,7 +468,7 @@ const initializeMapLayers = async (map: mapboxgl.Map, props: SatMapProps, isKiru
                 coordinates = [feature.geometry.coordinates[0], feature.geometry.coordinates[1]];
             }
 
-            const description = `Document Title:<br> <b>${feature.properties?.title}</b>`;
+            const description = `Document Title:<br> <b>${feature.properties?.title}</b><br>Document Type:<br> <b>${feature.properties?.type}</b>`;
             const popup = new mapboxgl.Popup({ closeButton: false, closeOnClick: false })
                 .setLngLat(coordinates)
                 .setHTML(`<div class="popup-content">${description}</div>`);
