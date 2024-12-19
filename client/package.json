@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/tailwindcss": "^0.2.1",
     "@heroicons/react": "1.0.6",
     "@internationalized/date": "^3.6.0",
     "@mapbox/mapbox-gl-draw": "^1.4.3",
@@ -39,8 +40,8 @@
     "react-dropzone": "^11.4.2",
     "react-pdf-viewer": "^0.1.0",
     "react-router-dom": "^6.11.2",
-    "tailwind-variants": "^0.3.0",
-    "swiper": "^11.1.15"
+    "swiper": "^11.1.15",
+    "tailwind-variants": "^0.3.0"
   },
   "devDependencies": {
     "@tremor/react": "^3.3.0",

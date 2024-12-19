@@ -32,7 +32,7 @@ export class DateRange {
         _id: false,
     },
 })
-class Connections {
+export class Connections {
 
     @prop({ required: true, ref: () => KxDocument })
     direct!: Ref<KxDocument>[];

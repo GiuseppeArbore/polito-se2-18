@@ -86,14 +86,22 @@ function List(props: ListProps) {
             enableRowGroup: false,
             filter: true,
             sortable: true,
+            getQuickFilterText: param => {
+              return param.value;
+            },
         },
-        { headerName: "Type", field: "type", enableRowGroup: true, filter: true },
+        { headerName: "Type", field: "type", enableRowGroup: true, filter: true, getQuickFilterText: () => {
+          return "";
+        }, },
         {
             headerName: "Stakeholders",
             field: "stakeholders",
             enableRowGroup: false,
             filter: true,
             cellRenderer: (params: any) => StakeholdersRenderer(params),
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Scale",
@@ -111,6 +119,9 @@ function List(props: ListProps) {
                 }
             },
             hide: true,
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Issuance Date",
@@ -140,6 +151,9 @@ function List(props: ListProps) {
                 return "";
             },
             hide: true,
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Area Type",
@@ -158,6 +172,9 @@ function List(props: ListProps) {
                 }
                 return "";
             },
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Language",
@@ -173,6 +190,9 @@ function List(props: ListProps) {
                 return locales.find((l) => l.code === params.value)?.name || "";
             },
             hide: true,
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Pages",
@@ -180,6 +200,9 @@ function List(props: ListProps) {
             enableRowGroup: false,
             filter: true,
             hide: true,
+            getQuickFilterText: () => {
+              return "";
+            }
         },
         {
             headerName: "Controls",
@@ -188,6 +211,9 @@ function List(props: ListProps) {
             enableRowGroup: false,
             cellRenderer: (params: any) => infoButton(params, props.user.current),
             filter: false,
+            getQuickFilterText: () => {
+              return "";
+            }
         },
     ];
     useMemo(() => {

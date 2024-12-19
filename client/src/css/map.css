@@ -21,8 +21,65 @@
     /* Optional: Add border-radius for rounded corners */
 }
 
+.button-select-area {
+    background-color: white;
+    color: #4A4A4A;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border: none;
+    border-radius: 0.5rem;
+
+}
+.button-select-area:hover {
+    background-color: #f0f0f0;
+}
 .button-whole-Kiruna:hover {
     background-color: #f0f0f0;
+}
+
+.Kiruna-map-style-button {
+    background-color: white;
+    color: #4A4A4A;
+    position: absolute;
+    bottom: 2rem; /* Move to bottom */
+    right: 0.5rem; /* Move to right */
+    z-index: 1;
+    width: 1.8rem; /* Set width */
+    height: 1.8rem; /* Set height */
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    border-radius: 0.3rem; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for floating effect */
+    border: none;
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.Kiruna-map-style-button:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
+}
+
+.Kiruna-map-style-button {
+    background-color: white;
+    color: #4A4A4A;
+    position: absolute;
+    bottom: 2rem; /* Move to bottom */
+    right: 0.5rem; /* Move to right */
+    z-index: 1;
+    width: 1.8rem; /* Set width */
+    height: 1.8rem; /* Set height */
+    display: flex;
+    justify-content: center; /* Center content horizontally */
+    align-items: center; /* Center content vertically */
+    border-radius: 0.3rem; /* Rounded corners */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Box shadow for floating effect */
+    border: none;
+    transition: all 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.Kiruna-map-style-button:hover {
+    background-color: #f0f0f0;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Increased shadow on hover */
 }
 
 .popup-content {
@@ -104,7 +161,19 @@
 @media (prefers-color-scheme: dark) {
     .input-dropdown {
         background-color: #040711;
-        color: #ffffff; /* Corrected color for better contrast */
+        color: #000000; /* Corrected color for better contrast */
+    }
+    .input-dropdown-area-item {
+        background-color: #121826;
+        color: #3F67BD; /* Corrected color for better contrast */
+    }
+    .input-dropdown-area-item:hover {
+        background-color: #031130;
+        color: #93b3f7;/* Corrected color for better contrast */
+    }
+    .input-dropdown-area {
+        background-color: #121826;
+        color: #3F67BD; /* Corrected color for better contrast */
     }
 }
 
@@ -130,11 +199,59 @@
         /* Darker shadow */
     }
 
+    .button-select-area{
+        background-color: #121826;
+        border : 1px solid #3F67BD;
+        color: #3F67BD;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.5);
+    }
+
     .button-whole-Kiruna:hover,
     .Kiruna-area-button:hover,
     .quickfilter:hover {
         background-color: #333;
         /* Slightly lighter black on hover */
+    }
+
+    .button-select-area:hover {
+        background-color: #031130;
+        color: #93b3f7; 
+    }
+}
+
+.tab-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    max-width: 25rem;
+    margin: 0 auto;
+}
+
+@media (max-width: 640px) {
+    .tab-group {
+        width: 100%;
+        max-width: 25rem;
+    }
+
+    .tab-group .tab {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+    }
+
+    .tab {
+        padding: 0.5rem; /* Reduced padding */
+    }
+
+    .tab svg {
+        margin-bottom: 0.1rem; /* Reduced margin */
+        margin-left: 0.5rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
 }
 
@@ -177,5 +294,19 @@
         background-color: #4A4A4A;
         border-radius: 10px;
         border: 2px solid #1E1E1E;
+    }
+}
+
+/* Dark theme styles */
+@media (prefers-color-scheme: dark) {
+    .Kiruna-map-style-button {
+        background-color: #1a1a1a; /* Shinier black */
+        color: #E0E0E0;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5); /* Darker shadow */
+    }
+
+    .Kiruna-map-style-button:hover {
+        background-color: #333; /* Slightly lighter black on hover */
+        box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3); /* Increased shadow on hover */
     }
 }

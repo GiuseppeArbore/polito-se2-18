@@ -180,6 +180,63 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         </Card>
                     </div>
                 </Col>
+                <Col numColSpanLg={1}>
+                    <div className="flex flex-row ">
+                        {showSideBar &&
+                            <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring" role="Button">
+                                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full" /></i>
+
+                            </Col>
+                        }
+                        {(showSideBar || windowWidth <= 1024) &&
+                            <Col className="w-full">
+                                <div className="space-y-6">
+                                    <TextInput
+                                        icon={RiSearchLine}
+                                        id="quickFilter"
+                                        placeholder="Search by title"
+                                        className="w-full"
+                                        value={quickFilterText}
+                                        onValueChange={(e) => {
+                                            setQuickFilterText(e);
+
+                                        }}
+                                    ></TextInput>
+                                    <FormDialog
+                                        documents={documents}
+                                        refresh={() => setRefreshNeeded(true)}
+                                        user={user}
+                                    />
+                                    <Card>
+                                        <Metric>KIRUNA</Metric>
+                                        <Title>Quick facts</Title>
+                                        <Text>
+                                            <ul className="list-disc list-inside">
+                                                <li>20,000 inhabitants</li>
+                                                <li>Located 140 km north of the Arctic Circle</li>
+                                                <li>Lowest recorded temperature -42 °C</li>
+                                                <li>45 days of Midnight Sun each year</li>
+                                                <li>21 days of Polar Night</li>
+                                                <li>Covered in snow for 8 months each year</li>
+                                            </ul>
+                                        </Text>
+                                    </Card>
+                                    <Card className="hidden lg:block w-full h-40">
+                                        <img
+                                            src="/kiruna.png"
+                                            alt="Kiruna"
+                                            className="w-full h-full object-contain"
+                                        />
+                                    </Card>
+                                </div>
+                            </Col>
+                        }
+
+                    </div>
+
+
+                </Col>
+
             </Grid>
             <Toaster />
         </main>
