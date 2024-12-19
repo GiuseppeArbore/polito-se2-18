@@ -90,7 +90,7 @@ export default function App() {
             setError={setError}
             user={user}>
             <Routes>
-                <Route path="/" element={<Home user={user} />} />
+                <Route path="/" element={<Home/>} />
                 <Route path="/dashboard" element={<Console user={user} />} />
                 <Route path="/documents/:id" element={<Document user={user} />} />
                 <Route path="/*" element={<NotFound />} />
