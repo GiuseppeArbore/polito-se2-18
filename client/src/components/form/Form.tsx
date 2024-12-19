@@ -34,6 +34,7 @@ import {
     RiLoopLeftLine,
     RiProjector2Line,
     RiInformation2Line,
+    RiAddLine,
     RiStarFill,
 } from "@remixicon/react";
 
@@ -55,7 +56,7 @@ import { set } from "date-fns";
 interface FormDialogProps {
     documents: KxDocument[];
     refresh: () => void;
-    user: { email: string; role: Stakeholders } | null;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }
 
 
@@ -371,9 +372,11 @@ export function FormDialog(props: FormDialogProps) {
 
     return (
         <>
-            {props.user && props.user.role === Stakeholders.URBAN_PLANNER && (
-                <Button className="w-full primary" onClick={() => { setIsOpen(true); clearForm() }}>
-                    Add new document
+            { props.user.current && props.user.current.role === Stakeholders.URBAN_PLANNER && (
+                <Button className="w-full primary flex items-center" style={{ borderRadius: '0.3rem', height: '2rem', width: '11rem', marginTop: '-0.2rem' }} onClick={() => { setIsOpen(true); clearForm() }}>
+                    <span className="flex items-center">
+                        <RiAddLine className="mr-2" /> Add new document
+                    </span>
                 </Button>
             )}
             <Dialog open={isOpen} onClose={(val) => setIsOpen(val)} static={true}>
@@ -798,7 +801,7 @@ export function FormDocumentGeolocalization({
     setDrawing: React.Dispatch<React.SetStateAction<any>>,
     hideMap?: boolean,
     setHideMap: React.Dispatch<React.SetStateAction<boolean>>
-    user: { email: string; role: Stakeholders } | null;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
     setUpdateHideMap?: React.Dispatch<React.SetStateAction<boolean>>
     updateHideMap?: boolean
 }) {

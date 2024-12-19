@@ -41,6 +41,7 @@ import {
     RiArrowDownSLine,
     RiFileLine,
     RiEditBoxLine,
+    RiSearchLine,
     RiRoadMapLine,
     RiEarthLine,
     RiShapesLine
@@ -83,7 +84,8 @@ export interface SatMapProps {
     style?: React.CSSProperties;
     className?: string;
     entireMunicipalityDocuments?: KxDocument[];
-    user: { email: string; role: Stakeholders } | null;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
+    setQuickFilterText?: (text: string) => void;
 }
 
 const getPointsAndCentroids = (
@@ -506,19 +508,24 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
     const mapContainerRef = useRef<any>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
     const [isKirunaVisible, setIsKirunaVisible] = useState(false);
+    const [searchText, setSearchText] = useState('');
+    const filteredDocuments = props.entireMunicipalityDocuments?.filter((doc) =>
+        doc.title.toLowerCase().includes(searchText.toLowerCase())
+    );
     const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-streets-v12");
 
     const toggleMapStyle = () => {
         setMapStyle(mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? "mapbox://styles/mapbox/streets-v12" : "mapbox://styles/mapbox/satellite-streets-v12");
     }
 
-    const toggleKirunaVisibility = () => {
+    const toggleKirunaVisibility = (isKirunaVisible: boolean) => {
         if (mapRef.current) {
-            const visibility = isKirunaVisible ? "none" : "visible";
-            mapRef.current.setLayoutProperty("Kiruna-fill", "visibility", visibility);
-            setIsKirunaVisible(!isKirunaVisible);
+            const visibility = isKirunaVisible ? 'visible' : 'none';
+            mapRef.current.setLayoutProperty('Kiruna-fill', 'visibility', visibility);
+            setIsKirunaVisible(isKirunaVisible);
         }
     };
+
 
     useEffect(() => {
         if (mapRef.current) return;
@@ -569,6 +576,12 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
         map.setZoom(props.zoom || defaultZoom);
     }, [props.zoom]);
 
+    useEffect(() => {
+        if (!props.isVisible) {
+            props.setQuickFilterText?.('');
+        }
+    }, [props.isVisible]);
+
     return (
         <>
             <div
@@ -583,14 +596,24 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
             />
 
 
+            {props.isVisible && <TextInput
+
+                icon={RiSearchLine}
+                id="quickFilter"
+                placeholder="Search..."
+                className="quickfilter w-full"
+                onValueChange={(e) => {
+                    props.setQuickFilterText?.(e);
+
+                }}
+            ></TextInput>}
             <Button className="Kiruna-map-style-button" style={{ display: props.isVisible ? "flex" : "none" }} onClick={toggleMapStyle}>
                 {mapStyle === "mapbox://styles/mapbox/satellite-streets-v12" ? <RiRoadMapLine /> : <RiEarthLine />}
             </Button>
 
             <DropdownMenu modal={false} >
                 <DropdownMenuTrigger asChild>
-                    <Button className="button-whole-Kiruna" variant="primary" style={{ display: props.isVisible ? "flex" : "none" }} onMouseEnter={toggleKirunaVisibility}
-                        onMouseLeave={toggleKirunaVisibility}>
+                    <Button className="button-whole-Kiruna" variant="primary" style={{ display: props.isVisible ? "flex" : "none" }} onMouseEnter={() => toggleKirunaVisibility(true)} onMouseLeave={() => toggleKirunaVisibility(false)} >
                         <div style={{ display: "flex", alignItems: "center" }}>
                             Whole Kiruna: {props.entireMunicipalityDocuments?.length}
                             <RiFileLine
@@ -610,11 +633,29 @@ export const DashboardMap: React.FC<SatMapProps & { isVisible: boolean }> = (pro
                         </div>
                     </Button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent>
+                <DropdownMenuContent >
                     <DropdownMenuLabel>Documents</DropdownMenuLabel>
                     <DropdownMenuSeparator />
+                    <div style={{ padding: '0.2rem' }}>
+                        <input className='input-dropdown'
+                            type="text"
+                            placeholder="Search documents..."
+                            value={searchText}
+                            onChange={(e) => setSearchText(e.target.value)}
+                            onKeyDown={(e) => e.stopPropagation()}
+                            style={{
+                                width: '100%',
+                                height: '1.5rem',
+                                padding: '0.5rem',
+                                boxSizing: 'border-box',
+                                borderRadius: '0.5rem',
+                                fontSize: '0.75rem',
+                            }}
+                        />
+                    </div>
+                    <DropdownMenuSeparator />
                     <DropdownMenuGroup className="dropdown-menu-group light-scrollbar dark-scrollbar" style={{ maxHeight: '15rem', overflowY: 'auto' }}>
-                        {props.entireMunicipalityDocuments?.map((doc, index) => (
+                        {filteredDocuments?.map((doc, index) => (
                             <DropdownMenuItem
                                 key={index}
                                 onClick={() => (window.location.href = `/documents/${doc._id}`)}
@@ -735,7 +776,7 @@ export const DocumentPageMap: React.FC<SatMapProps & { setDrawing: (drawing: Fea
     const [drawing, setDrawing] = useState(props.drawing);
     const mapContainerRef = useRef<any>(null);
     const mapRef = useRef<mapboxgl.Map | null>(null);
-    const canEdit = props.user && props.user.role === Stakeholders.URBAN_PLANNER;
+    const canEdit = props.user.current && props.user.current.role === Stakeholders.URBAN_PLANNER;
     const [mapStyle, setMapStyle] = useState("mapbox://styles/mapbox/satellite-streets-v12");
 
     const toggleMapStyle = () => {

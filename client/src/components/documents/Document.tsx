@@ -1,5 +1,5 @@
 
-import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiHome3Line, RiEditBoxLine, RiCamera2Fill, RiFilePdf2Fill, RiDeleteBinLine, RiAddBoxLine, RiInfoI } from '@remixicon/react';
+import { RiShareLine, RiFileCopyLine, RiCheckDoubleLine, RiEditBoxLine, RiDeleteBinLine, RiAddBoxLine, RiInfoI } from '@remixicon/react';
 import { Button, Card, Dialog, DialogPanel } from '@tremor/react';
 import { FormDialog, FormDocumentDescription, FormDocumentInformation, FormDocumentConnections } from "../form/Form";
 import { FileUpload } from "../form/DragAndDrop";
@@ -13,7 +13,7 @@ import {
     AccordionHeader,
     AccordionList
 } from '@tremor/react';
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, RefObject } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { DocumentPageMap, PreviewMap } from '../map/Map';
 import { KxDocument, DocCoords, Scale, ScaleOneToN } from "../../model";
@@ -37,7 +37,7 @@ import { set } from 'date-fns';
 import Kiruna from "../map/KirunaMunicipality.json";
 
 interface DocumentProps {
-    user: { email: string; role: Stakeholders } | null;
+    user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }
 
 interface FormDialogProps {
@@ -51,7 +51,7 @@ export default function Document({ user }: DocumentProps) {
         return date.toLocaleDateString('sv-SE'); // 'sv-SE' è un formato ISO-like
     };
 
-    const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
+    const canEdit = user.current && user.current.role === Stakeholders.URBAN_PLANNER;
 
     const navigate = useNavigate();
     const { id } = useParams<string>();
@@ -132,6 +132,7 @@ export default function Document({ user }: DocumentProps) {
                 setScale(document.scale as ScaleOneToN);
                 setIssuanceDate({ from: document.issuance_date.from, to: document.issuance_date.to });
                 setType(document.type);
+                setDocCoordinates(document.doc_coordinates as DocCoords);
                 setLanguage(document.language || undefined);
                 setPages(document.pages || undefined);
                 setDescription(document.description || undefined);
@@ -260,20 +261,16 @@ export default function Document({ user }: DocumentProps) {
         }
     };
     const [showCheck, setShowCheck] = useState(false);
+
     const [deleteOriginalResourceConfirm, setDeleteOriginalResourceConfirm] = useState(false);
-    const [selectedResource, setSelectedResource] = useState<string>("");
     const [isDragAndDropOpen, setIsDragAndDropOpen] = useState(false);
     const [isUpdateConnectionsOpen, setIsUpdateConnectionsOpen] = useState(false);
 
+
+
     return (
         <div>
-            <div className='flex flex-row mb-2'>
-                <i onClick={() => navigate("/")}><RiHome3Line className="mt-1 text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong" /></i>
-                <h1 className="text-2xl font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong">Document Page</h1>
-
-
-            </div>
-            <Card>
+            <Card style={{ marginTop: '-0.5rem' }}>
                 <div className='flex flex-row '>
 
                     <div className="flex flex-col items-start justify-between w-full lg:w-1/2 lg:border-r lg:border-gray-300 lg:me-6">
@@ -340,9 +337,8 @@ export default function Document({ user }: DocumentProps) {
                             pageRanges={pageRanges}
                             setPageRanges={setPageRanges}
                             id={id!}
-                            user={user}
+                            user={user.current}
                         />
-
 
                     </div>
 
@@ -356,7 +352,7 @@ export default function Document({ user }: DocumentProps) {
                                 description={description}
                                 setDescription={setDescription}
                                 id={id!}
-                                user={user}
+                                user={user.current}
                             />
                         </div>
                     </div>
@@ -539,7 +535,7 @@ export default function Document({ user }: DocumentProps) {
                             setDocumentsForProjection={setDocumentsForProjection}
                             setDocumentsForUpdate={setDocumentsForUpdate}
                             id={id!}
-                            user={user}
+                            user={user.current}
                         ></FormConnectionsDialog>
                     </div>
 
@@ -652,7 +648,7 @@ export default function Document({ user }: DocumentProps) {
                             description={description}
                             setDescription={setDescription}
                             id={id!}
-                            user={user}
+                            user={user.current}
                         />
                     </AccordionBody>
                 </Accordion>
@@ -674,7 +670,7 @@ export default function Document({ user }: DocumentProps) {
                             <DocumentPageMap
                                 drawing={drawings}
                                 setDrawing={setDrawings}
-                                style={{ minHeight: "300px", width: "100%" }}
+                                style={{ minHeight: "300px", width: "100%", height: "80vh" }}
                                 user={user}
                             />
                         </Card>
@@ -1133,7 +1129,7 @@ export function FormCoordinatesDialog(
         handleSaveDrawing: () => void;
         setDocCoordinates: React.Dispatch<React.SetStateAction<any>>;
         id: string | undefined;
-        user: { email: string; role: Stakeholders } | null;
+        user: RefObject<{ email: string; role: Stakeholders } | null>;
         drawing: any;
         setUpdateHideMap: React.Dispatch<React.SetStateAction<boolean>>;
         updateHideMap: boolean;
@@ -1142,7 +1138,7 @@ export function FormCoordinatesDialog(
 
     const [isOpen, setIsOpen] = useState(false);
     const [error, setError] = useState("");
-    const canEdit = user && user.role === Stakeholders.URBAN_PLANNER;
+    const canEdit = user.current && user.current.role === Stakeholders.URBAN_PLANNER;
     const [docCoordinatesError, setDocCoordinatesError] = useState(false);
     const [hideMap, setHideMap] = useState<boolean>(false);
     const [isMapOpen, setIsMapOpen] = useState(false);
