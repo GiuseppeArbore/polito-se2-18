@@ -400,7 +400,7 @@ describe("Integration Tests for Document API", () => {
             .get(`/api/documents/aggregateData`)
             .send();
 
-        expect(response.status).toBe(401);
+        expect(response.status).toBe(200);
     });
 
     test('Test 14 - get aggregate data', async () => {

@@ -1,5 +1,5 @@
 import { mongoose } from '@typegoose/typegoose';
-import { KxDocument, PageRange, Scale, Connections, KxDocumentAggregateData } from './model';
+import { KxDocument, KxDocumentAggregateData, PageRange, Scale, Connections } from './model';
 
 const API_URL = 'http://localhost:3001/api';
 
@@ -49,6 +49,30 @@ const getAllKxDocuments = async (): Promise<KxDocument[]> => {
             throw new Error(`Failed to fetch documents: ${error.message}`);
         } else {
             throw new Error('Failed to fetch documents: Unknown error');
+        }
+    }
+};
+
+const getKxDocumentsAggregateData = async (): Promise<KxDocumentAggregateData> => {
+    try {
+        const response = await fetch(API_URL + "/documents/aggregateData", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+
+        const data: KxDocumentAggregateData = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to fetch aggragate data: ${error.message}`);
+        } else {
+            throw new Error('Failed to fetch aggregate data: Unknown error');
         }
     }
 };
@@ -263,20 +287,6 @@ const deleteAttachmentFromDocument = async (id: mongoose.Types.ObjectId, fileNam
     }
 }
 
-const getAggregatedData = async (): Promise<KxDocumentAggregateData> =>  {
-    const response = await fetch(API_URL + '/documents/aggregateData', {
-        method: 'GET',
-        credentials: 'include'
-    });
-    if (!response.ok) {
-        const errMessage = await response.json();
-        throw errMessage;
-    } else {
-        return response.json();
-    }
-};
-
-
 interface Credentials {
     username: string;
     password: string;
@@ -326,7 +336,6 @@ const logout = async () => {
     }
 };
 
-
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, updateKxDocumentConnections, getKxFileByID, addAttachmentToDocument, deleteAttachmentFromDocument, login, getUserInfo, logout, getAggregatedData };
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, updateKxDocumentConnections, getKxFileByID, addAttachmentToDocument, deleteAttachmentFromDocument, login, getUserInfo, logout, getKxDocumentsAggregateData };
 
 export default API;

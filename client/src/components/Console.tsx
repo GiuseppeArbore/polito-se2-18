@@ -24,7 +24,7 @@ import { Link } from "react-router-dom";
 import { RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine, RiSearchLine } from "@remixicon/react";
 import { AdvancedFilterModel } from "ag-grid-enterprise";
 import { Stakeholders } from "../enum";
-
+import Flow from "./diagram/Diagram"
 interface ConsoleProps {
     user: React.RefObject<{ email: string; role: Stakeholders } | null>;
 }
@@ -278,7 +278,7 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         height: "100%",
                     }}
                 >
-                    <div>Coming soon...</div>
+                   <Flow documents={tmpDocuments}/>
                 </div>
             </>
         );

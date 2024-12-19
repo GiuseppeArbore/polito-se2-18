@@ -459,7 +459,7 @@ export function FormDocumentInformation({
     useEffect(() => {
         const fetchAggregateData = async () => {
             try {
-                const aggregateData = await API.getAggregatedData();
+                const aggregateData = await API.getKxDocumentsAggregateData();
                 if (aggregateData) {
                     setAggregatedStakeholders(aggregateData.stakeholders);
                     setAggregatedScales(aggregateData.scales.map(scale => scale.toLocaleString()));

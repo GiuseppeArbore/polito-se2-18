@@ -9,6 +9,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dagrejs/dagre": "^1.1.4",
     "@headlessui/tailwindcss": "^0.2.1",
     "@heroicons/react": "1.0.6",
     "@internationalized/date": "^3.6.0",
@@ -25,6 +26,7 @@
     "@tailwindcss/forms": "^0.5.9",
     "@tremor/react": "^3.3.0",
     "@typegoose/typegoose": "^12.9.0",
+    "@xyflow/react": "^12.3.6",
     "ag-grid-enterprise": "^32.3.2",
     "ag-grid-react": "^32.3.2",
     "date-fns": "^3.6.0",
