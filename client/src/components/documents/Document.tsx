@@ -27,6 +27,7 @@ import {
     parseLocalizedNumber,
     PageRange,
     validatePageRangeString,
+    pageRangeToString,
 } from "../../utils";
 import { toast } from "../../utils/toaster";
 import locales from "../../locales.json"
@@ -66,7 +67,7 @@ export default function Document({ user }: DocumentProps) {
     const [issuanceDate, setIssuanceDate] = useState<DateRange | undefined>(undefined);
     const [type, setType] = useState<string | undefined>(undefined);
     const [language, setLanguage] = useState<string | undefined>(undefined);
-    const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
+    const [pagesText, setPagesText] = useState<string>("");
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>(undefined);
     const [description, setDescription] = useState<string | undefined>(undefined);
     const [entireMunicipality, setEntireMunicipality] = useState(false);
@@ -134,7 +135,7 @@ export default function Document({ user }: DocumentProps) {
                 setType(document.type);
                 setDocCoordinates(document.doc_coordinates as DocCoords);
                 setLanguage(document.language || undefined);
-                setPages(document.pages || undefined);
+                setPagesText(pageRangeToString(document.pages));
                 setDescription(document.description || undefined);
                 setDocCoordinates(document.doc_coordinates as DocCoords);
                 setDocumentsForDirect(document.connections.direct.map((doc) => doc.toString()));
@@ -309,7 +310,7 @@ export default function Document({ user }: DocumentProps) {
 
                         <div className="flex items-center justify-between mb-2 space-x-2">
                             <i className="text-sm font-light text-tremor-content-strong dark:text-dark-tremor-content-strong">Pages:</i>
-                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pages != undefined && pages.toString() != "" ? pages : "Unknown"} </i>
+                            <i className='text-md font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'> {pagesText !== "" ? pagesText : "Unknown"} </i>
                         </div>
 
 
@@ -332,8 +333,8 @@ export default function Document({ user }: DocumentProps) {
                             setScale={setScale}
                             language={language}
                             setLanguage={setLanguage}
-                            pages={pages}
-                            setPages={setPages}
+                            pagesText={pagesText}
+                            setPagesText={setPagesText}
                             pageRanges={pageRanges}
                             setPageRanges={setPageRanges}
                             id={id!}
@@ -722,8 +723,8 @@ export function FormInfoDialog({
     setScale,
     language,
     setLanguage,
-    pages,
-    setPages,
+    pagesText,
+    setPagesText,
     pageRanges,
     setPageRanges,
     id,
@@ -746,8 +747,8 @@ export function FormInfoDialog({
     setScale: React.Dispatch<React.SetStateAction<Scale>>;
     language: string | undefined;
     setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
-    pages: PageRange[] | undefined;
-    setPages: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
+    pagesText: string;
+    setPagesText: React.Dispatch<React.SetStateAction<string>>;
     pageRanges: PageRange[] | undefined;
     setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
     id: string;
@@ -763,12 +764,12 @@ export function FormInfoDialog({
 
     const handleInfoSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (title === "" || stakeholders.length === 0 || type === undefined || scale === undefined) {
+        if (title === "" || stakeholders.length === 0 || type === undefined || scale === undefined || validatePageRangeString(pagesText) === undefined) {
             setError("Please fill all the fields");
             return;
         }
         try {
-            const updatedDocument = await API.updateKxDocumentInformation(id, title, stakeholders, type, scale, language, pages);
+            const updatedDocument = await API.updateKxDocumentInformation(id, title, stakeholders, type, scale, language, validatePageRangeString(pagesText));
             if (updatedDocument) {
                 toast({
                     title: "Success",
@@ -805,7 +806,7 @@ export function FormInfoDialog({
         setScale(document.scale as Scale);
         setType(document.type);
         setLanguage(document.language || undefined);
-        setPages(document.pages || undefined);
+        setPagesText(pageRangeToString(document.pages));
         setIsOpen(false);
     }
 
@@ -850,8 +851,8 @@ export function FormInfoDialog({
                             setScale={setScale}
                             language={language}
                             setLanguage={setLanguage}
-                            pages={pages}
-                            setPages={setPages}
+                            pagesText={pagesText}
+                            setPagesText={setPagesText}
                             pageRanges={pageRanges}
                             setPageRanges={setPageRanges}
 
