@@ -196,10 +196,10 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                         {((showSideBar && selectedView === 2)) &&
                             <Col className="w-full h-full flex justify-center items-center">
                                 <div className="flex flex-col items-center">
-                                    <div className="flex justify-center items-center mb-2">
+                                    <div className="flex justify-center items-center">
                                         <span className="font-semibold dark:text-white">Legend</span>
                                     </div>
-                                    <Card className="mb-4 p-4 flex-1" style={{ width: '13rem', height: '48vh' }}>
+                                    <Card className="mb-2 p-2 flex-1" style={{ width: '13rem', height: '48vh' }}>
                                         <div className="flex flex-col h-full">
                                             <div className="flex justify-center items-center mb-2">
                                                 <span className="font-semibold dark:text-white text-sm">Document Types</span>
