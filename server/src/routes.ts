@@ -1,10 +1,10 @@
 
-import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription, handleFileUpload, removeAttachmentFromDocument, getKxDocumentAggregateData } from './controller';
+import { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, getPresignedUrlForAttachment, updateKxDocumentInfo, updateKxDocumentDescription, handleFileUpload, removeAttachmentFromDocument, getKxDocumentAggregateData, updateKxDocumentConnections } from './controller';
 import { validateRequest } from './errorHandlers';
 import e, { Application, NextFunction, Request, Response } from 'express';
 import { body, param } from 'express-validator';
-import { AreaType, KxDocumentType, Stakeholders } from './models/enum';
-import { coordDistance, isDocCoords, isScale, KIRUNA_COORDS } from './utils';
+import { AreaType } from './models/enum';
+import { isDocCoords, isScale, validateConnections } from './utils';
 import multer from 'multer';
 import * as mime from 'mime-types';
 import { randomBytes } from 'crypto';
@@ -53,13 +53,7 @@ export function initRoutes(app: Application) {
                     (typeof e === "number" && e >= 0 && Number.isInteger(e)));
             })
         }).withMessage('Invalid pages'),
-        body('connections').optional().isObject().custom((v) => {
-            if (typeof v !== 'object' || v === null) return false;
-            const lists = Object.values(v);
-            const allItems = lists.flat();
-            const uniqueItems = new Set(allItems);
-            return uniqueItems.size === allItems.length;
-        }).withMessage('Invalid connections'),
+        body('connections').optional().isObject().custom(validateConnections).withMessage('Invalid connections'),
     ];
 
     const storage = multer.diskStorage({
@@ -121,9 +115,6 @@ export function initRoutes(app: Application) {
 
     app.get(
         '/api/documents/aggregateData',
-        // This is a potentially onerous operation, so we only allow it for authenticated
-        // users (non authenticated users do not need to call this anyway)
-        isUrbanPlanner,
         getKxDocumentAggregateData
     );
 
@@ -188,6 +179,16 @@ export function initRoutes(app: Application) {
         ],
         validateRequest,
         updateKxDocumentInfo
+    )
+
+    app.put('/api/documents/:id/connections',
+        isUrbanPlanner,
+        [
+            param("id").notEmpty().withMessage("Missing id").isString().isHexadecimal().withMessage("Invalid id"),
+            body().custom(validateConnections),
+        ],
+        validateRequest,
+        updateKxDocumentConnections
     )
 }
 
