@@ -163,7 +163,7 @@ const updateKxDocumentConnections = async (documentId: string, documentsForDirec
                 'Content-Type': 'application/json',
             },
             credentials: 'include',
-            body: JSON.stringify({ connections }),
+            body: JSON.stringify(connections),
         });
 
         if (!response.ok) {
