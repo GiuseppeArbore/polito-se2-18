@@ -243,11 +243,11 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                                                 <span className="font-semibold dark:text-white">Connection Types</span>
                                             </div>
                                             <div className="flex items-center mb-2">
-                                                <div className="w-6 h-0.5 bg-black dark:bg-white mr-2"></div>
+                                                <div className="w-6 h-0.5 border-t-2 border-dashed border-black dark:border-white mr-2"></div>
                                                 <span className="dark:text-white">Direct consequence</span>
                                             </div>
                                             <div className="flex items-center mb-2">
-                                                <div className="w-6 h-0.5 border-t-2 border-dashed border-black dark:border-white mr-2"></div>
+                                                <div className="w-6 h-0.5 border-t-2 border-dashed border-green-500 dark:border-green-500 mr-2"></div>
                                                 <span className="dark:text-white">Collateral consequence</span>
                                             </div>
                                             <div className="flex items-center mb-2">

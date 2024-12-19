@@ -19,12 +19,16 @@ import { YAxis, XAxis } from "./Axes";
 import API from "../../API";
 import { ScaleType } from "../../enum";
 import {CustomNode } from "./CustomNode";
-import { da } from "date-fns/locale";
+import {CustomEdge} from "./CustomEdge";
 
 const nodeTypes = {
   yAxis: YAxis,
   xAxis: XAxis,
   custom: CustomNode,
+};
+
+const edgeTypes = {
+  custom: CustomEdge,
 };
 
 interface FlowProps {
@@ -80,7 +84,6 @@ function Flow(props: FlowProps) {
       const y = scaleHeight * (scales.findIndex((s)=> JSON.stringify(s) === JSON.stringify((node.data as {scale:Scale}).scale)));
       const y_random = y + nodeHeight + n + margin / 2;
 
-      console.log(node)
       const newNode = {
         ...node,
         type: "custom",
@@ -196,15 +199,16 @@ function Flow(props: FlowProps) {
       });
 
     let connections = props.documents.map((d, index_e) => {
-      let a = Object.values(d.connections).map((c, index) => {
+      let a = Object.entries(d.connections).toSorted().map(([k, c], index) => {
         return c.map((i: { toString: () => any }, index_i: number) => {
           const iDoc = props.documents.find((doc) => doc._id === i);
           return {
-            id: (index_e * 10000 + index * 1000 + index_i).toString(),
+            id: (index_e * 10000 + index * 1000 + index_i + Math.random()).toString(),
             source: d.issuance_date.from < iDoc!.issuance_date.from ? d._id!.toString() : i.toString(),
             target: d.issuance_date.from > iDoc!.issuance_date.from ? d._id!.toString() : i.toString(),
             animated: true,
-            type: ConnectionLineType.Bezier,
+            type: "custom",
+            data:{label: k}
           };
         });
       });
@@ -247,8 +251,8 @@ function Flow(props: FlowProps) {
       onNodesChange={onNodesChange}
       onEdgesChange={onEdgesChange}
       onConnect={onConnect}
-      connectionLineType={ConnectionLineType.Bezier}
       nodeTypes={nodeTypes}
+      edgeTypes={edgeTypes}
       fitView
       style={{ backgroundColor: "#F7F9FB" }}
     >

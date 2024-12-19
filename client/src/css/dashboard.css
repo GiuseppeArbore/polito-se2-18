@@ -19,7 +19,7 @@
 }
 
 .linea-punti {
-    background: repeating-linear-gradient(to right, black 0, black 2px, transparent 2px, transparent 4px);
+    background: repeating-linear-gradient(to right, blue 0, blue 2px, transparent 2px, transparent 4px);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -30,12 +30,12 @@
 
 .linea-alternata {
     background: repeating-linear-gradient(to right,
-            black 0,
-            black 1px,
+            brown 0,
+            brown 1px,
             transparent 1px,
             transparent 4px,
-            black 4px,
-            black 9px,
+            brown 4px,
+            brown 9px,
             transparent 9px,
             transparent 12px
 
