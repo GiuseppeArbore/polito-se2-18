@@ -10,6 +10,7 @@ import {
     Tab,
     TextInput,
 } from "@tremor/react";
+import { RiFileFill, RiFileInfoFill, RiFileTransferFill, RiFileSettingsFill, RiDraftFill, RiShakeHandsFill, RiFileSearchFill,RiFileCheckFill,RiFileChartFill,RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine} from "@remixicon/react";
 import "../css/dashboard.css"
 import API from "../API";
 import { useState, useEffect, useMemo } from "react";
@@ -21,7 +22,6 @@ import { Toaster } from "./toast/Toaster";
 import { toast } from "../utils/toaster";
 import { FeatureCollection } from "geojson";
 import { Link } from "react-router-dom";
-import { RiHome2Fill, RiArrowRightSLine, RiArrowLeftSLine, RiSearchLine } from "@remixicon/react";
 import { AdvancedFilterModel } from "ag-grid-enterprise";
 import { Stakeholders } from "../enum";
 import Flow from "./diagram/Diagram"
@@ -115,10 +115,10 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
 
 
 
-    const [showSideBar, setShowSideBar] = useState(true);
+    const [showSideBar, setShowSideBar] = useState(false);
 
     useEffect(() => {
-        if (selectedView === 0) {
+        if (selectedView === 2) {
             setShowSideBar(true);
         } else {
             setShowSideBar(false);
@@ -163,72 +163,105 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                 </TabGroup>
             </div>
 
-            <Grid numItemsLg={12} className="gap-6 mt-6">
-                <Col numColSpanLg={12}>
-                    <div className="h-full w-full" style={{ display: 'flex', flexDirection: 'row' }}>
-                        <Card
-                            className="p-0 m-0"
-                            style={{
-                                marginTop: '-1.6rem',
-                                padding: 0,
-                                minHeight: "300px",
-                                width: "100%",
-                                height: "85vh",
-                            }}
-                        >
-                            {renderCurrentSelection( setQuickFilterText, selectedView)}
-                        </Card>
+            <Grid numItemsLg={6} className="gap-6 mt-6">
+                <Col numColSpanLg={showSideBar ? 5 : 6}>
+                    <div className="h-full" style={{ display: 'flex', flexDirection: 'row' }}>
+                        <Col className="h-full w-full">
+                            <Card className="h-full p-0 m-0" style={{ margin: 0, padding: 0, minHeight: "500px" }}>
+                                {renderCurrentSelection(selectedView)}
+                            </Card>
+                        </Col>
+                        {!showSideBar && 
+                        selectedView === 2 &&
+                            <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6 bg-[#D1DDE6] dark:bg-[#2D3748]" role="Button" >
+                                <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full" /></i>
+                            </Col>
+                        }
                     </div>
                 </Col>
                 <Col numColSpanLg={1}>
                     <div className="flex flex-row ">
                         {showSideBar &&
-                            <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring" role="Button">
+                        selectedView === 2 &&
+                            <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6 bg-[#D1DDE6] dark:bg-[#2D3748]" role="Button" style={{ marginLeft: '-1.2rem' }}>
                                 <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full" /></i>
 
                             </Col>
                         }
-                        {(showSideBar || windowWidth <= 1024) &&
-                            <Col className="w-full">
-                                <div className="space-y-6">
-                                    <TextInput
-                                        icon={RiSearchLine}
-                                        id="quickFilter"
-                                        placeholder="Search by title"
-                                        className="w-full"
-                                        value={quickFilterText}
-                                        onValueChange={(e) => {
-                                            setQuickFilterText(e);
+                        {((showSideBar &&  selectedView === 2)) &&
+                            <Col className="w-full h-full">
+                                <Card className="p-4 h-full">
+                                    <div className="flex justify-center items-center mb-2">
+                                        <span className="font-semibold dark:text-white" >Legend</span>
+                                    </div>
+                                    <Card className="mb-4 p-4 h-1/2">
+                                        <div className="flex flex-col h-full">
+                                            <div className="flex justify-center items-center mb-2">
+                                                <span className="font-semibold dark:text-white">Document Types</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileInfoFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span className="dark:text-white">Informative Document</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileTransferFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span className="dark:text-white">Prescriptive Document</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileSettingsFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span className="dark:text-white">Technical Document</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiDraftFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span className="dark:text-white">Design Document</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiShakeHandsFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span className="dark:text-white">Agreement</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileSearchFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span className="dark:text-white">Consultation</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileCheckFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span className="dark:text-white">Conflict Resolution</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileChartFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span className="dark:text-white">Strategy</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <RiFileFill className="mr-2" style={{ color: '#163C89' }} />
+                                                <span className="dark:text-white">Custom Document</span>
+                                            </div>
+                                        </div>
+                                    </Card>
+                                    <Card className="p-4 h-1/2">
+                                        <div className="flex flex-col h-full">
+                                            <div className="flex justify-center items-center mb-2">
+                                                <span className="font-semibold dark:text-white">Connection Types</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <div className="w-6 h-0.5 bg-black dark:bg-white mr-2"></div>
+                                                <span className="dark:text-white">Direct consequence</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <div className="w-6 h-0.5 border-t-2 border-dashed border-black dark:border-white mr-2"></div>
+                                                <span className="dark:text-white">Collateral consequence</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <div className="w-6 h-0.5 mr-2 linea-punti"></div>
+                                                <span className="dark:text-white">Projection</span>
+                                            </div>
+                                            <div className="flex items-center mb-2">
+                                                <div className="w-6 h-0.5 mr-2 linea-alternata"></div>
+                                                <span className="dark:text-white">Update</span>
+                                            </div>
 
-                                        }}
-                                    ></TextInput>
-                                    <FormDialog
-                                        documents={documents}
-                                        refresh={() => setRefreshNeeded(true)}
-                                        user={user}
-                                    />
-                                    <Card>
-                                        <Metric>KIRUNA</Metric>
-                                        <Title>Quick facts</Title>
-                                        <Text>
-                                            <ul className="list-disc list-inside">
-                                                <li>20,000 inhabitants</li>
-                                                <li>Located 140 km north of the Arctic Circle</li>
-                                                <li>Lowest recorded temperature -42 °C</li>
-                                                <li>45 days of Midnight Sun each year</li>
-                                                <li>21 days of Polar Night</li>
-                                                <li>Covered in snow for 8 months each year</li>
-                                            </ul>
-                                        </Text>
+                                        </div>
                                     </Card>
-                                    <Card className="hidden lg:block w-full h-40">
-                                        <img
-                                            src="/kiruna.png"
-                                            alt="Kiruna"
-                                            className="w-full h-full object-contain"
-                                        />
-                                    </Card>
-                                </div>
+                                </Card>
                             </Col>
                         }
 
@@ -239,9 +272,9 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
 
             </Grid>
             <Toaster />
-        </main>
+        </main >
     );
-    function renderCurrentSelection(setQuickFilterText: (_: string) => void, selectedView: number = 0) {
+    function renderCurrentSelection(selectedView: number = 0) {
         return (
             <>
                 <DashboardMap

@@ -14,6 +14,46 @@
 
 @media (max-width: 1024px) {
     .hide-on-small {
-      display: none;
+        display: none;
     }
-  }
+}
+
+.linea-punti {
+    background: repeating-linear-gradient(to right, black 0, black 2px, transparent 2px, transparent 4px);
+}
+
+@media (prefers-color-scheme: dark) {
+    .linea-punti {
+        background: repeating-linear-gradient(to right, white 0, white 2px, transparent 2px, transparent 4px);
+    }
+}
+
+.linea-alternata {
+    background: repeating-linear-gradient(to right,
+            black 0,
+            black 1px,
+            transparent 1px,
+            transparent 4px,
+            black 4px,
+            black 9px,
+            transparent 9px,
+            transparent 12px
+
+        );
+}
+
+@media (prefers-color-scheme: dark) {
+    .linea-alternata {
+        background: repeating-linear-gradient(to right,
+                white 0,
+                white 1px,
+                transparent 1px,
+                transparent 4px,
+                white 4px,
+                white 9px,
+                transparent 9px,
+                transparent 12px
+
+            );
+    }
+}
