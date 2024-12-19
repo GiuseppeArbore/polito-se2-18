@@ -77,7 +77,7 @@ export function FormDialog(props: FormDialogProps) {
 
     const [scale, setScale] = useState<Scale>({ type: ScaleType.TEXT });
     const [language, setLanguage] = useState<string | undefined>(undefined);
-    const [pages, setPages] = useState<PageRange[] | undefined>(undefined);
+    const [pagesText, setPagesText] = useState<string>("");
     const [pageRanges, setPageRanges] = useState<PageRange[] | undefined>([]);
     const [isMapOpen, setIsMapOpen] = useState(false);
     const [showGeoInfo, setShowGeoInfo] = useState(false);
@@ -164,7 +164,7 @@ export function FormDialog(props: FormDialogProps) {
             type: type,
             language,
             description,
-            pages: validatePageRangeString(pages?.toString() || ""),
+            pages: validatePageRangeString(pagesText),
             connections: {
                 direct: documentsForDirect.map(d => new mongoose.Types.ObjectId(d)),
                 collateral: documentsForCollateral.map(d => new mongoose.Types.ObjectId(d)),
@@ -190,7 +190,7 @@ export function FormDialog(props: FormDialogProps) {
                 setType(undefined);
                 setLanguage(undefined);
                 setDescription(undefined);
-                setPages(undefined);
+                setPagesText("");
                 setDrawing(undefined);
                 setPageRanges([]);
             } else {
@@ -246,7 +246,7 @@ export function FormDialog(props: FormDialogProps) {
         setTypeError(false);
         setScale({ type: ScaleType.TEXT });
         setLanguage(undefined);
-        setPages(undefined);
+        setPagesText("");
         setPageRanges([]);
         setHideMap(false);
         setDescription(undefined);
@@ -288,8 +288,8 @@ export function FormDialog(props: FormDialogProps) {
                     setScale={setScale}
                     language={language}
                     setLanguage={setLanguage}
-                    pages={pages}
-                    setPages={setPages}
+                    pagesText={pagesText}
+                    setPagesText={setPagesText}
                     pageRanges={pageRanges}
                     setPageRanges={setPageRanges}
                 />
@@ -420,8 +420,8 @@ export function FormDocumentInformation({
     setScale,
     language,
     setLanguage,
-    pages,
-    setPages,
+    pagesText,
+    setPagesText,
     pageRanges,
     setPageRanges
 }: {
@@ -443,8 +443,8 @@ export function FormDocumentInformation({
     setScale: React.Dispatch<React.SetStateAction<Scale>>;
     language: string | undefined;
     setLanguage: React.Dispatch<React.SetStateAction<string | undefined>>;
-    pages: PageRange[] | undefined;
-    setPages: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
+    pagesText: string;
+    setPagesText: React.Dispatch<React.SetStateAction<string>>;
     pageRanges: PageRange[] | undefined;
     setPageRanges: React.Dispatch<React.SetStateAction<PageRange[] | undefined>>;
 }) {
@@ -760,10 +760,8 @@ export function FormDocumentInformation({
                 <TextInput
                     id="pages"
                     name="pages"
-                    value={pages?.toString() || ""}
-                    onValueChange={(v: string) => {
-                        setPages(validatePageRangeString(v));
-                    }}
+                    value={pagesText}
+                    onValueChange={setPagesText}
                     error={!pageRanges ? true : false}
                     errorMessage='Invalid page range. Examples of valid ranges: "10" or "1-5" or "1-5,6"'
                     autoComplete="pages"

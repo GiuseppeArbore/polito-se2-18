@@ -7,6 +7,18 @@ export function parseLocalizedNumber(n: string, locale?: string): number {
     );
 }
 
+export function pageRangeToString(pr: PageRange[] | undefined): string {
+    if (pr === undefined)
+        return "";
+    return pr.map<string>(p => {
+        if (typeof p === "number") {
+            return p.toString();
+        } else {
+            return p.join("-");
+        }
+    }).join(",");
+}
+
 export function validatePageRangeString(pr: string): PageRange[] | undefined {
     if (pr.length === 0)
         return [];
