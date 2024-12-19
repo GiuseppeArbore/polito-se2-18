@@ -92,6 +92,7 @@ function Flow(props: FlowProps) {
           x: x - nodeWidth,
           y: y_random,
         },
+        //draggable: false,
       };
 
       return newNode as Node;

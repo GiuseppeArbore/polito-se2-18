@@ -27,7 +27,7 @@ export function YAxis({ data }: NodeProps<Axes>) {
                 }}
             >
             </div>
-            <p className='ml-2'>{data.label}</p>
+            <p className='ml-2 text-slate-950'>{data.label}</p>
         </div>
     );
 }
@@ -49,7 +49,7 @@ export function XAxis({ data }: NodeProps<Axes>) {
                     borderTop: "2.5px dashed #c0c8d2"
                 }}
             >
-                <p className='ml-2'>{data.label}</p>
+                <p className='ml-2 text-slate-950'>{data.label}</p>
             </div>
         </div>
     );
