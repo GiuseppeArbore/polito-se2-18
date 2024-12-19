@@ -172,30 +172,24 @@ const Console: React.FC<ConsoleProps> = ({ user }) => {
                                 padding: 0,
                                 minHeight: "300px",
                                 width: "100%",
-                                height: "83vh",
+                                height: "82vh",
                             }}>
                                 {renderCurrentSelection(selectedView)}
                             </Card>
                         </Col>
                         {!showSideBar &&
                             selectedView === 2 &&
-                            <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6 bg-[#D1DDE6] dark:bg-[#2D3748]" role="Button" style={{ height: '83vh', marginTop: '-1.5rem' }} >
+                            <Col className="hider ml-2 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6 bg-[#D1DDE6] dark:bg-[#2D3748]" role="Button" style={{ height: '82vh', marginTop: '-1.5rem' }} >
                                 <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(true)}><RiArrowLeftSLine className="h-full" /></i>
                             </Col>
                         }
                     </div>
                 </Col>
                 <Col numColSpanLg={1}>
-                    <div className="flex flex-row justify-center items-center" style={{
-                        marginTop: '-1.5rem',
-                        padding: 0,
-                        minHeight: "300px",
-                        width: "100%",
-                        height: "83vh",
-                    }}>
+                    <div className="flex flex-row justify-center items-center">
                         {showSideBar &&
                             selectedView === 2 &&
-                            <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6 bg-[#D1DDE6] dark:bg-[#2D3748]" role="Button" style={{ height: '83vh',marginLeft: '-1.2rem' }}>
+                            <Col className="hider mr-1 hide-on-small ring-1 dark:ring-dark-tremor-ring ring-tremor-ring w-6 bg-[#D1DDE6] dark:bg-[#2D3748]" role="Button" style={{ height: '82vh',marginLeft: '-1rem',marginTop:'-1.5rem' }}>
                                 <i className="h-full text-tremor-content dark:text-dark-tremor-content" onClick={() => setShowSideBar(false)}><RiArrowRightSLine className="h-full" /></i>
                             </Col>
                         }
