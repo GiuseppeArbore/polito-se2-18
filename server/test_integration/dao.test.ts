@@ -1,7 +1,7 @@
 import { describe, test } from "@jest/globals"
 import { db } from "../src/db/dao";
-import { AreaType, KxDocumentType, Scale, Stakeholders } from "../src/models/enum";
-import { Area, KxDocument, Point } from "../src/models/model";
+import { AreaType, KxDocumentType, ScaleType, Stakeholders } from "../src/models/enum";
+import { Area, KxDocument, Point, ScaleOneToN } from "../src/models/model";
 import { User, UserModel } from "../src/models/user";
 import { EJSON } from "bson";
 import { mongoose } from "@typegoose/typegoose";
@@ -23,7 +23,10 @@ beforeAll(async () => {
     const res = await db.createKxDocument({
         title: "title 1",
         stakeholders: [Stakeholders.RESIDENT],
-        scale: 10,
+        scale: {
+            type: ScaleType.ONE_TO_N,
+            scale: 10
+        },
         issuance_date: {
             from: date
         },
@@ -45,13 +48,16 @@ describe("Test DAO", () => {
         const res = await db.createKxDocument({
             title: "title 2",
             stakeholders: [Stakeholders.RESIDENT],
-            scale: 10,
+            scale: {
+                type: ScaleType.ONE_TO_N,
+                scale: 10
+            } as ScaleOneToN,
             issuance_date: {
                 from: date
             },
             type: KxDocumentType.INFORMATIVE,
             language: "Swedish",
-            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
+            doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
             description: "Test",
             connections: {
                 direct: [], collateral: [], projection: [], update: []
@@ -69,14 +75,17 @@ describe("Test DAO", () => {
             title: "title 1",
             _id: list[0],
             stakeholders: [Stakeholders.RESIDENT],
-            scale: 10,
+            scale: {
+                type: ScaleType.ONE_TO_N,
+                scale: 10
+            } as ScaleOneToN,
             pages: [],
             issuance_date: {
                 from: date
             },
             type: KxDocumentType.INFORMATIVE,
             language: "Swedish",
-            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
+            doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
             description: "Test",
             connections: {
                 direct: [], collateral: [], projection: [], update: []
@@ -95,13 +104,16 @@ describe("Test DAO", () => {
             _id: list[0],
             stakeholders: [Stakeholders.RESIDENT],
             pages: [],
-            scale: 10,
+            scale: {
+                type: ScaleType.ONE_TO_N,
+                scale: 10
+            } as ScaleOneToN,
             issuance_date: {
                 from: date
             },
             type: KxDocumentType.INFORMATIVE,
             language: "Swedish",
-            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
+            doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
             description: "Test"
         })
     });
@@ -115,13 +127,16 @@ describe("Test DAO", () => {
         const res = await db.createKxDocument({
             title: "test",
             stakeholders: [],
-            scale: 0,
+            scale: {
+                type: ScaleType.ONE_TO_N,
+                scale: 0
+            } as ScaleOneToN,
             issuance_date: {
                 from: date
             },
             type: KxDocumentType.INFORMATIVE,
             language: "Italian",
-            doc_coordinates: {type: AreaType.ENTIRE_MUNICIPALITY},
+            doc_coordinates: { type: AreaType.ENTIRE_MUNICIPALITY },
             description: "Test",
             pages: [2, [4, 8]],
             connections: {
@@ -141,7 +156,10 @@ describe("Test DAO", () => {
         const res = await db.createKxDocument({
             title: "test",
             stakeholders: [],
-            scale: 0,
+            scale: {
+                type: ScaleType.ONE_TO_N,
+                scale: 0
+            } as ScaleOneToN,
             issuance_date: {
                 from: date
             },
@@ -158,7 +176,7 @@ describe("Test DAO", () => {
         if (res && res._id) {
             expect(res).toHaveProperty("_id");
             const get = await db.getKxDocumentById(res._id);
-            expect(get?.doc_coordinates).toMatchObject({type: AreaType.ENTIRE_MUNICIPALITY});
+            expect(get?.doc_coordinates).toMatchObject({ type: AreaType.ENTIRE_MUNICIPALITY });
             const res2 = await db.deleteKxDocument(res._id);
             expect(res2).toBeTruthy();
         }
@@ -168,7 +186,10 @@ describe("Test DAO", () => {
         const res = await db.createKxDocument({
             title: "test",
             stakeholders: [],
-            scale: 0,
+            scale: {
+                type: ScaleType.ONE_TO_N,
+                scale: 0
+            } as ScaleOneToN,
             issuance_date: {
                 from: date
             },
@@ -186,7 +207,7 @@ describe("Test DAO", () => {
         if (res && res._id) {
             expect(res).toHaveProperty("_id");
             const get = await db.getKxDocumentById(res._id);
-            expect(get?.doc_coordinates).toMatchObject({type: AreaType.POINT, coordinates: [20.26, 67.845]});
+            expect(get?.doc_coordinates).toMatchObject({ type: AreaType.POINT, coordinates: [20.26, 67.845] });
             const res2 = await db.deleteKxDocument(res._id);
             expect(res2).toBeTruthy();
         }
@@ -196,7 +217,10 @@ describe("Test DAO", () => {
         const res = await db.createKxDocument({
             title: "test",
             stakeholders: [],
-            scale: 0,
+            scale: {
+                type: ScaleType.ONE_TO_N,
+                scale: 0
+            } as ScaleOneToN,
             issuance_date: {
                 from: date
             },
@@ -223,7 +247,10 @@ describe("Test DAO", () => {
             _id: id,
             title: "test",
             stakeholders: [],
-            scale: 0,
+            scale: {
+                type: ScaleType.ONE_TO_N,
+                scale: 0
+            } as ScaleOneToN,
             issuance_date: {
                 from: date
             },
@@ -269,7 +296,10 @@ describe("Test DAO", () => {
         const doc: KxDocument = {
             title: "title 1",
             stakeholders: [Stakeholders.RESIDENT],
-            scale: 10,
+            scale: {
+                type: ScaleType.ONE_TO_N,
+                scale: 10
+            } as ScaleOneToN,
             issuance_date: {
                 from: date
             },
@@ -305,7 +335,10 @@ describe("Test DAO", () => {
         const doc: KxDocument = {
             title: "title 1",
             stakeholders: [Stakeholders.RESIDENT],
-            scale: 10,
+            scale: {
+                type: ScaleType.ONE_TO_N,
+                scale: 10
+            } as ScaleOneToN,
             issuance_date: {
                 from: date
             },
@@ -343,7 +376,10 @@ describe("Test DAO", () => {
             _id: id,
             title: "test",
             stakeholders: [Stakeholders.RESIDENT, "Custom SH"],
-            scale: 10,
+            scale: {
+                type: ScaleType.ONE_TO_N,
+                scale: 10
+            } as ScaleOneToN,
             issuance_date: {
                 from: date
             },

@@ -1,0 +1,108 @@
+.buttonStyle {
+  display: flex;
+  align-items: center;
+  padding: 0.5rem 1rem;
+  border-radius: 0.25rem;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  text-decoration: none;
+  margin-top: 0.5rem;
+}
+
+.buttonStyle a {
+  text-decoration: none;
+  color: inherit;
+}
+
+.buttonStyle:hover {
+  background-color: #e0e0e0;
+  /* Change this to your desired hover color */
+}
+
+/* Dark theme styles */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #121212;
+    color: #E0E0E0;
+    margin-top: 0.5rem; /* Assicurati che il margine superiore sia fisso anche nel tema scuro */
+  }
+
+  .buttonStyle {
+    color: #E0E0E0;
+  }
+
+  .buttonStyle:hover {
+    background-color: white;
+    color: black;
+  }
+
+  .buttonStyle a {
+    color: inherit;
+  }
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .buttonStyle {
+      padding: 0.5rem 0.75rem;
+      font-size: 0.875rem;
+      margin-right: 0rem; /* Reduce margin-right for smaller screens */
+      margin-top: 1rem; /* Add top margin */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  .button-text {
+      display: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .buttonStyle {
+      padding: 0.5rem 0.5rem;
+      font-size: 0.75rem;
+      margin-top: 1rem; /* Add top margin */
+      display: flex;
+      justify-content: center;
+      align-items: center;
+  }
+  .button-text {
+      display: none;
+  }
+}
+
+.navbar-title {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  text-align: center;
+  font-family: sans-serif;
+  font-weight: bold;
+  font-size: 1.5rem;
+  color: #444444;
+  margin-top: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+@media (max-width: 768px) {
+  .navbar-title {
+      font-size: 1.2rem;
+      margin-top: 0.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .navbar-title {
+      font-size: 1rem;
+      margin-top: 0.5rem;
+      margin-bottom: -0.5rem
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  .navbar-title {
+      color: #dddddd;
+  }
+}

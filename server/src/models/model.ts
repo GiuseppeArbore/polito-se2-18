@@ -1,4 +1,4 @@
-import { AreaType } from "./enum";
+import { AreaType, ScaleType } from "./enum";
 import { mongoose, prop, modelOptions, getModelForClass, Ref, Severity } from "@typegoose/typegoose";
 
 export type PageRange = [number, number] | number;
@@ -7,7 +7,7 @@ export interface DocInfo {
     _id: mongoose.Types.ObjectId;
     title: string;
     stakeholders: string[];
-    scale: number;
+    scale: ScaleBase;
     type: string;
     language?: string;
     pages?: PageRange;
@@ -20,10 +20,10 @@ export interface DocInfo {
     },
 })
 export class DateRange {
-    @prop({required: true, type: Date})
+    @prop({ required: true, type: Date })
     from!: Date;
 
-    @prop({required: false, type: Date})
+    @prop({ required: false, type: Date })
     to?: Date;
 }
 
@@ -32,18 +32,18 @@ export class DateRange {
         _id: false,
     },
 })
-class Connections {
+export class Connections {
 
-    @prop({required: true, ref: () => KxDocument})
+    @prop({ required: true, ref: () => KxDocument })
     direct!: Ref<KxDocument>[];
 
-    @prop({required: true, ref: () => KxDocument})
+    @prop({ required: true, ref: () => KxDocument })
     collateral!: Ref<KxDocument>[];
 
-    @prop({required: true, ref: () => KxDocument})
+    @prop({ required: true, ref: () => KxDocument })
     projection!: Ref<KxDocument>[];
 
-    @prop({required: true, ref: () => KxDocument})
+    @prop({ required: true, ref: () => KxDocument })
     update!: Ref<KxDocument>[];
 }
 
@@ -53,29 +53,49 @@ class Connections {
         _id: false,
     },
 })
+class ScaleBase {
+    @prop({ required: true, type: String, enum: ScaleType })
+    type!: ScaleType
+}
+export class ScaleText extends ScaleBase {
+    declare type: ScaleType.TEXT
+}
+export class ScaleBlueprintEffects extends ScaleBase {
+    declare type: ScaleType.BLUEPRINT_EFFECTS
+}
+export class ScaleOneToN extends ScaleBase {
+    declare type: ScaleType.ONE_TO_N
+
+    @prop({ required: true, type: Number, validate: (v: any) => Number.isInteger(v) })
+    scale!: number
+}
+export type Scale = ScaleText | ScaleBlueprintEffects | ScaleOneToN;
+
+@modelOptions({
+    schemaOptions: {
+        discriminatorKey: "type",
+        _id: false,
+    },
+})
 class DocCoordsBase {
-    @prop({required: true, type: String, enum: AreaType})
+    @prop({ required: true, type: String, enum: AreaType })
     type!: AreaType
 }
-
 export class Point extends DocCoordsBase {
     declare type: AreaType.POINT
 
-    @prop({required: true, type: [Number]})
+    @prop({ required: true, type: [Number] })
     coordinates!: number[]
 }
-
 export class Area extends DocCoordsBase {
     declare type: AreaType.AREA
 
-    @prop({required: true, type: [[[Number]]]})
+    @prop({ required: true, type: [[[Number]]] })
     coordinates!: number[][][]
 }
-
 export class WholeMunicipality extends DocCoordsBase {
     declare type: AreaType.ENTIRE_MUNICIPALITY
 }
-
 export type DocCoords = Point | Area | WholeMunicipality;
 
 @modelOptions({
@@ -86,49 +106,54 @@ export type DocCoords = Point | Area | WholeMunicipality;
 export class KxDocument {
     _id?: mongoose.Types.ObjectId;
 
-    @prop({required: true, type: String})
+    @prop({ required: true, type: String })
     title!: string;
 
-    @prop({required: true, type: String})
+    @prop({ required: true, type: String })
     stakeholders!: string[];
 
-    //@prop({required: true, type: Scale})
-    //scale_info!: Scale;
+    @prop({
+        required: true,
+        type: ScaleBase,
+        discriminators: () => [
+            { type: ScaleText, value: ScaleType.TEXT },
+            { type: ScaleBlueprintEffects, value: ScaleType.BLUEPRINT_EFFECTS },
+            { type: ScaleOneToN, value: ScaleType.ONE_TO_N },
+        ]
+    })
+    scale!: ScaleBase;
 
-    @prop({required: true, type: Number})
-    scale!: number;
-
-    @prop({required: true, type: DateRange})
+    @prop({ required: true, type: DateRange })
     issuance_date!: DateRange;
 
-    @prop({required: true, type: String})
+    @prop({ required: true, type: String })
     type!: string;
 
-    @prop({type: String})
+    @prop({ type: String })
     language?: string;
 
     @prop({
         required: true,
         type: DocCoordsBase,
         discriminators: () => [
-            {type: Point, value: AreaType.POINT},
-            {type: Area, value: AreaType.AREA},
-            {type: WholeMunicipality, value: AreaType.ENTIRE_MUNICIPALITY},
+            { type: Point, value: AreaType.POINT },
+            { type: Area, value: AreaType.AREA },
+            { type: WholeMunicipality, value: AreaType.ENTIRE_MUNICIPALITY },
         ]
     })
     doc_coordinates!: DocCoordsBase;
 
-    @prop({required: true, type: String})
+    @prop({ required: true, type: String })
     description!: string;
 
     // TODO: use proper schema and validate
-    @prop({allowMixed: Severity.ALLOW, type: [mongoose.Schema.Types.Mixed], validate: () => {}})
+    @prop({ allowMixed: Severity.ALLOW, type: [mongoose.Schema.Types.Mixed], validate: () => { } })
     pages?: PageRange[];
 
-    @prop({required: true, type: Connections})
+    @prop({ required: true, type: Connections })
     connections!: Connections;
 
-    @prop({type: String})
+    @prop({ type: String })
     attachments?: string[];
 }
 

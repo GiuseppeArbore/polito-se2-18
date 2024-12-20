@@ -1,10 +1,9 @@
 import { mongoose } from '@typegoose/typegoose';
-import { KxDocument, PageRange } from './model';
+import { KxDocument, KxDocumentAggregateData, PageRange, Scale, Connections } from './model';
 
-const API_URL = 'http://localhost:3001/api';
+const API_URL =  import.meta.env.VITE_SERVER_ENV as string;
 
-
- const createKxDocument = async (document: KxDocument): Promise<KxDocument | null> => {
+const createKxDocument = async (document: KxDocument): Promise<KxDocument | null> => {
     try {
         const response = await fetch(API_URL + "/documents", {
             method: 'POST',
@@ -14,11 +13,11 @@ const API_URL = 'http://localhost:3001/api';
             credentials: 'include',
             body: JSON.stringify(document),
         });
-    
+
         if (!response.ok) {
             throw new Error(`Error status: ${response.status}`);
         }
-    
+
         const data: KxDocument = await response.json();
         return data;
     } catch (error) {
@@ -53,13 +52,37 @@ const getAllKxDocuments = async (): Promise<KxDocument[]> => {
     }
 };
 
+const getKxDocumentsAggregateData = async (): Promise<KxDocumentAggregateData> => {
+    try {
+        const response = await fetch(API_URL + "/documents/aggregateData", {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+
+        const data: KxDocumentAggregateData = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to fetch aggragate data: ${error.message}`);
+        } else {
+            throw new Error('Failed to fetch aggregate data: Unknown error');
+        }
+    }
+};
+
 // function to update title, stakeholders, type, scale, language, pages
 const updateKxDocumentInformation = async (
     documentId: string,
     title?: string,
     stakeholders?: string[],
     type?: string,
-    scale?: number,
+    scale?: Scale,
     language?: string,
     pages?: PageRange[],
     doc_coordinates?: any
@@ -108,7 +131,7 @@ const updateKxDocumentDescription = async (documentId: string, description: stri
             },
             credentials: 'include',
             body: JSON.stringify({ description }),
-                  });
+        });
 
         if (!response.ok) {
             throw new Error(`Error status: ${response.status}`);
@@ -124,7 +147,40 @@ const updateKxDocumentDescription = async (documentId: string, description: stri
         }
     }
 };
-const getKxFileByID = async (id: mongoose.Types.ObjectId, fileName:string): Promise<{presignedUrl: string}> => {
+
+const updateKxDocumentConnections = async (documentId: string, documentsForDirect: string[], documentsForCollateral: string[], documentsForProjection: string[], documentsForUpdate: string[]): Promise<KxDocument | null> => {
+    try {
+        const connections: Connections = {
+            direct: documentsForDirect.map(id => new mongoose.Types.ObjectId(id)),
+            collateral: documentsForCollateral.map(id => new mongoose.Types.ObjectId(id)),
+            projection: documentsForProjection.map(id => new mongoose.Types.ObjectId(id)),
+            update: documentsForUpdate.map(id => new mongoose.Types.ObjectId(id)),
+        };
+        const response = await fetch(API_URL + `/documents/${documentId}/connections`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+            body: JSON.stringify(connections),
+        });
+
+        if (!response.ok) {
+            throw new Error(`Error status: ${response.status}`);
+        }
+
+        const data: KxDocument = await response.json();
+        return data;
+    } catch (error) {
+        if (error instanceof Error) {
+            throw new Error(`Failed to update document: ${error.message}`);
+        } else {
+            throw new Error('Failed to update document: Unknown error');
+        }
+    }
+};
+
+const getKxFileByID = async (id: mongoose.Types.ObjectId, fileName: string): Promise<{ presignedUrl: string }> => {
     try {
         const response = await fetch(API_URL + `/documents/${id}/presignedUrl/${fileName}`, {
             method: 'GET',
@@ -134,7 +190,7 @@ const getKxFileByID = async (id: mongoose.Types.ObjectId, fileName:string): Prom
         if (!response.ok) {
             throw new Error(`Error status: ${response.status}`);
         }
-        const data: {presignedUrl: string} = await response.json();
+        const data: { presignedUrl: string } = await response.json();
         return data;
     } catch (error) {
         if (error instanceof Error) {
@@ -197,7 +253,7 @@ const addAttachmentToDocument = async (id: mongoose.Types.ObjectId, files: File[
             body: formData,
             credentials: 'include'
         });
-        
+
         if (!response.ok) {
             throw new Error(`Error status: ${response.status}`);
         }
@@ -230,7 +286,6 @@ const deleteAttachmentFromDocument = async (id: mongoose.Types.ObjectId, fileNam
     }
 }
 
-
 interface Credentials {
     username: string;
     password: string;
@@ -238,47 +293,48 @@ interface Credentials {
 
 const login = async (credentials: Credentials) => {
     const response = await fetch(API_URL + '/sessions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      credentials: 'include',
-      body: JSON.stringify(credentials),
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        credentials: 'include',
+        body: JSON.stringify(credentials),
     });
     if (response.ok) {
-      const user = await response.json();
-      return user;
+        const user = await response.json();
+        return user;
     } else {
-      const errDetails = await response.json();
-      throw errDetails;
+        const errDetails = await response.json();
+        throw errDetails;
     }
-  };
-  
-  const getUserInfo = async () => {
-    const response = await fetch(API_URL + '/sessions/current', {
-      method: 'GET',
-      credentials: 'include'
-    });
-    if (!response.ok) {
-      const errMessage = await response.json();
-      throw errMessage;
-    } else {
-      return response.json();
-    }
-  };
-  
-  const logout = async () => {
-    const response = await fetch(API_URL + '/sessions/current', {
-      method: 'DELETE',
-      credentials: 'include'
-    });
-    if (!response.ok) {
-      const errMessage = await response.json();
-      throw errMessage;
-    } else {
-      return null;
-    }
-  };
+};
 
-const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, getKxFileByID, addAttachmentToDocument, deleteAttachmentFromDocument, login, getUserInfo, logout };
+const getUserInfo = async () => {
+    const response = await fetch(API_URL + '/sessions/current', {
+        method: 'GET',
+        credentials: 'include'
+    });
+    if (!response.ok) {
+        const errMessage = await response.json();
+        throw errMessage;
+    } else {
+        return response.json();
+    }
+};
+
+const logout = async () => {
+    const response = await fetch(API_URL + '/sessions/current', {
+        method: 'DELETE',
+        credentials: 'include'
+    });
+    if (!response.ok) {
+        const errMessage = await response.json();
+        throw errMessage;
+    } else {
+        return null;
+    }
+};
+
+const API = { createKxDocument, getAllKxDocuments, getKxDocumentById, deleteKxDocument, updateKxDocumentDescription, updateKxDocumentInformation, updateKxDocumentConnections, getKxFileByID, addAttachmentToDocument, deleteAttachmentFromDocument, login, getUserInfo, logout, getKxDocumentsAggregateData };
+
 export default API;

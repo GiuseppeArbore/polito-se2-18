@@ -2,12 +2,13 @@ import request from 'supertest';
 import { NextFunction, Request, Response } from 'express';
 import { createKxDocument } from '../src/controller';
 import * as cnt from "../src/controller";
-import {app} from "../index";
+import { app } from "../index";
 import { db } from '../src/db/dao'
-import { AreaType, KxDocumentType, Scale, Stakeholders } from '../src/models/enum';
+import { AreaType, KxDocumentType, ScaleType, Stakeholders } from '../src/models/enum';
 import { KIRUNA_COORDS } from '../src/utils';
 import { randomBytes } from 'crypto';
 import { isUrbanPlanner } from '../src/auth';
+import { Connections, ScaleOneToN } from '../src/models/model';
 
 const TEST_ID = "6738b18f8da44b335177509e";
 const TEST_FILENAME = "filename";
@@ -17,7 +18,8 @@ jest.mock('../src/controller', () => ({
     createKxDocument: jest.fn(),
     handleFileUpload: jest.fn(),
     removeAttachmentFromDocument: jest.fn(),
-    getKxDocumentAggregateData: jest.fn()
+    getKxDocumentAggregateData: jest.fn(),
+    updateKxDocumentConnections: jest.fn()
 }));
 jest.mock("@aws-sdk/client-s3");
 jest.mock("@aws-sdk/s3-request-presigner");
@@ -42,7 +44,7 @@ describe('Document Routes', () => {
             _id: '12345',
             title: 'Unit Test Document',
             stakeholders: [Stakeholders.RESIDENT],
-            scale_info: Scale.TEXT,
+            scale_info: ScaleType.TEXT,
             scale: 10,
             issuance_date: {
                 from: new Date().toISOString()
@@ -69,8 +71,11 @@ describe('Document Routes', () => {
             .send({
                 title: 'Unit Test Document',
                 stakeholders: [Stakeholders.RESIDENT],
-                scale_info: Scale.TEXT,
-                scale: 10,
+                scale_info: ScaleType.TEXT,
+                scale: {
+                    type: ScaleType.ONE_TO_N,
+                    scale: 10
+                } as ScaleOneToN,
                 issuance_date: {
                     from: new Date().toISOString(),
                     to: new Date().toISOString()
@@ -99,8 +104,10 @@ describe('Document Routes', () => {
             .post('/api/documents')
             .send({
                 stakeholders: [Stakeholders.RESIDENT],
-                scale_info: Scale.TEXT,
-                scale: 10,
+                scale: {
+                    type: ScaleType.ONE_TO_N,
+                    scale: 10
+                } as ScaleOneToN,
                 issuance_date: {
                     from: new Date().toISOString()
                 },
@@ -120,8 +127,10 @@ describe('Document Routes', () => {
         const response = await request(app)
             .post('/api/documents')
             .send({
-                scale_info: Scale.TEXT,
-                scale: 10,
+                scale: {
+                    type: ScaleType.ONE_TO_N,
+                    scale: 10
+                } as ScaleOneToN,
                 issuance_date: {
                     from: new Date().toISOString()
                 },
@@ -141,8 +150,10 @@ describe('Document Routes', () => {
         const response = await request(app)
             .post('/api/documents')
             .send({
-                scale_info: Scale.TEXT,
-                scale: 10,
+                scale: {
+                    type: ScaleType.ONE_TO_N,
+                    scale: 10
+                } as ScaleOneToN,
                 issuance_date: {
                     from: new Date().toISOString()
                 },
@@ -160,8 +171,10 @@ describe('Document Routes', () => {
         const response = await request(app)
             .post('/api/documents')
             .send({
-                scale_info: Scale.TEXT,
-                scale: 10,
+                scale: {
+                    type: ScaleType.ONE_TO_N,
+                    scale: 10
+                } as ScaleOneToN,
                 issuance_date: {
                     from: new Date().toISOString()
                 },
@@ -180,8 +193,10 @@ describe('Document Routes', () => {
             .send({
                 title: 'Unit Test Document',
                 stakeholders: [Stakeholders.RESIDENT],
-                scale_info: Scale.TEXT,
-                scale: 10,
+                scale: {
+                    type: ScaleType.ONE_TO_N,
+                    scale: 10
+                } as ScaleOneToN,
                 issuance_date: {
                     from: new Date().toISOString()
                 },
@@ -198,7 +213,8 @@ describe('Document Routes', () => {
             });
 
         expect(response.status).toBe(400);
-        expect(response.body.errors[0].msg).toBe('Invalid connections');}
+        expect(response.body.errors[0].msg).toBe('Invalid connections');
+    }
     );
 
     test('Test 7 - POST /api/documents/:id/attachments - nominal case', async () => {
@@ -276,6 +292,42 @@ describe('Document Routes', () => {
 
         expect(response.status).toBe(200);
         expect(cnt.getKxDocumentAggregateData).toHaveBeenCalledTimes(1);
+    });
+    test('Test 12 - PUT /api/documents/:id/connections - update document connections', async () => {
+        jest.spyOn(cnt, "updateKxDocumentConnections").mockImplementation(
+            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+                res.status(200).send();
+            })
+        );
+        const response = await request(app)
+            .put(`/api/documents/${TEST_ID}/connections`)
+            .send({
+                direct: [],
+                collateral: [],
+                projection: [],
+                update: []
+            } as Connections);
+
+        expect(response.status).toBe(200);
+        expect(cnt.updateKxDocumentConnections).toHaveBeenCalledTimes(1);
+    });
+    test('Test 13 - PUT /api/documents/:id/connections - update document connections (malformed object)', async () => {
+        jest.spyOn(cnt, "updateKxDocumentConnections").mockImplementation(
+            jest.fn(async (req: Request, res: Response, next: NextFunction) => {
+                res.status(200).send();
+            })
+        );
+        const response = await request(app)
+            .put(`/api/documents/${TEST_ID}/connections`)
+            .send({
+                direct: [],
+                collateral: [],
+                projection: [],
+                wrongField: []
+            });
+
+        expect(response.status).toBe(400);
+        expect(cnt.updateKxDocumentConnections).toHaveBeenCalledTimes(0);
     });
 
 });

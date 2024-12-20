@@ -1,5 +1,5 @@
-import { DocCoords } from "./models/model";
-import { AreaType } from "./models/enum";
+import { Connections, DocCoords, Scale } from "./models/model";
+import { AreaType, ScaleType } from "./models/enum";
 
 export const KIRUNA_COORDS: [number, number] = [20.26, 67.845];
 
@@ -21,6 +21,26 @@ export function coordDistance(p1: [number, number], p2: [number, number]): numbe
         Math.sin(p1[0]) * Math.sin(p2[0]) + Math.cos(p1[0]) *
         Math.cos(p2[0]) * Math.cos(p2[1] - p1[1])
     );
+}
+
+export function validateConnections(cn: any): cn is Connections {
+    if (typeof cn !== 'object' || !cn.direct || !cn.collateral || !cn.projection || !cn.update)
+        return false;
+    const lists = Object.values(cn);
+    const allItems = lists.flat();
+    const uniqueItems = new Set(allItems);
+    return lists.every(l => Array.isArray(l)) && uniqueItems.size === allItems.length;
+}
+
+export function isScale(sc: any): sc is Scale {
+    return (
+        (sc.type) &&
+        (
+            (sc.type === ScaleType.TEXT) ||
+            (sc.type === ScaleType.BLUEPRINT_EFFECTS) ||
+            (sc.type === ScaleType.ONE_TO_N && Number.isInteger(sc.scale))
+        )
+    )
 }
 
 export function isDocCoords(dc: any): dc is DocCoords {
