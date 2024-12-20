@@ -76,7 +76,7 @@ sections:
 - E2E testing:
   - Total hours estimated 7h
   - Total hours spent     6h 45m 
-  - Nr of test cases   (vedere) 
+  - Nr of test cases  
 - Code review 
   - Total hours estimated 11h 
   - Total hours spent  7h 35m
